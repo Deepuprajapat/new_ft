@@ -1,0 +1,35 @@
+.swiper-horizontal {
+    overflow: visible;
+}
+
+.r-buttons {
+    position: absolute;
+    gap: 1rem;
+    bottom: -2rem; /* Position it below the carousel */
+    left: 50%;
+    transform: translateX(-50%); /* Center it horizontally */
+    display: flex;
+    justify-content: center;
+}
+
+.r-buttons button {
+    font-size: 1.2rem;
+    padding: 0.2rem 0.8rem;
+    color: blue;
+    border: none;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.r-buttons > :nth-child(1) {
+    /* background-color: #EEEEFF; */
+    background-color: #2067d1;
+    color: white;
+}
+
+.r-buttons > :nth-child(2) {
+    /* box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.25); */
+    background-color: #2067d1;
+    color: white;
+}

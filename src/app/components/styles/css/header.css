@@ -1,0 +1,254 @@
+/* General Header Styling */
+header {
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar-brand img {
+  height: 40px;
+}
+
+.navbar-nav .nav-item .nav-link {
+  font-size: 14px;
+  color: black;
+}
+
+.navbar-nav .nav-link:hover {
+  text-decoration: underline;
+}
+
+/* Search Form Styling */
+.header_search_form {
+  margin-top: 5px;
+  position: relative;
+}
+
+.header_search {
+  padding: 10px 9px !important;
+  position: absolute;
+  left: 0;
+  width: 95%;
+  border: 1px solid #00000052;
+}
+
+.header_search:focus {
+  outline: none;
+}
+
+/* Call-to-Action Buttons */
+.call-btn .btn {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+/* Toggler for Mobile */
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  color: black;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  margin: -7px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  min-width: 9rem;
+  font-size: 13px;
+  color: #212529;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, .15);
+  border-radius: 0.25rem;
+}
+
+.dropdown_item {
+  padding: 0px !important;
+  font-weight: 600 !important;
+}
+
+/* Compact Header Styles for Small Screens */
+@media (max-width: 768px) {
+  .navbar-nav {
+      text-align: center;
+      padding: 10px;
+  }
+
+  .navbar-brand img {
+      max-width: 120px;
+  }
+
+  .call-btn a {
+      font-size: 14px;
+      padding: 10px;
+  }
+
+  .header_search_form {
+      width: 100%;
+      margin: 10px 0;
+  }
+}
+
+/* Other Miscellaneous Styles */
+.card-im a {
+  text-decoration: none;
+}
+
+.premium {
+  position: absolute;
+  top: 10%;
+  left: 26%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  text-align: center;
+  background: #2067d1;
+  height: 25px;
+  width: 81px;
+}
+
+.main-slider {
+  background: url('https://res.cloudinary.com/deiuirtja/image/upload/v1713934028/investmango/Image-01_1_bssioj.jpg') !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+}
+
+.listing-home .listing-slide .card-im .list_headline_two {
+  font-size: 24px;
+}
+
+.offer-dec {
+  border: 3px dashed #fff;
+  border-radius: 9px;
+  background: url('https://www.investmango.com/update/img/main-banner.png');
+  padding: 12px;
+  color: #fff;
+}
+
+.blink_me {
+  animation: blinker 1s linear infinite;
+  background: red;
+  padding: 5px !important;
+  margin: 0;
+  color: #fff;
+  display: inline-block;
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}
+
+.top-header {
+  display: none;
+}
+
+.navbar {
+  padding: 0rem 1rem;
+}
+
+.stickyMenu {
+  position: fixed;
+  z-index: 99;
+  width: 100%;
+  transition: all 10s;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Image Container */
+.img-container {
+  position: relative;
+}
+
+.artistic-label {
+  position: absolute;
+  top: 95%;
+  right: 0;
+  transform: translate(0, -50%);
+  padding: 10px;
+  color: white;
+  font-size: 8px;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 600px) {
+  .call-btn {
+      display: none !important;
+  }
+
+  #pics {
+      width: 22%;
+  }
+
+  #heading {
+      margin-left: 85px !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .form-top-home .form .form-group input[type=text] {
+      width: 598px;
+  }
+
+  .form-top-home .form {
+      display: block;
+      margin-top: 297px;
+  }
+
+  header nav .navbar-brand {
+      margin-right: 7px;
+  }
+
+  .navbar-expand-sm > .container {
+      margin-left: -28px;
+  }
+
+  .call-btn a {
+      font-size: 4px;
+  }
+}
+
+.content_li {
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .navbar-expand-sm > .container,
+  .navbar-expand-sm > .container-fluid,
+  .navbar-expand-sm > .container-lg,
+  .navbar-expand-sm > .container-md,
+  .navbar-expand-sm > .container-sm,
+  .navbar-expand-sm > .container-xl {
+      flex-wrap: nowrap;
+  }
+}
+
+@media (max-width: 767px) {
+  .dropdown-menu {
+      margin-left: 0px !important;
+  }
+
+  header nav .navbar-nav .nav-link a.link i {
+      font-size: 12px;
+  }
+
+  #arrow, #arrow1 {
+      width: 24px;
+      height: 100%;
+      position: absolute;
+      right: 0;
+      z-index: 20000;
+  }
+}

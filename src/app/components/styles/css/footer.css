@@ -1,0 +1,116 @@
+/* Footer general styling */
+footer {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  padding-top: 20px; /* Reduced top padding */
+  padding-bottom: 20px; /* Added bottom padding */
+}
+
+.top-footer {
+  padding: 20px 0; /* Reduced padding */
+}
+
+.footer-logo {
+  margin-bottom: 10px; /* Reduced bottom margin */
+  width: 120px; /* Reduced logo size */
+}
+
+.footer-description {
+  font-size: 12px; /* Smaller font size */
+  margin-bottom: 15px; /* Reduced bottom margin */
+  color: #cccccc;
+}
+
+.contact-info li {
+  font-size: 12px; /* Smaller text size */
+  color: #cccccc;
+  margin-bottom: 6px; /* Reduced space between items */
+}
+
+.contact-info a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+.social-links {
+  margin-top: 10px; /* Reduced top margin */
+}
+
+.social-icon {
+  width: 20px; /* Smaller icons */
+  height: 20px;
+  margin-right: 8px; /* Reduced space between icons */
+}
+
+.footer-title {
+  font-size: 14px; /* Smaller title size */
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 15px; /* Reduced bottom margin */
+}
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+}
+
+.contact-list li {
+  font-size: 12px; /* Smaller text size */
+  color: #cccccc;
+  margin-bottom: 6px; /* Reduced space between items */
+}
+
+.quick-links {
+  list-style: none;
+  padding: 0;
+}
+
+.quick-links li {
+  margin-bottom: 6px; /* Reduced space between items */
+}
+
+.quick-links a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.quick-links a:hover {
+  color: #ffa500;
+  text-decoration: underline;
+}
+
+.bottom-footer {
+  background-color: #000000;
+  padding: 8px 0; /* Reduced padding */
+  text-align: center;
+}
+
+.bottom-footer p {
+  margin: 0;
+  font-size: 12px; /* Smaller font size */
+  color: #cccccc;
+}
+
+/* WhatsApp Button */
+.Whatsupbuttn {
+  position: fixed;
+  bottom: 15px; /* Reduced position */
+  right: 15px; /* Reduced position */
+  z-index: 100;
+}
+
+.Whatsupbuttn img {
+  border-radius: 50%;
+  width: 40px; /* Smaller button size */
+  height: 40px;
+  transition: transform 0.3s ease;
+}
+
+.Whatsupbuttn img:hover {
+  transform: scale(1.1);
+}

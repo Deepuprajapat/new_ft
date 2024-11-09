@@ -1,0 +1,165 @@
+/* General Styles */
+.main-body {
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px; /* Optional: Add some padding for spacing */
+  box-sizing: border-box;
+}
+
+/* Card Layout */
+.listing-home {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* Space between cards */
+  justify-content: space-between;
+  margin-top: 40px;
+  overflow: hidden;
+}
+
+.card-im {
+  flex: 1 1 calc(33.33% - 20px); /* One-third width minus gap for precise fit */
+  max-width: calc(33.33% - 20px); /* Ensure three cards fit in one row */
+  box-sizing: border-box;
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  background-color: white;
+}
+
+.card-im:hover {
+  transform: translateY(-5px);
+}
+
+.img-fluid {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.list_headline_two {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.location_im {
+  color: #666;
+}
+
+.details {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.theme-btn {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  border-radius: 4px;
+  display: inline-block;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.theme-btn:hover {
+  background-color: #0056b3;
+  text-decoration: none;
+}
+
+.project-title {
+  margin-top: 50px; /* Control spacing from the header */
+  margin-bottom: 10px; /* Control spacing below the title */
+  font-size: 2em; /* Adjust size for better visual hierarchy */
+}
+
+.styled-link {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.styled-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+/* Adjusting spacing for the paragraph and the following heading */
+p {
+  margin: 5px 0; /* Reduce space around breadcrumb link */
+  font-size: 1em;
+  color: #666;
+}
+
+h2 {
+  margin: 10px 0 20px; /* Controls spacing */
+  font-size: 1.5em;
+  font-weight: 600;
+  text-align: center; /* Centers the text horizontally */
+}
+
+/* Responsive Design for Tablets and Mobile Devices */
+@media (max-width: 1024px) {
+  /* Medium screens (Tablets) */
+  .card-im {
+    flex: 1 1 45%; /* Two cards per row */
+    max-width: 45%;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Small screens (large phones) */
+  .card-im {
+    flex: 1 1 100%; /* Stack the cards */
+    max-width: 100%;
+  }
+  .list_headline_two {
+    font-size: 16px;
+  }
+  .price {
+    font-size: 14px;
+  }
+  .theme-btn {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  .project-title {
+    font-size: 1.75em;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens (small phones) */
+  .main-body {
+    padding: 10px;
+  }
+  .container {
+    padding: 0 10px;
+  }
+  .list_headline_two {
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  .price {
+    font-size: 12px;
+  }
+  .theme-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  .project-title {
+    font-size: 1.5em;
+  }
+}

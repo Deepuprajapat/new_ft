@@ -1,0 +1,140 @@
+.content_index {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  list-style: none;
+}
+.content_index_bg {
+  background-color: #2067d1;
+  padding: 10px;
+  margin: 0;
+}
+.content_index a {
+  color: #fff;
+  text-transform: capitalize;
+}
+ul.content_index {
+  margin: 0;
+  padding: 0;
+}
+.content_index a:hover {
+  text-decoration: none;
+}
+.content_index_fixed {
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  width: 100%;
+}
+#dev {
+  margin-top: -13px;
+  margin-left: 98px;
+}
+#name {
+  margin-right: 176px;
+}
+/* #logo_img {
+} */
+.image-container {
+  position: relative;
+  width: 100%;
+  max-width: 780px !important;
+  overflow: hidden;
+}
+@media (max-width: 600px) {
+  #project_logo {
+    text-align: center;
+  }
+  #dev {
+    margin-left: -51px;
+  }
+  .brochure {
+    display: block !important;
+    margin-bottom: 35px !important;
+  }
+  #dev {
+    display: block;
+  }
+  #short_address {
+    display: none;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  header nav .navbar-brand {
+    margin-right: 7px;
+  }
+  .navbar-expand-sm > .container {
+    margin-left: -28px;
+  }
+  .call-btn a {
+    font-size: 4px;
+  }
+}
+#myDIV {
+  display: none;
+  margin-top: 20px;
+  position: absolute;
+  background: #fff;
+  padding: 16px;
+  z-index: 3;
+  width: 80%;
+  margin-top: 8px;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  box-shadow: 0 3px 8px 0 rgba(0, 106, 194, 0.2);
+}
+@media (max-width: 767px) {
+  #component2 {
+    display: none;
+  }
+}
+.image-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  overflow: hidden;
+}
+#zoom-image {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  transform-origin: center center;
+}
+.zoom-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.zoom-buttons button {
+  font-size: 24px;
+  padding: 8px 12px;
+  background-color: #f2f2f2;
+  border: none;
+  cursor: pointer;
+}
+.zoom-buttons button:hover {
+  background-color: #ddd;
+}
+@media (max-width: 600px) {
+  figure.zoom {
+    height: 213px;
+    width: 100%;
+  }
+}
+figure.zoom {
+  position: relative;
+  border: 5px solid #fff;
+  overflow: hidden;
+  cursor: zoom-in;
+  border-radius: 20px;
+}
+figure.zoom img {
+  transition: opacity 0.5s;
+  display: block;
+  width: 100%;
+}
+figure.zoom img:hover {
+  opacity: 0;
+}

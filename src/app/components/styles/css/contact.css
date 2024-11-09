@@ -1,0 +1,112 @@
+/* ContactUs.css */
+
+h1 {
+  margin-top: 50px; /* Decrease the space above h1 */
+  font-size: 36px;
+  text-align: left; /* Align text to the left */
+}
+
+.main-body {
+    padding: 20px 0;
+  }
+  
+  .container {
+    max-width: 1200px !important;
+    margin: 0 auto;
+  }
+  
+  .styled-link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .styled-link:hover {
+    text-decoration: underline;
+  }
+  
+  /* Contact Details */
+  .box-add {
+    margin-bottom: 20px;
+  }
+  
+  .cont_details {
+    display: flex;
+    align-items: center;
+  }
+  
+  .cont_details i {
+    font-size: 24px;
+    margin-right: 10px;
+  }
+  
+  .aRemove {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .aRemove:hover {
+    text-decoration: underline;
+  }
+  
+  /* Form Styles */
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  .theme-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .theme-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Alerts */
+  .alert {
+    margin-top: 10px;
+  }
+  
+  .alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
+  
+  .alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+  }
+  
+  /* Google Maps */
+  iframe {
+    border: 0;
+    width: 100%;
+    height: 400px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .h3 {
+      font-size: 1.5rem;
+    }
+  
+    .form-control {
+      padding: 8px;
+    }
+  
+    .theme-btn {
+      padding: 8px 16px;
+    }
+  }
+  
