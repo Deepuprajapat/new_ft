@@ -169,7 +169,7 @@ const ContactUs = () => {
                             ></textarea>
                           </div>
                           <div className="col-md-12">
-                            <button type="submit" name="send" id="contact_us" className="theme-btn">
+                            <button type="submit" name="send" id="contact_us" className="btn btn-primary">
                               Send
                             </button>
                             <br />
@@ -199,7 +199,7 @@ const ContactUs = () => {
                                   onChange={handleChange}
                                   required
                                 />
-                                <button style={{ margin: '0' }} id="contact_otp" className="theme-btn" onClick={handleVerifyOTP}>
+                                <button style={{ margin: '0' }} id="contact_otp" className="theme-btn-contact" onClick={handleVerifyOTP}>
                                   Verify OTP
                                 </button>
                               </div>

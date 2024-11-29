@@ -17,7 +17,11 @@ import Contact from "./app/components/pages/Contact";
 import SiteMap from "./app/components/pages/SiteMap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import '@fortawesome/fontawesome-svg-core/styles.css';
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import DeveloperPage from "./app/components/pages/DeveloperPage";
+import AddNewProjects from "./app/components/pages/AddNewProjects";
+import OverviewProjects from "./app/components/pages/OverviewProjects";
+import Dashboard from "./app/components/pages/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -30,14 +34,25 @@ const router = createBrowserRouter([
       { path: "/faq", element: <Faq /> },
       { path: "/allProjects", element: <AllProjects /> },
       { path: "/allProperties", element: <AllProperties /> },
-      { path: "/blogs", element: <Blogs /> },
       { path: "/mango-insights", element: <MangoInsights /> },
+      { path: "/blogs", element: <Blogs /> },
+      { path: "/blogs/:blogUrl", element: <Blogs /> },
       { path: "/career", element: <Career /> },
       { path: "/contact", element: <Contact /> },
       { path: "/sitemap", element: <SiteMap /> },
+      { path: "/developerPage", element: <DeveloperPage /> },
       { path: "/projectDetails", element: <ProjectDetails /> },
-      { path: "/:projectName", element:<ProjectDetails />},
+      { path: "/project/:urlName", element: <ProjectDetails /> },
       { path: "/propertyDetails", element: <PropertyDetails /> },
+      {
+        path: "/",
+        element: <Dashboard />,
+        children: [
+          { path: "/dashboard", element: <OverviewProjects /> }, 
+          {path:"/addnew-projects" ,element:<AddNewProjects/>},
+
+        ],
+      },
     ],
   },
 ]);

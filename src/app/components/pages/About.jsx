@@ -1,10 +1,25 @@
 import React from 'react'
+import '../styles/css/about.css'
 
 const About = () => {
   return (
     <div>
         
       <section class="main-body">
+      <div className="container">
+          <h1>About Us</h1>
+          <p>
+            <a
+              href="http://localhost:3000/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="styled-link"
+            >
+              Home
+            </a>{' '}
+            / About Us
+          </p>
+        </div>
         <div class="containerMain" >
             <div class="content"    >
                 <div class="row padding_im_about" >

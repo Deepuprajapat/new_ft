@@ -14,7 +14,7 @@ const Footer = () => {
             style={{ float: "right" }}
           >
             <img
-              src="../../images/whatsapp1.gif"
+              src= "https://www.investmango.com/images/whatsapp1.gif"
               title="SMS NOW"
               style={{ height: "59px", marginBottom: "3px" }}
               alt="WhatsApp"

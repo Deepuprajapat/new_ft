@@ -1,4 +1,87 @@
+// import React, { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { getAllBlog } from "../../apis/api";
+// import axios from "axios";
+
+// const MangoInsights = () => {
+//   const [blogs, setBlogs] = useState([]);
+//   const navigate = useNavigate(); 
+//   const handleReadMore = (blogUrl) => {
+//     navigate(`/blogs/${blogUrl.toLowerCase().replace(/\s+/g, "-")}`);
+//   };
+
+//   useEffect(() => {
+//     const fetchBlogs = async () => {
+//       const data = await getAllBlog();
+//       setBlogs(data.content || []);
+//     };
+//     fetchBlogs();
+//   }, []);
+
+//   return (
+//     <section className="main-body">
+//       <div className="container">
+//         <h1>Our Blogs</h1>
+//         <p>
+//           <a
+//             href="http://localhost:3000/"
+//             target="_blank"
+//             rel="noopener noreferrer"
+//             className="styled-link"
+//           >
+//             Home
+//           </a>{" "}
+//           / Blogs
+//         </p>
+//         <h2 style={{ textAlign: "center" }}>Read Our Latest Blog</h2>
+//       </div>
+
+//       <div className="main-con">
+//         <div className="container">
+//           <div className="home-blog blog-page">
+//             <div className="blog row">
+//               {blogs.map((blog) => (
+//                 <div key={blog.id} className="col-md-4">
+//                   <div className="item">
+//                     <a href={`/blogs/${blog.blogUrl}`}>
+//                       <img
+//                         src={blog?.images[0] || "path/to/default-image.jpg"}
+//                         alt={blog.alt || "Blog Image"}
+//                         style={{ width: "100%", height: "250px" }}
+//                         className="img-fluid"
+//                         fetchpriority="high"
+//                       />
+//                     </a>
+//                     <p className="title">{blog.headings}</p>
+//                     <small style={{ color: "#666a6f" }}>
+//                       Date - {new Date(blog.createdDate).toLocaleDateString()}
+//                     </small>
+//                     <p className="des">
+//                       {blog.description.slice(0, 100)} . . .
+//                     </p>
+//                     <hr />
+//                     {/* <a href={`/blogs/${blog.blogUrl}`} className="theme-btn">
+//                       read more
+//                     </a> */}
+//                     <button onClick={() => handleReadMore(blog.blogUrl)} className="theme-btn">
+//                       more details
+//                     </button>
+//                   </div>
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default MangoInsights;
+
+
 import React from "react";
+import BlogSection from "./BlogSection"; // Import the reusable component
 
 const MangoInsights = () => {
   return (
@@ -6,132 +89,16 @@ const MangoInsights = () => {
       <div className="container">
         <h1>Our Blogs</h1>
         <p>
-          <a
-            href="http://localhost:3000/"
-            target="_blank"
-            rel="noopener"
-            className="styled-link"
-          >
+          <a href="/" className="styled-link">
             Home
           </a>{" "}
           / Blogs
         </p>
         <h2 style={{ textAlign: "center" }}>Read Our Latest Blog</h2>
       </div>
-
       <div className="main-con">
         <div className="container">
-          <div className="home-blog blog-page">
-            <div className="blog row">
-              <div className="col-md-4">
-                <div className="item">
-                  <a href="/blogs">
-                    <img
-                      src="path/to/image.jpg"
-                      alt="Sample Alt Text"
-                      style={{ width: "100%", height: "250px" }}
-                      className="img-fluid"
-                      fetchpriority="high"
-                    />
-                  </a>
-                  <p className="title">Sample Blog Title</p>
-                  <small style={{ color: "#666a6f" }}>
-                    Date - October 9, 2024
-                  </small>
-                  <p className="des">
-                    This is a sample description of the blog content, which is
-                    shortened to show only the first 100 characters . . .
-                  </p>
-                  <hr />
-                  <a href="/blogs" className="theme-btn">
-                    read more
-                  </a>
-                </div>
-              </div>
-
-              <div className="col-md-4">
-                <div className="item">
-                  <a href="/blog.php/another-blog-url">
-                    <img
-                      src="path/to/another-image.jpg"
-                      alt="Another Alt Text"
-                      style={{ width: "100%", height: "250px" }}
-                      className="img-fluid"
-                      fetchpriority="high"
-                    />
-                  </a>
-                  <p className="title">Another Blog Title</p>
-                  <small style={{ color: "#666a6f" }}>
-                    Date - October 8, 2024
-                  </small>
-                  <p className="des">
-                    This is a sample description for another blog content, which
-                    is also shortened to 100 characters . . .
-                  </p>
-                  <hr />
-                  <a href="/blog.php/another-blog-url" className="theme-btn">
-                    read more
-                  </a>
-                </div>
-              </div>
-
-
-              <div className="col-md-4">
-                <div className="item">
-                  <a href="/blog.php/another-blog-url">
-                    <img
-                      src="path/to/another-image.jpg"
-                      alt="Another Alt Text"
-                      style={{ width: "100%", height: "250px" }}
-                      className="img-fluid"
-                      fetchpriority="high"
-                    />
-                  </a>
-                  <p className="title">Another Blog Title</p>
-                  <small style={{ color: "#666a6f" }}>
-                    Date - October 8, 2024
-                  </small>
-                  <p className="des">
-                    This is a sample description for another blog content, which
-                    is also shortened to 100 characters . . .
-                  </p>
-                  <hr />
-                  <a href="/blog.php/another-blog-url" className="theme-btn">
-                    read more
-                  </a>
-                </div>
-              </div>
-
-
-              <div className="col-md-4">
-                <div className="item">
-                  <a href="/blog.php/another-blog-url">
-                    <img
-                      src="path/to/another-image.jpg"
-                      alt="Another Alt Text"
-                      style={{ width: "100%", height: "250px" }}
-                      className="img-fluid"
-                      fetchpriority="high"
-                    />
-                  </a>
-                  <p className="title">Another Blog Title</p>
-                  <small style={{ color: "#666a6f" }}>
-                    Date - October 8, 2024
-                  </small>
-                  <p className="des">
-                    This is a sample description for another blog content, which
-                    is also shortened to 100 characters . . .
-                  </p>
-                  <hr />
-                  <a href="/blog.php/another-blog-url" className="theme-btn">
-                    read more
-                  </a>
-                </div>
-              </div>
-
-
-            </div>
-          </div>
+          <BlogSection isSwiper={false} />
         </div>
       </div>
     </section>
@@ -139,3 +106,4 @@ const MangoInsights = () => {
 };
 
 export default MangoInsights;
+

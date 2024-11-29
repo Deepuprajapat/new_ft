@@ -9,7 +9,7 @@ header {
 }
 
 .navbar-nav .nav-item .nav-link {
-  font-size: 14px;
+  font-size: 16px;
   color: black;
 }
 
@@ -251,4 +251,8 @@ html {
       right: 0;
       z-index: 20000;
   }
+}
+
+.MuiButton-root {
+  font-size: 1rem; /* Example of changing font size */
 }

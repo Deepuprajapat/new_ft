@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/css/projectCard.css";
-import { getAllProjects } from "../../apis/api";
+import { getAllProject } from "../../apis/api";
 import { useNavigate } from "react-router-dom";
 
 const AllProjects = () => {
@@ -9,14 +9,14 @@ const AllProjects = () => {
   const navigate = useNavigate(); 
   const handleMoreDetails = (name) => {
     // Navigate to the project name directly (without the /projectDetails prefix)
-    navigate(`/${name.toLowerCase().replace(/\s+/g, "-")}`);
+  navigate(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`);
   };
 
   // Fetch projects from the API when the component mounts
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const data = await getAllProjects();
+        const data = await getAllProject();
         console.log("Fetched Projects:", data);
         setProjects(data.content);
       } catch (error) {
@@ -110,8 +110,8 @@ const AllProjects = () => {
                         more details
                       </a> */}
                       <button onClick={() => handleMoreDetails(project.name)} className="project-card-details-btn">
-          more details
-        </button>
+                        more details
+                      </button>
                     </div>
                   </div>
                 ))

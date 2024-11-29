@@ -1,8 +1,28 @@
-import React from 'react';
+//import React from 'react';
+import React, { useState,useEffect } from "react";
+import { getAllBlogByUrl } from "../../apis/api";
+import { useParams } from "react-router-dom";
 // import "../styles/css/blog.css";
 
 
 const Blogs = () => {
+  const [blogData, setBlogData] = useState(null);
+  const { blogUrl } = useParams();
+  useEffect(() => {
+    const fetchData = async () => {
+      if (blogUrl) {
+        try {
+          const data = await getAllBlogByUrl(blogUrl);
+          console.log("Fetched project data:", data);
+          setBlogData(data);
+        } catch (error) {
+          console.error("Error fetching project data:", error);
+        }
+      }
+    };
+    fetchData();
+  }, [blogUrl]);
+
   return (
     <div>
       <section className="main-body">
@@ -18,9 +38,9 @@ const Blogs = () => {
                   <div className="col-md-12">
                     <p id="blog-title">Villa vs Apartment: What's the Better Choice?</p>
                   </div>
-                  <small>Date - 7 Oct 2024</small><br />
+                  <small>{blogData?.schema[4]}</small><br />
                   <div style={{ marginRight: 33 }}>
-                    <img style={{ width: 100 }} src="https://www.investmango.com/img/mango-insights/villa-vs-apartment-whats-the-better-choice.jpg" alt="demi" fetchpriority="high" />
+                    <img src="https://www.investmango.com/img/mango-insights/villa-vs-apartment-whats-the-better-choice.jpg" alt="demi" fetchpriority="high" />
                   </div>
                   <div className="content">
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae necessitatibus ut ipsa reiciendis qui dolore quasi delectus praesentium sed! Vitae excepturi deserunt repellat sed officiis, minus voluptate nemo eum magni!

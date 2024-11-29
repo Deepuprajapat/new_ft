@@ -1,6 +1,5 @@
 // ProjectCard.js
 import React from "react";
-import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import "../styles/css/home.css"; // Link to the updated CSS file
 
@@ -10,14 +9,14 @@ const ProjectCard = ({ project }) => {
   const navigate = useNavigate(); 
   const handleMoreDetails = (name) => {
     // Navigate to the project name directly (without the /projectDetails prefix)
-    navigate(`/${name.toLowerCase().replace(/\s+/g, "-")}`);
+    navigate(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`);
   };
   return (
     <div className="project-card">
       <a href={project.url} target="_blank" rel="noopener noreferrer">
         <img
           alt={project.name}
-          src={project.coverPhoto || defaultImage}
+          src={project.images.imageUrl || defaultImage}
           className="project-card-image"
         />
         <p className="project-card-title">{project.name}</p>
@@ -53,16 +52,6 @@ const ProjectCard = ({ project }) => {
               : (project.minPrice / 100000).toFixed(2) + "L"}
           </b>
         </p>
-        {/* <button onClick={()=>{handleMoreDetails(project.url)}}>
-        <a
-          href={project.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="project-card-details-btn"
-        >
-          more details
-        </a>
-        </button> */}
         <button onClick={() => handleMoreDetails(project.name)} className="project-card-details-btn">
           more details
         </button>
@@ -70,24 +59,5 @@ const ProjectCard = ({ project }) => {
     </div>
   );
 };
-
-// ProjectCard.propTypes = {
-//   project: PropTypes.shape({
-//     id: PropTypes.number.isRequired,
-//     name: PropTypes.string.isRequired,
-//     url: PropTypes.string.isRequired,
-//     coverPhoto: PropTypes.string,
-//     locality: PropTypes.shape({
-//       name: PropTypes.string.isRequired,
-//       city: PropTypes.shape({
-//         name: PropTypes.string.isRequired,
-//       }).isRequired,
-//     }).isRequired,
-//     minSize: PropTypes.number,
-//     maxSize: PropTypes.number,
-//     configuration: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
-//     minPrice: PropTypes.number,
-//   }).isRequired,
-// };
 
 export default ProjectCard;
