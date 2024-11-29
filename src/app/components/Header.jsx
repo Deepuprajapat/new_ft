@@ -1,11 +1,48 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../components/styles/css/header.css"; // Make sure to link to the updated CSS file
+import "../components/styles/css/header.css"; 
 import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/img/logo.jpg";
+import Login from "./pages/Login/Login";
+import { Button } from '@mui/material'; 
+import { currentUser } from "../apis/api";
+// import { currentUser } from "apis/api";/
+
 
 const Header = () => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [modal,setModal ]=useState(false);
+  const [username,setUserName]= useState(null);
+
+ 
+  const openModal = () => {
+    setModal(true); // Open the modal
+  };
+
+  const closeModal = () => {
+    setModal(false); // Close the modal
+  };
+  useEffect(()=>{
+    const token = localStorage.getItem("authToken");
+    console.log("token::::",token);
+    if(token){
+      currentUser(token)
+      .then((response)=>{
+        // console.log("responce check neeshu",JSON.stringify(response.data.firstName));
+        if(response?.data?.firstName && response?.data?.lastName){
+          const fullName=`${response.data.firstName} ${response.data.lastName}`
+          setUserName(fullName);
+          localStorage.setItem("username",fullName);
+        }
+      })
+      .catch((error)=>{
+        console.error("Failed to fetch user details:",error);
+      })
+    }
+  },[]);
+
+
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -116,7 +153,14 @@ const Header = () => {
             <a href="tel:+917428-189-189" className="btn btn-primary btn-sm ml-2">
               <i className="fas fa-phone-alt"></i> 7428-189-189
             </a>
+            {username ?(
+              <Button className="btn btn-primary btn-sm ml-2" ><a href="/dashboard">{username}</a></Button>):(
+            <Button className="btn btn-primary btn-sm ml-2"   onClick={openModal} > Login</Button>
+            )}
+        <Login/>
           </div>
+          
+         
 
           {/* Call-to-Action for Mobile */}
           <div className="call-btn d-lg-none">
@@ -126,6 +170,7 @@ const Header = () => {
           </div>
         </div>
       </nav>
+      <Login isOpen={modal} onClose={closeModal} />
     </header>
   );
 };

@@ -1,0 +1,39 @@
+.overview-projects {
+    padding: 20px;
+    background-color: white ;
+    border-radius: 8px;
+  }
+  .inputDiv input,textarea,select{
+  background: none;
+  outline: none;
+  border: 1px solid grey!important;
+  width: 100%;
+  color: var(--blackColor);
+  font-size: 14px;
+  padding: 10px;
+  border-radius: 10px!important;
+}
+.inputDiv{
+    margin-top: 10px!important;
+}
+.main-input{
+    display: flex;
+    gap: .5rem;
+    justify-content: space-between;
+}
+.main-input .inputDiv{
+    width: 50%;
+    justify-content: space-around;
+}
+.group{
+    display: flex;
+    text-align: center;
+    align-items: center;
+    gap: .5rem;
+}
+.group label{
+    margin: 0;
+}
+option{
+    text-transform: capitalize;
+}
