@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 //import Footer from './Footer'; // Ensure you create a Footer component in the specified path
-//import './Career.css'; // Import your CSS file for styling
-
+// import './Career.css';
+import "../styles/css/career.css" 
+import Accordion from './Accordion';
+import jobOpenings from '../../../utils/jobOpenings';
 const Career = () => {
   // State to manage form inputs
   const [formData, setFormData] = useState({
@@ -19,7 +21,7 @@ const Career = () => {
 
   // State to manage accordion sections
   const [activeAccordion, setActiveAccordion] = useState(null);
-
+  const [className, setClassName] = useState("collapsed");
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -76,76 +78,7 @@ const Career = () => {
   };
 
   // Job openings data
-  const jobOpenings = [
-    {
-      title: 'Sales Manager - Lucknow Location',
-      details: {
-        why: [
-          'Performance and Salary review in six months',
-          'Attractive incentives and mobility across regions (global)',
-          'Fast track growth.',
-          'Unlimited Incentives',
-          'Fastest Growing Cross Border Real Estate Platform',
-          'Diversified role',
-          'Multiple International Scope through Internal Job promotions',
-        ],
-        description: [
-          'Acquiring knowledge on different projects and understanding the complete project',
-          'Making calls to the prospective clients and briefing them about the different investment options',
-          'Sending mails to the clients along with project layout, price list and project PPT, as per the discussion',
-          'Keeping a regular follow up with the client through mails and calls',
-          'Conducting site visits',
-          'Producing innovative ideas and sales strategies to meet objectives',
-          'Develop and increase business by following up on potential leads with face-to-face presentation and meetings with clients and providing them the utmost customer service',
-          'Ensures to submit consistent property sales plans every month or quarterly for corporate sales',
-          'Selling and negotiating skills and Demonstration and Presentation skills',
-        ],
-        skills: [
-          'Bike or Car Mandatory',
-          'Willingness to travel in specific location of Gurgaon',
-          'An empathic communicator with pleasant personality',
-          'Self-driven, well groomed, results-oriented professional with a positive outlook',
-          'Structured and process oriented',
-          'Zeal for multitasking',
-          'Comprehensive towards Facts and Figures',
-        ],
-      },
-    },
-    {
-      title: 'Sales Manager - Gurgaon Location',
-      details: {
-        why: [
-          'Performance and Salary review in six months',
-          'Attractive incentives and mobility across regions (global)',
-          'Fast track growth.',
-          'Unlimited Incentives',
-          'Fastest Growing Cross Border Real Estate Platform',
-          'Diversified role',
-          'Multiple International Scope through Internal Job promotions',
-        ],
-        description: [
-          'Acquiring knowledge on different projects and understanding the complete project',
-          'Making calls to the prospective clients and briefing them about the different investment options',
-          'Sending mails to the clients along with project layout, price list and project PPT, as per the discussion',
-          'Keeping a regular follow up with the client through mails and calls',
-          'Conducting site visits',
-          'Producing innovative ideas and sales strategies to meet objectives',
-          'Develop and increase business by following up on potential leads with face-to-face presentation and meetings with clients and providing them the utmost customer service',
-          'Ensures to submit consistent property sales plans every month or quarterly for corporate sales',
-          'Selling and negotiating skills and Demonstration and Presentation skills',
-        ],
-        skills: [
-          'Bike or Car Mandatory',
-          'Willingness to travel in specific location of Gurgaon',
-          'An empathic communicator with pleasant personality',
-          'Self-driven, well groomed, results-oriented professional with a positive outlook',
-          'Structured and process oriented',
-          'Zeal for multitasking',
-          'Comprehensive towards Facts and Figures',
-        ],
-      },
-    },
-  ];
+  
 
   return (
     <div>
@@ -305,47 +238,8 @@ const Career = () => {
                     <div className="theme_sec">
                       <h5 className="h4">Current Openings</h5>
                     </div>
-
-                    {/* Accordion Sections */}
-                    {jobOpenings.map((job, index) => (
-                      <div key={index} className="accordion-section">
-                        <button
-                          className={`accordion ${activeAccordion === index ? 'active' : ''}`}
-                          onClick={() => toggleAccordion(index)}
-                          aria-expanded={activeAccordion === index}
-                          aria-controls={`panel-${index}`}
-                        >
-                          {job.title} <i className="fa fa-angle-down"></i>
-                        </button>
-                        <div
-                          id={`panel-${index}`}
-                          className={`panel ${activeAccordion === index ? 'show' : ''}`}
-                        >
-                          <br />
-                          <h5>Why Invest Mango?</h5>
-                          <ul>
-                            {job.details.why.map((point, i) => (
-                              <li key={i}>{point}</li>
-                            ))}
-                          </ul>
-                          <h5>Job Description</h5>
-                          <ul>
-                            {job.details.description.map((desc, i) => (
-                              <li key={i}>{desc}</li>
-                            ))}
-                          </ul>
-                          <h5>Desired Skills</h5>
-                          <ul>
-                            {job.details.skills.map((skill, i) => (
-                              <li key={i}>{skill}</li>
-                            ))}
-                          </ul>
-                          <a className="theme-btn" href="#topform">
-                            Apply Now
-                          </a>
-                        </div>
-                      </div>
-                    ))}
+                    <Accordion data={jobOpenings} allowMultipleExpanded={true} />
+                   
                   </div>
                 </div>
               </div>

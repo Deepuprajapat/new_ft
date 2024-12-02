@@ -1,0 +1,83 @@
+
+.group{
+display: flex;
+}
+.accordion{
+    margin-top: 2rem;
+    border: none;
+    display: block;
+    background-color: white;
+    
+}
+.flexCenter {
+    display: flex;
+    row-gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  
+  }
+.accordionItem{
+    background-color: white;
+    border: .8px solid rgba(128,128,128,0.143);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+.accordionItem.expanded{
+    box-shadow: var(--shadow);
+    border-radius: 6px;
+}
+.primaryText {
+    color: white;
+    font-weight: bold;
+    font-size: 2rem;
+  }
+
+.accordionButton{
+    /* background: #2067d1;
+    padding: 1rem;
+    width: 100%;
+    justify-content: space-between;
+    cursor: pointer; */
+    font-weight: 600;
+    font-size: 16px;
+    color: #ffffff;
+    background-color: #2067d1;
+    /* padding: 10px 28px; */
+    padding: 5px 14px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.icon{
+    padding: 10px;
+    background: transparent;
+    border-radius: 5px;
+}
+.icon svg{
+    fill: var(--white);
+}
+.accordionButton .primaryText{
+    font-size: 1.1rem;
+}
+@media (max-width:1024px) {
+   .v-container{
+    flex-direction: column;
+   }
+   @media (max-width:768px) {
+    .accordionButton .primaryText{
+        font-size: 0.8rem;
+    }
+   }
+   @media (max-width: 640px) {
+    .primaryText {
+      font-size: 1.5rem;
+    }
+    .orangeText {
+      font-size: 1.2rem;
+    }
+  }
+}
+
