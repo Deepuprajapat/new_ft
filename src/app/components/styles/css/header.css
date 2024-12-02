@@ -256,13 +256,16 @@ html {
   padding: 1rem;
 } */
 
-.navbar {
+/* .navbar {
   padding: 0rem 1rem;
   position: fixed;
   z-index: 9999;
   width: 100%;
   background-color: white;
-}
+} */
+ .bg-light{
+  background-color: rgb(255 255 255) !important;
+ }
 .navbar-brand img {
   width: 150px;
   height: auto;

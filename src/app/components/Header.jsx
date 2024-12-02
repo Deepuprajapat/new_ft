@@ -70,7 +70,6 @@ const Header = () => {
 
   return (
 
-<header>
     <Navbar bg="light" expand="lg">
   <Container>
     <Navbar.Brand href="#"> <img src={logo} alt="Invest Mango" title="Invest Mango" className="logo-img" /></Navbar.Brand>
@@ -108,7 +107,6 @@ const Header = () => {
     </Navbar.Collapse>
   </Container>
 </Navbar>
-</header>
     // <header>
     //   <nav className="navbar navbar-expand-lg navbar-light py-2">
     //     <div className="container">
