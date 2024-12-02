@@ -7,7 +7,13 @@ import Login from "./pages/Login/Login";
 import { Button } from '@mui/material'; 
 import { currentUser } from "../apis/api";
 // import { currentUser } from "apis/api";/
-
+import Nav from 'react-bootstrap/Nav';
+// import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import { Container,Navbar,NavbarBrand } from "react-bootstrap";
+// import navItems from "../../utils/navbar";
+import navItems from "../../utils/navbar";
+import { FaSearch, FaPhoneAlt } from "react-icons/fa";
 
 const Header = () => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
@@ -63,115 +69,136 @@ const Header = () => {
   };
 
   return (
-    <header>
-      <nav className="navbar navbar-expand-lg navbar-light py-2">
-        <div className="container">
-          {/* Logo and Brand */}
-          <NavLink to="/" className="navbar-brand">
-            <img src={logo} alt="Invest Mango" title="Invest Mango" className="logo-img" />
-          </NavLink>
 
-          {/* Toggler for Mobile */}
-          <button
-            type="button"
-            className="navbar-toggler"
-            data-toggle="collapse"
-            data-target="#navbar"
-            aria-controls="navbar"
-            aria-expanded="false"
-            aria-label="Toggle navigation menu"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
+<header>
+    <Navbar bg="light" expand="lg">
+  <Container>
+    <Navbar.Brand href="#"> <img src={logo} alt="Invest Mango" title="Invest Mango" className="logo-img" /></Navbar.Brand>
+    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+    <Navbar.Collapse id="basic-navbar-nav">
+      <Nav className="ms-auto">
+        {navItems.map((item,index)=>(
+          item.dropdown?(
+            <NavDropdown title={item.label} id={`nav-dropdown-${index}`} key={index}>
+              {item.dropdown.map((subItem,subIndex)=>(
+                <NavDropdown.Item  href={subItem.path} key={subIndex}>{subItem.label}</NavDropdown.Item>
+              ))}
+  
+          </NavDropdown>
+          ):(
+            <Nav.Link  href={item.path} key={index}>{item.label}</Nav.Link>
+          )
+        ))}
+        <Nav >
+        {/* <button variant="light" className="search-button">
+              <FaSearch />
+            </button> */}
+            <button  >
+              <a href="tel:+918595-189-189">
+              <FaPhoneAlt /> 8595-189-189</a>
+            </button>
+            <button  >
+            <a href="tel:+918595-189-189">
+              <FaPhoneAlt /> 7428-189-189</a>
+            </button>
+            <Login isOpen={modal} onClose={closeModal} />
+        </Nav>
+        
+      </Nav>
+    </Navbar.Collapse>
+  </Container>
+</Navbar>
+</header>
+    // <header>
+    //   <nav className="navbar navbar-expand-lg navbar-light py-2">
+    //     <div className="container">
+    //       <NavLink to="/" className="navbar-brand">
+    //         <img src={logo} alt="Invest Mango" title="Invest Mango" className="logo-img" />
+    //       </NavLink>
+    //       <button
+    //         type="button"
+    //         className="navbar-toggler"
+    //         data-toggle="collapse"
+    //         data-target="#navbar"
+    //         aria-controls="navbar"
+    //         aria-expanded="false"
+    //         aria-label="Toggle navigation menu"
+    //       >
+    //         <span className="navbar-toggler-icon"></span>
+    //       </button>
+    //       <div className="collapse navbar-collapse" id="navbar">
+    //         <ul className="navbar-nav mx-auto">
+    //           <li className="nav-item">
+    //             <NavLink to="/" className="nav-link">Home</NavLink>
+    //           </li>
+    //           <li className="nav-item dropdown">
+    //             <Link className="nav-link dropdown-toggle" to="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    //               About Us
+    //             </Link>
+    //             <ul className="dropdown-menu" aria-labelledby="aboutDropdown">
+    //               <li><Link className="dropdown-item" to="/about">About</Link></li>
+    //               <li><Link className="dropdown-item" to="/faq">FAQ</Link></li>
+    //               <li><Link className="dropdown-item" to="/video">Our Videos</Link></li>
+    //             </ul>
+    //           </li>
+    //           <li className="nav-item dropdown">
+    //             <Link className="nav-link dropdown-toggle" to="#" id="projectsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    //               Our Projects
+    //             </Link>
+    //             <ul className="dropdown-menu" aria-labelledby="projectsDropdown">
+    //               <li><Link className="dropdown-item" to="/allProjects">All Projects</Link></li>
+    //               <li><Link className="dropdown-item" to="/allProperties">Properties</Link></li>
+    //             </ul>
+    //           </li>
 
-          {/* Navbar Links */}
-          <div className="collapse navbar-collapse" id="navbar">
-            <ul className="navbar-nav mx-auto">
-              <li className="nav-item">
-                <NavLink to="/" className="nav-link">Home</NavLink>
-              </li>
-
-              {/* About Us Dropdown */}
-              <li className="nav-item dropdown">
-                <Link className="nav-link dropdown-toggle" to="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  About Us
-                </Link>
-                <ul className="dropdown-menu" aria-labelledby="aboutDropdown">
-                  <li><Link className="dropdown-item" to="/about">About</Link></li>
-                  <li><Link className="dropdown-item" to="/faq">FAQ</Link></li>
-                  <li><Link className="dropdown-item" to="/video">Our Videos</Link></li>
-                </ul>
-              </li>
-
-              {/* Our Projects Dropdown */}
-              <li className="nav-item dropdown">
-                <Link className="nav-link dropdown-toggle" to="#" id="projectsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Our Projects
-                </Link>
-                <ul className="dropdown-menu" aria-labelledby="projectsDropdown">
-                  <li><Link className="dropdown-item" to="/allProjects">All Projects</Link></li>
-                  <li><Link className="dropdown-item" to="/allProperties">Properties</Link></li>
-                </ul>
-              </li>
-
-              <li className="nav-item">
-                <NavLink to="/mango-insights" className="nav-link">Mango Insights</NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/career" className="nav-link">Career</NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/contact" className="nav-link">Contact Us</NavLink>
-              </li>
-
-              {/* Search Icon */}
-              <li className="nav-item">
-                <button onClick={toggleSearch} className="btn btn-link p-0">
-                  <i className="fa fa-search" aria-hidden="true"></i>
-                </button>
-              </li>
-            </ul>
-
-            {/* Search Input */}
-            {isSearchVisible && (
-              <form action="/search" method="GET" autoComplete="off" className="header_search_form">
-                <input
-                  type="search"
-                  name="search"
-                  className="header_search"
-                  placeholder="Search using Project Name"
-                />
-              </form>
-            )}
-          </div>
-
-          {/* Call-to-Action Buttons */}
-          <div className="call-btn d-none d-lg-flex">
-            <a href="tel:+919595-189-189" className="btn btn-primary btn-sm">
-              <i className="fas fa-phone-alt"></i> 8595-189-189
-            </a>
-            <a href="tel:+917428-189-189" className="btn btn-primary btn-sm ml-2">
-              <i className="fas fa-phone-alt"></i> 7428-189-189
-            </a>
-            {username ?(
-              <Button className="btn btn-primary btn-sm ml-2" ><a href="/dashboard">{username}</a></Button>):(
-            <Button className="btn btn-primary btn-sm ml-2"   onClick={openModal} > Login</Button>
-            )}
-        <Login/>
-          </div>
-          
-         
-
-          {/* Call-to-Action for Mobile */}
-          <div className="call-btn d-lg-none">
-            <a href="tel:+919595-189-189" className="btn btn-primary btn-sm">
-              <i className="fas fa-phone-alt"></i>
-            </a>
-          </div>
-        </div>
-      </nav>
-      <Login isOpen={modal} onClose={closeModal} />
-    </header>
+    //           <li className="nav-item">
+    //             <NavLink to="/mango-insights" className="nav-link">Mango Insights</NavLink>
+    //           </li>
+    //           <li className="nav-item">
+    //             <NavLink to="/career" className="nav-link">Career</NavLink>
+    //           </li>
+    //           <li className="nav-item">
+    //             <NavLink to="/contact" className="nav-link">Contact Us</NavLink>
+    //           </li>
+    //           <li className="nav-item">
+    //             <button onClick={toggleSearch} className="btn btn-link p-0">
+    //               <i className="fa fa-search" aria-hidden="true"></i>
+    //             </button>
+    //           </li>
+    //         </ul>
+    //         {isSearchVisible && (
+    //           <form action="/search" method="GET" autoComplete="off" className="header_search_form">
+    //             <input
+    //               type="search"
+    //               name="search"
+    //               className="header_search"
+    //               placeholder="Search using Project Name"
+    //             />
+    //           </form>
+    //         )}
+    //       </div>
+    //       <div className="call-btn d-none d-lg-flex">
+    //         <a href="tel:+919595-189-189" className="btn btn-primary btn-sm">
+    //           <i className="fas fa-phone-alt"></i> 8595-189-189
+    //         </a>
+    //         <a href="tel:+917428-189-189" className="btn btn-primary btn-sm ml-2">
+    //           <i className="fas fa-phone-alt"></i> 7428-189-189
+    //         </a>
+    //         {username ?(
+    //           <Button className="btn btn-primary btn-sm ml-2" ><a href="/dashboard">{username}</a></Button>):(
+    //         <Button className="btn btn-primary btn-sm ml-2"   onClick={openModal} > Login</Button>
+    //         )}
+    //     <Login/>
+    //       </div>
+    //       <div className="call-btn d-lg-none">
+    //         <a href="tel:+919595-189-189" className="btn btn-primary btn-sm">
+    //           <i className="fas fa-phone-alt"></i>
+    //         </a>
+    //       </div>
+    //     </div>
+    //   </nav>
+    //   <Login isOpen={modal} onClose={closeModal} />
+    // </header>
   );
 };
 

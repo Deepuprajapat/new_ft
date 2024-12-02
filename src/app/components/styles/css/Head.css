@@ -12,13 +12,7 @@
         display: none;
     }
 
-    .navbar {
-        padding: 0rem 1rem;
-        position: fixed;
-        z-index: 9999;
-        width: 100%;
-        background-color: white;
-    }
+    
     .main-slider {
         height: 663px !important;
     }

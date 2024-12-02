@@ -6,19 +6,19 @@ h1 {
   text-align: left; /* Align text to the left */
 }
 
-.main-body {
+/* .main-body {
     padding: 20px 0;
-  }
+  } */
   
-  .container {
+  /* .container {
     max-width: 1200px !important;
     margin: 0 auto;
-  }
+  } */
   
-  .styled-link {
+  /* .styled-link {
     color: #007bff;
     text-decoration: none;
-  }
+  } */
   
   .styled-link:hover {
     text-decoration: underline;

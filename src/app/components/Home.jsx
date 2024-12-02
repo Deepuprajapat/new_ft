@@ -65,11 +65,11 @@ const Head = () => {
 
   return (
     <div>
-       {showPopup && <CityPopup onClose={closePopup} />}
+       {/* {showPopup && <CityPopup onClose={closePopup} />} */}
       <section className="main-body">
         <div className="main-slider">
           <div className="form-top-home">
-            <div className="container">
+            {/* <div className="container">
               <form
                 method="POST"
                 action="#"
@@ -109,7 +109,6 @@ const Head = () => {
                       placeholder="Search using Project Name"
                     />
                     <datalist id="projects">
-                      {/* Add options here if needed */}
                     </datalist>
                   </div>
                   <div className="form-group">
@@ -134,7 +133,7 @@ const Head = () => {
                   </div>
                 </div>
               </form>
-            </div>
+            </div> */}
           </div>
         </div>
 

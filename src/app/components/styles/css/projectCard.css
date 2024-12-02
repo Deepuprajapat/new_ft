@@ -1,14 +1,14 @@
 /* General Styles */
-.main-body {
+/* .main-body {
   padding: 20px;
-}
+} */
 
-.container {
+/* .container {
   width: 100%;
   margin: 0 auto;
-  padding: 0 20px; /* Optional: Add some padding for spacing */
+  padding: 0 20px; 
   box-sizing: border-box;
-}
+} */
 
 /* Card Layout */
 .listing-home {
@@ -106,15 +106,15 @@
   font-size: 2em; /* Adjust size for better visual hierarchy */
 }
 
-.styled-link {
+/* .styled-link {
   text-decoration: none;
   color: #007bff;
-}
+} */
 
-.styled-link:hover {
+/* .styled-link:hover {
   color: #0056b3;
   text-decoration: underline;
-}
+} */
 
 /* Adjusting spacing for the paragraph and the following heading */
 p {

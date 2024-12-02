@@ -1,4 +1,4 @@
-/* General Header Styling */
+/* 
 header {
   background-color: white;
   border-bottom: 1px solid #ddd;
@@ -17,7 +17,6 @@ header {
   text-decoration: underline;
 }
 
-/* Search Form Styling */
 .header_search_form {
   margin-top: 5px;
   position: relative;
@@ -35,13 +34,10 @@ header {
   outline: none;
 }
 
-/* Call-to-Action Buttons */
 .call-btn .btn {
   padding: 5px 10px;
   font-size: 12px;
 }
-
-/* Toggler for Mobile */
 .navbar-toggler {
   border: none;
 }
@@ -50,7 +46,6 @@ header {
   color: black;
 }
 
-/* Dropdown Menu */
 .dropdown-menu {
   margin: -7px;
   position: absolute;
@@ -71,7 +66,6 @@ header {
   font-weight: 600 !important;
 }
 
-/* Compact Header Styles for Small Screens */
 @media (max-width: 768px) {
   .navbar-nav {
       text-align: center;
@@ -93,7 +87,6 @@ header {
   }
 }
 
-/* Other Miscellaneous Styles */
 .card-im a {
   text-decoration: none;
 }
@@ -160,8 +153,6 @@ header {
 html {
   scroll-behavior: smooth;
 }
-
-/* Image Container */
 .img-container {
   position: relative;
 }
@@ -182,7 +173,6 @@ html {
   display: block;
 }
 
-/* Responsive Media Queries */
 @media (max-width: 600px) {
   .call-btn {
       display: none !important;
@@ -254,5 +244,151 @@ html {
 }
 
 .MuiButton-root {
-  font-size: 1rem; /* Example of changing font size */
+  font-size: 1rem; 
+} */
+/* General Navbar Styling */
+
+
+
+/* Navbar Styles */
+/* .navbar {
+  background-color: #f8f9fa; 
+  padding: 1rem;
+} */
+
+.navbar {
+  padding: 0rem 1rem;
+  position: fixed;
+  z-index: 9999;
+  width: 100%;
+  background-color: white;
 }
+.navbar-brand img {
+  width: 150px;
+  height: auto;
+}
+/* .logo-img {
+  height: 50px;
+  width: auto;
+} */
+
+/* Navigation Links */
+.nav-link {
+  color: #000!important;
+  /* font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 15px; */
+}
+
+/* .nav-link:hover {
+  color: #2067d1;
+
+  text-decoration: none;
+} */
+
+/* Dropdown Styles */
+/* .navbar .dropdown-menu {
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+} */
+
+/* .navbar .dropdown-item {
+  color: #000;
+} */
+
+/* .navbar .dropdown-item:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #2067d1;
+
+} */
+
+/* Phone and Search Button Section */
+.search-button,
+button {
+  border: none;
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 5px 10px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.search-button svg {
+  color: #2067d1;
+
+  font-size: 16px;
+}
+
+button a {
+  text-decoration: none;
+  color: #000;
+  display: flex;
+  align-items: center;
+}
+
+button a svg {
+  margin-right: 5px;
+}
+
+button:hover a {
+  color: white;
+  text-decoration: none;
+
+}
+/* 
+button:hover a svg {
+  color: #2067d1;
+
+} */
+
+/* Button Styles for Phone Numbers */
+button {
+  border: 1px solid #2067d1;
+
+  border-radius: 5px;
+  background-color: #2067d1;
+
+  color: #fff;
+  padding: 8px 12px;
+  transition: all 0.3s ease;
+}
+
+button a {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* button:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+} */
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.5rem;
+  }
+
+  .logo-img {
+    height: 40px;
+  }
+
+  .nav-link {
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+  button {
+    font-size: 12px;
+    padding: 5px 8px;
+  }
+
+  button a {
+    font-size: 12px;
+  }
+}
+

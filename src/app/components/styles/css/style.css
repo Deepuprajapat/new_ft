@@ -3,7 +3,7 @@
 /* main-font:"Sofia Pro",sans-serif;
 	second-font:"Jost",sans-serif; */
 body {
-  font-family: main-font;
+  font-family: 'Inter', sans-serif;
   position: relative;
 }
 
@@ -11,9 +11,9 @@ p {
   margin: 0;
   padding: 0;
 }
-.container {
+/* .container {
   max-width: 1300px !important;
-}
+} */
 header {
   box-shadow: 0 4px 20px 0 #00000005;
   background: #fff;
@@ -626,13 +626,13 @@ header {
 }
 .main-con {
   .content {
-    padding: 90px 0;
+    padding: 20px 0;
     .row {
       align-items: center;
     }
-    .padding_im_about {
+    /* .padding_im_about {
       padding: 60px 0;
-    }
+    } */
     .h1 {
       font-family: main-font;
       font-size: 35px;
@@ -661,7 +661,7 @@ header {
       }
     }
     .p_n {
-      font-family: main-font;
+      font-family: 'Inter', sans-serif;
       font-size: 16px;
       color: #3f3f3f;
       letter-spacing: 0.2px;
@@ -839,13 +839,13 @@ footer {
     padding: 11px 20px !important;
     border-bottom: 1px solid #c5c5c5;
   }
-  .call-btn a {
+  /* .call-btn a {
     display: block;
     margin-top: 10px;
     margin-left: 0;
     padding: 10px;
     font-size: 12px;
-  }
+  } */
   .form-top-home {
     .container {
       position: static;
