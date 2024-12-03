@@ -50,19 +50,19 @@ const Header = () => {
 
 
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const navbarCollapse = document.querySelector(".navbar-collapse");
-      if (window.scrollY > 0) {
-        navbarCollapse.classList.remove("show");
-      } else {
-        navbarCollapse.classList.add("show");
-      }
-    };
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const navbarCollapse = document.querySelector(".navbar-collapse");
+  //     if (window.scrollY > 0) {
+  //       navbarCollapse.classList.remove("show");
+  //     } else {
+  //       navbarCollapse.classList.add("show");
+  //     }
+  //   };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, []);
 
   const toggleSearch = () => {
     setIsSearchVisible(!isSearchVisible);

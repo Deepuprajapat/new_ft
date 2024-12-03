@@ -45,7 +45,13 @@ const Accordion = ({ data, allowMultipleExpanded = false, preExpanded = [0] }) =
               </AccordionItemButton>
             </AccordionItemHeading>
             <AccordionItemPanel>
-              <p className="secondaryText">{item.detail}</p>
+                {Array.isArray(item.detail) ? (
+                  item.detail.map((detail, i) => <p key={i} className="p_n">{detail}</p>)
+                ) : (
+                  <p className="p_n">{item.detail}</p>
+                )}
+              {/* <p className="secondaryText">{item.detail}</p>
+              <a class="theme-btn" href="#topform">Apply Now</a> */}
             </AccordionItemPanel>
           </AccordionItem>
         );
@@ -53,5 +59,4 @@ const Accordion = ({ data, allowMultipleExpanded = false, preExpanded = [0] }) =
     </AccessibleAccordion>
   );
 };
-
 export default Accordion;

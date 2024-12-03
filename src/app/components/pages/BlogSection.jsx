@@ -58,7 +58,8 @@ const BlogSection = ({ isSwiper }) => {
 };
 
 const BlogCard = ({ blog }) => (
-  <div className="item">
+  <div className="item" style={{ padding: '20px' }}>
+
     <a href={`/blogs/${blog.blogUrl}`}>
       <img
         src={blog?.images[0] || "path/to/default-image.jpg"}
@@ -75,7 +76,7 @@ const BlogCard = ({ blog }) => (
     <p className="des">{blog.description.slice(0, 100)} . . .</p>
     <hr />
     <a href={`/blogs/${blog.blogUrl}`} className="theme-btn">
-      More Details
+      Read More
     </a>
   </div>
 );

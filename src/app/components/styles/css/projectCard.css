@@ -39,7 +39,7 @@
 .img-fluid {
   width: 100%;
   height: auto;
-  /* border-radius: 8px; */
+  border-radius: 10px;
 }
 /* .details-gallery {
   background-color: #fcfdfe;
@@ -81,7 +81,7 @@
 .price {
   font-size: 16px;
   font-weight: bold;
-  color: #007bff;
+  color: black;
 }
 
 /* .theme-btn {

@@ -6,6 +6,10 @@
   }
 }
 
+#blog-title{
+  font-size: 35px;
+  font-weight: 500;
+}
 header nav .navbar-brand img{
 height: 53px;
 }
@@ -51,6 +55,7 @@ background-color: #f2f2f2;
 #blog-title{
 font-size:35px;  
 font-weight:500;
+color: black;
 }
 #blog-space{
 margin-top: -735px;
@@ -59,7 +64,6 @@ margin-top: -735px;
 #blog-title{
 font-size:20px;  
 font-weight:500; 
-}
 }
 /*h2{font-size:0rem!important}*/
 .col-md-4{background-color:#fff;padding:30px;box-shadow:0 3px 12px -1px rgb(7 10 25 / 10%),0 22px 27px -30px rgb(7 10 25 / 10%);margin-top:-2870px;border:2px solid #f1f1f1;width:30%;float:left;position:sticky;top:30px;padding:9px}@media (min-width:992px){.col-md-8{order:1}.col-md-4{order:2}}@media (max-width:992px){.col-md-4{margin-top:20px!important;width:100%}}.main-con .content{padding:20px 11px}#stickyIM{transition:all 10s;position:fixed;width:100%;background:#fff;z-index:9999}p{margin-top:0;margin-bottom:1rem;font-size:15px}.blogs-links ul li a:hover{color:blue}
@@ -140,6 +144,7 @@ height: 100%;
 position: absolute;
 right: 0;
 z-index: 20000;
+}
 }
 }
 }

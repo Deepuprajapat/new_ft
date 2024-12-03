@@ -21,7 +21,7 @@ const Career = () => {
 
   // State to manage accordion sections
   const [activeAccordion, setActiveAccordion] = useState(null);
-  const [className, setClassName] = useState("collapsed");
+  // const [className, setClassName] = useState("collapsed");
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -73,9 +73,9 @@ const Career = () => {
   };
 
   // Handle accordion toggle
-  const toggleAccordion = (index) => {
-    setActiveAccordion(activeAccordion === index ? null : index);
-  };
+  // const toggleAccordion = (index) => {
+  //   setActiveAccordion(activeAccordion === index ? null : index);
+  // };
 
   // Job openings data
   
@@ -236,7 +236,7 @@ const Career = () => {
                 <div className="col-md-12">
                   <div>
                     <div className="theme_sec">
-                      <h5 className="h4">Current Openings</h5>
+                      <p>Current Openings</p>
                     </div>
                     <Accordion data={jobOpenings} allowMultipleExpanded={true} />
                    
