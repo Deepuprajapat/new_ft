@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
-//const BASE_URL = process.env.REACT_APP_BASE_URL || "http://192.168.1.52:8282";
+const BASE_URL1 = process.env.REACT_APP_BASE_URL || "http://3.111.119.169:8080";
 let token = "";
 export const login = async (userName, password) => {
   try {
@@ -219,5 +219,70 @@ export const fetchTestimonials = async () => {
   } catch (error) {
     console.error("Error fetching testimonials:", error);
     return []; // Return an empty array in case of error
+  }
+};
+
+
+// export const getAllvacancies = async () => {
+//   try {
+//     const res = await axios.get(`${BASE_URL}/get/all/vacancies`,{
+//       headers:{
+//         "x-auth-token": `${token}`,
+//       },
+//     });
+//     console.log("akansha",this.res)
+//     return res.data;
+//   } catch (error) {
+//     console.error("Error fetching Vacancy:", error);
+//     return { content: [] };
+//   }
+// };
+
+export const fetchAllVacancies = async () => {
+  try {
+    console.log("Starting fetchAllVacancies...");
+
+    const response = await fetch(`${BASE_URL1}/get/all/vacancies`);
+    console.log("Response received:", response);
+
+    if (!response.ok) {
+      console.error("Response not OK:", response.statusText);
+      throw new Error(`Error fetching vacancies: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Parsed JSON data:", data);
+
+    // Check if the expected structure exists
+    if (data && data.content) {
+      console.log("Vacancies content:", data.content);
+    } else {
+      console.warn("No 'content' field in the response data.");
+    }
+
+    return data.content || [];
+  } catch (error) {
+    console.error("Error in fetchAllVacancies:", error.message);
+    return [];
+  } finally {
+    console.log("fetchAllVacancies execution finished.");
+  }
+};
+
+
+// Function to submit hiring form data
+export const submitHiringForm = async (formData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/save/hiring/by/ai`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error(`Error submitting form: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
 };
