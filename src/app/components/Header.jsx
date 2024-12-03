@@ -80,12 +80,12 @@ const Header = () => {
           item.dropdown?(
             <NavDropdown title={item.label} id={`nav-dropdown-${index}`} key={index}>
               {item.dropdown.map((subItem,subIndex)=>(
-                <NavDropdown.Item  href={subItem.path} key={subIndex}>{subItem.label}</NavDropdown.Item>
+                <NavDropdown.Item  href={subItem.path} key={subIndex} target="_blank" >{subItem.label}</NavDropdown.Item>
               ))}
   
           </NavDropdown>
           ):(
-            <Nav.Link  href={item.path} key={index}>{item.label}</Nav.Link>
+            <Nav.Link  href={item.path} key={index} target="_blank">{item.label}</Nav.Link>
           )
         ))}
         <Nav >

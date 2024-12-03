@@ -1,24 +1,26 @@
 import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
+//const BASE_URL = process.env.REACT_APP_BASE_URL || "http://192.168.1.52:8282";
 let token = "";
-export const login = async(userName,password)=>{
+export const login = async (userName, password) => {
   try {
-    const response = await axios.post(`${BASE_URL}/auth/generate-token`,{
-      userName,password
+    const response = await axios.post(`${BASE_URL}/auth/generate-token`, {
+      userName,
+      password,
     });
     token = response.data.token;
-    localStorage.setItem("authToken",token)
-    localStorage.setItem("userName" , userName)
-    console.log("userName"+userName)
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("userName", userName);
+    console.log("userName" + userName);
     return token;
   } catch (error) {
     console.error("Login failed:", error);
     throw error;
   }
-}
+};
 
-axios.interceptors.request.use( 
+axios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("x-auth-token");
     if (token) {
@@ -30,78 +32,74 @@ axios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export const currentUser = async (token)=>{
+export const currentUser = async (token) => {
   try {
-    console.log("token  //////",token);
-    
-    const res=await axios.get(`${BASE_URL}/auth/current`,{
+    console.log("token  //////", token);
+
+    const res = await axios.get(`${BASE_URL}/auth/current`, {
       headers: {
         "x-auth-token": `${token}`,
-    },
+      },
     });
-    console.log("repsonse : :" ,res);
+    console.log("repsonse : :", res);
     return res;
-    
   } catch (error) {
-    console.error('Error fetching Current User:', error);
+    console.error("Error fetching Current User:", error);
     return { content: [] };
   }
-}
-export const getAllLocality = async()=>{
+};
+export const getAllLocality = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/locality/get/all`,{
-      headers:{
-        "x-auth-token":`${token}`,
-      }
-    })
+    const res = await axios.get(`${BASE_URL}/locality/get/all`, {
+      headers: {
+        "x-auth-token": `${token}`,
+      },
+    });
     return res;
-    
   } catch (error) {
-    
-    console.error('Error Fetching Locality',error);
+    console.error("Error Fetching Locality", error);
     return { content: [] };
-    
   }
-}
-export const getAllDeveloper = async()=>{
+};
+export const getAllDeveloper = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/developer/get/all`,{
-      headers:{
-        "x-auth-token":`${token}`
-      }
-    })
+    const res = await axios.get(`${BASE_URL}/developer/get/all`, {
+      headers: {
+        "x-auth-token": `${token}`,
+      },
+    });
     return res;
   } catch (error) {
-    console.error('Error Fetching Developer',error);
+    console.error("Error Fetching Developer", error);
     return { content: [] };
-    
   }
-}
-export const getAllAmenitiesWithCategory = async()=>{
+};
+export const getAllAmenitiesWithCategory = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/amenity/get/all`,{
-      headers:{
-        "x-auth-token":`${token}`
-      }
-    })
+    const res = await axios.get(`${BASE_URL}/amenity/get/all`, {
+      headers: {
+        "x-auth-token": `${token}`,
+      },
+    });
     return res;
   } catch (error) {
-    console.error('Error Fetching in Amenities',error);
+    console.error("Error Fetching in Amenities", error);
     return { content: [] };
   }
-}
+};
 
-export const getAllPropertyConfiguration=async()=>{
+export const getAllPropertyConfiguration = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/project-configuration-type/get/all`);
+    const res = await axios.get(
+      `${BASE_URL}/project-configuration-type/get/all`
+    );
     console.log(JSON.stringify(res.data));
-    return res.data
+    return res.data;
   } catch (error) {
-    console.error('Error fetching in Property Configuration');
-    return {content:[]};
+    console.error("Error fetching in Property Configuration");
+    return { content: [] };
   }
-}
-
+};
 
 export const getAllProject = async (page = 0, size = 20) => {
   try {
@@ -118,9 +116,7 @@ export const getAllProject = async (page = 0, size = 20) => {
 //  get all project by urlname
 export const getAllProjectsByUrlName = async (urlName) => {
   try {
-    const res = await axios.get(
-      `${BASE_URL}/project/get/by/url/${urlName}`
-    );
+    const res = await axios.get(`${BASE_URL}/project/get/by/url/${urlName}`);
     console.log("Data fetch:", res.data); // Logs the data for debugging
     return res.data || {}; // Ensures that if the response body is empty, we return an empty object
   } catch (error) {
@@ -129,13 +125,9 @@ export const getAllProjectsByUrlName = async (urlName) => {
   }
 };
 
-
-
 export const getAllBlogByUrl = async (blogUrl) => {
   try {
-    const res = await axios.get(
-      `${BASE_URL}/blogs/get/by/url/${blogUrl}`
-    );
+    const res = await axios.get(`${BASE_URL}/blogs/get/by/url/${blogUrl}`);
     console.log("Data fetch:", res.data); // Logs the data for debugging
     return res.data || {}; // Ensures that if the response body is empty, we return an empty object
   } catch (error) {
@@ -149,8 +141,8 @@ export const getAllFloor = async (params = {}) => {
   try {
     const res = await axios.get(`${BASE_URL}/floor-plan/get/all`, {
       params: {
-        ...params
-      }
+        ...params,
+      },
     });
     console.log("Data fetched:", res.data); // Logs the data for debugging
     return res.data || {}; // Ensures that if the response body is empty, we return an empty object
@@ -160,14 +152,9 @@ export const getAllFloor = async (params = {}) => {
   }
 };
 
-
-
-
 export const getAllBlog = async () => {
   try {
-    const res = await axios.get(
-      `${BASE_URL}/blogs/get/all`
-    );
+    const res = await axios.get(`${BASE_URL}/blogs/get/all`);
     return res.data;
   } catch (error) {
     console.error("Error fetching Blogs:", error);
@@ -190,16 +177,17 @@ export const getAllDevelopers = async () => {
   }
 };
 
-export const getDeveloperById = async (developerId) =>{
+export const getDeveloperById = async (developerId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/developer/get/by/id/${developerId}`);
+    const response = await axios.get(
+      `${BASE_URL}/developer/get/by/id/${developerId}`
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching developers:", error);
     return [];
   }
-}
-
+};
 
 export const getAllTestimonials = async () => {
   try {
@@ -218,7 +206,9 @@ export const getAllTestimonials = async () => {
 
 export const fetchTestimonials = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/testimonials/get/all?page=0&size=12`);
+    const response = await fetch(
+      `${BASE_URL}/testimonials/get/all?page=0&size=12`
+    );
     if (response.ok) {
       const data = await response.json(); // Parse the JSON response
       return data.content || []; // Return the content array if available
