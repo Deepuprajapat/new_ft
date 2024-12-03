@@ -13,9 +13,9 @@
     }
 
     
-    .main-slider {
+    /* .main-slider {
         height: 663px !important;
-    }
+    } */
     
     /* Media Queries */
     @media (max-width: 600px) {
@@ -23,6 +23,7 @@
             background-color: #2067d1;
             border-radius: 0px;
             margin-top: 497px;
+            padding: 20px;
         }
         .call-btn {
             display: none !important;
@@ -30,10 +31,6 @@
         .main-slider {
             background-position: top !important;
             background-size: 100% !important;
-        }
-        .form-top-home .form {
-            background-color: #2067d1;
-            border-radius: 0px;
         }
         .winter_fest_side {
             display: block !important;
@@ -54,9 +51,7 @@
     .winter_fest_side {
         display: none;
     }
-    .top-header {
-        /* background-image: url('img/main-banner.png'); */
-    }
+    
    
     .top-header p {
         color: #fff;
@@ -103,7 +98,7 @@
         background-repeat: no-repeat;
         background-position-x: 98%;
         background-position-y: 50%;
-    }
+    }   
     *:focus {
         outline: none;
         box-shadow: none !important;

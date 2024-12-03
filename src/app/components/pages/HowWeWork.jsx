@@ -4,8 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const HowWeWork = () => {
   return (
-    <div className="weWork" style={{ marginTop: "-84px" }}>
-      <div className="container">
+
         <div className="col-md-12">
           <div className="headline">
             <p className="sub-headline">How We Work</p>
@@ -72,8 +71,7 @@ const HowWeWork = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    
   );
 };
 

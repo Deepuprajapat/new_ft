@@ -71,18 +71,14 @@
   margin-bottom: 10px;
 }
 
-.testimonial .headline .h3 {
-  font-size: 2.5rem;
-  font-weight: bold;
-}
 
-.testimonial .client-slide .item {
+/* .testimonial .client-slide .item {
   text-align: center;
   padding: 20px;
-  height: 350px; /* Fixed height for the item */
-  overflow: hidden; /* Hide overflow content */
+  height: 350px; 
+  overflow: hidden; 
   position: relative;
-}
+} */
 
 .testimonial .client-slide .checked {
   color: #ffd700; /* Gold color for checked stars */
@@ -153,7 +149,7 @@
 }
 
 /* Styling for the project card */
-.project-card {
+/* .project-card {
   flex: 0 0 auto;
   width: 300px;
   border: 1px solid #e3e3e3;
@@ -168,7 +164,7 @@
   max-width: 100%;
   background-color: #f7f7f7;
   padding: 20px;
-}
+} */
 
 .project-card:hover {
   transform: translateY(-5px);

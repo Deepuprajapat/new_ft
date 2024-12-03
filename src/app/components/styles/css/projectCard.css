@@ -11,18 +11,18 @@
 } */
 
 /* Card Layout */
-.listing-home {
+/* .listing-home {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px; /* Space between cards */
+  gap: 20px; 
   justify-content: space-between;
   margin-top: 40px;
   overflow: hidden;
-}
+} */
 
-.card-im {
-  flex: 1 1 calc(33.33% - 20px); /* One-third width minus gap for precise fit */
-  max-width: calc(33.33% - 20px); /* Ensure three cards fit in one row */
+/* .card-im {
+  flex: 1 1 calc(33.33% - 20px); 
+  max-width: calc(33.33% - 20px); 
   box-sizing: border-box;
   border: 1px solid #e3e3e3;
   border-radius: 8px;
@@ -30,7 +30,7 @@
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
   background-color: white;
-}
+} */
 
 .card-im:hover {
   transform: translateY(-5px);

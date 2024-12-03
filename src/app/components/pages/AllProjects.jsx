@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import "../styles/css/projectCard.css";
 import { getAllProject } from "../../apis/api";
 import { useNavigate } from "react-router-dom";
-
+import ProjectCard from "./ProjectCard";
+import { sliderSettings } from "../../../utils/common";
+// import { sliderSettings } from "../../utils/common";
+import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
+import "swiper/css";
 const AllProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +15,6 @@ const AllProjects = () => {
     navigate(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`);
   };
 
-  // Fetch projects from the API when the component mounts
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -49,75 +52,25 @@ const AllProjects = () => {
         <div className="main-con">
           <div className="container">
             <div className="listing-home listing-page">
+            <div class="listing-slide row">
               {loading ? (
                 <p>Loading projects...</p>
               ) : projects.length > 0 ? (
-                projects.map((project, index) => (
+                projects.map((project,index) => (
+                  
+                        <div class="col-md-4">
                   <div key={index} className="card-im">
-                    <a
-                      href={project.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={project?.coverPhoto}
-                        alt={project?.name}
-                        className="img-fluid"
-                        fetchpriority="high"
-                      />
-
-                      <p className="list_headline_two">{project?.name}</p>
-                    </a>
-
-                    <p className="location_im">
-                      <i className="fas fa-map-marker-alt"></i>{" "}
-                      {`${project?.locality?.name} ${project?.locality?.city?.name}`}
-                    </p>
-                    <p className="details">
-                      <span>
-                        <i className="fas fa-ruler-combined"></i>{" "}
-                        {project?.minSize && project?.maxSize
-                          ? `${project?.minSize} To ${project?.maxSize} Sq.ft.`
-                          : "Size Info"}
-                      </span>
-
-                      <span>
-                        <i className="fa fa-bed" aria-hidden="true"></i>{" "}
-                        {Array.isArray(project.configuration)
-                          ? project.configuration.join(", ")
-                          : project.configuration || "Property Type"}
-                      </span>
-                    </p>
-                    <div className="list-footer">
-                      <p className="price">
-                        Start from{" "}
-                        <b>
-                          ₹
-                          {project.minPrice >= 10000000
-                            ? (project.minPrice / 10000000).toFixed(2) + "Cr"
-                            : (project.minPrice / 100000).toFixed(2) + "L"}
-                        </b>
-                      </p>
-                      {/* <a
-                        href={project.url}
-                        target="_blank"
-                        className="theme-btn"
-                        rel="noopener noreferrer"
-                      >
-                        more details
-                      </a> */}
-                      <button
-                        onClick={() => handleMoreDetails(project.name)}
-                        className="project-card-details-btn"
-                      >
-                        more details
-                      </button>
-                    </div>
+                    <ProjectCard project={project} />
                   </div>
+                  </div>
+                 
+
                 ))
+               
               ) : (
                 <p>No projects available.</p>
               )}
+          </div>
             </div>
           </div>
         </div>

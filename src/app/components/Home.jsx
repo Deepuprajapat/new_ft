@@ -69,7 +69,7 @@ const Head = () => {
       <section className="main-body">
         <div className="main-slider">
           <div className="form-top-home">
-            {/* <div className="container">
+            <div className="container">
               <form
                 method="POST"
                 action="#"
@@ -133,7 +133,7 @@ const Head = () => {
                   </div>
                 </div>
               </form>
-            </div> */}
+            </div>
           </div>
         </div>
 
@@ -142,14 +142,15 @@ const Head = () => {
             <div className="row">
               <div className="offset-md-1"></div>
               <div className="col-md-10">
-                <div className="headline" style={{ display: "contents" }}>
+               
+                <div className="main-con">
+                  <div className="container">
+                  <div className="headline" style={{ display: "contents" }}>
                   <h1 className="h3">Top Projects</h1>
                   <p className="head_p">
                     Connecting people with their dream properties
                   </p>
                 </div>
-                <div className="main-con">
-                  <div className="container">
                     <Swiper {...sliderSettings}>
                       <SliderButton />
                       {loading ? ( // Check if still loading
@@ -180,12 +181,12 @@ const Head = () => {
             <AboutUs />
           </div>
         </div>
-        <div class="weWork" style={{ marginTop: "-84px" }}>
+        <div class="weWork" >
           <div class="container">
             <HowWeWork />
           </div>
         </div>
-        <div class="testimonial" style={{ marginTop: "-86px" }}>
+        <div class="testimonial" >
           <div class="container">
             <Testimonial />
           </div>

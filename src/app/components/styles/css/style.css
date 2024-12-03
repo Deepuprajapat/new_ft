@@ -190,13 +190,13 @@ header {
 
 .form {
   display: flex;
-  padding: 230px;
+  /* padding: 230px; */
   box-shadow: 4px 7px 20px 6px #0000000a;
   border-radius: 0 0 20px 20px;
   justify-content: center;
-  margin-top: 150px;
+  margin-top: 400px;
   .form-group {
-    min-width: 160px;
+    min-width: 181px;
     margin-bottom: 0;
     select {
       border: 0;
@@ -211,9 +211,9 @@ header {
       display: block;
       border-radius: 0;
     }
-    input[type="text"] {
+    /* input[type="text"] {
       width: 500px;
-    }
+    } */
     button {
       display: block;
       min-height: 50px;
@@ -222,7 +222,7 @@ header {
       background-color: #000;
       letter-spacing: 0.5px;
       border-radius: 0;
-      margin-left: 20px;
+      margin-left: 0px;
     }
     label {
       font-weight: 700 !important;
@@ -292,6 +292,7 @@ header {
   }
   .headline {
     display: flex;
+    /* text-align: center; */
     justify-content: space-between;
     .h3 {
       font-family: main-font;
@@ -468,6 +469,7 @@ header {
         width: 120px;
         transition: 0.3s;
         margin: auto;
+        height: 120px;
       }
     }
   }
@@ -793,7 +795,7 @@ footer {
   }
   .form-top-home {
     .form {
-      margin: 15px;
+      /* margin: 15px; */
       .form-group {
         input[type="text"] {
           width: 100%;

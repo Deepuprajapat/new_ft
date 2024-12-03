@@ -35,17 +35,13 @@ const Testimonial = () => {
 
   if (loading) {
     return (
-      <div className="testimonial">
-        <div className="container">
           <p>Loading testimonials...</p>
-        </div>
-      </div>
+       
     );
   }
 
   return (
-    <div className="testimonial">
-      <div className="container">
+   
         <div className="col-md-12">
           <div className="headline">
             <p className="sub-headline">Clients Testimonial</p>
@@ -56,7 +52,7 @@ const Testimonial = () => {
           <div className="client-slide owl-carousel owl-theme" id="testi_slide">
             {testimonials.map((testimonial, index) => (
               <div className="item" key={index}>
-                {[...Array(5)].map((_, i) => (
+                {[...Array(testimonial.rating)].map((_, i) => (
                   <span
                     key={i}
                     className={`fa fa-star ${i < testimonial.rating ? "checked" : ""}`}
@@ -65,20 +61,13 @@ const Testimonial = () => {
                 <p className={`normal ${expanded[index] ? "expanded" : ""}`}>
                   {testimonial.text}
                 </p>
-                {/* <span
-                  className="read-more"
-                  onClick={() => toggleReadMore(index)}
-                >
-                  {expanded[index] ? "Read Less" : "Read More"}
-                </span> */}
                 <h3 className="title">{testimonial.name}</h3>
                 <p className="project">{testimonial.role}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </div>
+     
   );
 };
 

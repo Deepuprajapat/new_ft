@@ -13,12 +13,14 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Container,Navbar,NavbarBrand } from "react-bootstrap";
 // import navItems from "../../utils/navbar";
 import navItems from "../../utils/navbar";
+import Form from 'react-bootstrap/Form';
 import { FaSearch, FaPhoneAlt } from "react-icons/fa";
 
 const Header = () => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [modal,setModal ]=useState(false);
   const [username,setUserName]= useState(null);
+  const [showSearch, setShowSearch] = useState(false);
 
  
   const openModal = () => {
@@ -46,7 +48,10 @@ const Header = () => {
       })
     }
   },[]);
-
+  
+  const handleSearchClick = () => {
+    setShowSearch(!showSearch);
+  };
 
 
 
@@ -89,9 +94,30 @@ const Header = () => {
           )
         ))}
         <Nav >
-        {/* <button variant="light" className="search-button">
-              <FaSearch />
-            </button> */}
+        <div className="search-form-container">
+      {/* Search button */}
+      <button
+        onClick={handleSearchClick}
+        variant="light"
+        className="search-button"
+      >
+        <FaSearch />
+      </button>
+
+      {/* Conditionally render the search input */}
+      {showSearch && (
+        <div className="search-overlay">
+          <Form className="d-flex">
+            <Form.Control
+              type="search"
+              placeholder="Search"
+              className="search-input"
+              aria-label="Search"
+            />
+          </Form>
+        </div>
+      )}
+    </div>
             <button  >
               <a href="tel:+918595-189-189">
               <FaPhoneAlt /> 8595-189-189</a>
