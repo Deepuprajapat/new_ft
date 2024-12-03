@@ -86,14 +86,14 @@
     left: 0;
 }
 .listing-page .listing-slide .card-im{
-    padding: 1px 16px;
+    /* padding: 1px 16px; */
 box-shadow: 2px 2px 5px 0 #00000057;
 width: 100%;
 background-color: #ffffff00 !important;
 }
-.listing-page .listing-slide .card-im img{
+/* .listing-page .listing-slide .card-im img{
     height: auto;
-}
+} */
 .list_headline_two{
     min-height:80px;
 }

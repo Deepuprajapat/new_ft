@@ -12,11 +12,12 @@ const ProjectCard = ({ project }) => {
     navigate(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`);
   };
   return (
+    
     <div className="project-card">
       <a href={project.url} target="_blank" rel="noopener noreferrer">
         <img
           alt={project.name}
-          src={project.images.imageUrl || defaultImage}
+          src={(project.images && project.images[0]?.imageUrl) || defaultImage}
           className="project-card-image"
         />
         <p className="project-card-title">{project.name}</p>
