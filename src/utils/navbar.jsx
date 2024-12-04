@@ -1,6 +1,6 @@
 // navData.js
 
-const navItems = [
+ const navItems = [
     { label: 'Home', path: '/' },
     {
       label: 'About Us',
@@ -22,5 +22,6 @@ const navItems = [
     { label: 'Contact Us', path: '/contact' },
   ];
   
-  export default navItems;
+  
+export default navItems;  
   

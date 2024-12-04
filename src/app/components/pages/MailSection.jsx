@@ -12,7 +12,6 @@ const MailSection = () => {
   };
 
   return (
-    <div className="mail-section">
       <div className="container mail-background">
         <div className="headline">
           <h3 className="h3">Still Confused?</h3>
@@ -91,7 +90,7 @@ const MailSection = () => {
           </form>
         </div>
       </div>
-    </div>
+    
   );
 };
 

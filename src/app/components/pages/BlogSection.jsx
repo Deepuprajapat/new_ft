@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import { sliderSettings } from "../../../utils/common";
 import { Navigation, Pagination } from "swiper/modules";
 import { getAllBlog } from "../../apis/api";
-
+import "../styles/css/blogCard.css";
 const BlogSection = ({ isSwiper }) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,11 +33,6 @@ const BlogSection = ({ isSwiper }) => {
   return isSwiper ? (
     <Swiper
       {...sliderSettings}
-      slidesPerView={3}
-      spaceBetween={20}
-      navigation
-      pagination={{ clickable: true }}
-      modules={[Navigation, Pagination]}
     >
       {blogs.map((blog) => (
         <SwiperSlide key={blog.id}>

@@ -1,4 +1,4 @@
-/* BlogCard.css */
+/* BlogCard.css
 .blog-carousel {
     padding: 20px;
     background: #f8f9fa;
@@ -57,4 +57,44 @@
   .theme-btn:hover {
     background-color: #0056b3;
   }
-  
+   */
+  .title {
+    font-family: 'Lato', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+    min-height: 91px;
+    color: #000;
+    margin: 0;
+    padding: 20px 0 5px;
+}
+.small {
+  color: #89909a;
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: block;
+}
+.theme-btn {
+  font-family: 'Lato', sans-serif;
+  border-radius: 8px;
+  padding: 5px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #fff !important;
+  background-color: #2067d1;
+  border: 2px solid #2067d1;
+  text-decoration: none;
+  display: block;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-top: 15px;
+}
+.des{
+  font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    color: #77808b;
+    letter-spacing: .2px;
+    line-height: 1.3;
+}

@@ -112,4 +112,46 @@ h1 {
       padding: 8px 16px;
     }
   }
+  .col-md-4 .location-item p{
+    margin: 0; padding: 0; font-size: 14px;
+  }
   
+
+.location-item i {
+    font-size: 30px; /* Adjusts the size of the icons */
+    color: #007bff; /* Blue color for the icons */
+    margin-right: 10px; /* Adds space between the icon and the address */
+}
+
+.location-item p {
+    font-size: 16px; /* Adjusts the text size for better readability */
+    line-height: 1.6; /* Adjusts the line height for better spacing between lines */
+    margin-top: 10px; /* Adds space between the icon and the address */
+}
+
+/* Adds spacing between columns in the row */
+.row {
+    display: flex;
+    flex-wrap: wrap; /* Ensures items wrap to the next line on smaller screens */
+}
+
+.col-md-6 {
+    margin-bottom: 20px; /* Adds space between each column */
+}
+
+.location-icon {
+    width: 30px; /* Adjust the size */
+    height: 30px; /* Adjust the size */
+    border-radius: 50%; /* Makes the image round */
+    object-fit: cover; /* Ensures the image covers the circle area */
+    margin-right: 10px; /* Adds some space between the image and text */
+}
+
+.location-item {
+    margin-bottom: 30px;
+}
+@media (max-width: 600px) {
+        .col-md-4 {
+          
+        }
+    }

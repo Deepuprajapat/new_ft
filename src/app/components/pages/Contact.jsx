@@ -100,10 +100,55 @@ const ContactUs = () => {
           <div className="container">
             <div className="content contactUsinner">
               <div className="row">
+              <div className="col-md-12">
+                           
+                           </div>
+                           <div className="col-md-6">
+                            <h2><p className="h3">Head Office</p></h2>
+                            <div className="box-add">
+                            <div className="cont_details">
+                                <i className="fas fa-phone-alt"></i>
+                                <p> <a className="aRemove" href="tel:+918595189189"> +91-8595-189-189</a> <br/> <a  className="aRemove" href="tel:+917428189189">+91-7428-189-189</a>
+                                <br/> <a  className="aRemove" href="tel:+919911189189">+91-9911-189-189</a></p>
+                            </div>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="box-add">
+                            <div className="cont_details">
+                                <i className="fas fa-envelope"></i>
+                                <p><a className="aRemove" href="mailto:info@investmango.com">info@investmango.com</a> <br/><a className="aRemove" href="mailto:hr@investmango.com"> hr@investmango.com</a></p>
+                            </div>
+                            </div>
+                        </div>
+                        <div className="col-md-12">
+                            <h2 className="h3">Office Locations</h2>
+                            <div className="box-add">
+                                <div className="row">
+                                    <div className="col-md-4 location-item">
+                                        <img src="images/Noida.png" alt="Noida Location" className="location-icon"/>
+                                        <span className="city-name"><strong>Noida</strong></span>
+                                        <p >11th Floor, Plot no 6, Magnus Tower, Sector 73, Noida, Uttar Pradesh 201307</p>
+                                    </div>
+                                    <div className="col-md-4 location-item">
+                                        <img src="images/Gurugram.png" alt="Gurugram Location" className="location-icon"/>
+                                        <span className="city-name"><strong>Gurugram</strong></span>
+                                        <p >Office no. 307, Third Floor, (T2) DLF Corporate Green - 2, Sector - 74A, Gurugram, Haryana -122004</p>
+                                    </div>
+                                    <div className="col-md-4 location-item">
+                                        <img src="images/Pune.png" alt="Pune Location" className="location-icon"/>
+                                        <span className="city-name"><strong>Pune</strong></span>
+                                        <p >A-803A, Teerth Technospace, Bengaluru - Mumbai Highway, Baner, Pune, Maharashtra - 411045</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                 <div className="col-md-6">
                   <form id="contactpage" onSubmit={handleSubmit}>
                     <div id="firstcon">
                       <div className="row">
+                     
+                     
                         <div className="col-md-6">
                           <label htmlFor="username">Name :</label>
                           <input

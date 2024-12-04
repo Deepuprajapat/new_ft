@@ -116,6 +116,11 @@
   font-size: 1.1rem;
   margin-top: 10px;
 }
+.swiper-button-prev:after, .swiper-button-next:after{
+  font-size: 10px!important;
+ 
+}
+
 
 .testimonial .client-slide .project {
   font-size: 0.9rem;

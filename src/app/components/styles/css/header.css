@@ -395,6 +395,7 @@ button:hover a {
 .navbar-nav{
 font-weight: 600;
     font-size: 13px;
+    gap:7px
   }
 /* 
 button:hover a svg {
@@ -443,11 +444,16 @@ button a {
   .nav-link {
     font-size: 14px;
     margin-right: 10px;
+    padding: 11px 5px !important;
+    border-bottom: 1px solid #c5c5c5;
+
   }
 
   button {
     font-size: 12px;
     padding: 5px 8px;
+    width: 124px;
+
   }
 
   button a {

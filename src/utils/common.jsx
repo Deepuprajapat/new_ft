@@ -1,4 +1,4 @@
-import { Navigation } from "swiper/modules";
+import { Navigation,Autoplay } from "swiper/modules";
 export const sliderSettings={
     modules:[Navigation],
     navigation:true,
@@ -20,13 +20,24 @@ export const sliderSettings={
         }
     }
 }
-// modules={[Navigation]}
-// navigation
-// loop={true}
-// spaceBetween={20}
-// slidesPerView={1}
-// breakpoints={{
-//   640: { slidesPerView: 1 },
-//   768: { slidesPerView: 2 },
-//   1024: { slidesPerView: 3 },
-// }}
+export const carouselOptions={
+    modules:[Navigation,Autoplay],
+    // navigation:true,
+    loop:true,
+    slidesPerView:1,
+    spaceBetween:50,
+    breakpoints:{
+        480:{
+            slidesPerView:1
+        },
+        600:{
+            slidesPerView:3
+        },
+        700:{
+            slidesPerView:6
+        },
+        1100:{
+            slidesPerView:6
+        }
+    } 
+}

@@ -1739,3 +1739,8 @@ footer {
   .theme-btn:hover {
 	background-color: #0056b3;
 } */
+@media (min-width: 1200px) {
+  .container, .container-lg, .container-md, .container-sm, .container-xl {
+      max-width: 1400px;
+  }
+}

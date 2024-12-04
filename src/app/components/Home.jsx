@@ -2,70 +2,60 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../components/styles/css/style.css";
 import "../components/styles/css/Head.css";
-import "owl.carousel/dist/assets/owl.carousel.css";
-import "owl.carousel/dist/assets/owl.theme.default.css";
 import AboutUs from "../components/pages/AboutUs";
 import OurAssociations from "./pages/OurAssociations";
 import HowWeWork from "./pages/HowWeWork";
 import MailSection from "./pages/MailSection";
 import Testimonial from "./pages/Testimonial";
 import ProjectCard from "./pages/ProjectCard";
-import BlogCard from "./pages/BlogCard";
-// import BlogSection from "./BlogSection"; 
 import BlogSection from "./pages/BlogSection";
 // import Popup from "./pages/Popup";
 import CityPopup from "./pages/Popup";
 import { getAllProject } from "../apis/api";
-import { getAllBlog } from "../apis/api";
 import { sliderSettings } from "../../utils/common";
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import "swiper/css";
 import "./Home.css";
+import withSafeLinks from "../../utils/rel";
 
 const Head = () => {
   const [projects, setProjects] = useState([]);
-  const [blogs, setBlog] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading stat
+  const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
-
-
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowPopup(true);
-    }, 5000); // Show popup after 5 seconds
-
-    return () => clearTimeout(timer); // Cleanup timer
+    }, 5000);
+    return () => clearTimeout(timer); 
   }, []);
 
   const closePopup = () => {
     setShowPopup(false);
   };
 
-
   useEffect(() => {
-    // Fetch projects from API on component mount
     const fetchProjects = async () => {
-      setLoading(true); // Set loading to true when data starts loading
+      setLoading(true); 
       const response = await getAllProject();
       console.log(response.content);
-      setProjects(response.content || []); // Assuming `projects` is the array in response
-      setLoading(false); // Set loading to false after data is loaded
+      setProjects(response.content || []);
+      setLoading(false); 
     };
-    const fetchBlog = async () => {
-      setLoading(true);
-      const response = await getAllBlog();
-      console.log("data of blpog", response.content);
-      setBlog(response.console || []);
-      setLoading(false);
-    };
-    fetchBlog();
+    // const fetchBlog = async () => {
+    //   setLoading(true);
+    //   const response = await getAllBlog();
+    //   console.log("data of blpog", response.content);
+    //   setBlog(response.console || []);
+    //   setLoading(false);
+    // };
+    // // fetchBlog();
     fetchProjects();
   }, []);
 
   return (
     <div>
-       {/* {showPopup && <CityPopup onClose={closePopup} />} */}
+      {/* {showPopup && <CityPopup onClose={closePopup} />} */}
       <section className="main-body">
         <div className="main-slider">
           <div className="form-top-home">
@@ -108,8 +98,7 @@ const Head = () => {
                       name="search"
                       placeholder="Search using Project Name"
                     />
-                    <datalist id="projects">
-                    </datalist>
+                    <datalist id="projects"></datalist>
                   </div>
                   <div className="form-group">
                     <div className="form-top-home-select">
@@ -142,21 +131,18 @@ const Head = () => {
             <div className="row">
               <div className="offset-md-1"></div>
               <div className="col-md-10">
-               
                 <div className="main-con">
                   <div className="container">
-                  <div className="headline" style={{ display: "contents" }}>
-                  <h1 className="h3">Top Projects</h1>
-                  <p className="head_p">
-                    Connecting people with their dream properties
-                  </p>
-                </div>
+                    <div className="headline" style={{ display: "contents" }}>
+                      <h1 className="h3">Top Projects</h1>
+                      <p className="head_p">
+                        Connecting people with their dream properties
+                      </p>
+                    </div>
                     <Swiper {...sliderSettings}>
-                      <SliderButton />
-                      {loading ? ( // Check if still loading
+                      {loading ? (
                         <div className="loader-container">
                           <div className="loader">Loading...</div>{" "}
-                          {/* Loader element */}
                         </div>
                       ) : (
                         <div className="listing-home listing-page row">
@@ -176,54 +162,60 @@ const Head = () => {
           </div>
         </div>
 
-        <div class="about-us">
-          <div class="container">
+        <div className="about-us">
+          <div className="container">
             <AboutUs />
           </div>
         </div>
-        <div class="weWork" >
-          <div class="container">
+        <div className="weWork">
+          <div className="container">
             <HowWeWork />
           </div>
         </div>
-        <div class="testimonial" >
-          <div class="container">
+        <div className="testimonial">
+          <div className="container">
             <Testimonial />
           </div>
         </div>
-        
 
-        <div class="blog-card">
-          <div class="container">
-            <div className="main-con">
-              <div className="container">
-                  {loading ? ( // Check if still loading
-                    <div className="loader-container">
-                      <div className="loader">Loading...</div>{" "}
-                      {/* Loader element */}
-                    </div>
-                  ) : (
-                    <div className="listing-home listing-page row">
-                      {/* {blogs.map((blog) => ( */}
-                        {/* <SwiperSlide key={blog.id}> */}
-                        <BlogSection isSwiper={true} />
-                        {/* </SwiperSlide> */}
-                      {/* ))} */}
-                    </div>
-                  )}
-                {/* </Swiper> */}
-              </div>
+        <div className="home-blog">
+          <div className="container">
+            <div className="headline">
+              <p className="sub-headline">MANGO INSIGHTS</p>
+              <h3 className="h3">
+                An Outlook In The World of
+                <br className="mobiHide" /> Real Estate
+              </h3>
             </div>
+            {loading ? (
+              <div className="loader-container">
+                <div className="loader">Loading...</div>{" "}
+              </div>
+            ) : (
+              <div className="listing-home listing-page row">
+                <BlogSection isSwiper={true} />
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="your-parent-div">
-          <div className="client_slider">
-            <OurAssociations />
+        <div className="home-blog">
+          <div className="container">
+            <div className="headline">
+              <h3 className="h3">Our Associations</h3>
+            </div>
+            {loading ? (
+              <div className="loader-container">
+                <div className="loader">Loading...</div>{" "}
+              </div>
+            ) : (
+              <div className="listing-home listing-page row">
+                <OurAssociations />
+              </div>
+            )}
           </div>
         </div>
-
-        <div class="mail-section">
+        <div className="mail-section">
           <MailSection />
         </div>
       </section>
@@ -231,14 +223,14 @@ const Head = () => {
   );
 };
 
-export default Head;
+export default withSafeLinks(Head);
 
-const SliderButton = () => {
-  const swiper = useSwiper();
-  return (
-    <div className="r-buttons">
-      <button onClick={() => swiper.slidePrev()}>&lt;</button>
-      <button onClick={() => swiper.slideNext()}>&gt;</button>
-    </div>
-  );
-};
+// const SliderButton = () => {
+//   const swiper = useSwiper();
+//   return (
+//     <div className="r-buttons">
+//       <button onClick={() => swiper.slidePrev()}>&lt;</button>
+//       <button onClick={() => swiper.slideNext()}>&gt;</button>
+//     </div>
+//   );
+// };
