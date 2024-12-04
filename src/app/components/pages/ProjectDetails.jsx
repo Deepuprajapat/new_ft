@@ -204,17 +204,17 @@ const ProjectDetails = ({}) => {
 
                 {/* Final two images in smaller size */}
                 <div className="col-md-3">
-                  {projectData.images[1] && (
+                  {projectData.images[3] && (
                     <div className="img-container">
                       <a
-                        href={projectData.images[1].imageUrl}
+                        href={projectData.images[3].imageUrl}
                         data-toggle="lightbox"
                         data-gallery="gallery"
                         className="secondary-image-link"
                       >
                         <img
-                          alt={projectData.images[1].category || "Image"}
-                          src={projectData.images[1].imageUrl}
+                          alt={projectData.images[3].category || "Image"}
+                          src={projectData.images[3].imageUrl}
                           className="img-fluid secondary-image"
                           fetchpriority="high"
                         />
@@ -222,17 +222,17 @@ const ProjectDetails = ({}) => {
                       {/* <div className="artistic-label">Artistic</div> */}
                     </div>
                   )}
-                  {projectData.images[2] && (
+                  {projectData.images[4] && (
                     <div className="img-container">
                       <a
-                        href={projectData.images[2].imageUrl}
+                        href={projectData.images[4].imageUrl}
                         data-toggle="lightbox"
                         data-gallery="gallery"
                         className="secondary-image-link"
                       >
                         <img
-                          alt={projectData.images[2].category || "Image"}
-                          src={projectData.images[2].imageUrl}
+                          alt={projectData.images[4].category || "Image"}
+                          src={projectData.images[4].imageUrl}
                           className="img-fluid secondary-image"
                           fetchpriority="high"
                         />

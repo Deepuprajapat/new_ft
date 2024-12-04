@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 //import Footer from './Footer'; // Ensure you create a Footer component in the specified path
 // import './Career.css';
+import { fetchAllVacancies,submitHiringForm } from "../../apis/api";
 import "../styles/css/career.css" 
 import Accordion from './Accordion';
 import jobOpenings from '../../../utils/jobOpenings';
+
+
+
 const Career = () => {
-  // State to manage form inputs
   const [formData, setFormData] = useState({
     userposition: '',
     username: '',
@@ -19,9 +22,18 @@ const Career = () => {
     fileToUpload: null,
   });
 
-  // State to manage accordion sections
-  const [activeAccordion, setActiveAccordion] = useState(null);
-  // const [className, setClassName] = useState("collapsed");
+  const [positions, setPositions] = useState([]);
+
+  // Fetch positions on component mount
+  useEffect(() => {
+    const loadPositions = async () => {
+      const positionsData = await fetchAllVacancies();
+      setPositions(positionsData);
+    };
+
+    loadPositions();
+  }, []);
+
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -36,49 +48,43 @@ const Career = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Create form data
+    const hiringRequestJson = {
+      userposition: formData.userposition,
+      username: formData.username,
+      usermobile: formData.usermobile,
+      useremail: formData.useremail,
+      userdob: formData.userdob,
+      userexp: formData.userexp,
+      current_ctc: formData.current_ctc,
+      expected_ctc: formData.expected_ctc,
+      notice_period: formData.notice_period,
+    };
+
     const data = new FormData();
-    Object.keys(formData).forEach((key) => {
-      data.append(key, formData[key]);
-    });
+    data.append('hiringRequestJson', JSON.stringify(hiringRequestJson));
+    if (formData.fileToUpload) {
+      data.append('file', formData.fileToUpload);
+    }
 
     try {
-      const response = await fetch('/api/career', { // Replace with your actual API endpoint
-        method: 'POST',
-        body: data,
+      const response = await submitHiringForm(data);
+      alert('Application submitted successfully!');
+      setFormData({
+        userposition: '',
+        username: '',
+        usermobile: '',
+        useremail: '',
+        userdob: '',
+        userexp: '',
+        current_ctc: '',
+        expected_ctc: '',
+        notice_period: '',
+        fileToUpload: null,
       });
-
-      if (response.ok) {
-        alert('Application submitted successfully!');
-        // Reset form
-        setFormData({
-          userposition: '',
-          username: '',
-          usermobile: '',
-          useremail: '',
-          userdob: '',
-          userexp: '',
-          current_ctc: '',
-          expected_ctc: '',
-          notice_period: '',
-          fileToUpload: null,
-        });
-      } else {
-        alert('There was an error submitting your application.');
-      }
     } catch (error) {
-      console.error('Error:', error);
       alert('There was an error submitting your application.');
     }
   };
-
-  // Handle accordion toggle
-  // const toggleAccordion = (index) => {
-  //   setActiveAccordion(activeAccordion === index ? null : index);
-  // };
-
-  // Job openings data
-  
 
   return (
     <div>
@@ -103,22 +109,27 @@ const Career = () => {
             <div className="content" style={{ padding: '20px 0px 60px' }}>
               <div className="row padding_im_about align-self-center">
                 <div className="col-md-4">
-                  <h2 style={{ fontWeight: 700 }}>We want you</h2>
+                  <h2 style={{ fontWeight: 700, textAlign: "left" }}>We want you</h2>
                   <h5 style={{ fontSize: '65px', fontWeight: 800, lineHeight: '60px' }}>
                     Come and Join Us
                   </h5>
                   <p id="topform">Don’t Hesitate to Contact with us for any kind of information</p>
                   <form id="contactForm" onSubmit={handleSubmit} encType="multipart/form-data">
                     <div className="form-group">
-                      <input
-                        type="text"
+                      <select
                         className="form-control"
-                        placeholder="Applying For :"
                         name="userposition"
                         value={formData.userposition}
                         onChange={handleChange}
                         required
-                      />
+                      >
+                        <option value="">Select Position</option>
+                        {positions.map((pos) => (
+                          <option key={pos.id} value={pos.id}>
+                            {pos.designation}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="form-group">
                       <input
@@ -157,7 +168,6 @@ const Career = () => {
                       <input
                         type="date"
                         className="form-control"
-                        placeholder="Date of Birth :"
                         name="userdob"
                         value={formData.userdob}
                         onChange={handleChange}
@@ -227,7 +237,7 @@ const Career = () => {
                     src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/a88e788f-a24a-498c-b72d-0e9913e3b300/public"
                     alt="career"
                     className="img-fluid"
-                    loading="eager" // Replaced 'fetchpriority' with 'loading'
+                    loading="eager"
                   />
                 </div>
               </div>
@@ -239,14 +249,12 @@ const Career = () => {
                       <p>Current Openings</p>
                     </div>
                     <Accordion data={jobOpenings} allowMultipleExpanded={true} />
-                   
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
       </section>
     </div>
   );
