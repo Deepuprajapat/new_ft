@@ -1,5 +1,5 @@
 .swiper-horizontal {
-    overflow: visible;
+  overflow: hidden;
 }
 
 .r-buttons {
@@ -93,3 +93,62 @@
   .listing-home {
     margin-top: 80px; /* Add space to prevent overlap with form on mobile */
   }
+
+  .card-im{
+    border-radius: 20px;
+    width: 340px;
+    margin: auto;
+    max-width: 100%;
+    background-color: #f7f7f7;
+    padding: 20px;
+}
+    
+  
+.testimonial-container {
+  padding: 50px 0;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.testimonial-item {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.stars {
+  margin-bottom: 10px;
+}
+
+.fa-star.checked {
+  color: #ffcc00;
+}
+
+.testimonial-text {
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+.testimonial-name {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.testimonial-role {
+  color: #666;
+}
+
+/* Custom Swiper navigation buttons */
+.swiper-button-next,
+.swiper-button-prev {
+  color: white;
+  transition: color 0.3s;
+  background-color: #2067d1;
+}
+
+/* .swiper-button-next:hover,
+.swiper-button-prev:hover {
+  color: #ffcc00;
+} */

@@ -13,7 +13,7 @@ const ProjectCard = ({ project }) => {
   };
   return (
     
-    <div className="project-card">
+    <div className="card-im">
       <a href={project.url} target="_blank" rel="noopener noreferrer">
         <img
           alt={project.name}

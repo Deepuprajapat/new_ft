@@ -59,7 +59,7 @@ const AllProjects = () => {
                 projects.map((project,index) => (
                   
                         <div class="col-md-4">
-                  <div key={index} className="card-im">
+                  <div key={index}>
                     <ProjectCard project={project} />
                   </div>
                   </div>
