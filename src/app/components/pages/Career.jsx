@@ -1,24 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 //import Footer from './Footer'; // Ensure you create a Footer component in the specified path
 // import './Career.css';
-import { fetchAllVacancies,submitHiringForm } from "../../apis/api";
-import "../styles/css/career.css" 
-import Accordion from './Accordion';
-import jobOpenings from '../../../utils/jobOpenings';
-
-
+import { fetchAllVacancies, submitHiringForm } from "../../apis/api";
+import "../styles/css/career.css";
+import Accordion from "./Accordion";
+import jobOpenings from "../../../utils/jobOpenings";
 
 const Career = () => {
   const [formData, setFormData] = useState({
-    userposition: '',
-    username: '',
-    usermobile: '',
-    useremail: '',
-    userdob: '',
-    userexp: '',
-    current_ctc: '',
-    expected_ctc: '',
-    notice_period: '',
+    userposition: "",
+    username: "",
+    usermobile: "",
+    useremail: "",
+    userdob: "",
+    userexp: "",
+    current_ctc: "",
+    expected_ctc: "",
+    notice_period: "",
     fileToUpload: null,
   });
 
@@ -28,16 +26,19 @@ const Career = () => {
   useEffect(() => {
     const loadPositions = async () => {
       const positionsData = await fetchAllVacancies();
-      setPositions(positionsData);
+      const validPositions = positionsData.filter(
+        (pos) => pos.id && pos.designation
+      );
+      console.log("Valid Positions:", validPositions);
+      setPositions(validPositions);
     };
-
     loadPositions();
   }, []);
 
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'fileToUpload') {
+    if (name === "fileToUpload") {
       setFormData({ ...formData, [name]: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -48,8 +49,9 @@ const Career = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const hiringRequestJson = {
-      userposition: formData.userposition,
+    const data = new FormData();
+    const hiringRequestJson = JSON.stringify({
+      userposition: formData.userposition, // Ensure this is set to the correct ID
       username: formData.username,
       usermobile: formData.usermobile,
       useremail: formData.useremail,
@@ -58,31 +60,21 @@ const Career = () => {
       current_ctc: formData.current_ctc,
       expected_ctc: formData.expected_ctc,
       notice_period: formData.notice_period,
-    };
+    });
 
-    const data = new FormData();
-    data.append('hiringRequestJson', JSON.stringify(hiringRequestJson));
+    console.log("Payload Sent:", hiringRequestJson);
+
+    data.append("hiringRequestJson", hiringRequestJson);
     if (formData.fileToUpload) {
-      data.append('file', formData.fileToUpload);
+      data.append("file", formData.fileToUpload);
     }
 
     try {
       const response = await submitHiringForm(data);
-      alert('Application submitted successfully!');
-      setFormData({
-        userposition: '',
-        username: '',
-        usermobile: '',
-        useremail: '',
-        userdob: '',
-        userexp: '',
-        current_ctc: '',
-        expected_ctc: '',
-        notice_period: '',
-        fileToUpload: null,
-      });
+      console.log("Server Response:", response);
     } catch (error) {
-      alert('There was an error submitting your application.');
+      console.error("Submission Error:", error);
+      alert("There was an error submitting your application.");
     }
   };
 
@@ -99,22 +91,37 @@ const Career = () => {
               className="styled-link"
             >
               Home
-            </a>{' '}
+            </a>{" "}
             / Career
           </p>
         </div>
 
         <div className="main-con">
           <div className="container">
-            <div className="content" style={{ padding: '20px 0px 60px' }}>
+            <div className="content" style={{ padding: "20px 0px 60px" }}>
               <div className="row padding_im_about align-self-center">
                 <div className="col-md-4">
-                  <h2 style={{ fontWeight: 700, textAlign: "left" }}>We want you</h2>
-                  <h5 style={{ fontSize: '65px', fontWeight: 800, lineHeight: '60px' }}>
+                  <h2 style={{ fontWeight: 700, textAlign: "left" }}>
+                    We want you
+                  </h2>
+                  <h5
+                    style={{
+                      fontSize: "65px",
+                      fontWeight: 800,
+                      lineHeight: "60px",
+                    }}
+                  >
                     Come and Join Us
                   </h5>
-                  <p id="topform">Don’t Hesitate to Contact with us for any kind of information</p>
-                  <form id="contactForm" onSubmit={handleSubmit} encType="multipart/form-data">
+                  <p id="topform">
+                    Don’t Hesitate to Contact with us for any kind of
+                    information
+                  </p>
+                  <form
+                    id="contactForm"
+                    onSubmit={handleSubmit}
+                    encType="multipart/form-data"
+                  >
                     <div className="form-group">
                       <select
                         className="form-control"
@@ -124,11 +131,15 @@ const Career = () => {
                         required
                       >
                         <option value="">Select Position</option>
-                        {positions.map((pos) => (
-                          <option key={pos.id} value={pos.id}>
-                            {pos.designation}
-                          </option>
-                        ))}
+                        {positions
+                          .filter((pos) => pos?.designation) // Only include positions with a designation
+                          .map((pos) => (
+                            <option key={pos.id} value={pos.id}>
+                              {" "}
+                              {/* Ensure `pos.id` is valid */}
+                              {pos.designation}
+                            </option>
+                          ))}
                       </select>
                     </div>
                     <div className="form-group">
@@ -233,7 +244,7 @@ const Career = () => {
                 <div className="col-md-2"></div>
                 <div className="col-md-6">
                   <img
-                    style={{ width: '100%' }}
+                    style={{ width: "100%" }}
                     src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/a88e788f-a24a-498c-b72d-0e9913e3b300/public"
                     alt="career"
                     className="img-fluid"
@@ -248,7 +259,10 @@ const Career = () => {
                     <div className="theme_sec">
                       <p>Current Openings</p>
                     </div>
-                    <Accordion data={jobOpenings} allowMultipleExpanded={true} />
+                    <Accordion
+                      data={jobOpenings}
+                      allowMultipleExpanded={true}
+                    />
                   </div>
                 </div>
               </div>

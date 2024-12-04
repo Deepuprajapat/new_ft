@@ -273,16 +273,23 @@ export const fetchAllVacancies = async () => {
 // Function to submit hiring form data
 export const submitHiringForm = async (formData) => {
   try {
-    const response = await fetch(`${BASE_URL}/user/save/hiring/by/ai`, {
-      method: 'POST',
+    console.log("FormData Payload:", Array.from(formData.entries()));
+
+    const response = await fetch(`${BASE_URL1}/user/save/hiring/by/ai`, {
+      method: "POST",
       body: formData,
     });
+
     if (!response.ok) {
-      throw new Error(`Error submitting form: ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(`Error: ${response.status}, Details: ${errorText}`);
     }
-    return await response.json();
+
+    const data = await response.json();
+    console.log("API Response:", data);
+    return data;
   } catch (error) {
-    console.error(error);
+    console.error("Error Submitting Form:", error);
     throw error;
   }
 };

@@ -22,6 +22,7 @@ import DeveloperPage from "./app/components/pages/DeveloperPage";
 import AddNewProjects from "./app/components/pages/AddNewProjects";
 import OverviewProjects from "./app/components/pages/OverviewProjects";
 import Dashboard from "./app/components/pages/Dashboard";
+import CompareProjects from "./app/components/pages/CompareProjects";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,7 @@ const router = createBrowserRouter([
       { path: "/mango-insights", element: <MangoInsights /> },
       { path: "/blogs", element: <Blogs /> },
       { path: "/blogs/:blogUrl", element: <Blogs /> },
+      { path: "/compareProjests", element: <CompareProjects /> },
       { path: "/career", element: <Career /> },
       { path: "/contact", element: <Contact /> },
       { path: "/sitemap", element: <SiteMap /> },
