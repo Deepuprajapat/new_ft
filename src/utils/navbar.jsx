@@ -18,6 +18,7 @@
       ],
     },
     { label: 'Mango Insights', path: '/mango-insights' },
+    { label: 'Compare Projects',path: '/compare'},
     { label: 'Career', path: '/career' },
     { label: 'Contact Us', path: '/contact' },
   ];

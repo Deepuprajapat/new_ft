@@ -38,7 +38,7 @@ const router = createBrowserRouter([
       { path: "/mango-insights", element: <MangoInsights /> },
       { path: "/blogs", element: <Blogs /> },
       { path: "/blogs/:blogUrl", element: <Blogs /> },
-      { path: "/compareProjests", element: <CompareProjects /> },
+      { path: "/compare", element: <CompareProjects /> },
       { path: "/career", element: <Career /> },
       { path: "/contact", element: <Contact /> },
       { path: "/sitemap", element: <SiteMap /> },

@@ -237,7 +237,7 @@ a {
   display: block;
   width: -webkit-fit-content;
   width: -moz-fit-content;
-  /* width: fit-content; */
+  width: fit-content;
   margin-top: 0;
   text-transform: uppercase;
 }

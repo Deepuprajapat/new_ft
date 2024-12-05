@@ -89,11 +89,12 @@ const CompareProjects = () => {
         <p className="lead">Easy way to compare projects</p>
       </div>
 
-      <div className="d-flex justify-content-center mb-4">
+      <div className="d-flex  flex-wrap justify-content-center mb-4">
         {[0, 1, 2].map((index) => (
+            <div key={index} className="d-flex flex-column mx-2 mb-3" style={{ minWidth: "200px" }}>
           <select
             key={index}
-            className="form-select mx-2"
+            className="custom-select form-select mx-2"
             style={{ width: "200px" }}
             value={selectedProjects[index]}
             onChange={(e) => handleSelect(index, e.target.value)}
@@ -105,16 +106,19 @@ const CompareProjects = () => {
               </option>
             ))}
           </select>
+          </div>
         ))}
-        <button className="btn btn-primary" onClick={handleCompare}>
+        <div className="w-100 d-flex justify-content-center">
+        <button className="btn btn-primary" style={{width: 'auto'}} onClick={handleCompare}>
           Compare Now
         </button>
+        </div>
       </div>
 
       {comparedProjects.length > 0 && (
         <div className="table-responsive">
           <h3 className="my-4">Project Comparison</h3>
-          <table className="table table-bordered">
+          <table className="table table-bordered table-responsive">
             <thead>
               {/* <tr>
                 <th>Fields</th>
