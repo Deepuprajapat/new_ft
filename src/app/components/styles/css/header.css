@@ -392,11 +392,11 @@ button:hover a {
   text-decoration: none;
 
 }
-.navbar-nav{
-font-weight: 600;
-    font-size: 13px;
-    gap:7px
-  }
+.navbar-nav {
+  font-weight: 600;
+  font-size: 12px;
+  gap: 0px;
+}
 /* 
 button:hover a svg {
   color: #2067d1;
@@ -427,6 +427,9 @@ button a {
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
+  .phoneButton{
+    display: none;
+  }
   .search-overlay{
     right: 14px;
   }

@@ -118,11 +118,11 @@ const Header = () => {
         </div>
       )}
     </div>
-            <button  >
+            <button className="phoneButton" >
               <a href="tel:+918595-189-189">
               <FaPhoneAlt /> 8595-189-189</a>
             </button>
-            <button  >
+            <button className="phoneButton" >
             <a href="tel:+918595-189-189">
               <FaPhoneAlt /> 7428-189-189</a>
             </button>
