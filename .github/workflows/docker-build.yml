@@ -1,0 +1,31 @@
+name: Build and push docker images to docker hub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: .  
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
+            ${{ secrets.DOCKER_USERNAME }}/docker-test:38282e32
+          file: ./dockerfile
