@@ -1,4 +1,4 @@
-import React from "react";
+import React ,{useState,useEffect}from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
 import "../components/styles/css/footer.css";
@@ -7,7 +7,29 @@ import logo from "../assets/img/logo_investmango.png";
 import withSafeLinks from "../../utils/rel";
 
 const Footer = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
 
+    // Add event listener
+    window.addEventListener("scroll", handleScroll);
+
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // Smooth scrolling
+    });
+  };
  
   return (
     <div>
@@ -32,6 +54,14 @@ const Footer = () => {
         </a>
       </div>
     </div>
+    <button
+      onClick={scrollToTop}
+      id="ScrollTop"
+      title="Go to top"
+      style={{ display: isVisible ? "block" : "none" ,background: '#2067d1'}}
+    >
+      <i className="fas fa-chevron-up"></i>
+    </button>
     
       <footer>
         <div className="Whatsupbuttn" style={{ width: "70px" }}>

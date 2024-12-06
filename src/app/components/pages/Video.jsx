@@ -17,7 +17,7 @@ const Video = () => {
             </a>{" "}
             / Our Videos
           </p>
-          <h2> Latest Videos</h2>
+          <h2 style={{textAlign: 'center'}}> Latest Videos</h2>
         </div>
         <div class="main-con">
   <div class="container">
