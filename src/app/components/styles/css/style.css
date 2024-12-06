@@ -306,8 +306,7 @@ header {
       font-size: 18px;
       color: #77808b;
       padding-bottom: 15px;
-
-      margin-left: 45px;
+      /* margin-left: 45px; */
     }
   }
   .listing-slide {
@@ -928,6 +927,7 @@ footer {
       }
       .head_p {
         text-align: center;
+        font-size: 16px;
       }
     }
     .custom-nav-mobi {
