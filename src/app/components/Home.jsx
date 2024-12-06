@@ -133,7 +133,7 @@ const Head = () => {
               <div className="col-md-10">
                 <div className="main-con">
                   <div className="container">
-                    <div className="headline" style={{ display: "contents" }}>
+                    <div className="headline" style={{ display: "contents",marginTop:' 26px'}}>
                       <h1 className="h3">Top Projects</h1>
                       <p className="head_p">
                         Connecting people with their dream properties

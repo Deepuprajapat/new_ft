@@ -20,15 +20,16 @@ export const sliderSettings={
         }
     }
 }
+
 export const carouselOptions={
     modules:[Navigation,Autoplay],
-    // navigation:true,
+    navigation:true,
     loop:true,
     slidesPerView:1,
     spaceBetween:50,
     breakpoints:{
-        480:{
-            slidesPerView:1
+        380:{
+            slidesPerView:2
         },
         600:{
             slidesPerView:3

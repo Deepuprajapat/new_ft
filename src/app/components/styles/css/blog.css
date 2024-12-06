@@ -16,8 +16,9 @@ height: 53px;
 img{
 width: 100%;
 height: 400px;
-margin-bottom: 20px;
+/* margin-bottom: 20px; */
 }
+
 @media (max-width: 768px) {
 img {
 width: 100%;

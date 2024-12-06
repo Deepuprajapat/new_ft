@@ -1,4 +1,5 @@
 .client_slider .headline .h3 {
+  font-family: 'Lato', sans-serif;
   text-align: center;
   font-size: 2.5rem; /* Increased heading size */
   font-weight: bold; /* Makes the heading bold */
@@ -17,6 +18,7 @@
 
 /* Headline styling */
 .mail-section .headline .h3 {
+  font-family: 'Lato', sans-serif;
   font-size: 2.5rem;
   text-align: center;
   margin-bottom: 10px;
@@ -29,13 +31,13 @@
 }
 
 /* Button styling */
-.mail-section .theme-btn {
+/* .mail-section .theme-btn {
   background-color: #007bff;
   color: white;
   border: none;
   padding: 10px 20px;
   cursor: pointer;
-}
+} */
 
 .mail-section .theme-btn:hover {
   background-color: #0056b3;
@@ -145,12 +147,12 @@
 
 /* Adjust the layout to allow horizontal scrolling */
 .listing-home {
-  display: flex;
+  /* display: flex; */
   overflow-x: hidden;
   gap: 20px; /* Space between cards */
 
   scroll-behavior: smooth; /* Smooth scroll */
-  margin-top: 40px;
+  /* margin-top: 40px; */
 }
 
 /* Styling for the project card */
@@ -269,7 +271,8 @@ a {
 }
 
 .main-con {
-  position: relative; /* Ensures that elements inside the container won't be overlapped by the loader */
+  position: relative; 
+  padding: 20px;
 }
 
 h1,

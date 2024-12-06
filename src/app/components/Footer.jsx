@@ -7,8 +7,32 @@ import logo from "../assets/img/logo_investmango.png";
 import withSafeLinks from "../../utils/rel";
 
 const Footer = () => {
+
+ 
   return (
     <div>
+   <div className="CTA">
+      <div className="whatsapp">
+        <a
+          href="https://api.whatsapp.com/send?phone=+918368547490&text=Hi%2C%20I%27m%20interested%20in%20Invest%20Mango.%20Please%20share%20details%20about%20this%20project."
+          // style={{ fontSize: "20px" }}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <i className="fab fa-whatsapp"></i> WhatsApp
+        </a>
+      </div>
+      <div className="callnow">
+        <a href="tel:+918368547490">
+          <i
+            style={{ transform: "rotate(95deg)" }}
+            className="fas fa-phone"
+          ></i>{" "}
+          8368547490
+        </a>
+      </div>
+    </div>
+    
       <footer>
         <div className="Whatsupbuttn" style={{ width: "70px" }}>
           <a
@@ -28,10 +52,10 @@ const Footer = () => {
         <div className="container">
           <div className="row">
             {footerItems.map((column, colIndex) => (
-              <div className="col-6 col-md-3" key={colIndex}>
-                <ul className="footer-links">
+              <div className="col-md-3" key={colIndex}>
+                <ul className="footer-links" >
                   {column.map((footerUrl, index) => (
-                    <li key={index}>
+                    <li key={index} >
                       <a href={footerUrl.href}>{footerUrl.projectName}</a>
                     </li>
                   ))}
@@ -55,11 +79,11 @@ const Footer = () => {
                 <p className="normal">
                   Giving the right experience to our Clients!
                 </p>
-                <ul className="content_li">
+                <ul className="content_li" style={{ color:' #737373'}}>
                   <li>
                     <a
                       href="mailto:info@investmango.com"
-                      style={{ color: "white" }}
+                     
                     >
                       <i className="fas fa-envelope"></i> info@investmango.com
                     </a>
@@ -157,9 +181,9 @@ const Footer = () => {
               </div>
 
               {/* Our Projects */}
-              <div className="col-md-3">
+              <div className="col-md-3" id="our-project">
                 <h5 className="headline">Our Projects</h5>
-                <ul >
+                <ul>
                   <li>
                     <a href="/projects/ace-divino">ACE Divino</a>
                   </li>

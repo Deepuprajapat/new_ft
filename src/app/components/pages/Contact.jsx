@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import "../styles/css/contact.css";
-import axios from 'axios'; // Optional, you can use fetch instead
+import axios from 'axios'; 
+// import {noidaImage}  from './';
+import noidaImage from "../../assets/img/Noida.png";
+
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -101,10 +104,10 @@ const ContactUs = () => {
             <div className="content contactUsinner">
               <div className="row">
               <div className="col-md-12">
-                           
+              <h2><p className="h3">Head Office</p></h2>
                            </div>
                            <div className="col-md-6">
-                            <h2><p className="h3">Head Office</p></h2>
+                            
                             <div className="box-add">
                             <div className="cont_details">
                                 <i className="fas fa-phone-alt"></i>
@@ -126,17 +129,17 @@ const ContactUs = () => {
                             <div className="box-add">
                                 <div className="row">
                                     <div className="col-md-4 location-item">
-                                        <img src="images/Noida.png" alt="Noida Location" className="location-icon"/>
+                                        <img src={noidaImage} alt="Noida Location" className="location-icon"/>
                                         <span className="city-name"><strong>Noida</strong></span>
                                         <p >11th Floor, Plot no 6, Magnus Tower, Sector 73, Noida, Uttar Pradesh 201307</p>
                                     </div>
                                     <div className="col-md-4 location-item">
-                                        <img src="images/Gurugram.png" alt="Gurugram Location" className="location-icon"/>
+                                        <img src={noidaImage} alt="Gurugram Location" className="location-icon"/>
                                         <span className="city-name"><strong>Gurugram</strong></span>
                                         <p >Office no. 307, Third Floor, (T2) DLF Corporate Green - 2, Sector - 74A, Gurugram, Haryana -122004</p>
                                     </div>
                                     <div className="col-md-4 location-item">
-                                        <img src="images/Pune.png" alt="Pune Location" className="location-icon"/>
+                                        <img src={noidaImage} alt="Pune Location" className="location-icon"/>
                                         <span className="city-name"><strong>Pune</strong></span>
                                         <p >A-803A, Teerth Technospace, Bengaluru - Mumbai Highway, Baner, Pune, Maharashtra - 411045</p>
                                     </div>
@@ -200,7 +203,7 @@ const ContactUs = () => {
                           ></textarea>
                         </div>
                         <div className="col-md-12">
-                          <button type="submit" name="send" id="contact_us" className="btn btn-primary">
+                          <button type="submit" name="send" id="contact_us" className="btn btn-primary" style={{width: 'auto'}}>
                             Send
                           </button>
                         </div>

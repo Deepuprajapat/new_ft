@@ -51,7 +51,7 @@ const Testimonial = () => {
           <div className="headline">
             <p className="sub-headline">Clients Testimonial</p>
             <h3 className="h3">
-              A Relation Built on Trust & <span className="mobiHide">Experience</span>
+              A Relation Built on Trust & <br className="mobiHide"/>Experience
             </h3>
           </div>
           <div className="client-slide owl-carousel owl-theme" id="testi_slide">

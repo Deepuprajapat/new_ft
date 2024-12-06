@@ -44,7 +44,7 @@ const Video = () => {
             </h3>
             <div class="list-footer">
               <p class="price">
-                Start from <b><i class="fas fa-rupee-sign"></i>45,00,000</b>
+                Start from <b><i class="fas fa-rupee-sign"></i>45,</b>
               </p>
               <a href="tel:+918586819819" target="_blank" rel="noopener" class="theme-btn">
                 Talk to our Expert
@@ -73,7 +73,7 @@ const Video = () => {
             </h3>
             <div class="list-footer">
               <p class="price">
-                Start from <b><i class="fas fa-rupee-sign"></i>85,00,000</b>
+                Start from <b><i class="fas fa-rupee-sign"></i>85,</b>
               </p>
               <a href="tel:+918586819819" target="_blank" rel="noopener" class="theme-btn">
                 Talk to our Expert
@@ -102,7 +102,7 @@ const Video = () => {
             </h3>
             <div class="list-footer">
               <p class="price">
-                Start from <b><i class="fas fa-rupee-sign"></i>60,00,000</b>
+                Start from <b><i class="fas fa-rupee-sign"></i>60</b>
               </p>
               <a href="tel:+918586819819" target="_blank" rel="noopener" class="theme-btn">
                 Talk to our Expert

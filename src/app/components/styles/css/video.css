@@ -1,16 +1,13 @@
 @media (max-width: 767px) {
-    h2{
-        font-size:20px;
-        margin-top:10px;
-    }
+  
     h1{
         font-size:25px;
     }       }
     h2{
         font-family: sans-serif;
     font-weight: 600;
-    font-size: 38px;
-    text-align: center
+    font-size: 30px;
+    text-align: left
     }
 .youtube {
     background-color: #000;
@@ -85,12 +82,12 @@
     top: 0;
     left: 0;
 }
-.listing-page .listing-slide .card-im{
-    /* padding: 1px 16px; */
+/* .listing-page .listing-slide .card-im{
+    padding: 1px 16px;
 box-shadow: 2px 2px 5px 0 #00000057;
 width: 100%;
 background-color: #f7f7f7 !important;
-}
+} */
 /* .listing-page .listing-slide .card-im img{
     height: auto;
 } */
@@ -189,18 +186,10 @@ background-color: #f7f7f7 !important;
     font-weight: bold; /* Make text bold on hover */
     color: blue; /* Change text color to blue on hover */
 }
-.theme-btn {
-    font-family: main-font;
-    border-radius: 5px;
-    padding: 5px 2px;
-    font-weight: 600;
-    color: #fff !important;
-    font-size: 12px;
-    background-color: #2067d1;
-    border: 2px solid #2067d1;
-    text-decoration: none;
-    display: block;
-    width: fit-content;
-    margin-top: 0;
-    text-transform: uppercase;
-}
+
+/* .listing-page .listing-slide .card-im {
+    padding: 1px 16px;
+    box-shadow: 2px 2px 5px 0 #00000057;
+    width: 100%;
+    background-color: #ffffff00 !important;
+} */

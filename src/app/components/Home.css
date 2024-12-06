@@ -90,9 +90,9 @@
   }
   
   /* Additional spacing for the section under the slider */
-  .listing-home {
-    margin-top: 80px; /* Add space to prevent overlap with form on mobile */
-  }
+  /* .listing-home {
+    margin-top: 80px;
+  } */
 
   .card-im{
     border-radius: 20px;
@@ -143,11 +143,13 @@
 /* Custom Swiper navigation buttons */
 .swiper-button-next,
 .swiper-button-prev {
-  color: white;
+  color: black;
   transition: color 0.3s;
-  background-color: #2067d1;
+  /* background-color: #2067d1; */
     width: 4%;
     border-radius: 54px;
+    font-weight: 600;
+    font-size: 40px;
   }
 
 

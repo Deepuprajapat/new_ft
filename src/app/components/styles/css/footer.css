@@ -4,6 +4,12 @@ footer .top-footer .footer-logo {
     display: block;
     margin-left: 64px;
 }
+#our-project{
+    display: none;
+}
+.bottom-footer{
+    display: none;
+}
 .Whatsupbuttn{
     display:none;
 }
