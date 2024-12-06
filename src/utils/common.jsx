@@ -22,8 +22,12 @@ export const sliderSettings={
 }
 
 export const carouselOptions={
-    modules:[Navigation,Autoplay],
-    navigation:true,
+    modules:[Autoplay],
+    autoplay: {
+        delay: 3000, // Adjust the delay as needed
+        disableOnInteraction: false, // Keeps autoplay running after user interaction
+    },
+    navigation:false,
     loop:true,
     slidesPerView:1,
     spaceBetween:50,

@@ -17,11 +17,13 @@ import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import "swiper/css";
 import "./Home.css";
 import withSafeLinks from "../../utils/rel";
+import { getAllLocalities } from "../apis/api";
 
 const Head = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
+  const [localities, setLocalities] = useState([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -53,6 +55,16 @@ const Head = () => {
     fetchProjects();
   }, []);
 
+  useEffect(() => {
+    // Fetch localities when the component mounts
+    const fetchLocalities = async () => {
+      const data = await getAllLocalities();
+      setLocalities(data);
+    };
+
+    fetchLocalities();
+  }, []);
+
   return (
     <div>
       {/* {showPopup && <CityPopup onClose={closePopup} />} */}
@@ -69,24 +81,20 @@ const Head = () => {
                 <div className="form">
                   <div className="form-group">
                     <div className="form-top-home-select">
-                      <select
-                        name="location"
-                        className="form-control"
-                        aria-label="Noida"
-                      >
-                        <option value="" selected>
-                          Location --{" "}
-                        </option>
-                        <option value="Noida">Noida</option>
-                        <option value="Greater Noida">Greater Noida</option>
-                        <option value="Sector 150 Noida">
-                          Sector 150 Noida
-                        </option>
-                        <option value="Noida Extension">Noida Extension</option>
-                        <option value="Delhi">New Delhi</option>
-                        <option value="Gurgaon">Gurgaon</option>
-                        <option value="Pune">Pune</option>
-                      </select>
+                    <select
+                    name="location"
+                    className="form-control"
+                    aria-label="Noida"
+                  >
+                    <option value="" selected>
+                      Location --{" "}
+                    </option>
+                    {localities.map((locality) => (
+                      <option key={locality.id} value={locality.name}>
+                        {locality.city.name} - {locality.name}
+                      </option>
+                    ))}
+                  </select>
                     </div>
                   </div>
                   <div className="form-group">
@@ -133,8 +141,8 @@ const Head = () => {
               <div className="col-md-10">
                 <div className="main-con">
                   <div className="container">
-                    <div className="headline" style={{ display: "contents"}}>
-                      <h1 className="h3" style={{marginTop:' 28px'}}>Top Projects</h1>
+                    <div className="headline" style={{ display: "contents" }}>
+                      <h1 className="h3" style={{marginTop:'26px'}}>Top Projects</h1>
                       <p className="head_p">
                         Connecting people with their dream properties
                       </p>

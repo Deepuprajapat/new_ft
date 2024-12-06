@@ -6,8 +6,9 @@
       label: 'About Us',
       dropdown: [
         { label: 'Overview', path: '/about' },
-        { label: 'FAQ', path: '/faq' },
         { label: 'Our Videos', path: '/video' },
+        { label: 'FAQ', path: '/faq' },
+        
       ],
     },
     {
