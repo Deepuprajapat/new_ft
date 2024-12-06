@@ -26,6 +26,6 @@ jobs:
           context: .  
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
-            ${{ secrets.DOCKER_USERNAME }}/docker-test:38282e32
+            ${{ secrets.DOCKER_USERNAME }}/docker-frontend-invest:latest
+            ${{ secrets.DOCKER_USERNAME }}/docker-frontend-invest:38282e32
           file: ./dockerfile
