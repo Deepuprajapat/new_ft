@@ -339,14 +339,8 @@ figure.zoom img:hover {
 }
 
 /* Action Buttons */
-.project-actions button {
-  border: none;
-  font-size: 11px;
 
-  cursor: pointer;
-}
-
-.rera-btn {
+/* .rera-btn {
   background-color: #2067d1;
   color: white;
   width: 55px;
@@ -363,7 +357,7 @@ figure.zoom img:hover {
 
 .top-amenities-btn {
   width: 90px;
-}
+} */
 
 /* Rera Details */
 .rera-details {

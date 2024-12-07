@@ -135,9 +135,7 @@ h1 {
     flex-wrap: wrap; /* Ensures items wrap to the next line on smaller screens */
 }
 
-.col-md-6 {
-    margin-bottom: 20px; /* Adds space between each column */
-}
+
 
 .location-icon {
     width: 30px; /* Adjust the size */
