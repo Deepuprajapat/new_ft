@@ -1161,7 +1161,7 @@ const ProjectDetails = () => {
                                     If we talk about the ACE Divino site plan, it spreads over 10.41 acres of area. In fact, it has 70% Green landscape and its rest 30% will be used for Construction according to sustainable lifestyle living.
                                 </p>
                                 <div className="position-relative px-3">
-                                    <div className="position-relative" style={{ overflow: 'hidden', height: '400px' }}>
+                                    <div className="position-relative" style={{ overflow: 'hidden', height: window.innerWidth <= 768 ? '200px' : '400px' }}>
                                         <div
                                             id="image-container"
                                             style={{
@@ -1266,7 +1266,7 @@ const ProjectDetails = () => {
                     <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>About ACE Group</h4>
-                            <div className="row">
+                            <div className="row px-3">
                                 <div className="col-12">
                                     <div className="d-flex align-items-center mb-4 px-3">
                                         <img
@@ -1276,21 +1276,21 @@ const ProjectDetails = () => {
                                             style={{ maxWidth: '120px' }}
                                             fetchpriority="high"
                                         />
-                                        <p className="mb-0">
+                                        <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
                                             ESTABLISHED IN - <b>2010</b><br />
                                             TOTAL PROJECTS - <b>10+</b>
                                         </p>
                                     </div>
 
-                                    <p className="mb-4">
+                                    <p className="mb-4" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
                                         <b>Ace Group of India</b> wants to deliver your 'dream home' - where you can enjoy the luxury in your personal space. Under the leadership of Mr.Ajay Ch . . .
                                     </p>
 
-                                    <a href="developer.php/2/ace-group" className="btn btn-primary mb-4">Read More</a>
+                                    <a href="developer.php/2/ace-group" className="btn btn-primary mb-4" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>Read More</a>
 
-                                    <h4 className="fw-bold mb-3" style={{ fontSize: '18px' }}>Contact Details</h4>
+                                    <h4 className="fw-bold mb-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '18px' }}>Contact Details</h4>
 
-                                    <p className="mb-0">
+                                    <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
                                         <b>ACE Divino</b><br />
                                         <b>Address:</b> GH-14A, Sector-1, Greater Noida West,
                                         Uttar Pradesh 201306<br />
@@ -1468,10 +1468,10 @@ const ProjectDetails = () => {
                     </div>
                 </section>
 
-                <section className="col-md-4">
-                    {/* Content for 40% width column */}
+                <section className="col-md-4 mb-4">
+                    {/*Connect to Our Expert */}
                     <div className="position-sticky" style={{ top: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                        <div className="bg-white rounded-3 mb-4 p-4">
+                        <div className="bg-white rounded-3 mb-4 p-4 pb-0">
                             <h4 className="mb-4 text-center">Connect to Our Expert</h4>
                             {!otpSent && !otpVerified && (
                                 <form onSubmit={(e) => e.preventDefault()}>
@@ -1546,13 +1546,15 @@ const ProjectDetails = () => {
                                     {error && (
                                         <div className="alert alert-danger">{error}</div>
                                     )}
-                                    <button
-                                        type="button"
-                                        className="btn btn-primary w-100"
-                                        onClick={sendOtp}
-                                    >
-                                        Get a Call back
-                                    </button>
+                                    <div className="text-center d-flex justify-content-center">
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary w-100"
+                                            onClick={sendOtp}
+                                        >
+                                            Get a Call back
+                                        </button>
+                                    </div>
                                 </form>
                             )}
 
@@ -1613,7 +1615,7 @@ const ProjectDetails = () => {
                             )}
                         </div>
 
-                        <div className="bg-white rounded-3 p-3 pt-2 text-center">
+                        <div className="bg-white rounded-3 p-3 pt-0 text-center d-flex justify-content-center">
                             <button 
                                 className="btn btn-primary w-100"
                                 style={{ fontSize: '16px' }}
