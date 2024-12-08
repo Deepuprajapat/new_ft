@@ -126,6 +126,7 @@ const Career = () => {
                       <select
                         className="form-control"
                         name="userposition"
+                        style={{appearance:'auto'}}
                         value={formData.userposition}
                         onChange={handleChange}
                         required
@@ -177,8 +178,10 @@ const Career = () => {
                     </div>
                     <div className="form-group">
                       <input
-                        type="date"
+                        type="text"
+                        onFocus={(e) => (e.target.type = 'date')} 
                         className="form-control"
+                        placeholder="Date of Birth:"
                         name="userdob"
                         value={formData.userdob}
                         onChange={handleChange}

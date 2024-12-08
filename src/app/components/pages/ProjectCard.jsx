@@ -8,11 +8,10 @@ const ProjectCard = ({ project }) => {
   const defaultImage = "http://localhost:3000/img/building_soon.jpg"; // Placeholder image
   const navigate = useNavigate(); 
   const handleMoreDetails = (name) => {
-    // Navigate to the project name directly (without the /projectDetails prefix)
-    navigate(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`);
+    // Open the project details in a new tab
+    window.open(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`, '_blank', 'noopener,noreferrer');
   };
   return (
-    
     <div className="card-im">
       <a href={project.url} target="_blank" rel="noopener noreferrer">
         <img

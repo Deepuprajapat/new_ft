@@ -39,13 +39,13 @@ h1 {
     margin-right: 10px;
   }
   
-  .aRemove {
+  /* .aRemove {
     color: inherit;
     text-decoration: none;
-  }
+  } */
   
   .aRemove:hover {
-    text-decoration: underline;
+    text-decoration: none;
   }
   
   /* Form Styles */
@@ -78,6 +78,10 @@ h1 {
   
   .col-md-12 {
     padding: 10px;
+
+  }
+  .h3{
+    text-align: left;
   }
   .alert-danger {
     color: #721c24;
@@ -101,6 +105,7 @@ h1 {
   /* Responsive Design */
   @media (max-width: 768px) {
     .h3 {
+      font-family: 'Lato', sans-serif;
       font-size: 1.5rem;
     }
   
@@ -113,7 +118,7 @@ h1 {
     }
   }
   .col-md-4 .location-item p{
-    margin: 0; padding: 0; font-size: 14px;
+    margin: 0; padding: 0; font-size: 14px;font-family: "Jost", sans-serif;
   }
   
 
@@ -124,9 +129,11 @@ h1 {
 }
 
 .location-item p {
-    font-size: 16px; /* Adjusts the text size for better readability */
+    font-size: 14px; /* Adjusts the text size for better readability */
     line-height: 1.6; /* Adjusts the line height for better spacing between lines */
     margin-top: 10px; /* Adds space between the icon and the address */
+    font-family: "Jost", sans-serif;
+    color: black;
 }
 
 /* Adds spacing between columns in the row */
@@ -145,11 +152,4 @@ h1 {
     margin-right: 10px; /* Adds some space between the image and text */
 }
 
-.location-item {
-    margin-bottom: 30px;
-}
-@media (max-width: 600px) {
-        .col-md-4 {
-          
-        }
-    }
+

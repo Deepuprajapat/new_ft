@@ -9,8 +9,8 @@ const HowWeWork = () => {
           <div className="headline">
             <p className="sub-headline">How We Work</p>
             <h3 className="h3">
-              We Bestow Full Assistance at
-              <span className="mobiHide"> Every Stride</span>
+              We Bestow Full <br /> Assistance at  Every Stride
+              {/* <span className="mobiHide"> Every Stride</span> */}
             </h3>
           </div>
           <div className="weWorkInner">

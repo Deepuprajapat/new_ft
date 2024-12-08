@@ -363,15 +363,17 @@ button {
   background: none;
   font-size: 14px;
   cursor: pointer;
-  padding: 5px 10px;
+  padding: 10px 0px;
   margin-left: 10px;
   display: flex;
   align-items: center;
   font-weight: 600;
 }
-
+.dropdown-item {
+  color: black;
+}
 .search-button svg {
-  color: #2067d1;
+  color: #7f7f7f;
 
   font-size: 16px;
 }
@@ -406,15 +408,16 @@ button:hover a svg {
 /* Button Styles for Phone Numbers */
 button {
   border: 1px solid #2067d1;
-
-  border-radius: 5px;
+  border-radius: 10px;
   background-color: #2067d1;
-
   color: #fff;
   padding: 8px 12px;
   transition: all 0.3s ease;
 }
 
+.phoneButton{
+  border-radius: 10px;
+}
 button a {
   color: #fff;
   font-weight: 600;
@@ -451,7 +454,10 @@ button a {
     border-bottom: 1px solid #c5c5c5;
 
   }
-
+  .search-form-container{
+  position: relative;
+    border-bottom: 1px solid #c5c5c5;
+  }
   button {
     font-size: 12px;
     padding: 5px 8px;

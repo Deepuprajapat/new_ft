@@ -101,10 +101,10 @@ export const getAllPropertyConfiguration = async () => {
   }
 };
 
-export const getAllProject = async (page = 0, size = 20) => {
+export const getAllProject = async () => {
   try {
     const res = await axios.get(
-      `${BASE_URL}/project/get/all?isDeleted=false&page=${page}&size=${size}`
+      `${BASE_URL}/project/get/all?isDeleted=false`
     );
     return res.data;
   } catch (error) {
@@ -222,22 +222,6 @@ export const fetchTestimonials = async () => {
   }
 };
 
-
-// export const getAllvacancies = async () => {
-//   try {
-//     const res = await axios.get(`${BASE_URL}/get/all/vacancies`,{
-//       headers:{
-//         "x-auth-token": `${token}`,
-//       },
-//     });
-//     console.log("akansha",this.res)
-//     return res.data;
-//   } catch (error) {
-//     console.error("Error fetching Vacancy:", error);
-//     return { content: [] };
-//   }
-// };
-
 export const fetchAllVacancies = async () => {
   try {
     console.log("Starting fetchAllVacancies...");
@@ -291,5 +275,15 @@ export const submitHiringForm = async (formData) => {
   } catch (error) {
     console.error("Error Submitting Form:", error);
     throw error;
+  }
+};
+
+export const getAllLocalities = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/locality/get/all`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching localities:", error);
+    return [];
   }
 };

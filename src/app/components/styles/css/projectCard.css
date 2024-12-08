@@ -123,11 +123,11 @@ p {
   color: #666;
 }
 
-h2 {
-  margin: 10px 0 20px; /* Controls spacing */
+/* h2 {
+  margin: 10px 0 20px;
   font-size: 1.5em;
   font-weight: 600;
-}
+} */
 
 /* Responsive Design for Tablets and Mobile Devices */
 @media (max-width: 1024px) {

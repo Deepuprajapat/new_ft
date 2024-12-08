@@ -39,12 +39,12 @@ const BlogSection = ({ isSwiper }) => {
           <BlogCard blog={blog} />
         </SwiperSlide>
       ))}
-      <SliderButton /> {/* Ensure this is inside the Swiper context */}
+      {/* <SliderButton /> */}
     </Swiper>
   ) : (
     <div className="row">
       {blogs.map((blog) => (
-        <div key={blog.id} className="col-md-4">
+        <div key={blog.id} className="col-md-4" style={{marginBottom: '63px'}}>
           <BlogCard blog={blog} />
         </div>
       ))}
@@ -76,15 +76,15 @@ const BlogCard = ({ blog }) => (
   </div>
 );
 
-const SliderButton = () => {
-  const swiper = useSwiper();
+// const SliderButton = () => {
+//   const swiper = useSwiper();
 
-  return (
-    <div className="r-buttons">
-      <button onClick={() => swiper.slidePrev()}>&lt;</button>
-      <button onClick={() => swiper.slideNext()}>&gt;</button>
-    </div>
-  );
-};
+//   return (
+//     <div className="r-buttons">
+//       <button onClick={() => swiper.slidePrev()}>&lt;</button>
+//       <button onClick={() => swiper.slideNext()}>&gt;</button>
+//     </div>
+//   );
+// };
 
 export default BlogSection;

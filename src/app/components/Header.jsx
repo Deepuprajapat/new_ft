@@ -55,19 +55,17 @@ const Header = () => {
 
 
 
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     const navbarCollapse = document.querySelector(".navbar-collapse");
-  //     if (window.scrollY > 0) {
-  //       navbarCollapse.classList.remove("show");
-  //     } else {
-  //       navbarCollapse.classList.add("show");
-  //     }
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, []);
+    useEffect(() => {
+      const handleScroll = () => {
+        const navbarCollapse = document.querySelector(".navbar-collapse");
+        if (window.scrollY > 0) {
+          navbarCollapse.classList.remove("show");
+        }
+      };
+  
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
   const toggleSearch = () => {
     setIsSearchVisible(!isSearchVisible);
@@ -87,7 +85,6 @@ const Header = () => {
               {item.dropdown.map((subItem,subIndex)=>(
                 <NavDropdown.Item  href={subItem.path} key={subIndex} target="_blank" >{subItem.label}</NavDropdown.Item>
               ))}
-  
           </NavDropdown>
           ):(
             <Nav.Link  href={item.path} key={index} target="_blank">{item.label}</Nav.Link>
