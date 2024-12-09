@@ -85,13 +85,18 @@ const CompareProjects = () => {
       <p>Home / Compare Projects</p>
 
       <div className="text-center my-4">
-        <h2 className="text-primary">Confused?</h2>
-        <p className="lead">Easy way to compare projects</p>
+        {/* <h2 className="text-primary">Confused?</h2>
+        <p className="lead">Easy way to compare projects</p> */}
+        <h2>
+        <b style={{color:'#2067d1',fontSize:'60px',fontFamily:'lato,sans-serif'}}>Confused?</b> 
+          {/* <b style={{color:'#2067d1'font-size:'60px'}}>Confused?</b>  */}
+          <br/>Easy way to compare projects
+        </h2>
       </div>
 
       <div className="d-flex  flex-wrap justify-content-center mb-4">
         {[0, 1, 2].map((index) => (
-            <div key={index} className="d-flex flex-column mx-2 mb-3" style={{ minWidth: "200px" }}>
+            <div key={index} className="d-flex flex-column mx-2 mb-3" >
           <select
             key={index}
             className="custom-select form-select mx-2"
