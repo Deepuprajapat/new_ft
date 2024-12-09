@@ -1847,3 +1847,22 @@ a:hover{
   -moz-appearance: none;
   appearance: none;
 }
+
+.table-bordered{
+  border: 1px solid #dee2e6;
+}
+.table>tbody {
+  border: 1px solid #dee2e6;
+}
+.table-bordered td {
+  font-weight: 600;
+  color: #14191e;
+  padding: .75rem;
+  vertical-align: top;
+}
+.table-bordered th{
+  font-weight: 400;
+  color: #212529;
+  padding: .75rem;
+  vertical-align: top;
+}

@@ -150,7 +150,7 @@ const CompareProjects = () => {
                 "Construction Type",
               ].map((field) => (
                 <tr key={field}>
-                  <td>{field}</td>
+                  <th>{field}</th>
                   {comparedProjects.map((project) => (
                     <td key={project.id}>{renderProjectData(project, field)}</td>
                   ))}
