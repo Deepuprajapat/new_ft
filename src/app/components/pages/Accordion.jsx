@@ -35,7 +35,7 @@ const Accordion = ({ data, allowMultipleExpanded = false, preExpanded = [0] }) =
                 {/* <div className="flexCenter icon">
                   {item.icon}
                 </div> */}
-                <span className="primaryText">
+                <span className="primary-text">
                   {item.heading}
                 </span>
                 <div className="flexCenter icon">

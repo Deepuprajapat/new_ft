@@ -22,6 +22,7 @@
     padding: 10px;
     text-align: center;
     font-size: 1.5rem;
+
     /* color: #ecf0f1; */
     color: #757575;
 }
@@ -74,10 +75,11 @@
     background-color: #16a085;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .sidebar {
         width: 70px;
     }
+
     .sidebar.expanded {
         width: 200px;
     }

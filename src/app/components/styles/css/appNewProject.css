@@ -3,6 +3,7 @@
     background-color: white ;
     border-radius: 8px;
   }
+
   .inputDiv input,textarea,select{
   background: none;
   outline: none;
@@ -13,27 +14,33 @@
   padding: 10px;
   border-radius: 10px!important;
 }
+
 .inputDiv{
     margin-top: 10px!important;
 }
+
 .main-input{
     display: flex;
     gap: .5rem;
     justify-content: space-between;
 }
+
 .main-input .inputDiv{
     width: 50%;
     justify-content: space-around;
 }
+
 .group{
     display: flex;
     text-align: center;
     align-items: center;
     gap: .5rem;
 }
+
 .group label{
     margin: 0;
 }
+
 option{
     text-transform: capitalize;
 }

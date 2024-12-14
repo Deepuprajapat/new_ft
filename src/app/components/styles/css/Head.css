@@ -2,44 +2,46 @@
     .contactUs .container {
         margin-top: 50px;
     }
+
     .aRemove {
         color: #000;
     }
+
     .aRemove:hover {
         text-decoration: none;
     }
+
     #secondcon {
         display: none;
     }
 
-    
-    /* .main-slider {
-        height: 663px !important;
-    } */
-    
-    /* Media Queries */
-    @media (max-width: 600px) {
+    @media (width <= 600px) {
         .form-top-home .form {
             background-color: #2067d1;
-            border-radius: 0px;
+            border-radius: 0;
             margin-top: 497px;
             padding: 20px;
         }
+
         .call-btn {
             display: none !important;
         }
+
         .main-slider {
             background-position: top !important;
             background-size: 100% !important;
         }
+
         .winter_fest_side {
             display: block !important;
         }
+
         .main-slider {
             background-size: 200% !important;
         }
     }
-    @media (max-width: 676px) {
+
+    @media (width <= 676px) {
         .listing-home .custom-nav-mobi .owl-prev,
         .listing-home .custom-nav-mobi .owl-next {
             background-color: #2067d1;
@@ -47,7 +49,6 @@
         }
     }
 
-    /* General Styles */
     .winter_fest_side {
         display: none;
     }
@@ -56,31 +57,38 @@
     .top-header p {
         color: #fff;
     }
+
     .top-header p i {
         color: #fff;
     }
+
     .card-im img {
         height: 250px;
         width: 100%;
         object-fit: cover;
         border-radius: 15px;
     }
+
     .blog .item img {
         height: 250px;
         width: 100%;
         object-fit: cover;
         border-radius: 15px;
     }
+
     .weWork .headline .sub-headline {
         font-size: 20px;
         letter-spacing: 3px;
     }
+
     .card-im a {
         text-decoration: none;
     }
+
     .client_slider .owl-carousel .item img {
         padding: 5px;
     }
+
     .client_slider .headline .h3 {
         font-family: "Sofia Pro", sans-serif;
         font-size: 46px;
@@ -88,24 +96,28 @@
         font-weight: 700;
         color: #000;
     }
+
     .listing-home .listing-slide .card-im .list_headline_two {
         min-height: 80px;
     }
+
     .form-top-home select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
+        appearance: none;
         background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
         background-repeat: no-repeat;
         background-position-x: 98%;
         background-position-y: 50%;
     }   
+
     *:focus {
         outline: none;
         box-shadow: none !important;
     }
+
     #projects {
         position: absolute;
     }
+
     .main-slider h1 {
         text-align: center;
         color: #fff;

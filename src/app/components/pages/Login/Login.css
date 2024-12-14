@@ -22,6 +22,7 @@
     width: 150px;
     margin-bottom: 20px;
   }
+
   /* h2{
     font-family:  sans-serif;
     font-weight: 600;
@@ -39,14 +40,15 @@
     display: flex;
     flex-direction: column;
     justify-content:flex-start;
-   
     background-color: #f5f5f5;
   }
+
   .r-container h2 {
     display: flex;
     justify-content:flex-start;
-    margin: 0px;
+    margin: 0;
   }
+
   .MuiDialogTitle-root {
     font-size: 24px;
     font-weight: 600;
@@ -99,9 +101,11 @@
     color: #1e90ff;
     font-size: 14px;
   }
+
   .full-form{
     padding: 30px;
   }
+
   .login-form {
     display: flex;
     flex-direction: column;
@@ -111,6 +115,7 @@
 .inputDiv {
     display: flex;
     flex-direction: column;
+
     /* gap: 0.5rem; */
 }
 
@@ -118,6 +123,7 @@
     color:#355359 ;
     font-weight: 400;
     font-size: 16px; /* Adjusted to a smaller font size for the label */
+
     /* padding: 0.5rem 0; */
     display: block;
 }
@@ -128,8 +134,7 @@
     gap: 0.5rem;
     padding: 0.75rem 1rem; /* Adjusted padding for a more compact look */
     background: #E4EAF2;
-    border: 0px;
-    border-radius: 20px;
+    border: 0;
     border-radius: 10px;
 }
 
