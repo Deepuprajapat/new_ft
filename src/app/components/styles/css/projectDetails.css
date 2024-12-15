@@ -1,184 +1,38 @@
-/* .content_index {
-  display: flex;
-  justify-content: space-between;
-  margin: 0;
-  list-style: none;
-}
-.content_index_bg {
-  background-color: #2067d1;
-  padding: 10px;
-  margin: 0;
-}
-.content_index a {
-  color: #fff;
-  text-transform: capitalize;
-}
-ul.content_index {
-  margin: 0;
-  padding: 0;
-}
-.content_index a:hover {
-  text-decoration: none;
-}
-.content_index_fixed {
-  position: fixed;
-  z-index: 999;
-  top: 0;
-  width: 100%;
-}
-#dev {
-  margin-top: -13px;
-  margin-left: 98px;
-}
-#name {
-  margin-right: 176px;
-}
-/* #logo_img {
-} */
-/* .image-container {
-  position: relative;
-  width: 100%;
-  max-width: 780px !important;
-  overflow: hidden;
-}
-@media (max-width: 600px) {
-  #project_logo {
-    text-align: center;
-  }
-  #dev {
-    margin-left: -51px;
-  }
-  .brochure {
-    display: block !important;
-    margin-bottom: 35px !important;
-  }
-  #dev {
-    display: block;
-  }
-  #short_address {
-    display: none;
-  }
-}
-@media (min-width: 768px) and (max-width: 991px) {
-  header nav .navbar-brand {
-    margin-right: 7px;
-  }
-  .navbar-expand-sm > .container {
-    margin-left: -28px;
-  }
-  .call-btn a {
-    font-size: 4px;
-  }
-}
-#myDIV {
-  display: none;
-  margin-top: 20px;
-  position: absolute;
-  background: #fff;
-  padding: 16px;
-  z-index: 3;
-  width: 80%;
-  margin-top: 8px;
-  border-radius: 4px;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  box-shadow: 0 3px 8px 0 rgba(0, 106, 194, 0.2);
-}
-@media (max-width: 767px) {
-  #component2 {
-    display: none;
-  }
-}
-.image-container {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  overflow: hidden;
-}
-#zoom-image {
-  width: 100%;
-  height: auto;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  transform-origin: center center;
-}
-.zoom-buttons {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-.zoom-buttons button {
-  font-size: 24px;
-  padding: 8px 12px;
-  background-color: #f2f2f2;
-  border: none;
-  cursor: pointer;
-}
-.zoom-buttons button:hover {
-  background-color: #ddd;
-}
-@media (max-width: 600px) {
-  figure.zoom {
-    height: 213px;
-    width: 100%;
-  }
-}
-figure.zoom {
-  position: relative;
-  border: 5px solid #fff;
-  overflow: hidden;
-  cursor: zoom-in;
-  border-radius: 20px;
-}
-figure.zoom img {
-  transition: opacity 0.5s;
-  display: block;
-  width: 100%;
-}
-figure.zoom img:hover {
-  opacity: 0;
-} */
-*/
-
-
-/*New CSS Started here*/
-/* General styles for the gallery */
 .details-gallery .container-fluid {
   padding: 0;
 }
 
-/* Main large image styles */
 .main-image-link {
   display: block;
 }
+
 .main-image {
   width: 100%;
   height: auto;
   object-fit: cover;
 }
+
 .project-developer {
   margin-left: 15%;
 }
-/* Small images container */
-/* .img-container {
-  margin-bottom: 15px;
-} */
+
 .secondary-image-link {
   display: block;
 }
+
 .secondary-image {
   width: 100%;
   height: auto;
   object-fit: cover;
 }
 
-/* Artistic label styles */
 .artistic-label {
   margin-top: 5px;
   font-size: 12px;
   text-align: center;
   color: #555;
 }
+
 .btnbutton {
   color: #2067d1;
   border: none;
@@ -188,8 +42,8 @@ figure.zoom img:hover {
   border-radius: 5px;
   padding: 8px;
 }
-/* Responsive adjustments */
-@media (max-width: 767px) {
+
+@media (width <= 767px) {
   .details-gallery .col-md-6,
   .details-gallery .col-md-3 {
     flex: 0 0 100%;
@@ -202,7 +56,7 @@ figure.zoom img:hover {
 }
 
 .theme-btn {
-  font-family: 'Lato', sans-serif;
+  font-family: Lato, sans-serif;
   border-radius: 8px;
   padding: 5px 20px;
   font-size: 14px;
@@ -215,7 +69,7 @@ figure.zoom img:hover {
   display: block;
   width: fit-content;
   margin-top: 15px;
-  margin: 0px;
+  margin: 0;
 
   &:hover {
     border-radius: 8px;
@@ -228,20 +82,26 @@ figure.zoom img:hover {
     background-color: #fff0;
   }
 }
+
 .details-gallery {
   background-color: #fcfdfe;
+
   .row {
     padding: 0;
+
     .col-md-6 {
       padding: 0;
+
       img {
         width: 760px;
         height: 606px;
       }
     }
+
     .col-md-3 {
       padding: 0;
     }
+
     img {
       width: 380px;
       height: 303px;
@@ -250,14 +110,12 @@ figure.zoom img:hover {
   }
 }
 
-/* General container background */
 .content-index-bg {
   background-color: #2067d1;
   padding: 10px;
   margin: 0;
 }
 
-/* Styling for the list of links */
 .content-index {
   display: flex;
   justify-content: space-between;
@@ -276,13 +134,11 @@ figure.zoom img:hover {
   text-decoration: underline;
 }
 
-/* Responsive Styles */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .content-index {
     flex-direction: column;
     align-items: flex-start;
   }
-
   .content-index li {
     margin-bottom: 10px;
   }
@@ -292,7 +148,7 @@ figure.zoom img:hover {
   }
 }
 
-@media (min-width: 768px) and (max-width: 991px) {
+@media (width >= 768px) and (width <= 991px) {
   .content-index {
     justify-content: space-around;
   }
@@ -302,16 +158,12 @@ figure.zoom img:hover {
   }
 }
 
-/* Section Container */
-/* .main-body-section {
-  padding: 20px 0;
-} */
+
 
 .details-header-section {
   padding: 20px 0;
 }
 
-/* Developer Logo */
 #developer-logo {
   width: 90px;
   height: 70px;
@@ -319,7 +171,6 @@ figure.zoom img:hover {
   padding: 6px;
 }
 
-/* Project Name */
 .project-name-container {
   padding-left: 110px;
 }
@@ -332,18 +183,15 @@ figure.zoom img:hover {
   white-space: nowrap;
 }
 
-/* Developer Info */
 .developer-info {
   font-size: 14px;
   margin-top: -5px;
   text-align: left;
 }
 
-/* Action Buttons */
 .project-actions button {
   border: none;
   font-size: 11px;
-
   cursor: pointer;
 }
 
@@ -366,7 +214,6 @@ figure.zoom img:hover {
   width: 90px;
 }
 
-/* Rera Details */
 .rera-details {
   margin-top: 10px;
 }
@@ -398,7 +245,6 @@ figure.zoom img:hover {
   color: #42526e;
 }
 
-/* Project Price */
 .project-price-label {
   font-weight: 700;
   font-size: 18px;
@@ -409,8 +255,7 @@ figure.zoom img:hover {
   color: #333;
 }
 
-/* Responsive Design */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .project-name-container {
     padding-left: 0;
   }
@@ -430,7 +275,6 @@ figure.zoom img:hover {
   }
 }
 
-/* FAQ question styles */
 .faq-question {
   background: none;
   border: none;
@@ -440,22 +284,19 @@ figure.zoom img:hover {
   margin: 10px 0;
   padding: 0;
   font-weight: normal;
-  color: #333; /* Default color for questions */
+  color: #333;
   transition: color 0.3s ease;
 }
 
-/* Change color for the active question */
 .faq-question.active {
   font-weight: bold;
-  color: #000; /* Dark black color for active question */
+  color: #000; 
 }
 
-/* Add hover effect to questions */
 .faq-question:hover {
   text-decoration: underline;
 }
 
-/* Panel for answers */
 .panel {
   margin: 10px 0 20px;
   padding: 10px;
@@ -465,23 +306,24 @@ figure.zoom img:hover {
   font-size: 0.95rem;
 }
 
-/*Rera popup css*/
-/* Positioning for the popup */
 .project-actions {
   margin-top: 26px;
   position: relative;
 }
+
 .brochure {
   background-color: #2067d1;
   padding: 20px;
   box-shadow: 2px 2px 5px 0 #00000014;
   border-radius: 6px !important;
+
   img {
     border-radius: 20px;
     height: 160px;
     object-fit: cover;
     width: 100%;
   }
+
   a {
     text-align: center;
     margin: -10px auto 0;
@@ -490,25 +332,29 @@ figure.zoom img:hover {
     padding: 2% 10%;
   }
 }
+
 .rera-popup {
   position: absolute;
-  top: calc(100% + 10px); /* Position slightly below the Rera button */
-  left: 0; /* Align with the Rera button */
+  top: calc(100% + 10px); 
+  left: 0; 
   background: #fff;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 20%);
   z-index: 1000;
-  width: 35rem; /* Fixed width for popup */
+  width: 35rem; 
   white-space: nowrap;
 }
+
 .Why_action {
   padding: 20px 30px;
+
   .theme-btn {
     width: 100%;
     text-align: center;
   }
+
   .white-btn {
     padding: 1px;
     width: 100%;
@@ -517,40 +363,48 @@ figure.zoom img:hover {
     color: #000 !important;
     background-color: #fff0;
   }
+
   .project-gallery {
     .item {
       &:nth-child(2) a img {
         height: 130px;
         object-fit: cover;
       }
+
       &:nth-child(3) a img {
         height: 130px;
         object-fit: cover;
       }
+
       img {
         border-radius: 25px;
         padding: 7px;
+
         &:nth-child(1) {
           height: 230px;
           width: 100%;
           object-fit: cover;
         }
       }
+
       &:nth-child(2) {
         width: 50%;
         float: left;
       }
+
       &:nth-child(3) {
         width: 50%;
         float: left;
       }
     }
   }
+
   .right_section {
     .col-md-6 {
       display: flex;
       align-items: center;
-      padding: 15px 15px;
+      padding: 15px;
+
       span:nth-child(2) {
         line-height: 18px;
         font-weight: 500;
@@ -559,6 +413,7 @@ figure.zoom img:hover {
     }
   }
 }
+
 .rera-popup-header {
   display: flex;
   justify-content: space-between;
@@ -585,15 +440,12 @@ figure.zoom img:hover {
   padding: 5px;
   text-align: left;
 }
-
-/* Keep other buttons unaffected */
 .no-brokerage-btn,
 .floor-plans-btn,
 .top-amenities-btn {
   margin-left: 10px;
 }
 
-/* Alerts */
 .alert {
   margin-top: 10px;
   background-color: black;
@@ -603,28 +455,32 @@ figure.zoom img:hover {
   a:hover {
     color: #fff;
   }
+
   a {
     color: #fcfdfe;
     text-decoration: none;
     background-color: transparent;
   }
-  text-align: center;
+
+  /* text-align: center;
   line-height: 35px;
   background-color: #40433e;
   font-size: 20px;
   color: #fff;
   font-weight: 800;
-  border-left: 9px solid #40433e;
+  border-left: 9px solid #40433e; */
 }
 
 .details-content {
   background-color: #fcfdfe;
   padding: 30px;
+
   .box {
     background-color: #ffffff3d;
     margin-bottom: 30px;
     border-radius: 6px !important;
     box-shadow: 2px 2px 5px 0 #00000014;
+
     .slide_left_btn {
       background-color: #2067d1;
       color: #fff;
@@ -639,33 +495,40 @@ figure.zoom img:hover {
       box-shadow: -3px 2px 12px #082c6285;
       z-index: 999;
     }
+
     .floor_item {
       width: 350px;
       box-shadow: 0 1px 4px 0 #006ac233;
       margin: 10px;
       padding: 0 20px 20px;
       border-radius: 8px;
+
       img {
         width: 100%;
       }
+
       p {
         font-weight: 700;
         color: #000 !important;
         font-size: 18px;
       }
+
       .btn {
         background-color: #2067d1;
         color: #fff;
         font-weight: 500;
       }
     }
+
     .calculate {
       padding: 10px;
       margin: 0;
+
       .calheadline {
         font-weight: 600;
         font-size: 18px;
       }
+
       p {
         margin: 0;
         padding: 0;
@@ -674,7 +537,7 @@ figure.zoom img:hover {
 
     .headline {
       border-bottom: solid 1px #e8e8e8;
-      padding: 12px 16px 12px;
+      padding: 12px 16px;
       font-size: 15px;
       background-color: #2067d1;
       text-transform: uppercase;
@@ -683,34 +546,43 @@ figure.zoom img:hover {
       color: #fff;
       border-radius: 6px 6px 0 0;
     }
+
     .inner-item {
       padding: 10px 20px;
+
       .over_head {
         img {
           border: 1px solid #727272;
           margin-right: 10px;
         }
+
         display: flex;
         align-items: center;
+
         p {
           margin: 0;
         }
       }
+
       p {
         color: #666;
         font-family: second-font;
       }
+
       p.icon {
         padding: 10px;
         color: #2067d1;
+
         i {
           font-size: 20px;
         }
       }
+
       .amenities {
         color: #000;
         line-height: 18px;
       }
+
       /* // &.limitcon {
 	// overflow:hidden;
 	// white-space:nowrap;
@@ -719,22 +591,27 @@ figure.zoom img:hover {
 	// */
     }
   }
+
   .amenities {
     li {
       list-style: none;
+
       img {
         width: 35px;
         margin-right: 10px;
       }
     }
+
     .amenities-item {
       padding: 10px;
       display: flex;
       align-items: center;
     }
   }
+
   .item-fq {
     margin-bottom: 12px;
+
     .accordion {
       border: 0;
       width: 100%;
@@ -742,15 +619,17 @@ figure.zoom img:hover {
       align-items: center;
       justify-content: space-between;
       text-align: left;
-      font-family: 'Lato', sans-serif;
+      font-family: Lato, sans-serif;
       padding: 7px 12px;
     }
+
     .panel {
       padding: 5px 10px;
-      font-family: 'Lato', sans-serif;
+      font-family: Lato, sans-serif;
       font-size: 15px;
       color: #77808b;
       letter-spacing: 0.2px;
+
       p {
         margin: 0;
         font-family: second-font;

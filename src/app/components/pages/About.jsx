@@ -1,6 +1,6 @@
 import React from 'react'
 
-import '../styles/css/about.css'
+// import '../styles/css/about.css'
 import { aboutUsData } from '../../../utils/about'
 const About = () => {
   return (

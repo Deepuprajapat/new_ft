@@ -235,7 +235,7 @@ header nav .navbar-nav .submenu .nav-link a {
 }
 .breadcrumb_im {
   padding: 45px 0;
-  background: url(../img/);
+  background: url(../img);
   background-attachment: initial;
   background-position: center;
   background-size: cover;

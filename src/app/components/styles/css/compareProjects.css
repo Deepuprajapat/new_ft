@@ -1,11 +1,8 @@
-/* Overall container styling */
 .container {
     margin-top: 5rem;
   }
   
-  /* Title and sub-heading styling */
   h1, h2 {
-    /* text-align: center; */
     color: #333;
     font-size: 36px;
     text-align: left;
@@ -17,11 +14,11 @@
   }
   
   p.lead {
-    font-size: 1.5rem; /* Adjust the size as needed */
-    color: #333; /* Dark color for the text */
-    font-weight: bold; /* Optional: Make the text bold for better visibility */
+    font-size: 1.5rem; 
+    color: #333; 
+    font-weight: bold; 
 }
-  /* Button styling */
+
   .compare-btn {
     margin-top: 20px;
     padding: 10px 15px;
@@ -36,7 +33,6 @@
     background-color: #0056b3;
   }
   
-  /* Dropdown styling */
   .project-select {
     width: 200px;
     margin-right: 10px;
@@ -46,7 +42,6 @@
     padding: 5px;
   }
   
-  /* Table styling */
   .comparison-table {
     width: 100%;
     border-collapse: collapse;
@@ -75,8 +70,7 @@
     border-radius: 5px;
   }
   
-  /* Responsiveness for smaller screens */
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     .comparison-table th,
     .comparison-table td {
       font-size: 12px;
@@ -88,7 +82,7 @@
     }
   }
   
-  @media (max-width: 480px) {
+  @media (width <= 480px) {
     .comparison-table {
       display: block;
       overflow-x: auto;

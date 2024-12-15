@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllBlogByUrl } from "../../apis/api";
 import { useParams } from "react-router-dom";
-import "../styles/css/blog.css";
+// import "../styles/css/blog.css";
 
 const Blogs = () => {
   const [blogData, setBlogData] = useState(null);

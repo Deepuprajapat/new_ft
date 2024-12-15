@@ -1,4 +1,5 @@
 /* General Styles */
+
 /* .main-body {
   padding: 20px;
 } */
@@ -11,6 +12,7 @@
 } */
 
 /* Card Layout */
+
 /* .listing-home {
   display: flex;
   flex-wrap: wrap;
@@ -41,6 +43,7 @@
   height: auto;
   border-radius: 10px;
 }
+
 /* .details-gallery {
   background-color: #fcfdfe;
   .row {
@@ -130,7 +133,7 @@ p {
 } */
 
 /* Responsive Design for Tablets and Mobile Devices */
-@media (max-width: 1024px) {
+@media (width <= 1024px) {
   /* Medium screens (Tablets) */
   .card-im {
     flex: 1 1 45%; /* Two cards per row */
@@ -138,18 +141,21 @@ p {
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   /* Small screens (large phones) */
   .card-im {
     flex: 1 1 100%; /* Stack the cards */
     max-width: 100%;
   }
+
   .list_headline_two {
     font-size: 16px;
   }
+
   .price {
     font-size: 14px;
   }
+
   /* .theme-btn {
     font-size: 14px;
     padding: 8px 12px;
@@ -159,21 +165,25 @@ p {
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   /* Extra small screens (small phones) */
   .main-body {
     padding: 10px;
   }
+
   .container {
     padding: 0 10px;
   }
+
   .list_headline_two {
     font-size: 14px;
     margin-top: 5px;
   }
+
   .price {
     font-size: 12px;
   }
+
   /* .theme-btn {
     font-size: 12px;
     padding: 6px 10px;

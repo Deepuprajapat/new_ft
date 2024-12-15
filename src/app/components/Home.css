@@ -5,9 +5,9 @@
 .r-buttons {
     position: relative;
     gap: 1rem;
-    bottom: -2rem; /* Position it below the carousel */
+    bottom: -2rem; 
     left: 50%;
-    transform: translateX(-50%); /* Center it horizontally */
+    transform: translateX(-50%);
     display: flex;
     justify-content: center;
     top: 17px;
@@ -24,76 +24,63 @@
 }
 
 .r-buttons > :nth-child(1) {
-    /* background-color: #EEEEFF; */
     background-color: #2067d1;
     color: white;
 }
 
 .r-buttons > :nth-child(2) {
-    /* box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.25); */
     background-color: #2067d1;
     color: white;
 }
+
 .main-slider {
   background: url('https://res.cloudinary.com/deiuirtja/image/upload/v1713934028/investmango/Image-01_1_bssioj.jpg') !important;
   background-position: center !important;
   background-size: cover !important;
   background-repeat: no-repeat !important;
 }
+
 .main-slider {
     position: relative;
   }
   
   .form-top-home {
-    position: absolute; /* Make it overlay on top of the slider */
+    position: absolute;
     top: 30%; 
     left: 50%;
-    transform: translate(-50%, -50%); /* Center it */
-    width: 100%; /* Make the form full width */
-    z-index: 10; /* Ensure the form stays on top */
+    transform: translate(-50%, -50%); 
+    width: 100%; 
+    z-index: 10; 
   }
   
   .form-top-home form {
-    max-width: 600px; /* You can adjust this as needed */
+    max-width: 600px; 
     margin: 0 auto;
   }
+
   a:hover {
     text-decoration: none;
   }
   
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     .form-top-home {
-      position: static; /* Make the form behave as normal content */
-      margin-top: 20px; /* Adjust the margin to space out the form */
+      position: static; 
+      margin-top: 20px; 
       transform: none;
     }
   
     .main-slider {
-      height: auto; /* Ensure the slider doesn't overflow in smaller screens */
+      height: auto;
     }
   }
   
-  /* Additional Styles for the form when overlayed on larger screens */
-  @media (min-width: 769px) {
+  @media (width >= 769px) {
     .main-slider {
-      height: 100vh; /* Make the slider take full height on larger screens */
+      height: 100vh; 
     }
-/*   
-    .form-top-home {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 80%; 
-      z-index: 100;
-    } */
+
   }
   
-  /* Additional spacing for the section under the slider */
-  /* .listing-home {
-    margin-top: 80px;
-  } */
-
   .card-im{
     border-radius: 20px;
     width: 340px;
@@ -114,7 +101,7 @@
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 10%);
   text-align: center;
 }
 
@@ -123,7 +110,7 @@
 }
 
 .fa-star.checked {
-  color: #ffcc00;
+  color: #fc0;
 }
 
 .testimonial-text {
@@ -140,20 +127,12 @@
   color: #666;
 }
 
-/* Custom Swiper navigation buttons */
 .swiper-button-next,
 .swiper-button-prev {
   color: black;
   transition: color 0.3s;
-  /* background-color: #2067d1; */
     width: 4%;
     border-radius: 54px;
     font-weight: 600;
     font-size: 40px;
   }
-
-
-/* .swiper-button-next:hover,
-.swiper-button-prev:hover {
-  color: #ffcc00;
-} */

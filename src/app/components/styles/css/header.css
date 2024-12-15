@@ -1,277 +1,13 @@
-/* 
-header {
-  background-color: white;
-  border-bottom: 1px solid #ddd;
-}
-
-.navbar-brand img {
-  height: 40px;
-}
-
-.navbar-nav .nav-item .nav-link {
-  font-size: 16px;
-  color: black;
-}
-
-.navbar-nav .nav-link:hover {
-  text-decoration: underline;
-}
-
-.header_search_form {
-  margin-top: 5px;
-  position: relative;
-}
-
-.header_search {
-  padding: 10px 9px !important;
-  position: absolute;
-  left: 0;
-  width: 95%;
-  border: 1px solid #00000052;
-}
-
-.header_search:focus {
-  outline: none;
-}
-
-.call-btn .btn {
-  padding: 5px 10px;
-  font-size: 12px;
-}
-.navbar-toggler {
-  border: none;
-}
-
-.navbar-toggler-icon {
-  color: black;
-}
-
-.dropdown-menu {
-  margin: -7px;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 1000;
-  min-width: 9rem;
-  font-size: 13px;
-  color: #212529;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, .15);
-  border-radius: 0.25rem;
-}
-
-.dropdown_item {
-  padding: 0px !important;
-  font-weight: 600 !important;
-}
-
-@media (max-width: 768px) {
-  .navbar-nav {
-      text-align: center;
-      padding: 10px;
-  }
-
-  .navbar-brand img {
-      max-width: 120px;
-  }
-
-  .call-btn a {
-      font-size: 14px;
-      padding: 10px;
-  }
-
-  .header_search_form {
-      width: 100%;
-      margin: 10px 0;
-  }
-}
-
-.card-im a {
-  text-decoration: none;
-}
-
-.premium {
-  position: absolute;
-  top: 10%;
-  left: 26%;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  text-align: center;
-  background: #2067d1;
-  height: 25px;
-  width: 81px;
-}
-
-.main-slider {
-  background: url('https://res.cloudinary.com/deiuirtja/image/upload/v1713934028/investmango/Image-01_1_bssioj.jpg') !important;
-  background-position: center !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-}
-
-.listing-home .listing-slide .card-im .list_headline_two {
-  font-size: 24px;
-}
-
-.offer-dec {
-  border: 3px dashed #fff;
-  border-radius: 9px;
-  background: url('https://www.investmango.com/update/img/main-banner.png');
-  padding: 12px;
-  color: #fff;
-}
-
-.blink_me {
-  animation: blinker 1s linear infinite;
-  background: red;
-  padding: 5px !important;
-  margin: 0;
-  color: #fff;
-  display: inline-block;
-}
-
-@keyframes blinker {
-  50% { opacity: 0; }
-}
-
-.top-header {
-  display: none;
-}
-
-.navbar {
-  padding: 0rem 1rem;
-}
-
-.stickyMenu {
-  position: fixed;
-  z-index: 99;
-  width: 100%;
-  transition: all 10s;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-.img-container {
-  position: relative;
-}
-
-.artistic-label {
-  position: absolute;
-  top: 95%;
-  right: 0;
-  transform: translate(0, -50%);
-  padding: 10px;
-  color: white;
-  font-size: 8px;
-}
-
-.img-fluid {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-@media (max-width: 600px) {
-  .call-btn {
-      display: none !important;
-  }
-
-  #pics {
-      width: 22%;
-  }
-
-  #heading {
-      margin-left: 85px !important;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  .form-top-home .form .form-group input[type=text] {
-      width: 598px;
-  }
-
-  .form-top-home .form {
-      display: block;
-      margin-top: 297px;
-  }
-
-  header nav .navbar-brand {
-      margin-right: 7px;
-  }
-
-  .navbar-expand-sm > .container {
-      margin-left: -28px;
-  }
-
-  .call-btn a {
-      font-size: 4px;
-  }
-}
-
-.content_li {
-  list-style: none;
-}
-
-@media (min-width: 900px) {
-  .navbar-expand-sm > .container,
-  .navbar-expand-sm > .container-fluid,
-  .navbar-expand-sm > .container-lg,
-  .navbar-expand-sm > .container-md,
-  .navbar-expand-sm > .container-sm,
-  .navbar-expand-sm > .container-xl {
-      flex-wrap: nowrap;
-  }
-}
-
-@media (max-width: 767px) {
-  .dropdown-menu {
-      margin-left: 0px !important;
-  }
-
-  header nav .navbar-nav .nav-link a.link i {
-      font-size: 12px;
-  }
-
-  #arrow, #arrow1 {
-      width: 24px;
-      height: 100%;
-      position: absolute;
-      right: 0;
-      z-index: 20000;
-  }
-}
-
-.MuiButton-root {
-  font-size: 1rem; 
-} */
-/* General Navbar Styling */
-
-
-
-/* Navbar Styles */
-/* .navbar {
-  background-color: #f8f9fa; 
-  padding: 1rem;
-} */
-
-/* .navbar {
-  padding: 0rem 1rem;
-  position: fixed;
-  z-index: 9999;
-  width: 100%;
-  background-color: white;
-} */
- .bg-light{
+.bg-light{
   background-color: rgb(255 255 255) !important;
-  /* padding: 0px; */
  }
+
 .navbar-brand img {
   width: 150px;
   height: auto;
   margin: auto;
 }
+
 .search-form-container {
   position: relative; /* For positioning the search overlay relative to this container */
 }
@@ -286,9 +22,9 @@ html {
 
 .search-overlay {
   position: absolute;
-  top: 0px;
+  top: 0;
   right: 47px;
-  padding: 0px;
+  padding: 0;
   border-radius: 5px;
   display: flex
 ;
@@ -320,61 +56,30 @@ html {
   visibility: visible;
 }
 
-/* .logo-img {
-  height: 50px;
-  width: auto;
-} */
 
-/* Navigation Links */
 .nav-link {
   color: #000!important;
-  /* font-weight: 600;
-  text-transform: uppercase;
-  margin-right: 15px; */
 }
 
-/* .nav-link:hover {
-  color: #2067d1;
-
-  text-decoration: none;
-} */
-
-/* Dropdown Styles */
-/* .navbar .dropdown-menu {
-  background-color: #fff;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-} */
-
-/* .navbar .dropdown-item {
-  color: #000;
-} */
-
-/* .navbar .dropdown-item:hover {
-  background-color: rgba(0, 123, 255, 0.1);
-  color: #2067d1;
-
-} */
-
-/* Phone and Search Button Section */
 .search-button,
 button {
   border: none;
   background: none;
   font-size: 14px;
   cursor: pointer;
-  padding: 10px 0px;
+  padding: 10px 0;
   margin-left: 10px;
   display: flex;
   align-items: center;
   font-weight: 600;
 }
+
 .dropdown-item {
   color: black;
 }
+
 .search-button svg {
   color: #7f7f7f;
-
   font-size: 16px;
 }
 
@@ -394,18 +99,13 @@ button:hover a {
   text-decoration: none;
 
 }
+
 .navbar-nav {
   font-weight: 600;
   font-size: 12px;
-  gap: 0px;
+  gap: 0;
 }
-/* 
-button:hover a svg {
-  color: #2067d1;
 
-} */
-
-/* Button Styles for Phone Numbers */
 button {
   border: 1px solid #2067d1;
   border-radius: 10px;
@@ -418,27 +118,25 @@ button {
 .phoneButton{
   border-radius: 10px;
 }
+
 button a {
   color: #fff;
   font-weight: 600;
 }
 
-/* button:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
-} */
-
-/* Media Queries for Responsiveness */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .phoneButton{
     display: none;
   }
+
   .search-overlay{
     right: 14px;
   }
+
   .search-overlay .search-input {
     width: 336px;
 }
+
   .navbar {
     padding: 0.5rem;
   }
@@ -454,10 +152,12 @@ button a {
     border-bottom: 1px solid #c5c5c5;
 
   }
+
   .search-form-container{
   position: relative;
     border-bottom: 1px solid #c5c5c5;
   }
+
   button {
     font-size: 12px;
     padding: 5px 8px;
