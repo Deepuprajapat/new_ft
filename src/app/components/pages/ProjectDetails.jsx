@@ -16,9 +16,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-import sampleFloorplan from './sampleFloorplan.json';
 import amenities from './ameties.json';
 import similarProjects from './similarProjects.json';
+
+
 const ProjectDetails = () => {
     const [activeSection, setActiveSection] = useState('overview');
     const [projectData, setProjectData] = useState(null);
@@ -31,10 +32,10 @@ const ProjectDetails = () => {
     const [showFullDescription, setShowFullDescription] = useState(false);
     const [activeFilter, setActiveFilter] = useState('all');
     const [showMobileNav, setShowMobileNav] = useState(false);
+    const [showFullScreen, setShowFullScreen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isNavFixed, setIsNavFixed] = useState(false);
     const [navInitialPosition, setNavInitialPosition] = useState(null);
-    const imageUrl = "https://www.investmango.com/img/ace-divino/ace-divino-greater-noida-west.webp";
-    const projectLogo = "https://www.investmango.com/img/all-logo/ace-divino-logo.webp"
 
     // Store initial nav position on mount
     useEffect(() => {
@@ -81,6 +82,29 @@ const ProjectDetails = () => {
         fetchDeveloper();
     }, [developerId]); // Dependency on developerId";
 
+    const formatPrice = (price) => {
+        if (!price) return '';
+        
+        const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+        
+        // Handle decimal crore values directly
+        if (numPrice < 100 && numPrice > 0) {
+            return `${numPrice} Cr`;
+        }
+        
+        if (numPrice >= 10000000) {
+            const crores = (numPrice / 10000000).toFixed(2);
+            return `${crores} Cr`;
+        }
+        
+        if (numPrice >= 100000) {
+            const lakhs = (numPrice / 100000).toFixed(2);
+            return `${lakhs} L`;
+        }
+        
+        return numPrice.toLocaleString('en-IN');
+    }
+
     // Function to toggle the expanded question
     const toggleFAQ = (index) => {
         setExpandedIndex(index === expandedIndex ? null : index);
@@ -111,7 +135,7 @@ const ProjectDetails = () => {
     const handleOtpChange = (e) => setOtp(e.target.value);
 
     // Simulate sending OTP API
-    const sendOtp = () => {
+    const sendOtp = async () => {
         if (!formData.usermobile || formData.usermobile.length !== 10) {
             setError("Please enter a valid 10-digit phone number.");
             return;
@@ -120,16 +144,28 @@ const ProjectDetails = () => {
         setOtpSent(true);
         setTimer(60);
         console.log("OTP sent to:", `${formData.dial_code}${formData.usermobile}`);
+        const response = await sendOtp(`${formData.dial_code}${formData.usermobile}`);
+        if (response.status === "success") {
+            setOtpSent(true);
+        } else {
+            setError("Failed to send OTP. Please try again.");
+        }
     };
 
     // Simulate OTP verification API
-    const verifyOtp = () => {
+    const verifyOtp = async () => {
         if (otp !== "1234") {
             setError("Invalid OTP. Please try again.");
             return;
         }
         setError("");
         setOtpVerified(true);
+        const response = await verifyOtp(`${formData.dial_code}${formData.usermobile}`, otp);
+        if (response.status === "success") {
+            setOtpVerified(true);
+        } else {
+            setError("Failed to verify OTP. Please try again.");
+        }
     };
 
     // Resend OTP logic
@@ -189,48 +225,122 @@ const ProjectDetails = () => {
     return <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
             {/* Gallery Section */}
-            <div className="row mx-0 g-0 " style={{ padding: '0.5px' }}>
-                {/* Main Image - Full width on mobile, half width on desktop */}
-                <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
-                    {projectData && projectData.images && imageUrl && (
-                        <div className="h-100 d-flex align-items-center justify-content-center" style={{ minHeight: '184px', maxHeight: '700px' }}>
-                            <a href={imageUrl} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-center w-100 h-100">
-                                <img
-                                    src={imageUrl}
-                                    alt="Project Image"
-                                    className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
-                                    style={{ objectFit: 'cover' }}
-                                    fetchpriority="high"
-                                />
-                            </a>
-                        </div>
-                    )}
-                </div>
-
-                {/* Additional Images Grid */}
-                <div className="col-12 col-md-6 p-0 d-flex align-items-center justify-content-center">
-                    <div className="row g-0">
-                        {/* Show all 4 images in one row on mobile and in 2x2 grid on desktop */}
-                        {[1, 2, 3, 4].map((index) => (
-                            projectData?.images?.[index] && (
-                                <div key={index} className="col-3 col-md-6" style={{ padding: '1px' }}>
-                                    <div className="h-100" style={{ minHeight: '92px', maxHeight: '350px' }}>
-                                        <a href={imageUrl} target="_blank" rel="noopener noreferrer" className="w-100 h-100">
-                                            <img
-                                                src={imageUrl}
-                                                alt={imageUrl.category || "Project Image"}
-                                                className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
-                                                style={{ objectFit: 'cover' }}
-                                                fetchpriority="high"
-                                            />
-                                        </a>
-                                    </div>
+            <div className="row mx-0 g-0" style={{ padding: '0.5px' }}>
+                {projectData && projectData.images && projectData.images.length > 0 && (
+                    <>
+                        {/* Main Image - Full width on mobile, half width on desktop */}
+                        <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
+                            {projectData?.images[0] && (
+                                <div className="h-100 d-flex align-items-center justify-content-center" style={{ minHeight: '184px', maxHeight: '700px' }}>
+                                    <a
+                                        href={projectData?.images[0]?.imageUrl}
+                                        data-toggle="lightbox"
+                                        data-gallery="gallery"
+                                        className="d-flex align-items-center justify-content-center w-100 h-100"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setShowFullScreen(true);
+                                            setCurrentImageIndex(0);
+                                        }}
+                                    >
+                                        <img
+                                            alt={projectData?.images[0]?.category || "Image"}
+                                            src={projectData?.images[0]?.imageUrl}
+                                            className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
+                                            style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                            fetchpriority="high"
+                                        />
+                                    </a>
                                 </div>
-                            )
-                        ))}
+                            )}
+                        </div>
+
+                        {/* Additional Images Grid */}
+                        <div className="col-12 col-md-6 p-0 d-flex align-items-center justify-content-center">
+                            <div className="row g-0">
+                                {[1, 2, 3, 4].map((index) => (
+                                    projectData?.images[index] && (
+                                        <div key={index} className="col-3 col-md-6" style={{ padding: '1px' }}>
+                                            <div className="h-100" style={{ minHeight: '92px', maxHeight: '350px' }}>
+                                                <a
+                                                    href={projectData?.images[index]?.imageUrl}
+                                                    data-toggle="lightbox"
+                                                    data-gallery="gallery"
+                                                    className="w-100 h-100"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setShowFullScreen(true);
+                                                        setCurrentImageIndex(index);
+                                                    }}
+                                                >
+                                                    <img
+                                                        alt={projectData?.images[index]?.category || "Image"}
+                                                        src={projectData?.images[index]?.imageUrl}
+                                                        className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
+                                                        style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                                        fetchpriority="high"
+                                                    />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    )
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+
+            {/* Fullscreen Image Modal */}
+            {showFullScreen && projectData?.images && (
+                <div
+                    className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                    style={{
+                        backgroundColor: 'rgba(0,0,0,0.9)',
+                        zIndex: 9999
+                    }}
+                    onClick={() => setShowFullScreen(false)}
+                >
+                    <div
+                        className="position-relative w-75"
+                        style={{ height: window.innerWidth <= 768 ? '50%' : '75%' }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <img
+                            src={projectData?.images[currentImageIndex]?.imageUrl}
+                            alt={projectData?.images[currentImageIndex]?.category || "Full Screen Image"}
+                            className="img-fluid w-100 h-100"
+                            style={{ objectFit: 'contain' }}
+                        />
+                        <button
+                            className="position-absolute top-50 start-0 translate-middle-y rounded-circle"
+                            onClick={() => setCurrentImageIndex(prev => prev === 0 ? projectData?.images?.length - 1 : prev - 1)}
+                            style={{
+                                width: '40px',
+                                height: '40px',
+                                background: 'rgba(255,255,255,0.3)',
+                                border: 'none',
+                                color: 'white'
+                            }}
+                        >
+                            &lt;
+                        </button>
+                        <button
+                            className="position-absolute top-50 end-0 translate-middle-y rounded-circle"
+                            onClick={() => setCurrentImageIndex(prev => prev === projectData?.images?.length - 1 ? 0 : prev + 1)}
+                            style={{
+                                width: '40px',
+                                height: '40px',
+                                background: 'rgba(255,255,255,0.3)',
+                                border: 'none',
+                                color: 'white'
+                            }}
+                        >
+                            &gt;
+                        </button>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
 
         {/* Navigation Section */}
@@ -248,37 +358,35 @@ const ProjectDetails = () => {
                 marginTop: isNavFixed ? '0' : 'auto'
             }}
         >
-            <div className="container" style={{ width: '80%' }}>
+            <div className="container" style={{ width: window.innerWidth <= 768 ? '90%' : '80%' }}>
                 {/* Desktop Navigation */}
                 <ul className="content-index d-none d-md-flex flex-wrap justify-content-between align-items-center list-unstyled mb-0 py-1" id="links">
                     {[
-                        'overview', 'about', 'floor', 'price', 'payment plan',
+                        'overview', 'about', 'floor', 'price', 'payment_plan',
                         'amenities', 'video', 'location', 'siteplan', 'developer',
-                        'faqs', 'similar projects'
+                        'faqs', 'similar_projects'
                     ].map((item) => (
                         <li key={item} className="mx-1">
                             <a
                                 href={`#${item}`}
-                                className={`text-white text-decoration-none ${activeSection === item ? 'fw-bolder' : ''}`}
+                                className={`text-white text-decoration-none ${activeSection === item ? 'fw-bold' : ''}`}
                                 style={{
-                                    fontWeight: activeSection === item ? '900' : '400',
+                                    fontWeight: activeSection === item ? 'bold' : '400',
                                     textDecoration: activeSection === item ? 'underline' : 'none'
                                 }}
                                 onClick={(e) => {
-                                    if (item === 'overview') {
-                                        e.preventDefault();
-                                        const element = document.querySelector('#project-details');
-                                        const headerOffset = 100;
-                                        const elementPosition = element.getBoundingClientRect().top;
-                                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                                        window.scrollTo({
-                                            top: offsetPosition,
-                                            behavior: 'smooth'
-                                        });
-                                    }
+                                    e.preventDefault();
+                                    const element = document.querySelector(`#${item}`);
+                                    const headerOffset = 100;
+                                    const elementPosition = element.getBoundingClientRect().top;
+                                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                                    window.scrollTo({
+                                        top: offsetPosition,
+                                        behavior: 'smooth'
+                                    });
                                 }}
                             >
-                                {item}
+                                {item.replace('_', ' ').charAt(0).toUpperCase() + item.replace('_', ' ').slice(1)}
                             </a>
                         </li>
                     ))}
@@ -286,49 +394,111 @@ const ProjectDetails = () => {
 
                 {/* Mobile Navigation */}
                 <div className="d-md-none">
-                    <button
-                        className={`btn w-100 text-center py-1 border-0 ${showMobileNav ? 'bg-white text-primary' : 'bg-transparent text-white'}`}
-                        onClick={() => setShowMobileNav(!showMobileNav)}
-                        style={{ height: '30px', fontSize: '12px' }}
-                    >
-                        {activeSection} <FontAwesomeIcon icon={faBars} className="ms-2" />
-                    </button>
+                    <div className="position-relative" style={{ backgroundColor: '#2067d1', width: '100%' }}>
+                        {/* Left scroll button */}
+                        <div
+                            id="scrollLeftArrow"
+                            className="position-absolute start-0 top-50 translate-middle-y"
+                            style={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                padding: '4px',
+                                marginLeft: '-30px',
+                                borderRadius: '0 50% 50% 0',
+                                color: 'white',
+                                fontSize: '14px',
+                                display: 'none',
+                                cursor: 'pointer',
+                                zIndex: 1
+                            }}
+                            onClick={() => {
+                                const nav = document.getElementById('scrollableNav');
+                                nav.scrollTo({
+                                    left: nav.scrollLeft - 100,
+                                    behavior: 'smooth'
+                                });
+                            }}
+                        >
+                            &lt;
+                        </div>
 
-                    <div className={`collapse ${showMobileNav ? 'show' : ''} transition-height`}
-                        style={{ transition: 'height 300ms ease-in-out' }}>
-                        <div className="bg-white mt-1">
+                        <div
+                            className="d-flex overflow-auto"
+                            id="scrollableNav"
+                            onScroll={(e) => {
+                                const element = e.target;
+                                const showRightArrow = element.scrollLeft < (element.scrollWidth - element.clientWidth - 10);
+                                const showLeftArrow = element.scrollLeft > 10;
+                                const rightArrow = document.getElementById('scrollRightArrow');
+                                const leftArrow = document.getElementById('scrollLeftArrow');
+                                if (rightArrow) {
+                                    rightArrow.style.display = showRightArrow ? 'block' : 'none';
+                                }
+                                if (leftArrow) {
+                                    leftArrow.style.display = showLeftArrow ? 'block' : 'none';
+                                }
+                            }}
+                            style={{
+                                scrollbarWidth: 'none',
+                                msOverflowStyle: 'none',
+                                '&::-webkit-scrollbar': {
+                                    display: 'none'
+                                }
+                            }}
+                        >
                             {[
-                                'overview', 'about', 'floor', 'price', 'payment plan',
+                                'overview', 'about', 'floor', 'price', 'payment_plan',
                                 'amenities', 'video', 'location', 'siteplan', 'developer',
-                                'faqs', 'similar projects'
+                                'faqs', 'similar_projects'
                             ].map((item) => (
                                 <a
                                     key={item}
                                     href={`#${item}`}
-                                    className={`d-block text-decoration-none py-1 px-3 border-bottom ${activeSection === item
-                                        ? 'bg-light text-primary'
-                                        : 'text-secondary bg-transparent'
-                                        }`}
-                                    style={{ fontSize: '11px' }}
+                                    className="text-decoration-none py-2 px-3 flex-shrink-0"
+                                    style={{ 
+                                        fontSize: '11px', 
+                                        whiteSpace: 'nowrap',
+                                        backgroundColor: activeSection === item ? '#ffffff' : 'transparent',
+                                        color: activeSection === item ? '#2067d1' : '#ffffff'
+                                    }}
                                     onClick={(e) => {
-                                        if (item === 'overview') {
-                                            e.preventDefault();
-                                            const element = document.querySelector('#project-details');
-                                            const headerOffset = 380;
-                                            const elementPosition = element.getBoundingClientRect().top;
-                                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                                            window.scrollTo({
+                                        e.preventDefault();
+                                        const element = document.querySelector(`#${item}`);
+                                        const headerOffset = 100;
+                                        const elementPosition = element.getBoundingClientRect().top;
+                                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                                        window.scrollTo({
                                                 top: offsetPosition,
                                                 behavior: 'smooth'
-                                            });
-                                        }
+                                        });
                                         setActiveSection(item);
-                                        setShowMobileNav(false);
                                     }}
                                 >
-                                    {item}
+                                    {item.replace('_', ' ').charAt(0).toUpperCase() + item.replace('_', ' ').slice(1)}
                                 </a>
                             ))}
+                        </div>
+                        {/* Right scroll button */}
+                        <div
+                            id="scrollRightArrow"
+                            className="position-absolute end-0 top-50 translate-middle-y"
+                            style={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                padding: '4px',
+                                marginRight: '-30px',
+                                borderRadius: '50% 0 0 50%',
+                                color: 'white',
+                                fontSize: '14px',
+                                cursor: 'pointer'
+                            }}
+                            onClick={() => {
+                                const nav = document.getElementById('scrollableNav');
+                                nav.scrollTo({
+                                    left: nav.scrollLeft + 100,
+                                    behavior: 'smooth'
+                                });
+                            }}
+                        >
+                            &gt;
                         </div>
                     </div>
                 </div>
@@ -345,8 +515,8 @@ const ProjectDetails = () => {
                         <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start mb-2 mt-2 mt-md-3">
                             <div className="mb-2 mb-md-0 me-md-3 text-center text-md-start">
                                 <img
-                                    src={projectLogo || "defaultLogo.jpg"}
-                                    alt={projectLogo || "Project Logo"}
+                                    src={projectData?.developerLogo || "defaultLogo.jpg"}
+                                    alt={projectData?.developerLogo || "Project Logo"}
                                     className="img-fluid"
                                     style={{ maxWidth: '80px' }}
                                 />
@@ -460,12 +630,16 @@ const ProjectDetails = () => {
             <div className="row">
                 <section className="col-md-8">
                     {/* Project Details */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} id="project-details">
+                    <div className="mb-4" id='overview' style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>Project Details</h4>
                             <div className="px-3">
                                 <p className="mb-2 mb-md-4" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
-                                    This is a brief overview of the project that gives essential information about its features and amenities.
+                                    {projectData?.overviewPara ? (
+                                        <div dangerouslySetInnerHTML={{ __html: projectData.overviewPara }} />
+                                    ) : (
+                                        <p>No overview available</p>
+                                    )}
                                 </p>
 
                                 <div className="row g-3 mb-0 mb-md-4">
@@ -484,7 +658,7 @@ const ProjectDetails = () => {
                                             <FontAwesomeIcon icon={faRulerCombined} className="mb-2 mb-md-0 me-md-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '20px', color: '#2067d1' }} />
                                             <div className="text-center text-md-start">
                                                 <small style={{ color: '#000', fontSize: window.innerWidth <= 768 ? '11px' : '15px', fontWeight: '600' }}>Sizes</small>
-                                                <p className="mb-0 fw-normal fw-md-bolder" style={{ color: '#000', fontSize: window.innerWidth <= 768 ? '12px' : '13px', marginTop: '2px', fontWeight: window.innerWidth <= 768 ? '400' : '800' }}>{projectData?.sizes?.join(' - ') || '800 sq ft - 1500 sq ft'}</p>
+                                                <p className="mb-0 fw-normal fw-md-bolder" style={{ color: '#000', fontSize: window.innerWidth <= 768 ? '12px' : '13px', marginTop: '2px', fontWeight: window.innerWidth <= 768 ? '400' : '800' }}>{projectData?.sizes?.join(' - ') || 'not available'}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -574,7 +748,7 @@ const ProjectDetails = () => {
                                             <FontAwesomeIcon icon={faHouseUser} className="mb-2 mb-md-0 me-md-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '20px', color: '#2067d1' }} />
                                             <div className="text-center text-md-start">
                                                 <small style={{ color: '#000', fontSize: window.innerWidth <= 768 ? '11px' : '15px', fontWeight: '600' }}>Configurations</small>
-                                                <p className="mb-0 fw-normal fw-md-bolder text-break" style={{ color: '#000', fontSize: window.innerWidth <= 768 ? '12px' : '13px', marginTop: '2px' }}>{projectData?.configurationsType?.configurations}</p>
+                                                <p className="mb-0 fw-normal fw-md-bolder text-break" style={{ color: '#000', fontSize: window.innerWidth <= 768 ? '12px' : '13px', marginTop: '2px' }}>{projectData?.configurationsType?.configurationTypeName}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -592,6 +766,164 @@ const ProjectDetails = () => {
                             </div>
                         </div>
                     </div>
+                    {/* connect to out expert for mobile view*/}
+                    {window.innerWidth <= 768 && (
+                        <div className="position-sticky mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                            <div className="bg-white rounded-3 mb-4 p-4 pb-0">
+                                <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>Connect to Our Expert</h4>
+                                {!otpSent && !otpVerified && (
+                                    <form onSubmit={(e) => e.preventDefault()}>
+                                        <div className="mb-3">
+                                            <input
+                                                name="username"
+                                                className="form-control"
+                                                type="text"
+                                                placeholder="Name"
+                                                value={formData.username}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <input
+                                                name="useremail"
+                                                className="form-control"
+                                                type="email"
+                                                placeholder="Email"
+                                                value={formData.useremail}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <div className="input-group">
+                                                <select
+                                                    name="dial_code"
+                                                    className="form-select"
+                                                    style={{ maxWidth: '100px' }}
+                                                    value={formData.dial_code}
+                                                    onChange={handleChange}
+                                                >
+                                                    <option value="91">+91</option>
+                                                    <option value="61">+61</option>
+                                                    <option value="852">+852</option>
+                                                    <option value="1">+1</option>
+                                                </select>
+                                                <input
+                                                    name="usermobile"
+                                                    className="form-control"
+                                                    type="tel"
+                                                    maxLength="10"
+                                                    placeholder="Phone"
+                                                    value={formData.usermobile}
+                                                    onChange={handleChange}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label fw-bold">I am interested in</label>
+                                            <select
+                                                className="form-select"
+                                                name="intersted_in"
+                                                value={formData.intersted_in}
+                                                onChange={handleChange}
+                                            >
+                                                <option value="">Select</option>
+                                                <option value="2bhk">2 BHK</option>
+                                                <option value="3bhk">3 BHK</option>
+                                            </select>
+                                        </div>
+                                        <div className="mb-3">
+                                            <textarea
+                                                name="usermsg"
+                                                className="form-control"
+                                                placeholder="Message"
+                                                rows="3"
+                                                value={formData.usermsg}
+                                                onChange={handleChange}
+                                            ></textarea>
+                                        </div>
+                                        {error && (
+                                            <div className="alert alert-danger">{error}</div>
+                                        )}
+                                        <div className="text-center d-flex justify-content-center">
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary w-100"
+                                                onClick={sendOtp}
+                                            >
+                                                Get a Call back
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+
+                                {otpSent && !otpVerified && (
+                                    <div>
+                                        <div className="alert alert-success">
+                                            <span className="fw-bold">
+                                                OTP sent to your mobile number{" "}
+                                                <a
+                                                    href="#"
+                                                    onClick={() => setOtpSent(false)}
+                                                    className="text-decoration-none"
+                                                >
+                                                    Edit
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <div className="mb-3">
+                                            <input
+                                                name="enterotp"
+                                                className="form-control"
+                                                type="text"
+                                                placeholder="Enter OTP"
+                                                value={otp}
+                                                onChange={handleOtpChange}
+                                            />
+                                        </div>
+                                        {error && (
+                                            <div className="alert alert-danger">{error}</div>
+                                        )}
+                                        <div className="d-flex justify-content-between">
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={resendOtp}
+                                                disabled={timer > 0}
+                                            >
+                                                Resend {timer > 0 && `(${timer}s)`}
+                                            </button>
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={verifyOtp}
+                                            >
+                                                Verify OTP
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {otpVerified && (
+                                    <form onSubmit={handleSubmit}>
+                                        <div className="alert alert-success">
+                                            OTP verified! We will connect with you shortly.
+                                        </div>
+                                        <button type="submit" className="btn btn-primary w-100">
+                                            Submit
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+
+                            <div className="bg-white rounded-3 p-3 pt-0 text-center d-flex justify-content-center">
+                                <button
+                                    className="btn btn-primary w-100"
+                                    style={{ fontSize: '16px' }}
+                                >
+                                    <i className="fas fa-download me-2"></i>
+                                    DOWNLOAD BROCHURE
+                                </button>
+                            </div>
+                        </div>
+                    )}
                     {/* Why to choose */}
                     <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} id="why-choose">
                         <div className="">
@@ -600,23 +932,23 @@ const ProjectDetails = () => {
                                     <h4 className="mb-0  py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>Why to choose {projectData?.name}?</h4>
                                     <div className="px-3" style={{ boxShadow: '0 4px 8px rgba(0,0,0,0.1)', borderRadius: '4px', padding: '20px' }}>
                                         <p className="text-muted mb-4" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
-                                            This is the reason why you should choose this project. It offers excellent amenities and prime location.
+                                            {projectData?.whyPara || "This is the reason why you should choose this project. It offers excellent amenities and prime location."}
                                         </p>
                                         <div className="row">
                                             <div className="col-md-6">
                                                 <div className="row g-1">
                                                     {/* First row with single image */}
-                                                    {projectData?.images && imageUrl && (
+                                                    {projectData?.images && projectData?.images[0] && (
                                                         <div className="col-12 mb-1">
                                                             <a
-                                                                href={imageUrl}
+                                                                href={projectData?.images[0].imageUrl}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block"
                                                             >
                                                                 <img
-                                                                    alt={imageUrl.caption || "Project Image 1"}
-                                                                    src={imageUrl}
+                                                                    alt={projectData?.images[0].caption || "Project Image 1"}
+                                                                    src={projectData?.images[0].imageUrl}
                                                                     className="img-fluid rounded w-100"
                                                                     style={{
                                                                         height: window.innerWidth <= 768 ? "200px" : "300px",
@@ -632,7 +964,7 @@ const ProjectDetails = () => {
                                                     {/* Second row with two images */}
                                                     <div className="col-12">
                                                         <div className="row g-2">
-                                                            {projectData?.images?.slice(1, 3).map((image, index) => (
+                                                            {projectData?.images && projectData?.images?.slice(1, 3).map((image, index) => (
                                                                 <div className="col-6" key={index + 1}>
                                                                     <a
                                                                         href={image.imageUrl}
@@ -642,7 +974,7 @@ const ProjectDetails = () => {
                                                                     >
                                                                         <img
                                                                             alt={image.caption || `Project Image ${index + 2}`}
-                                                                            src={imageUrl}
+                                                                            src={image.imageUrl}
                                                                             className="img-fluid rounded w-100"
                                                                             style={{ height: "150px", objectFit: "cover", borderRadius: "16px" }}
                                                                             fetchpriority="high"
@@ -657,7 +989,7 @@ const ProjectDetails = () => {
 
                                             <div className="col-md-6">
                                                 <div className="row g-4" style={{ marginTop: window.innerWidth <= 768 ? '5px' : '0' }}>
-                                                    {projectData?.usps?.map((usp, idx) => (
+                                                    {projectData?.usps && projectData?.usps?.map((usp, idx) => (
                                                         <div className="col-6" key={idx}>
                                                             <div className="d-flex align-items-start">
                                                                 <img
@@ -734,22 +1066,23 @@ const ProjectDetails = () => {
                         </div>
                     </div>
                     {/* Know About */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="mb-4" id = "about" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>Know About {projectData?.name}</h4>
                             <div className="px-3">
-                                <div className="position-relative overflow-hidden" style={{ maxHeight: showReraDetails ? 'none' : '100px' }}>
-                                    <div className={!showReraDetails ? 'position-absolute w-100 h-100' : ''}
+                                <div className="position-relative overflow-hidden" style={{ maxHeight: showFullDescription ? 'none' : '100px' }}>
+                                    <div className={!showFullDescription ? 'position-absolute w-100 h-100' : ''}
                                         style={{
-                                            background: !showReraDetails ? 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)' : 'none',
+                                            background: !showFullDescription ? 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)' : 'none',
                                             top: 0,
                                             left: 0
                                         }}>
                                     </div>
-                                    <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
-                                        {projectData?.name} is a premium residential project offering a blend of modern living and serene surroundings.
-                                        It provides a variety of amenities and spacious apartments designed for comfort and convenience.
-                                    </p>
+                                    <div className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
+                                        {projectData?.about && (
+                                            <div dangerouslySetInnerHTML={{ __html: projectData.about }} />
+                                        )}
+                                    </div>
                                     <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
                                         <span className="text-primary fw-bold">Coming Soon</span>
                                     </p>
@@ -760,17 +1093,21 @@ const ProjectDetails = () => {
                                     </p>
                                 </div>
                                 <button
+                                    type="button"
                                     className="btn btn-link text-decoration-none p-0 mt-2"
-                                    onClick={() => setShowReraDetails(!showReraDetails)}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setShowFullDescription(!showFullDescription);
+                                    }}
                                     style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}
                                 >
-                                    {showReraDetails ? 'Show Less' : 'Read More'}
+                                    {showFullDescription ? 'Show Less' : 'Read More'}
                                 </button>
                             </div>
                         </div>
                     </div>
                     {/* Floor Plan */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="mb-4" id = "floor"style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.name} Floor Plan</h4>
                             <div className="px-3">
@@ -792,40 +1129,34 @@ const ProjectDetails = () => {
                                     >
                                         All
                                     </button>
-                                    <button
-                                        onClick={() => setActiveFilter('2BHK')}
-                                        className={`btn ${activeFilter === '2BHK' ? 'btn-primary' : ''}`}
-                                        style={{
-                                            border: "2px solid #000",
-                                            borderRadius: "15px",
-                                            padding: window.innerWidth <= 768 ? '2px 5px' : '5px 15px',
-                                            fontSize: window.innerWidth <= 768 ? '10px' : '14px',
-                                            fontWeight: "600",
-                                            backgroundColor: activeFilter === '2BHK' ? 'rgb(32, 103, 209)' : ''
-                                        }}
-                                    >
-                                        2 BHK
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveFilter('3BHK')}
-                                        className={`btn ${activeFilter === '3BHK' ? 'btn-primary' : ''}`}
-                                        style={{
-                                            border: "2px solid #000",
-                                            borderRadius: "15px",
-                                            padding: window.innerWidth <= 768 ? '2px 5px' : '5px 15px',
-                                            fontSize: window.innerWidth <= 768 ? '10px' : '14px',
-                                            fontWeight: "600",
-                                            backgroundColor: activeFilter === '3BHK' ? 'rgb(32, 103, 209)' : ''
-                                        }}
-                                    >
-                                        3 BHK
-                                    </button>
+                                    {projectData?.configurations.map((config, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setActiveFilter(config)}
+                                            className={`btn ${activeFilter === config ? 'btn-primary' : ''}`}
+                                            style={{
+                                                border: "2px solid #000",
+                                                borderRadius: "15px",
+                                                padding: window.innerWidth <= 768 ? '2px 5px' : '5px 15px',
+                                                fontSize: window.innerWidth <= 768 ? '10px' : '14px',
+                                                fontWeight: "600",
+                                                backgroundColor: activeFilter === config ? 'rgb(32, 103, 209)' : ''
+                                            }}
+                                        >
+                                            {config}
+                                        </button>
+                                    ))}
                                 </div>
                                 <Carousel
                                     responsive={{
+                                        superLargeDesktop: {
+                                            breakpoint: { max: 4000, min: 3000 },
+                                            items: 3,
+                                            slidesToSlide: 1
+                                        },
                                         desktop: {
                                             breakpoint: { max: 3000, min: 1024 },
-                                            items: 3,
+                                            items: 2,
                                             slidesToSlide: 1
                                         },
                                         tablet: {
@@ -845,14 +1176,17 @@ const ProjectDetails = () => {
                                     style={{ width: '60%', margin: '0 auto' }}
                                 >
                                     {(() => {
-                                        const filteredPlans = sampleFloorplan.floorPlans
-                                            ?.filter(plan => activeFilter === 'all' || plan.type === activeFilter);
+                                        const filteredPlans = projectData?.floorplans || [];
+                                            
+                                        const filtered = filteredPlans.filter(plan => 
+                                            activeFilter === 'all' || plan.projectConfigurationName === activeFilter
+                                        );
 
-                                        return filteredPlans.map((plan, index) => (
+                                        return filtered.map((plan, index) => (
                                             <div key={index} className="px-2 d-flex justify-content-center">
-                                                <div className="card border-0" style={{ width: '80%', maxWidth: window.innerWidth <= 768 ? '80%' : 'auto' }}> {/* Reduced width to 80% */}
+                                                <div className="card border-0" style={{ width: '80%', maxWidth: window.innerWidth <= 768 ? '80%' : 'auto' }}> 
                                                     <div className="card-body p-3">
-                                                        <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', fontWeight: '600' }}>{plan.heading}</p>
+                                                        <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', fontWeight: '600' }}>{plan.title}</p>
                                                         <img
                                                             src={plan.imageUrl}
                                                             alt={`${plan.type} Floor Plan`}
@@ -862,11 +1196,11 @@ const ProjectDetails = () => {
                                                         <div className="row mb-3">
                                                             <div className="col-6">
                                                                 <small className="text-muted" style={{ fontSize: window.innerWidth <= 768 ? '11px' : '12px' }}>Builtup Area</small>
-                                                                <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? '13px' : '14px', fontWeight: '600' }}>{plan.buildUpArea}</p>
+                                                                <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? '13px' : '14px', fontWeight: '600' }}>{plan.size}</p>
                                                             </div>
                                                             <div className="col-6">
                                                                 <small className="text-muted" style={{ fontSize: window.innerWidth <= 768 ? '11px' : '12px' }}>Price</small>
-                                                                <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? '13px' : '14px', fontWeight: '600' }}>₹{plan.price || 'On Request'}</p>
+                                                                <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? '13px' : '14px', fontWeight: '600' }}>{formatPrice(plan.price)}</p>
                                                             </div>
                                                         </div>
                                                         <div className="d-flex flex-column gap-2 align-items-center">
@@ -913,48 +1247,30 @@ const ProjectDetails = () => {
                         </div>
                     </div>
                     {/* Price List */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="mb-4" id = "price" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.name} Price List</h4>
                             <div className="px-3">
                                 <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
                                     This is a brief description of the price list for the project.
                                 </p>
-                                <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                                <div style={{ overflowX: 'auto', maxHeight: '400px', overflowY: 'auto' }}>
                                     <table className="table table-striped" style={{ minWidth: window.innerWidth <= 768 ? '100%' : 'auto' }}>
                                         <thead>
                                             <tr>
-                                                <th scope="col" style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>Config</th>
-                                                <th scope="col" style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>Size</th>
-                                                <th scope="col" style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>Price</th>
-                                                <th scope="col" style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>Best Buy</th>
+                                                <th scope="col" style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px', fontWeight: 'bold', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>Configuration</th>
+                                                <th scope="col" style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px', fontWeight: 'bold', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>Size</th>
+                                                <th scope="col" style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px', fontWeight: 'bold', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>Price</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>2 BHK</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>1000 sq ft</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>₹75L</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>₹70L</td>
-                                            </tr>
-                                            <tr>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>3 BHK</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>1500 sq ft</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>₹1Cr</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>₹95L</td>
-                                            </tr>
-                                            <tr>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>4 BHK</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>2000 sq ft</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>On Request</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>₹1.85Cr</td>
-                                            </tr>
-                                            <tr>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>5 BHK</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>2500 sq ft</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>Sold Out</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}></td>
-                                            </tr>
+                                            { projectData?.floorplans && projectData?.floorplans?.map((plan, index) => (
+                                                <tr key={index}>
+                                                    <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>{plan.title}</td>
+                                                    <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>{plan.size} sq ft</td>
+                                                    <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>{!plan.isSoldOut ? formatPrice(plan.price) : "Sold Out"}</td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -973,32 +1289,22 @@ const ProjectDetails = () => {
                         <a href="tel:+918595-189-189" style={{ color: '#2067d1', textDecoration: 'underline' }}>8595-189-189</a>
                     </div>
                     {/* Payment Plan */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="mb-4" id = "payment_plan" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.name} Payment Plan</h4>
-                            <div className="px-3">
+                            <div className="p-3">
                                 <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
                                     This is a brief description of the payment plan for the project.
                                 </p>
                                 <div className="table-responsive">
                                     <table className="table table-striped">
                                         <tbody>
-                                            <tr>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>Booking Amount</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>10% of Total Price</td>
-                                            </tr>
-                                            <tr>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>On Agreement</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>20% of Total Price</td>
-                                            </tr>
-                                            <tr>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>On Foundation</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>15% of Total Price</td>
-                                            </tr>
-                                            <tr>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>On Completion</td>
-                                                <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>Remaining Balance</td>
-                                            </tr>
+                                            { projectData?.paymentPlans && projectData?.paymentPlans?.map((plan, index) => (
+                                                <tr key={index}>
+                                                    <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>{plan.planName}</td>
+                                                    <td style={{ fontSize: window.innerWidth <= 768 ? '11px' : '14px', padding: window.innerWidth <= 768 ? '8px 4px' : '8px' }}>{plan.details}</td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -1006,12 +1312,16 @@ const ProjectDetails = () => {
                         </div>
                     </div>
                     {/* Amenities */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="mb-4" id = "amenities" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.name} Amenities</h4>
                             <div className="px-3">
                                 <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
-                                    World class amenities are there in {projectData?.name} for the residents to enjoy a luxurious lifestyle. Know in detail about the amenities in the list below.
+                                    {projectData?.amenitiesPara ? (
+                                        <div dangerouslySetInnerHTML={{ __html: projectData.amenitiesPara }} />
+                                    ) : (
+                                        <p>World class amenities are there in {projectData?.name} for the residents to enjoy a luxurious lifestyle. Know in detail about the amenities in the list below.</p>
+                                    )}
                                 </p>
 
                                 <div className="inner-item" style={{ height: '400px', overflowY: 'auto', overflowX: 'hidden' }}>
@@ -1037,28 +1347,34 @@ const ProjectDetails = () => {
                         </div>
                     </div>
                     {/* video presentation */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="mb-4" id = "video" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>
-                                VIDEO PRESENTATION OF {projectData?.name}
+                                Video Presentation of {projectData && projectData?.name}
                             </h4>
                             <div className="px-3">
                                 <p className="mb-3 mb-md-5" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px' }}>
-                                    Click for the video of {projectData?.name} and understand every perspective of 'quality living' that they are offering. And for more property videos visit our YouTube channel.
+                                { projectData?.videoPara ? (
+                                    <div dangerouslySetInnerHTML={{ __html: projectData.videoPara }} />
+                                ) : (
+                                    `VIDEO PRESENTATION OF ${projectData?.name}`
+                                )}
                                 </p>
                                 <div className="d-flex flex-column">
-                                    <div className="ratio ratio-16x9">
-                                        <iframe
-                                            src="https://www.youtube.com/embed/OmvpphgerjI"
-                                            title={`${projectData?.name} Video Presentation`}
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                            style={{
-                                                border: 'none',
-                                                borderRadius: '8px'
-                                            }}
-                                        ></iframe>
-                                    </div>
+                                    { projectData?.videos && projectData?.videos?.map((videoUrl, index) => (
+                                        <div key={index} className="ratio ratio-16x9 mb-3">
+                                            <iframe
+                                                src="https://www.youtube.com/embed/OmvpphgerjI"
+                                                title={`${projectData?.name} Video Presentation ${index + 1}`}
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                                style={{
+                                                    border: 'none',
+                                                    borderRadius: '8px'
+                                                }}
+                                            ></iframe>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -1076,70 +1392,31 @@ const ProjectDetails = () => {
                                     </p>
 
                                     <div style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
-                                        <p className="fw-bolder mb-2" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', color: '#000000' }}>SPORTS FACILITIES</p>
-                                        <ul className="mb-4">
-                                            <li>Skyjumper trampoline park - 23-minute drive</li>
-                                            <li>Golf Course Noida - 25-minute drive</li>
-                                            <li>Play All Sports Complex - 19-minute drive</li>
-                                        </ul>
-
-                                        <p className="fw-bolder mb-2" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', color: '#000000' }}>ROAD CONNECTIVITY</p>
-                                        <ul className="mb-4">
-                                            <li>Ek Murti Gol Chakkar - 20-minute drive</li>
-                                            <li>Indira Gandhi International Airport - 1 hr 12 minutes drive</li>
-                                            <li>Pari Chowk - 25-minute drive</li>
-                                        </ul>
-
-                                        <p className="fw-bolder mb-2" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', color: '#000000' }}>PUBLIC TRANSPORT</p>
-                                        <ul className="mb-4">
-                                            <li>Blue Line Metro Station 52 - 25-minute drive</li>
-                                            <li>Sector 101 Metro Station Road Sector 78 - 16-minute drive</li>
-                                        </ul>
-
-                                        <p className="fw-bolder mb-2" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', color: '#000000' }}>MEDICAL FACILITIES</p>
-                                        <ul className="mb-4">
-                                            <li>Saini Hospital - 13-minute drive</li>
-                                            <li>Yatharth Hospital - 25-minute drive</li>
-                                            <li>Kailash Hospital - 32-minute drive</li>
-                                            <li>Nix Multi Speciality Hospital - 10-minute drive</li>
-                                        </ul>
-
-                                        <p className="fw-bolder mb-2" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', color: '#000000' }}>ENTERTAINMENT HUB</p>
-                                        <ul className="mb-4">
-                                            <li>Bhangel Market - 25-minute drive</li>
-                                            <li>Gaur City Mall - 19-minute drive</li>
-                                            <li>Ace City Square Mall - 13-minute drive</li>
-                                        </ul>
-
-                                        <p className="fw-bolder mb-2" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', color: '#000000' }}>EDUCATIONAL INSTITUTIONS</p>
-                                        <ul className="mb-4">
-                                            <li>K C International School - 10-minute drive</li>
-                                            <li>G D Goenka International School - 17-minute drive</li>
-                                            <li>Amity University - 31-minute drive</li>
-                                            <li>D.S International School - 7-minute drive</li>
-                                            <li>J M International School Greater Noida West - 15-minute drive</li>
-                                            <li>Maharishi University Of IT, Noida - 25-minute drive</li>
-                                        </ul>
+                                        {projectData?.locationPara && (
+                                            <div style={{ padding: '0px 10px' }} dangerouslySetInnerHTML={{ __html: projectData.locationPara }} />
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     {/* Location Map */}
-                    <div className="bg-white rounded-3 mb-4">
+                    <div className="bg-white rounded-3 mb-4" id = "location">
                         <h2 className="mb-4" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', color: '#000000', fontWeight: 'bold', textAlign: 'left', backgroundColor: '#2067d1', padding: '8px 12px', borderRadius: '4px', color: '#ffffff' }}>
-                            ACE Divino Location Map
+                            {projectData?.name} Location Map
                         </h2>
                         <div className="row">
                             <div className="col-12">
-                                <p className="mb-4 px-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
-                                    Ace Divino is located in <b>Sector-1, Greater Noida west,</b> Uttar Pradesh 201306. The location is easily accessible from all major highways and has good connectivity to nearby areas.
-                                </p>
+                                <div className="mb-4 px-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
+                                    {projectData?.locationMap && (
+                                        <div dangerouslySetInnerHTML={{ __html: projectData.locationMap }} />
+                                    )}
+                                </div>
                                 <div className="position-relative">
                                     <div style={{ position: 'absolute', width: '80%', height: '100%', background: '#f22a2a00', zIndex: 1 }}></div>
                                     <iframe
                                         title="Location"
-                                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3504.2857262980438!2d77.43616551440543!3d28.56118159405898!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cef9c39e91025%3A0x7a015a36f37ecdee!2sAce%20Divino!5e0!3m2!1sen!2sin!4v1663676267893!5m2!1sen!2sin"
+                                        src={projectData?.locationUrl}
                                         width="100%"
                                         height="300"
                                         style={{ border: 0 }}
@@ -1151,14 +1428,18 @@ const ProjectDetails = () => {
                         </div>
                     </div>
                     {/* Site Plan */}
-                    <div className="bg-white rounded-3 mb-4">
+                    <div className="bg-white rounded-3 mb-4" id = "siteplan">
                         <h2 className="mb-4" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', color: '#ffffff', fontWeight: 'bold', textAlign: 'left', backgroundColor: '#2067d1', padding: '8px 12px', borderRadius: '4px' }}>
-                            ACE Divino Site Plan
+                            {projectData?.name} Site Plan
                         </h2>
                         <div className="row">
                             <div className="col-12">
                                 <p className="mb-4 px-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
-                                    If we talk about the ACE Divino site plan, it spreads over 10.41 acres of area. In fact, it has 70% Green landscape and its rest 30% will be used for Construction according to sustainable lifestyle living.
+                                    {projectData?.siteplanPara ? (
+                                        <div dangerouslySetInnerHTML={{ __html: projectData.siteplanPara }} />
+                                    ) : (
+                                        <p>If we talk about the ACE Divino site plan, it spreads over 10.41 acres of area. In fact, it has 70% Green landscape and its rest 30% will be used for Construction according to sustainable lifestyle living.</p>
+                                    )}
                                 </p>
                                 <div className="position-relative px-3">
                                     <div className="position-relative" style={{ overflow: 'hidden', height: window.innerWidth <= 768 ? '200px' : '400px' }}>
@@ -1174,8 +1455,8 @@ const ProjectDetails = () => {
                                             <img
                                                 className="img-fluid"
                                                 id="zoom-image"
-                                                alt="ACE Divino Site Plan"
-                                                src="https://www.investmango.com/img/ace-divino/ace-divino-site-plan.webp"
+                                                alt={`${projectData?.name} Site Plan`}
+                                                src={projectData?.siteplanImg || "https://www.investmango.com/img/ace-divino/ace-divino-site-plan.webp"}
                                                 fetchpriority="high"
                                                 style={{
                                                     transform: 'scale(1) translate(0px, 0px)',
@@ -1263,37 +1544,48 @@ const ProjectDetails = () => {
                         </div>
                     </div>
                     {/* about group */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} id = "developer">
                         <div className="p-0 pb-2">
-                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>About ACE Group</h4>
+                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>About {developerDetails?.name}</h4>
                             <div className="row px-3">
                                 <div className="col-12">
-                                    <div className="d-flex align-items-center mb-4 px-3">
+                                    <div className="d-flex align-items-center px-3">
                                         <img
-                                            src="https://www.investmango.com/img/developer-img/ace-group.webp"
+                                            src={developerDetails?.logo}
                                             className="img-fluid me-3"
-                                            alt="ACE Group logo"
+                                            alt={developerDetails?.altLogo}
                                             style={{ maxWidth: '120px' }}
                                             fetchpriority="high"
                                         />
                                         <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
-                                            ESTABLISHED IN - <b>2010</b><br />
-                                            TOTAL PROJECTS - <b>10+</b>
+                                            ESTABLISHED IN - <b>{developerDetails?.establishedYear}</b><br />
+                                            TOTAL PROJECTS - <b>{developerDetails?.totalProjects}</b>
                                         </p>
                                     </div>
 
-                                    <p className="mb-4" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
-                                        <b>Ace Group of India</b> wants to deliver your 'dream home' - where you can enjoy the luxury in your personal space. Under the leadership of Mr.Ajay Ch . . .
-                                    </p>
-
-                                    <a href="developer.php/2/ace-group" className="btn btn-primary mb-4" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>Read More</a>
-
+                                    <div className="mb-4" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
+                                        {developerDetails?.about && (
+                                            <>
+                                                <div style={{padding: '0px 10px'}} dangerouslySetInnerHTML={{ 
+                                                    __html: expandedIndex === 'about' 
+                                                        ? developerDetails.about 
+                                                        : developerDetails.about.substring(0, 300) + '...'
+                                                }} />
+                                                <button 
+                                                    onClick={() => setExpandedIndex(expandedIndex === 'about' ? null : 'about')}
+                                                    className="btn btn-link p-0"
+                                                    style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}
+                                                >
+                                                    {expandedIndex === 'about' ? 'Show Less' : 'Read More'}
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
                                     <h4 className="fw-bold mb-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '18px' }}>Contact Details</h4>
 
                                     <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
-                                        <b>ACE Divino</b><br />
-                                        <b>Address:</b> GH-14A, Sector-1, Greater Noida West,
-                                        Uttar Pradesh 201306<br />
+                                        <b>{projectData?.name}</b><br />
+                                        <b>Address:</b> {projectData?.address}<br />
                                         <b>Phone:</b> <a href="tel:+918595-189-189" style={{ textDecoration: 'none' }}>+91-8595-189-189</a><br />
                                         <b>Book Your Site Visit</b> <span style={{ cursor: 'pointer', color: '#2067d1', fontWeight: 700 }} id="BookBtn3">Click Here</span>
                                     </p>
@@ -1302,7 +1594,7 @@ const ProjectDetails = () => {
                         </div>
                     </div>
                     {/* Frequently Asked Questions */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} id = "faqs">
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>
                                 Frequently Asked Questions (FAQs)
@@ -1312,35 +1604,7 @@ const ProjectDetails = () => {
                                     {/* JSON-LD content */}
                                 </script>
 
-                                {[
-                                    {
-                                        question: "Why to choose ACE Divino for investment?",
-                                        answer: <>
-                                            <p style={{ fontSize: '12px' }}>There are countless reasons to choose ACE Divino in Sector-1, Greater Noida West, some of the prominent reasons to choose ACE Divino are as follows -</p>
-                                            <ul style={{ fontSize: '12px' }}>
-                                                <li>Only 3 Apartments on a Single Floor for Privacy</li>
-                                                <li>A Skywalk is developed for the Inter-Walking Tower</li>
-                                                <li>One main clubhouse with 2 Mini Clubhouses</li>
-                                            </ul>
-                                        </>
-                                    },
-                                    {
-                                        question: "What is the location of the project?",
-                                        answer: "The ace divino address is Plot no GH-14A, Sector-1, Greater Noida West, Uttar Pradesh 201306."
-                                    },
-                                    {
-                                        question: "What is the RERA Number of ACE Divino?",
-                                        answer: "ACE Divino RERA Number is UPRERAPRJ6734."
-                                    },
-                                    {
-                                        question: "What is the project area of ACE Divino?",
-                                        answer: "The ACE Divino project is spread over a total land area of 10.41 acres."
-                                    },
-                                    {
-                                        question: "On which date it was launched?",
-                                        answer: "ACE Divino was launched in May 2017."
-                                    }
-                                ].map((faq, index) => (
+                                {projectData?.faqs?.map((faq, index) => (
                                     <div key={index} className="mb-3">
                                         <div
                                             className="d-flex justify-content-between align-items-center p-3"
@@ -1367,7 +1631,7 @@ const ProjectDetails = () => {
                         </div>
                     </div>
                     {/* Similar Projects */}
-                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} id = "similar_projects">
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>Similar Projects</h4>
                             <div className="row">
@@ -1470,161 +1734,163 @@ const ProjectDetails = () => {
 
                 <section className="col-md-4 mb-4">
                     {/*Connect to Our Expert */}
-                    <div className="position-sticky" style={{ top: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                        <div className="bg-white rounded-3 mb-4 p-4 pb-0">
-                            <h4 className="mb-4 text-center">Connect to Our Expert</h4>
-                            {!otpSent && !otpVerified && (
-                                <form onSubmit={(e) => e.preventDefault()}>
-                                    <div className="mb-3">
-                                        <input
-                                            name="username"
-                                            className="form-control"
-                                            type="text"
-                                            placeholder="Name"
-                                            value={formData.username}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <input
-                                            name="useremail" 
-                                            className="form-control"
-                                            type="email"
-                                            placeholder="Email"
-                                            value={formData.useremail}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <div className="input-group">
-                                            <select
-                                                name="dial_code"
-                                                className="form-select"
-                                                style={{ maxWidth: '100px' }}
-                                                value={formData.dial_code}
-                                                onChange={handleChange}
-                                            >
-                                                <option value="91">+91</option>
-                                                <option value="61">+61</option>
-                                                <option value="852">+852</option>
-                                                <option value="1">+1</option>
-                                            </select>
+                    {window.innerWidth > 768 && (
+                        <div className="position-sticky" style={{ top: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                            <div className="bg-white rounded-3 mb-4 p-4 pb-0">
+                                <h4 className="mb-4 text-center">Connect to Our Expert</h4>
+                                {!otpSent && !otpVerified && (
+                                    <form onSubmit={(e) => e.preventDefault()}>
+                                        <div className="mb-3">
                                             <input
-                                                name="usermobile"
+                                                name="username"
                                                 className="form-control"
-                                                type="tel"
-                                                maxLength="10"
-                                                placeholder="Phone"
-                                                value={formData.usermobile}
+                                                type="text"
+                                                placeholder="Name"
+                                                value={formData.username}
                                                 onChange={handleChange}
                                             />
                                         </div>
-                                    </div>
-                                    <div className="mb-3">
-                                        <label className="form-label fw-bold">I am interested in</label>
-                                        <select
-                                            className="form-select"
-                                            name="intersted_in"
-                                            value={formData.intersted_in}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="">Select</option>
-                                            <option value="2bhk">2 BHK</option>
-                                            <option value="3bhk">3 BHK</option>
-                                        </select>
-                                    </div>
-                                    <div className="mb-3">
-                                        <textarea
-                                            name="usermsg"
-                                            className="form-control"
-                                            placeholder="Message"
-                                            rows="3"
-                                            value={formData.usermsg}
-                                            onChange={handleChange}
-                                        ></textarea>
-                                    </div>
-                                    {error && (
-                                        <div className="alert alert-danger">{error}</div>
-                                    )}
-                                    <div className="text-center d-flex justify-content-center">
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary w-100"
-                                            onClick={sendOtp}
-                                        >
-                                            Get a Call back
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
-
-                            {otpSent && !otpVerified && (
-                                <div>
-                                    <div className="alert alert-success">
-                                        <span className="fw-bold">
-                                            OTP sent to your mobile number{" "}
-                                            <a
-                                                href="#"
-                                                onClick={() => setOtpSent(false)}
-                                                className="text-decoration-none"
+                                        <div className="mb-3">
+                                            <input
+                                                name="useremail"
+                                                className="form-control"
+                                                type="email"
+                                                placeholder="Email"
+                                                value={formData.useremail}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <div className="input-group">
+                                                <select
+                                                    name="dial_code"
+                                                    className="form-select"
+                                                    style={{ maxWidth: '100px' }}
+                                                    value={formData.dial_code}
+                                                    onChange={handleChange}
+                                                >
+                                                    <option value="91">+91</option>
+                                                    <option value="61">+61</option>
+                                                    <option value="852">+852</option>
+                                                    <option value="1">+1</option>
+                                                </select>
+                                                <input
+                                                    name="usermobile"
+                                                    className="form-control"
+                                                    type="tel"
+                                                    maxLength="10"
+                                                    placeholder="Phone"
+                                                    value={formData.usermobile}
+                                                    onChange={handleChange}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label fw-bold">I am interested in</label>
+                                            <select
+                                                className="form-select"
+                                                name="intersted_in"
+                                                value={formData.intersted_in}
+                                                onChange={handleChange}
                                             >
-                                                Edit
-                                            </a>
-                                        </span>
-                                    </div>
-                                    <div className="mb-3">
-                                        <input
-                                            name="enterotp"
-                                            className="form-control"
-                                            type="text"
-                                            placeholder="Enter OTP"
-                                            value={otp}
-                                            onChange={handleOtpChange}
-                                        />
-                                    </div>
-                                    {error && (
-                                        <div className="alert alert-danger">{error}</div>
-                                    )}
-                                    <div className="d-flex justify-content-between">
-                                        <button
-                                            className="btn btn-primary"
-                                            onClick={resendOtp}
-                                            disabled={timer > 0}
-                                        >
-                                            Resend {timer > 0 && `(${timer}s)`}
-                                        </button>
-                                        <button 
-                                            className="btn btn-primary"
-                                            onClick={verifyOtp}
-                                        >
-                                            Verify OTP
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+                                                <option value="">Select</option>
+                                                <option value="2bhk">2 BHK</option>
+                                                <option value="3bhk">3 BHK</option>
+                                            </select>
+                                        </div>
+                                        <div className="mb-3">
+                                            <textarea
+                                                name="usermsg"
+                                                className="form-control"
+                                                placeholder="Message"
+                                                rows="3"
+                                                value={formData.usermsg}
+                                                onChange={handleChange}
+                                            ></textarea>
+                                        </div>
+                                        {error && (
+                                            <div className="alert alert-danger">{error}</div>
+                                        )}
+                                        <div className="text-center d-flex justify-content-center">
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary w-100"
+                                                onClick={sendOtp}
+                                            >
+                                                Get a Call back
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
 
-                            {otpVerified && (
-                                <form onSubmit={handleSubmit}>
-                                    <div className="alert alert-success">
-                                        OTP verified! We will connect with you shortly.
+                                {otpSent && !otpVerified && (
+                                    <div>
+                                        <div className="alert alert-success">
+                                            <span className="fw-bold">
+                                                OTP sent to your mobile number{" "}
+                                                <a
+                                                    href="#"
+                                                    onClick={() => setOtpSent(false)}
+                                                    className="text-decoration-none"
+                                                >
+                                                    Edit
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <div className="mb-3">
+                                            <input
+                                                name="enterotp"
+                                                className="form-control"
+                                                type="text"
+                                                placeholder="Enter OTP"
+                                                value={otp}
+                                                onChange={handleOtpChange}
+                                            />
+                                        </div>
+                                        {error && (
+                                            <div className="alert alert-danger">{error}</div>
+                                        )}
+                                        <div className="d-flex justify-content-between">
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={resendOtp}
+                                                disabled={timer > 0}
+                                            >
+                                                Resend {timer > 0 && `(${timer}s)`}
+                                            </button>
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={verifyOtp}
+                                            >
+                                                Verify OTP
+                                            </button>
+                                        </div>
                                     </div>
-                                    <button type="submit" className="btn btn-primary w-100">
-                                        Submit
-                                    </button>
-                                </form>
-                            )}
-                        </div>
+                                )}
 
-                        <div className="bg-white rounded-3 p-3 pt-0 text-center d-flex justify-content-center">
-                            <button 
-                                className="btn btn-primary w-100"
-                                style={{ fontSize: '16px' }}
-                            >
-                                <i className="fas fa-download me-2"></i>
-                                DOWNLOAD BROCHURE
-                            </button>
+                                {otpVerified && (
+                                    <form onSubmit={handleSubmit}>
+                                        <div className="alert alert-success">
+                                            OTP verified! We will connect with you shortly.
+                                        </div>
+                                        <button type="submit" className="btn btn-primary w-100">
+                                            Submit
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+
+                            <div className="bg-white rounded-3 p-3 pt-0 text-center d-flex justify-content-center">
+                                <button
+                                    className="btn btn-primary w-100"
+                                    style={{ fontSize: '16px' }}
+                                >
+                                    <i className="fas fa-download me-2"></i>
+                                    DOWNLOAD BROCHURE
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </section>
             </div>
         </section>
