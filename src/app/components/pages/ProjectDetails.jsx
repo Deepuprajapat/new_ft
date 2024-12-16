@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getAllProjectsByUrlName, getDeveloperById } from '../../apis/api';
+import { getAllProjectsByUrlName, getDeveloperById, getAllProject } from '../../apis/api';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faExpandArrowsAlt,
@@ -16,13 +16,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-import amenities from './ameties.json';
-import similarProjects from './similarProjects.json';
 
 
 const ProjectDetails = () => {
     const [activeSection, setActiveSection] = useState('overview');
     const [projectData, setProjectData] = useState(null);
+    const [allSimilarProjects, setAllSimilarProjects] = useState(null);
     const [developerId, setDeveloperId] = useState("");
     const [developerDetails, setDeveloperDetails] = useState(null);
     const { urlName } = useParams();
@@ -46,6 +45,7 @@ const ProjectDetails = () => {
         }
     }, []);
 
+
     useEffect(() => {
         const fetchData = async () => {
             if (urlName) {
@@ -64,6 +64,18 @@ const ProjectDetails = () => {
         fetchData();
     }, [urlName]); // Dependency on urlName
 
+    useEffect(() => {
+        if (projectData) {
+            const fetchAllProject = async () => {
+                const data = await getAllProject(projectData?.locality?.city?.id);
+                console.log("Fetched all project data:", data?.content);
+                if (data) {
+                    setAllSimilarProjects(data?.content);
+                }
+            }
+            fetchAllProject();
+        }
+    }, [projectData]);
     // Fetch developer details when DeveloperId changes
     useEffect(() => {
         const fetchDeveloper = async () => {
@@ -103,6 +115,44 @@ const ProjectDetails = () => {
         }
         
         return numPrice.toLocaleString('en-IN');
+    }
+
+    // Process amenities to match the format of amenities.json
+    const processAmenities = () => {
+        if (!projectData?.projectAmenities) return [];
+
+        const groupedAmenities = projectData.projectAmenities.reduce((acc, amenity) => {
+            const category = amenity.category.toLowerCase();
+            if (!acc[category]) {
+                acc[category] = {
+                    name: category,
+                    assets: []
+                };
+            }
+            acc[category].assets.push({
+                name: amenity.name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+                icon: amenity.url
+            });
+            return acc;
+        }, {});
+
+        return Object.values(groupedAmenities);
+    };
+
+    const getLeastPriceOfFloorPlan = (floorPlan) => {
+        if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
+            return 0;
+        }
+        const sortedFloorPlan = [...floorPlan].sort((a, b) => a.price - b.price);
+        return sortedFloorPlan[0].price;
+    }
+
+    const getHighestPriceOfFloorPlan = (floorPlan) => {
+        if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
+            return 0;
+        }
+        const sortedFloorPlan = [...floorPlan].sort((a, b) => b.price - a.price);
+        return sortedFloorPlan[0].price;
     }
 
     // Function to toggle the expanded question
@@ -578,21 +628,11 @@ const ProjectDetails = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {projectData?.projectReraData?.map((row, index) => (
-                                                    <tr key={index}>
-                                                        <td>{row.phase}</td>
-                                                        <td>{row.status}</td>
-                                                        <td>
-                                                            <a
-                                                                href={row.reraLink}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                            >
-                                                                {row.reraNumber}
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                                <tr>
+                                                    <td style={{ fontSize: '11px', padding: '8px 0' }}></td>
+                                                    <td style={{ fontSize: '11px', padding: '8px 0' }}>{projectData?.status}</td>
+                                                    <td style={{ fontSize: '11px', padding: '8px 0' }}>{projectData?.reraLink}</td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -615,7 +655,7 @@ const ProjectDetails = () => {
                     <div className="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-2 mt-md-2 p-0 p-md-0" style={{ boxShadow: 'none', border: 'none', }}>
                         <p className="mb-1 fw-bold text-black text-center text-md-end mt-2 mt-md-4" style={{ fontSize: '16px' }}>Project Price</p>
                         <h2 className="h2 mb-0 fw-bold text-center text-md-end" style={{ fontSize: '25px', fontWeight: '800' }}>
-                            ₹{projectData?.minPrice || "0"} - ₹{projectData?.maxPrice || "0"}
+                            ₹{formatPrice(getLeastPriceOfFloorPlan(projectData?.floorplans)) || "0"} - ₹{formatPrice(getHighestPriceOfFloorPlan(projectData?.floorplans)) || "0"}
                         </h2>
                     </div>
                 </div>
@@ -917,6 +957,11 @@ const ProjectDetails = () => {
                                 <button
                                     className="btn btn-primary w-100"
                                     style={{ fontSize: '16px' }}
+                                    onClick={() => {
+                                        if (projectData?.brochure) {
+                                            window.open(projectData.brochure, '_blank');
+                                        }
+                                    }}
                                 >
                                     <i className="fas fa-download me-2"></i>
                                     DOWNLOAD BROCHURE
@@ -1325,7 +1370,7 @@ const ProjectDetails = () => {
                                 </p>
 
                                 <div className="inner-item" style={{ height: '400px', overflowY: 'auto', overflowX: 'hidden' }}>
-                                    {amenities.amenities.map((category, categoryIndex) => (
+                                    {processAmenities().map((category, categoryIndex) => (
                                         <div key={categoryIndex}>
                                             <p className="fw-bolder mb-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px', color: '#2067d1', fontWeight: '1000' }}>
                                                 {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
@@ -1364,7 +1409,7 @@ const ProjectDetails = () => {
                                     { projectData?.videos && projectData?.videos?.map((videoUrl, index) => (
                                         <div key={index} className="ratio ratio-16x9 mb-3">
                                             <iframe
-                                                src="https://www.youtube.com/embed/OmvpphgerjI"
+                                                src={`https://www.youtube.com/embed/${videoUrl}`}
                                                 title={`${projectData?.name} Video Presentation ${index + 1}`}
                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                                 allowFullScreen
@@ -1660,34 +1705,38 @@ const ProjectDetails = () => {
                                                 }
                                             }}
                                         >
-                                            {similarProjects.map((project, index) => (
-                                                <div key={index} className="px-2">
-                                                    <div className="similar_projects_item">
-                                                        <div style={{ color: '#000' }}>
-                                                            <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#000', textDecoration: 'none' }}>
-                                                                <img
-                                                                    src={project.imageUrl}
-                                                                    alt={project.name}
-                                                                    style={{ height: '150px', width: '100%', objectFit: 'cover', borderRadius: '10px' }}
-                                                                />
-                                                                <p style={{ color: '#2067d1', fontWeight: 600, margin: '10px 0', fontSize: window.innerWidth <= 768 ? '14px' : '16px', lineHeight: '20px', minHeight: '45px' }}>
-                                                                    {project.name}
-                                                                </p>
-                                                            </a>
-                                                            <div className="project-details">
-                                                                <p className="mb-1" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '13px' }}><i className="fas fa-map-marker-alt me-2"></i>{project.location}</p>
-                                                                {project.sizeInfo && <p className="mb-1" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '13px' }}><i className="fa fa-bed me-2"></i>Size Info: {project.sizeInfo}</p>}
-                                                                {project.startingPrice && (
-                                                                    <p className="mb-1" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '13px' }}>
-                                                                        Starting <i className="fas fa-rupee-sign me-1"></i>
-                                                                        <b>{project.startingPrice}</b>
+                                            {allSimilarProjects && allSimilarProjects.length > 0 ? (
+                                                allSimilarProjects.map((project, index) => (
+                                                    <div key={index} className="px-2">
+                                                        <div className="similar_projects_item">
+                                                            <div style={{ color: '#000' }}>
+                                                                <a href={project?.url} target="_blank" rel="noopener noreferrer" style={{ color: '#000', textDecoration: 'none' }}>
+                                                                    <img
+                                                                        src={project?.images[0]?.imageUrl}
+                                                                        alt={project?.name}
+                                                                        style={{ height: '150px', width: '100%', objectFit: 'cover', borderRadius: '10px' }}
+                                                                    />
+                                                                    <p style={{ color: '#2067d1', fontWeight: 600, margin: '10px 0', fontSize: window.innerWidth <= 768 ? '14px' : '16px', lineHeight: '20px', minHeight: '45px' }}>
+                                                                        {project.name}
                                                                     </p>
-                                                                )}
+                                                                </a>
+                                                                <div className="project-details">
+                                                                    <p className="mb-1" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '13px' }}><i className="fas fa-map-marker-alt me-2"></i>{project?.shortAddress}</p>
+                                                                    {project?.area && <p className="mb-1" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '13px' }}><i className="fa fa-bed me-2"></i>Size Info: {project?.area}</p>}
+                                                                    {project?.floorplans && (
+                                                                        <p className="mb-1" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '13px' }}>
+                                                                            Starting <i className="fas fa-rupee-sign me-1"></i>
+                                                                            <b>{formatPrice(getLeastPriceOfFloorPlan(project?.floorplans))}</b>
+                                                                        </p>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))
+                                            ) : (
+                                                <div>No similar projects available</div>
+                                            )}
                                         </Carousel>
                                         <style>
                                             {`
@@ -1884,6 +1933,11 @@ const ProjectDetails = () => {
                                 <button
                                     className="btn btn-primary w-100"
                                     style={{ fontSize: '16px' }}
+                                    onClick={() => {
+                                        if (projectData?.brochure) {
+                                            window.open(projectData.brochure, '_blank');
+                                        }
+                                    }}
                                 >
                                     <i className="fas fa-download me-2"></i>
                                     DOWNLOAD BROCHURE
