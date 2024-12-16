@@ -140,12 +140,18 @@ const ProjectDetails = () => {
     };
 
     const getLeastPriceOfFloorPlan = (floorPlan) => {
-        const sortedFloorPlan = floorPlan.sort((a, b) => a.price - b.price);
+        if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
+            return 0;
+        }
+        const sortedFloorPlan = [...floorPlan].sort((a, b) => a.price - b.price);
         return sortedFloorPlan[0].price;
     }
 
     const getHighestPriceOfFloorPlan = (floorPlan) => {
-        const sortedFloorPlan = floorPlan.sort((a, b) => b.price - a.price);
+        if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
+            return 0;
+        }
+        const sortedFloorPlan = [...floorPlan].sort((a, b) => b.price - a.price);
         return sortedFloorPlan[0].price;
     }
 
