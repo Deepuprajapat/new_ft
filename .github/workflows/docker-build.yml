@@ -1,4 +1,4 @@
-name: Build and push docker images to private registry
+name: Build and push docker images to private registry on the EC2 instance.
 
 on:
   push:
