@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-//import "../styles/css/compareProjects.css"
+import { getAllProject } from "../../apis/api"; // Importing the API function
 
 const CompareProjects = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProjects, setSelectedProjects] = useState(["", "", ""]);
   const [comparedProjects, setComparedProjects] = useState([]);
 
-  // Fetch project data from the API
+  // Fetch project data using api.js
   useEffect(() => {
-    axios
-      .get("http://13.200.229.71:8282/project/get/all?isDeleted=false&page=0&size=12")
-      .then((response) => setProjects(response.data.content))
-      .catch((error) => console.error("Error fetching projects:", error));
+    const fetchProjects = async () => {
+      const data = await getAllProject();
+      setProjects(data.content); // Update state with fetched projects
+    };
+
+    fetchProjects();
   }, []);
 
   // Handle dropdown selection
@@ -20,6 +21,12 @@ const CompareProjects = () => {
     const updatedSelection = [...selectedProjects];
     updatedSelection[index] = value;
     setSelectedProjects(updatedSelection);
+  };
+
+  const formatPriceInCrores = (price) => {
+    if (!price) return "N/A"; // Handle undefined/null prices
+    const crore = price / 10000000; // Convert price to crores
+    return `${crore.toFixed(2)} Cr`; // Format to 2 decimal places and add 'Cr'
   };
 
   // Handle compare action
@@ -39,13 +46,19 @@ const CompareProjects = () => {
   // Render the table data for comparison
   const renderProjectData = (project, field) => {
     switch (field) {
-        case "Image": // Fetch the image from the 'images' array
-        // Check if the project has images and return the first one
-        const image = project.images && project.images.length > 0 ? project.images[0].imageUrl : null;
+      case "Image":
+        const image =
+          project.images && project.images.length > 0
+            ? project.images[0].imageUrl
+            : null;
         return image ? (
-          <img src={image} alt={project.name} style={{ width: '300px', height: '300px',borderRadius: '10px' }} />
+          <img
+            src={image}
+            alt={project.name}
+            style={{ width: "300px", height: "300px", borderRadius: "10px" }}
+          />
         ) : (
-          "No Image Available" // Placeholder text if no image is found
+          "No Image Available"
         );
       case "Project Name":
         return project.name;
@@ -58,22 +71,47 @@ const CompareProjects = () => {
       case "Possession Date":
         return new Date(project.possessionDate).toLocaleDateString();
       case "Size/Price":
-        return project.configurations.join(", ");
+        return (
+          <table className="nested-table">
+            <tbody>
+              {project.floorplans && project.floorplans.length > 0 ? (
+                project.floorplans.map((config, index) => (
+                  <tr key={index}>
+                    <td>{config.title}</td>
+                    <td>{config.size} Sq.ft.</td>
+                    <td>{formatPriceInCrores(config.price)}</td> {/* Add formatted price */}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center">
+                    No Data Available
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        );
       case "Per Sq.ft. Rate":
-        // Assuming we get price per sq ft from another source or calculation
-        return "₹1000"; // Placeholder value
+        return "psf"; // Placeholder value
       case "Property Type":
-        return project.configurationsType.propertyType;
+        return project.configurationsType?.propertyType || "N/A";
       case "No. of Towers":
-        return project.totalFloor; // Assuming `totalFloor` can represent towers
+        const towerCount = project.totalTowers || 0; // Handle undefined or null values
+        return towerCount === 1
+          ? `${towerCount} Tower`
+          : `${towerCount} Towers`;
       case "Total Floors":
-        return project.totalFloor;
+        const floorCount = project.totalFloor || 0; // Handle undefined or null values
+        return floorCount === 1
+          ? `${floorCount} Floor`
+          : `${floorCount} Floors`;
       case "Per Tower Lifts":
-        return project.liftCount || "Not Available"; // Assuming lift count is in project data
+        return project.liftCount || "	--Lifts";
       case "Open Area":
-        return "5000 sq ft"; // Placeholder value
+        return "--"; // Placeholder value
       case "Construction Type":
-        return project.configurationsType.configurationName;
+        return project.configurationsType?.configurationName || "--";
       default:
         return "";
     }
@@ -85,38 +123,50 @@ const CompareProjects = () => {
       <p>Home / Compare Projects</p>
 
       <div className="text-center my-4">
-        {/* <h2 className="text-primary">Confused?</h2>
-        <p className="lead">Easy way to compare projects</p> */}
         <h2>
-        <b style={{color:'#2067d1',fontSize:'60px',fontFamily:'lato,sans-serif'}}>Confused?</b> 
-          {/* <b style={{color:'#2067d1'font-size:'60px'}}>Confused?</b>  */}
-          <br/>Easy way to compare projects
+          <b
+            style={{
+              color: "#2067d1",
+              fontSize: "40px", // Adjust to desired size
+              fontFamily: "Lato, sans-serif",
+            }}
+          >
+            Confused?
+          </b>
+          <br />
+          Easy way to compare projects
         </h2>
       </div>
 
-      <div className="d-flex  flex-wrap justify-content-center mb-4">
+      <div className="d-flex flex-wrap justify-content-center mb-4">
         {[0, 1, 2].map((index) => (
-            <div key={index} className="d-flex flex-column mx-2 mb-3" >
-          <select
-            key={index}
-            className="custom-select form-select mx-2"
-            style={{ width: "200px" }}
-            value={selectedProjects[index]}
-            onChange={(e) => handleSelect(index, e.target.value)}
-          >
-            <option value="">Select</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-          </select>
+          <div key={index} className="d-flex flex-column mx-2 mb-3">
+            <select
+              key={index}
+              className="custom-select form-select mx-2"
+              style={{ width: "200px" }}
+              value={selectedProjects[index]}
+              onChange={(e) => handleSelect(index, e.target.value)}
+            >
+              <option value="">Select</option>
+              {projects
+                .sort((a, b) => a.name.localeCompare(b.name)) // Sort projects alphabetically by name
+                .map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+            </select>
           </div>
         ))}
         <div className="w-100 d-flex justify-content-center">
-        <button className="btn btn-primary" style={{width: 'auto'}} onClick={handleCompare}>
-          Compare Now
-        </button>
+          <button
+            className="btn btn-primary"
+            style={{ width: "auto" }}
+            onClick={handleCompare}
+          >
+            Compare Now
+          </button>
         </div>
       </div>
 
@@ -124,14 +174,6 @@ const CompareProjects = () => {
         <div className="table-responsive">
           <h3 className="my-4">Project Comparison</h3>
           <table className="table table-bordered table-responsive">
-            <thead>
-              {/* <tr>
-                <th>Fields</th>
-                {comparedProjects.map((project) => (
-                  <th key={project.id}>{project.name}</th>
-                ))}
-              </tr> */}
-            </thead>
             <tbody>
               {[
                 "Image",
@@ -152,7 +194,9 @@ const CompareProjects = () => {
                 <tr key={field}>
                   <th>{field}</th>
                   {comparedProjects.map((project) => (
-                    <td key={project.id}>{renderProjectData(project, field)}</td>
+                    <td key={project.id}>
+                      {renderProjectData(project, field)}
+                    </td>
                   ))}
                 </tr>
               ))}

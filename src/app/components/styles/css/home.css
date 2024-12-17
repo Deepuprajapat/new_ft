@@ -178,11 +178,12 @@ a {
 
 .project-card-details span span {
   color: black;
-  font-weight: 700;
+  font-weight: 500;
+  font-size: small;
 }
 
 .project-card-price {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: bold;
   color: #1d1f21;
 }
@@ -271,4 +272,23 @@ p {
 
 .scroll-button-right {
   right: 10px;
+}
+
+
+.theme-btn {
+  font-family: 'Lato', sans-serif;
+  border-radius: 8px;
+  padding: 5px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #fff !important;
+  background-color: #2067d1;
+  border: 2px solid #2067d1;
+  text-decoration: none;
+  display: block;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-top: 15px;
 }

@@ -3,14 +3,28 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/css/home.css"; // Link to the updated CSS file
 
-
 const ProjectCard = ({ project }) => {
   const defaultImage = "http://localhost:3000/img/building_soon.jpg"; // Placeholder image
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const handleMoreDetails = (name) => {
     // Open the project details in a new tab
-    window.open(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`, '_blank', 'noopener,noreferrer');
+    window.open(
+      `/project/${name.toLowerCase().replace(/\s+/g, "-")}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   };
+
+  // Extract floorplan sizes
+  const floorplanSizes = project.floorplans?.map((floorplan) => floorplan.size) || [];
+  const minSize = floorplanSizes.length ? Math.min(...floorplanSizes) : null;
+  const maxSize = floorplanSizes.length ? Math.max(...floorplanSizes) : null;
+
+  // Find the minimum price
+  const minPrice = project.floorplans?.length
+  ? Math.min(...project.floorplans.map((floorplan) => floorplan.price))
+  : null;
+
   return (
     <div className="card-im">
       <a href={project.url} target="_blank" rel="noopener noreferrer">
@@ -28,31 +42,37 @@ const ProjectCard = ({ project }) => {
       <p className="project-card-details">
         <span>
           <i className="fas fa-ruler-combined"></i>{" "}
-          <span>{project.minSize && project.maxSize
-            ? `${project.minSize} To ${project.maxSize} Sq.ft.`
-            : "Size Info"}
-            </span>
+          <span>
+            {minSize && maxSize
+              ? `${minSize} To ${maxSize} Sq.ft.`
+              : "Size Info"}
+          </span>
         </span>
         <span>
           <i className="fa fa-bed" aria-hidden="true"></i>{" "}
           <span>
-          {Array.isArray(project.configuration)
-            ? project.configuration.join(", ")
-            : project.configuration || "Property Type"}
-            </span>
+            {Array.isArray(project.configurations) &&
+            project.configurations.length > 0
+              ? project.configurations.join(", ") // Join configurations with commas
+              : "Property Type"}{" "}
+            {/* Fallback text when configurations are empty or not an array */}
+          </span>
         </span>
       </p>
       <div className="project-card-footer">
-        <p className="project-card-price">
+      <p className="project-card-price">
           Start from{" "}
           <b>
             ₹
-            {project.minPrice >= 10000000
-              ? (project.minPrice / 10000000).toFixed(2) + "Cr"
-              : (project.minPrice / 100000).toFixed(2) + "L"}
+            {minPrice >= 10000000
+              ? (minPrice / 10000000).toFixed(2) + " Cr"
+              : (minPrice / 100000).toFixed(2) + " L"}
           </b>
         </p>
-        <button onClick={() => handleMoreDetails(project.name)} className="project-card-details-btn">
+        <button
+          onClick={() => handleMoreDetails(project.name)}
+          className="project-card-details-btn"
+        >
           more details
         </button>
       </div>
