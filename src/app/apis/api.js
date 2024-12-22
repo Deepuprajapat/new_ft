@@ -287,3 +287,39 @@ export const getAllLocalities = async () => {
     return [];
   }
 };
+
+export const sendOTP = async (phone, projectName, source, name, email) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/leads/save/new/and/send-otp`, {
+      name: name,
+      phone: phone,
+      email: email,
+      projectName: projectName,
+      source: source,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error resending OTP:", error);
+    throw error;
+  }
+}
+
+export const verifyOTP = async (phone, otp) => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/leads/validate/otp?phone=${phone}&OTP=${otp}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    throw error;
+  }
+}
+
+export const resendOTP = async (phone) => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/leads/resend/otp?phone=${phone}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error resending OTP:", error);
+    throw error;
+  }
+}
