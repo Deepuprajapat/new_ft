@@ -48,6 +48,7 @@ const ProjectDetails = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            console.log(urlName,'jkasdgdiyta')
             if (urlName) {
                 try {
                     const data = await getAllProjectsByUrlName(urlName);
@@ -62,7 +63,7 @@ const ProjectDetails = () => {
             }
         };
         fetchData();
-    }, [urlName]); // Dependency on urlName
+    }, [urlName]); 
 
     useEffect(() => {
         if (projectData) {

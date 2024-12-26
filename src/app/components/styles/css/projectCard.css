@@ -192,3 +192,11 @@ p {
     font-size: 1.5em;
   }
 }
+
+
+.no-projects-message {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-top: 50px;
+}

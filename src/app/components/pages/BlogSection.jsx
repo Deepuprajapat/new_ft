@@ -30,31 +30,37 @@ const BlogSection = ({ isSwiper }) => {
     );
   }
 
+  const stripHtml = (html) => {
+    return html.replace(/<[^>]*>/g, '');  // Removes HTML tags
+  };
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+    return date.toLocaleDateString('en-GB', options);
+  };
+
   return isSwiper ? (
-    <Swiper
-      {...sliderSettings}
-    >
+    <Swiper {...sliderSettings}>
       {blogs.map((blog) => (
         <SwiperSlide key={blog.id}>
-          <BlogCard blog={blog} />
+          <BlogCard blog={blog} stripHtml={stripHtml} formatDate={formatDate} />
         </SwiperSlide>
       ))}
-      {/* <SliderButton /> */}
     </Swiper>
   ) : (
     <div className="row">
       {blogs.map((blog) => (
-        <div key={blog.id} className="col-md-4" style={{marginBottom: '63px'}}>
-          <BlogCard blog={blog} />
+        <div key={blog.id} className="col-md-4" style={{ marginBottom: '63px' }}>
+          <BlogCard blog={blog} stripHtml={stripHtml} formatDate={formatDate} />
         </div>
       ))}
     </div>
   );
 };
 
-const BlogCard = ({ blog }) => (
+const BlogCard = ({ blog, stripHtml, formatDate }) => (
   <div className="item" style={{ padding: '20px' }}>
-
     <a href={`/blogs/${blog.blogUrl}`}>
       <img
         src={blog?.images[0] || "path/to/default-image.jpg"}
@@ -66,9 +72,9 @@ const BlogCard = ({ blog }) => (
     </a>
     <p className="title">{blog.headings}</p>
     <small style={{ color: "#666a6f" }}>
-      Date - {new Date(blog.createdDate).toLocaleDateString()}
+      Date - {formatDate(blog.createdDate)}  {/* Fixed date formatting */}
     </small>
-    <p className="des">{blog.description.slice(0, 100)} . . .</p>
+    <p className="des">{stripHtml(blog.description).slice(0, 100)} . . .</p> {/* Strip HTML from description */}
     <hr />
     <a href={`/blogs/${blog.blogUrl}`} className="theme-btn">
       Read More
@@ -76,15 +82,6 @@ const BlogCard = ({ blog }) => (
   </div>
 );
 
-// const SliderButton = () => {
-//   const swiper = useSwiper();
 
-//   return (
-//     <div className="r-buttons">
-//       <button onClick={() => swiper.slidePrev()}>&lt;</button>
-//       <button onClick={() => swiper.slideNext()}>&gt;</button>
-//     </div>
-//   );
-// };
 
 export default BlogSection;

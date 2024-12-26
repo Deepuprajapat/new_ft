@@ -6,10 +6,11 @@ import "../styles/css/home.css"; // Link to the updated CSS file
 const ProjectCard = ({ project }) => {
   const defaultImage = "http://localhost:3000/img/building_soon.jpg"; // Placeholder image
   const navigate = useNavigate();
-  const handleMoreDetails = (name) => {
+  const handleMoreDetails = (url) => {
+    // console.log("tetsing url"+ this.project.name);
     // Open the project details in a new tab
     window.open(
-      `/project/${name.toLowerCase().replace(/\s+/g, "-")}`,
+      `/project/${url.toLowerCase().replace(/\s+/g, "-")}`,
       "_blank",
       "noopener,noreferrer"
     );
@@ -27,7 +28,7 @@ const ProjectCard = ({ project }) => {
 
   return (
     <div className="card-im">
-      <a href={project.url} target="_blank" rel="noopener noreferrer">
+      <a href={"project/"+project.url} target="_blank" rel="noopener noreferrer">
         <img
           alt={project.name}
           src={(project.images && project.images[0]?.imageUrl) || defaultImage}
@@ -70,7 +71,7 @@ const ProjectCard = ({ project }) => {
           </b>
         </p>
         <button
-          onClick={() => handleMoreDetails(project.name)}
+          onClick={() => handleMoreDetails(project.url)}
           className="project-card-details-btn"
         >
           more details

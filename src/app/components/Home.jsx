@@ -1,3 +1,4 @@
+// src/components/Head.js
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../components/styles/css/style.css";
@@ -9,130 +10,43 @@ import MailSection from "./pages/MailSection";
 import Testimonial from "./pages/Testimonial";
 import ProjectCard from "./pages/ProjectCard";
 import BlogSection from "./pages/BlogSection";
-// import Popup from "./pages/Popup";
-import CityPopup from "./pages/Popup";
 import { getAllProject } from "../apis/api";
 import { sliderSettings } from "../../utils/common";
-import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "./Home.css";
 import withSafeLinks from "../../utils/rel";
-import { getAllLocalities } from "../apis/api";
+import SearchBar from "./pages/SearchBar"; // Import the SearchBar component
 
 const Head = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showPopup, setShowPopup] = useState(false);
-  const [localities, setLocalities] = useState([]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowPopup(true);
-    }, 5000);
-    return () => clearTimeout(timer); 
-  }, []);
-
-  const closePopup = () => {
-    setShowPopup(false);
-  };
 
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true); 
-      const response = await getAllProject();
-      console.log(response.content);
+      const response = await getAllProject({ isFeatured: true });
       setProjects(response.content || []);
       setLoading(false); 
     };
-    // const fetchBlog = async () => {
-    //   setLoading(true);
-    //   const response = await getAllBlog();
-    //   console.log("data of blpog", response.content);
-    //   setBlog(response.console || []);
-    //   setLoading(false);
-    // };
-    // // fetchBlog();
     fetchProjects();
   }, []);
 
-  useEffect(() => {
-    // Fetch localities when the component mounts
-    const fetchLocalities = async () => {
-      const data = await getAllLocalities();
-      setLocalities(data);
-    };
-
-    fetchLocalities();
-  }, []);
-
   return (
+
+    
     <div>
-      {/* {showPopup && <CityPopup onClose={closePopup} />} */}
       <section className="main-body">
+        {/* Render the SearchBar Component */}
+        {/*  */}
         <div className="main-slider">
           <div className="form-top-home">
             <div className="container">
-              <form
-                method="POST"
-                action="#"
-                autocomplete="off"
-                style={{ marginTop: "-200px" }}
-              >
-                <div className="form">
-                  <div className="form-group">
-                    <div className="form-top-home-select">
-                    <select
-                    name="location"
-                    className="form-control"
-                    aria-label="Noida"
-                  >
-                    <option value="" selected>
-                      Location --{" "}
-                    </option>
-                    {localities.map((locality) => (
-                      <option key={locality.id} value={locality.name}>
-                        {locality.city.name} - {locality.name}
-                      </option>
-                    ))}
-                  </select>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <input
-                      className="form-control"
-                      list="projects"
-                      id="search"
-                      type="text"
-                      name="search"
-                      placeholder="Search using Project Name"
-                    />
-                    <datalist id="projects"></datalist>
-                  </div>
-                  <div className="form-group">
-                    <div className="form-top-home-select">
-                      <select
-                        name="type"
-                        className="form-control border-r"
-                        aria-label="Residential"
-                      >
-                        <option value="" selected>
-                          Property --{" "}
-                        </option>
-                        <option value="Residential">Residential</option>
-                        <option value="Commercial">Commercial</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <button type="submit" className="btn btn-dark">
-                      Search
-                    </button>
-                  </div>
-                </div>
-              </form>
+            <SearchBar />
             </div>
           </div>
         </div>
+
 
         <div className="listing-home">
           <div className="container-fluid">
@@ -142,7 +56,9 @@ const Head = () => {
                 <div className="main-con">
                   <div className="container">
                     <div className="headline" style={{ display: "contents" }}>
-                      <h1 className="h3" style={{marginTop:'26px'}}>Top Projects</h1>
+                      <h1 className="h3" style={{ marginTop: "26px" }}>
+                        Top Projects
+                      </h1>
                       <p className="head_p">
                         Connecting people with their dream properties
                       </p>
@@ -150,11 +66,11 @@ const Head = () => {
                     <Swiper {...sliderSettings}>
                       {loading ? (
                         <div className="loader-container">
-                          <div className="loader">Loading...</div>{" "}
+                          <div className="loader">Loading...</div>
                         </div>
                       ) : (
                         <div className="listing-home listing-page row">
-                          {projects.map((project) => (
+                          {projects?.map((project) => (
                             <SwiperSlide key={project.id}>
                               <ProjectCard project={project} />
                             </SwiperSlide>
@@ -197,7 +113,7 @@ const Head = () => {
             </div>
             {loading ? (
               <div className="loader-container">
-                <div className="loader">Loading...</div>{" "}
+                <div className="loader">Loading...</div>
               </div>
             ) : (
               <div className="listing-home listing-page row">
@@ -214,7 +130,7 @@ const Head = () => {
             </div>
             {loading ? (
               <div className="loader-container">
-                <div className="loader">Loading...</div>{" "}
+                <div className="loader">Loading...</div>
               </div>
             ) : (
               <div className="listing-home listing-page row">
@@ -232,13 +148,3 @@ const Head = () => {
 };
 
 export default withSafeLinks(Head);
-
-// const SliderButton = () => {
-//   const swiper = useSwiper();
-//   return (
-//     <div className="r-buttons">
-//       <button onClick={() => swiper.slidePrev()}>&lt;</button>
-//       <button onClick={() => swiper.slideNext()}>&gt;</button>
-//     </div>
-//   );
-// };

@@ -1,76 +1,91 @@
 import React, { useEffect, useState } from "react";
 import "../styles/css/projectCard.css";
 import { getAllProject } from "../../apis/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ProjectCard from "./ProjectCard";
-import { sliderSettings } from "../../../utils/common";
-// import { sliderSettings } from "../../utils/common";
-import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
-import "swiper/css";
+
 const AllProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const handleMoreDetails = (name) => {
-    navigate(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`);
+  const location = useLocation();
+
+  // Function to extract query params
+  const getQueryParams = () => {
+    const searchParams = new URLSearchParams(location.search);
+    return {
+      cityId: searchParams.get("locationId"), // Extract locationId as cityId
+      locationName: searchParams.get("location"), // Optional: Get location name
+      propertyType: searchParams.get("propertyType"), // Get property type
+      search: searchParams.get("search"), // Search term (project name)
+    };
   };
 
   useEffect(() => {
     const fetchProjects = async () => {
+      setLoading(true);
       try {
-        const data = await getAllProject();
+        const { cityId, propertyType, search } = getQueryParams();
+  
+        const filters = {
+          isDeleted: false,
+          ...(cityId && { cityId }),
+          ...(search && { name: search }),
+          ...(propertyType && { type: propertyType }), // Pass propertyType as 'type'
+        };
+  
+        console.log("Fetching with filters:", filters); // Debug filters
+        const data = await getAllProject(filters);
         console.log("Fetched Projects:", data);
-        setProjects(data.content);
+        setProjects(data.content || []);
       } catch (error) {
         console.error("Error fetching projects:", error);
+        setProjects([]);
       } finally {
         setLoading(false);
       }
     };
+  
     fetchProjects();
-  }, []);
+  }, [location.search]); // Runs when query params change
+
+  const handleMoreDetails = (name) => {
+    navigate(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`);
+  };
 
   return (
     <div>
       <section className="main-body">
         <div className="container">
-          <h1 className="project-title">All Projects</h1>
+          <h1 className="project-title">
+            {getQueryParams().locationName
+              ? `Projects in ${getQueryParams().locationName}`
+              : "All Projects"}
+          </h1>
           <p>
-            <a
-              href="http://localhost:3000/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="styled-link"
-            >
+            <a href="/" className="styled-link">
               Home
-            </a>
-            / All Projects
+            </a>{" "}
+            / {getQueryParams().locationName || "All Projects"}
           </p>
-          <h2>Best Residential And Commercial Projects</h2>
         </div>
 
         <div className="main-con">
           <div className="container">
             <div className="listing-home listing-page">
-            <div class="listing-slide row">
-              {loading ? (
-                <p>Loading projects...</p>
-              ) : projects.length > 0 ? (
-                projects.map((project,index) => (
-                  
-                        <div class="col-md-4">
-                  <div key={index}>
-                    <ProjectCard project={project} />
-                  </div>
-                  </div>
-                 
-
-                ))
-               
-              ) : (
-                <p>No projects available.</p>
-              )}
-          </div>
+              <div className="listing-slide row">
+                {loading ? (
+                  <p>Loading projects...</p>
+                ) : projects.length > 0 ? (
+                  projects.map((project, index) => (
+                    <div className="col-md-4" key={index}>
+                      <ProjectCard project={project} />
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-projects-message">No projects available...</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

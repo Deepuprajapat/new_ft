@@ -44,15 +44,7 @@
     position: relative;
   }
   
-  .form-top-home {
-    position: absolute;
-    top: 30%; 
-    left: 50%;
-    transform: translate(-50%, -50%); 
-    width: 100%; 
-    z-index: 10; 
-  }
-  
+ 
   .form-top-home form {
     max-width: 600px; 
     margin: 0 auto;

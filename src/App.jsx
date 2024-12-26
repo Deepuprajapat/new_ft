@@ -23,6 +23,9 @@ import AddNewProjects from "./app/components/pages/AddNewProjects";
 import OverviewProjects from "./app/components/pages/OverviewProjects";
 import Dashboard from "./app/components/pages/Dashboard";
 import CompareProjects from "./app/components/pages/CompareProjects";
+import "./app/components/pages/NotFound"
+import NotFound from "./app/components/pages/NotFound";
+import ThankYouPage from "./app/components/ThankYouPage";
 
 const router = createBrowserRouter([
   {
@@ -43,9 +46,11 @@ const router = createBrowserRouter([
       { path: "/contact", element: <Contact /> },
       { path: "/sitemap", element: <SiteMap /> },
       { path: "/developerPage", element: <DeveloperPage /> },
-      { path: "/projectDetails", element: <ProjectDetails /> },
+      // { path: "/projectDetails", element: <ProjectDetails /> },
       { path: "/project/:urlName", element: <ProjectDetails /> },
       { path: "/propertyDetails", element: <PropertyDetails /> },
+      {path:"*" ,element: <NotFound/>},
+      {path: "/thankYou" ,element: <ThankYouPage/>},
       {
         path: "/",
         element: <Dashboard />,

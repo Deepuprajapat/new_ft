@@ -34,7 +34,7 @@ axios.interceptors.request.use(
 
 export const currentUser = async (token) => {
   try {
-    console.log("token  //////", token);
+    console.log("token", token);
 
     const res = await axios.get(`${BASE_URL}/auth/current`, {
       headers: {
@@ -48,6 +48,7 @@ export const currentUser = async (token) => {
     return { content: [] };
   }
 };
+
 export const getAllLocality = async () => {
   try {
     const res = await axios.get(`${BASE_URL}/locality/get/all`, {
@@ -61,6 +62,7 @@ export const getAllLocality = async () => {
     return { content: [] };
   }
 };
+
 export const getAllDeveloper = async () => {
   try {
     const res = await axios.get(`${BASE_URL}/developer/get/all`, {
@@ -101,17 +103,59 @@ export const getAllPropertyConfiguration = async () => {
   }
 };
 
-export const getAllProject = async (page = 0, size = 500) => {
+// export const getAllProject = async (page = 0, size = 500) => {
+//   try {
+//     const res = await axios.get(
+//       `${BASE_URL}/project/get/all?isDeleted=false&page=${page}&size=${size}`
+//     );
+//     return res.data;
+//   } catch (error) {
+//     console.error("Error fetching projects:", error);
+//     return { content: [] };
+//   }
+// };
+
+export const getAllProject = async (filters = {}) => {
+  const {
+    page,
+    size = 100,
+    isPriority,
+    isPremium,
+    isFeatured,
+    isDeleted,
+    status,
+    developerId,
+    cityId,
+    localityId,
+    name,
+    type, 
+  } = filters;
+
   try {
-    const res = await axios.get(
-      `${BASE_URL}/project/get/all?isDeleted=false&page=${page}&size=${size}`
-    );
+    const params = {
+      ...(page !== undefined && { page }),
+      ...(size !== undefined && { size }),
+      ...(isDeleted !== undefined && { isDeleted }),
+      ...(isPriority !== undefined && { isPriority }),
+      ...(isPremium !== undefined && { isPremium }),
+      ...(isFeatured !== undefined && { isFeatured }),
+      ...(status && { status }),
+      ...(developerId && { developerId }),
+      ...(cityId && { cityId }),
+      ...(localityId && { localityId }),
+      ...(name && { name }),
+      ...(type && { type: type.toUpperCase() }),  
+    };
+    console.log("Params sent to API:", params); // Debugging
+    const res = await axios.get(`${BASE_URL}/project/get/all`, { params });
     return res.data;
   } catch (error) {
     console.error("Error fetching projects:", error);
     return { content: [] };
   }
 };
+
+
 
 //  get all project by urlname
 export const getAllProjectsByUrlName = async (urlName) => {
@@ -278,12 +322,82 @@ export const submitHiringForm = async (formData) => {
   }
 };
 
+// export const getAllLocalities = async () => {
+//   try {
+//     const response = await axios.get(`${BASE_URL}/locality/get/all`);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching localities:", error);
+//     return [];
+//   }
+// };
+
 export const getAllLocalities = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/locality/get/all`);
-    return response.data;
+    const localities = response.data || []; // Default to an empty array if no data
+
+    // Map localities to extract city details and ensure uniqueness
+    const uniqueCities = Array.from(
+      new Map(
+        localities.map((locality) => [locality.city.id, locality.city])
+      ).values()
+    );
+
+    return uniqueCities; // Returns an array of { id, name } objects
   } catch (error) {
     console.error("Error fetching localities:", error);
     return [];
+  }
+};
+
+// API Call to Check Phone Number
+export const checkPhoneNumberExists = async (phone) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/leads/get/all`, {
+      params: {
+        phone: phone,
+        page: 0,
+        size: 50
+      }
+    });
+
+    console.log("Phone Check Response:", response.data);
+    
+    // Handle the paginated response properly
+    const leads = response.data?.content || [];  
+    return leads.some((lead) => lead.phone === phone);
+    
+  } catch (error) {
+    console.error("Error checking phone number:", error.response || error.message);
+    throw new Error("Failed to check phone number.");
+  }
+};
+
+// API Call to Submit New Lead
+export const submitLead = async (formData) => {
+  const payload = {
+    id: 0,
+    createdDate: new Date().getTime(),
+    updatedDate: new Date().getTime(),
+    name: formData.username,
+    phone: formData.usermobile,
+    email: "",
+    projectName: formData.usermsg,
+    source: "Website",
+    otp: "",
+    frequency: 1,
+  };
+
+  try {
+    const response = await axios.post(
+      "http://13.200.229.71:8282/leads/save/new",
+      payload
+    );
+    console.log("Lead Submission Response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting lead:", error.response || error.message);
+    throw new Error("Failed to submit lead.");
   }
 };
