@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getAllProjectsByUrlName, getDeveloperById, getAllProject, sendOTP, verifyOTP, resendOTP } from '../../apis/api';
+import { getAllProjectsByUrlName, getDeveloperById, getAllProject, sendOTP, verifyOTP, resendOTP, getLeadByPhone, saveLead } from '../../apis/api';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faExpandArrowsAlt,
@@ -254,12 +254,35 @@ const ProjectDetails = () => {
     }, [timer, otpSent]);
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form Submitted:", formData);
-        setOtpSent(false);
-        setOtpVerified(false);
-        alert("Thank you! We will connect with you shortly.");
+        try {
+            // Check if lead exists
+            const existingLead = await getLeadByPhone(`${formData.usermobile}`);
+            
+            if (existingLead?.message != null) {
+                // Lead doesn't exist, create new lead
+                const newLead = {
+                    name: formData.username,
+                    phone: `${formData.dial_code}${formData.usermobile}`,
+                    email: formData.useremail,
+                    projectName: projectData?.name,
+                    source: "Website"
+                };
+                await saveLead(newLead);
+                alert("Thank you! We will connect with you shortly.");
+            }else{
+                alert("Thank you! We will connect with you shortly.");
+            }
+
+            setOtpSent(false);
+            setOtpVerified(false);
+            alert("Thank you! We will connect with you shortly.");
+
+        } catch (error) {
+            console.error("Error handling form submission:", error);
+            alert("Something went wrong. Please try again.");
+        }
     };
 
     // Update active section based on scroll position and handle nav fixing
@@ -908,7 +931,7 @@ const ProjectDetails = () => {
                                             <button
                                                 type="button"
                                                 className="btn btn-primary w-100"
-                                                onClick={sendOtp}
+                                                onClick={handleSubmit}
                                             >
                                                 Get a Call back
                                             </button>
@@ -1578,7 +1601,8 @@ const ProjectDetails = () => {
                                                     background: '#dddd',
                                                     width: '40px',
                                                     height: '40px',
-                                                    cursor: 'pointer'
+                                                    cursor: 'pointer',
+                                                    color: '#000'
                                                 }}
                                                 onClick={() => {
                                                     const img = document.getElementById('zoom-image');
@@ -1597,7 +1621,8 @@ const ProjectDetails = () => {
                                                     background: '#dddd',
                                                     width: '40px',
                                                     height: '40px',
-                                                    cursor: 'pointer'
+                                                    cursor: 'pointer',
+                                                    color: '#000'
                                                 }}
                                                 onClick={() => {
                                                     const img = document.getElementById('zoom-image');
@@ -1890,7 +1915,7 @@ const ProjectDetails = () => {
                                             <button
                                                 type="button"
                                                 className="btn btn-primary w-100"
-                                                onClick={sendOtp}
+                                                onClick={handleSubmit}
                                             >
                                                 Get a Call back
                                             </button>

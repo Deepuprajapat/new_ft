@@ -3,6 +3,7 @@ import axios from "axios";
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
 const BASE_URL1 = process.env.REACT_APP_BASE_URL || "http://3.111.119.169:8080";
 let token = "";
+
 export const login = async (userName, password) => {
   try {
     const response = await axios.post(`${BASE_URL}/auth/generate-token`, {
@@ -323,3 +324,24 @@ export const resendOTP = async (phone) => {
     throw error;
   }
 }
+
+export const getLeadByPhone = async (phone) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/leads/get/by/phone/${phone}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching lead by phone:", error);
+    return [];
+  }
+}
+
+export const saveLead = async (lead) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/leads/save/new`, lead);
+    return response.data;
+  } catch (error) {
+    console.error("Error saving lead:", error);
+    throw error;
+  }
+}
+
