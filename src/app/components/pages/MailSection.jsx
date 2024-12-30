@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import swal from 'sweetalert';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/css/home.css";
 import { checkPhoneNumberExists, submitLead } from "../../apis/api";
@@ -8,7 +9,7 @@ const MailSection = () => {
   const [formData, setFormData] = useState({
     username: "",
     usermobile: "",
-    usermsg: "",
+    message: "",
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -16,7 +17,6 @@ const MailSection = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Allow alphabets for Name and numbers for Phone
     if (name === "username" && !/^[a-zA-Z\s]*$/.test(value)) return;
     if (name === "usermobile" && !/^\d*$/.test(value)) return;
 
@@ -34,16 +34,21 @@ const MailSection = () => {
     }
 
     try {
-      // Check if phone exists
       const phoneExists = await checkPhoneNumberExists(formData.usermobile);
       if (phoneExists) {
         setError("This phone number is already registered.");
         return;
       }
 
-      // Submit lead if phone doesn't exist
-      const result = await submitLead(formData);
-      navigate("/thankYou");  // Navigate to Thank You page
+      await submitLead(formData);
+      swal({
+        title: 'Success!',
+        text: 'Your form has been submitted successfully.',
+        icon: 'success',
+        button: 'OK',
+      }).then(() => {
+        navigate("/thankYou");
+      });
     } catch (error) {
       console.error("Submission Error:", error.message);
       setError("Failed to submit form. Please try again later.");
@@ -88,11 +93,11 @@ const MailSection = () => {
               <div className="col-md-12">
                 <label>Message:</label>
                 <textarea
-                  name="usermsg"
+                  name="message"
                   className="form-control"
                   rows="3"
                   placeholder="Message"
-                  value={formData.usermsg}
+                  value={formData.message}
                   onChange={handleChange}
                 ></textarea>
               </div>

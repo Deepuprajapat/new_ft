@@ -1,0 +1,36 @@
+/* Blog Page Custom CSS */
+.blog-container {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+
+.blog-content {
+  flex: 2;
+}
+
+.recent-posts {
+  flex: 1;
+ 
+}
+
+.recent-posts h2 {
+  margin-bottom: 20px;
+}
+
+.blog-image {
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+  display: block;   /* Prevents inline spacing issues */
+  object-fit: contain;
+
+  
+}
+
+  
+#blog-title{
+    font-size: 35px;
+    font-weight: 500;
+    color: black;
+}

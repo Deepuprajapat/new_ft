@@ -382,10 +382,11 @@ export const submitLead = async (formData) => {
     updatedDate: new Date().getTime(),
     name: formData.username,
     phone: formData.usermobile,
-    email: "",
+    email: formData.useremail,
     projectName: formData.usermsg,
-    source: "Website",
-    otp: "",
+    message: formData.message,
+    source: formData.source,
+    otp: "", // Sending OTP-related fields if needed
     frequency: 1,
   };
 
@@ -397,7 +398,7 @@ export const submitLead = async (formData) => {
     console.log("Lead Submission Response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error submitting lead:", error.response || error.message);
+    console.error("Error submitting lead:", error);
     throw new Error("Failed to submit lead.");
   }
 };
