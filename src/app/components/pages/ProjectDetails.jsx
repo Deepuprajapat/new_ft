@@ -260,7 +260,9 @@ const ProjectDetails = () => {
             // Check if lead exists
             const existingLead = await getLeadByPhone(`${formData.usermobile}`);
             
-            if (existingLead?.message != null) {
+            // Only create new lead if getLeadByPhone fails with bad request
+            console.log("Existing lead:", existingLead);
+            if (existingLead.length == 0) {
                 // Lead doesn't exist, create new lead
                 const newLead = {
                     name: formData.username,
@@ -270,14 +272,13 @@ const ProjectDetails = () => {
                     source: "Website"
                 };
                 await saveLead(newLead);
-                alert("Thank you! We will connect with you shortly.");
-            }else{
+                alert("Thank you! We have already created a query for you. We will connect with you shortly.");
+            } else {
                 alert("Thank you! We will connect with you shortly.");
             }
 
             setOtpSent(false);
             setOtpVerified(false);
-            alert("Thank you! We will connect with you shortly.");
 
         } catch (error) {
             console.error("Error handling form submission:", error);
