@@ -1,4 +1,4 @@
-name: Build and Push Docker Image to the docker-private registry on the EC2 instance (local-hrconsole).
+name: Build and Push Docker Image
 
 on:
   push:
@@ -13,16 +13,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Configure the Docker daemon for insecure registry
-        run: |
-          echo '{"insecure-registries":["3.111.119.169:5000"]}' | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
-
-      - name: Log in to Docker Registry
-        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login http://3.111.119.169:5000 -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
-
-      - name: Build Docker Image
-        run: docker build -t 3.111.119.169:5000/my-new-app:${{ github.sha }} .
-
-      - name: Push Docker Image
-        run: docker push 3.111.119.169:5000/my-new-app:${{ github.sha }}
+      - name: Build & push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: frontend-invest
+          tags: ${{ github.sha }}, latest
+          registry: registry.virtualintelligence.co.in
+          dockerfile: dockerfile
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}

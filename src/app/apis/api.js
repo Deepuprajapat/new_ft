@@ -102,10 +102,10 @@ export const getAllPropertyConfiguration = async () => {
   }
 };
 
-export const getAllProject = async () => {
+export const getAllProject = async (page = 0, size = 500) => {
   try {
     const res = await axios.get(
-      `${BASE_URL}/project/get/all?isDeleted=false`
+      `${BASE_URL}/project/get/all?isDeleted=false&page=${page}&size=${size}`
     );
     return res.data;
   } catch (error) {
@@ -153,9 +153,9 @@ export const getAllFloor = async (params = {}) => {
   }
 };
 
-export const getAllBlog = async () => {
+export const getAllBlog = async (page = 0, size = 500) => {
   try {
-    const res = await axios.get(`${BASE_URL}/blogs/get/all`);
+    const res = await axios.get(`${BASE_URL}/blogs/get/all?isDeleted=false&page=${page}&size=${size}`);
     return res.data;
   } catch (error) {
     console.error("Error fetching Blogs:", error);
