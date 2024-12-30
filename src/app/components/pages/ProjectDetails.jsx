@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getAllProjectsByUrlName, getDeveloperById, getAllProject } from '../../apis/api';
+import { getAllProjectsByUrlName, getDeveloperById, getAllProject, sendOTP, verifyOTP, resendOTP, getLeadByPhone, saveLead } from '../../apis/api';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faExpandArrowsAlt,
@@ -16,7 +16,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-
 
 const ProjectDetails = () => {
     const [activeSection, setActiveSection] = useState('overview');
@@ -93,14 +92,13 @@ const ProjectDetails = () => {
             }
         };
         fetchDeveloper();
-    }, [developerId]); // Dependency on developerId";
+    }, [developerId]); 
 
     const formatPrice = (price) => {
         if (!price) return '';
         
         const numPrice = typeof price === 'string' ? parseFloat(price) : price;
         
-        // Handle decimal crore values directly
         if (numPrice < 100 && numPrice > 0) {
             return `${numPrice} Cr`;
         }
@@ -192,36 +190,60 @@ const ProjectDetails = () => {
             return;
         }
         setError("");
-        setOtpSent(true);
         setTimer(60);
         console.log("OTP sent to:", `${formData.dial_code}${formData.usermobile}`);
-        const response = await sendOtp(`${formData.dial_code}${formData.usermobile}`);
-        if (response.status === "success") {
-            setOtpSent(true);
-        } else {
+        try {
+            const response = await sendOTP(
+                `${formData.dial_code}${formData.usermobile}`,
+                projectData?.name || "",
+                "Website",
+                formData.username,
+                formData.useremail
+            );
+            if (response) {
+                setOtpSent(true);
+            } else {
+                setError("Failed to send OTP. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error sending OTP:", error);
             setError("Failed to send OTP. Please try again.");
         }
     };
 
     // Simulate OTP verification API
     const verifyOtp = async () => {
-        if (otp !== "1234") {
-            setError("Invalid OTP. Please try again.");
-            return;
-        }
-        setError("");
-        setOtpVerified(true);
-        const response = await verifyOtp(`${formData.dial_code}${formData.usermobile}`, otp);
-        if (response.status === "success") {
-            setOtpVerified(true);
-        } else {
+        try {
+            const response = await verifyOTP(`${formData.dial_code}${formData.usermobile}`, otp);
+            console.log("OTP verification response:", response);
+            if (response) {
+                setError("");
+                setOtpVerified(true);
+            } else {
+                setError("Failed to verify OTP. Please try again.");
+                setOtpVerified(false);
+            }
+        } catch (error) {
+            console.error("Error verifying OTP:", error);
             setError("Failed to verify OTP. Please try again.");
+            setOtpVerified(false);
         }
     };
 
     // Resend OTP logic
-    const resendOtp = () => {
-        sendOtp();
+    const resendOtp = async () => {
+        try {
+            const response = await resendOTP(`${formData.dial_code}${formData.usermobile}`);
+            if (response) {
+                setTimer(60);
+                setError("");
+            } else {
+                setError("Failed to resend OTP. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error resending OTP:", error);
+            setError("Failed to resend OTP. Please try again.");
+        }
     };
 
     // Countdown timer for resend button
@@ -233,12 +255,36 @@ const ProjectDetails = () => {
     }, [timer, otpSent]);
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form Submitted:", formData);
-        setOtpSent(false);
-        setOtpVerified(false);
-        alert("Thank you! We will connect with you shortly.");
+        try {
+            // Check if lead exists
+            const existingLead = await getLeadByPhone(`${formData.usermobile}`);
+            
+            // Only create new lead if getLeadByPhone fails with bad request
+            console.log("Existing lead:", existingLead);
+            if (existingLead.length == 0) {
+                // Lead doesn't exist, create new lead
+                const newLead = {
+                    name: formData.username,
+                    phone: `${formData.dial_code}${formData.usermobile}`,
+                    email: formData.useremail,
+                    projectName: projectData?.name,
+                    source: "Website"
+                };
+                await saveLead(newLead);
+                alert("Thank you! We have already created a query for you. We will connect with you shortly.");
+            } else {
+                alert("Thank you! We will connect with you shortly.");
+            }
+
+            setOtpSent(false);
+            setOtpVerified(false);
+
+        } catch (error) {
+            console.error("Error handling form submission:", error);
+            alert("Something went wrong. Please try again.");
+        }
     };
 
     // Update active section based on scroll position and handle nav fixing
@@ -307,32 +353,30 @@ const ProjectDetails = () => {
                         </div>
 
                         {/* Additional Images Grid */}
-                        <div className="col-12 col-md-6 p-0 d-flex align-items-center justify-content-center">
-                            <div className="row g-0">
+                        <div className="col-12 col-md-6 p-0">
+                            <div className="row g-0 h-100">
                                 {[1, 2, 3, 4].map((index) => (
                                     projectData?.images[index] && (
-                                        <div key={index} className="col-3 col-md-6" style={{ padding: '1px' }}>
-                                            <div className="h-100" style={{ minHeight: '92px', maxHeight: '350px' }}>
-                                                <a
-                                                    href={projectData?.images[index]?.imageUrl}
-                                                    data-toggle="lightbox"
-                                                    data-gallery="gallery"
-                                                    className="w-100 h-100"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        setShowFullScreen(true);
-                                                        setCurrentImageIndex(index);
-                                                    }}
-                                                >
-                                                    <img
-                                                        alt={projectData?.images[index]?.category || "Image"}
-                                                        src={projectData?.images[index]?.imageUrl}
-                                                        className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
-                                                        style={{ objectFit: 'cover', cursor: 'pointer' }}
-                                                        fetchpriority="high"
-                                                    />
-                                                </a>
-                                            </div>
+                                        <div key={index} className="col-3 col-md-6" style={{ padding: '1px', height: '350px' }}>
+                                            <a
+                                                href={projectData?.images[index]?.imageUrl}
+                                                data-toggle="lightbox"
+                                                data-gallery="gallery"
+                                                className="d-block h-100"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setShowFullScreen(true);
+                                                    setCurrentImageIndex(index);
+                                                }}
+                                            >
+                                                <img
+                                                    alt={projectData?.images[index]?.category || "Image"}
+                                                    src={projectData?.images[index]?.imageUrl}
+                                                    className="w-100 h-100 rounded-0"
+                                                    style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                                    fetchpriority="high"
+                                                />
+                                            </a>
                                         </div>
                                     )
                                 ))}
@@ -889,7 +933,7 @@ const ProjectDetails = () => {
                                             <button
                                                 type="button"
                                                 className="btn btn-primary w-100"
-                                                onClick={sendOtp}
+                                                onClick={handleSubmit}
                                             >
                                                 Get a Call back
                                             </button>
@@ -934,7 +978,13 @@ const ProjectDetails = () => {
                                             </button>
                                             <button
                                                 className="btn btn-primary"
-                                                onClick={verifyOtp}
+                                                onClick={() => {
+                                                    if (!otp || otp.trim() === '') {
+                                                        setError('Please enter OTP');
+                                                        return;
+                                                    }
+                                                    verifyOtp();
+                                                }}
                                             >
                                                 Verify OTP
                                             </button>
@@ -1553,7 +1603,8 @@ const ProjectDetails = () => {
                                                     background: '#dddd',
                                                     width: '40px',
                                                     height: '40px',
-                                                    cursor: 'pointer'
+                                                    cursor: 'pointer',
+                                                    color: '#000'
                                                 }}
                                                 onClick={() => {
                                                     const img = document.getElementById('zoom-image');
@@ -1572,7 +1623,8 @@ const ProjectDetails = () => {
                                                     background: '#dddd',
                                                     width: '40px',
                                                     height: '40px',
-                                                    cursor: 'pointer'
+                                                    cursor: 'pointer',
+                                                    color: '#000'
                                                 }}
                                                 onClick={() => {
                                                     const img = document.getElementById('zoom-image');
@@ -1865,7 +1917,7 @@ const ProjectDetails = () => {
                                             <button
                                                 type="button"
                                                 className="btn btn-primary w-100"
-                                                onClick={sendOtp}
+                                                onClick={handleSubmit}
                                             >
                                                 Get a Call back
                                             </button>
@@ -1910,7 +1962,13 @@ const ProjectDetails = () => {
                                             </button>
                                             <button
                                                 className="btn btn-primary"
-                                                onClick={verifyOtp}
+                                                onClick={() => {
+                                                    if (!otp || otp.trim() === '') {
+                                                        setError('Please enter OTP');
+                                                        return;
+                                                    }
+                                                    verifyOtp();
+                                                }}
                                             >
                                                 Verify OTP
                                             </button>

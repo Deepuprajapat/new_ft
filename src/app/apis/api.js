@@ -3,6 +3,7 @@ import axios from "axios";
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
 const BASE_URL1 = process.env.REACT_APP_BASE_URL || "http://3.111.119.169:8080";
 let token = "";
+
 export const login = async (userName, password) => {
   try {
     const response = await axios.post(`${BASE_URL}/auth/generate-token`, {
@@ -348,57 +349,5 @@ export const getAllLocalities = async () => {
   } catch (error) {
     console.error("Error fetching localities:", error);
     return [];
-  }
-};
-
-// API Call to Check Phone Number
-export const checkPhoneNumberExists = async (phone) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/leads/get/all`, {
-      params: {
-        phone: phone,
-        page: 0,
-        size: 50
-      }
-    });
-
-    console.log("Phone Check Response:", response.data);
-    
-    // Handle the paginated response properly
-    const leads = response.data?.content || [];  
-    return leads.some((lead) => lead.phone === phone);
-    
-  } catch (error) {
-    console.error("Error checking phone number:", error.response || error.message);
-    throw new Error("Failed to check phone number.");
-  }
-};
-
-// API Call to Submit New Lead
-export const submitLead = async (formData) => {
-  const payload = {
-    id: 0,
-    createdDate: new Date().getTime(),
-    updatedDate: new Date().getTime(),
-    name: formData.username,
-    phone: formData.usermobile,
-    email: formData.useremail,
-    projectName: formData.usermsg,
-    message: formData.message,
-    source: formData.source,
-    otp: "", // Sending OTP-related fields if needed
-    frequency: 1,
-  };
-
-  try {
-    const response = await axios.post(
-      "http://13.200.229.71:8282/leads/save/new",
-      payload
-    );
-    console.log("Lead Submission Response:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error submitting lead:", error);
-    throw new Error("Failed to submit lead.");
   }
 };
