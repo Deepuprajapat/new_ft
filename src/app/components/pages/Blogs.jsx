@@ -3,7 +3,7 @@ import { getAllBlogByUrl, getAllBlog, checkPhoneNumberExists, submitLead } from 
 import { useParams, useNavigate } from "react-router-dom";
 import "../styles/css/blog.css";
 import swal from 'sweetalert';
-
+import { Helmet } from "react-helmet";
 
 const Blogs = () => {
   const [blogData, setBlogData] = useState(null);
@@ -75,7 +75,7 @@ const Blogs = () => {
           usermobile: "",
           message: "",
         });
-      }
+      } 
     } catch (error) {
       swal("Error", "An error occurred. Please try again.", "error");
     }
@@ -83,6 +83,19 @@ const Blogs = () => {
 
   return (
     <div>
+     <Helmet>
+      <title>{blogData.headings || ""}</title>
+      <meta name="description" content={blogData.description || ""} />
+      <link rel="canonical" href={blogData.canonical || ""} />
+      {blogData.schema &&
+        blogData.schema.map((schemaItem, index) => (
+          <script
+            key={index}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaItem) }}
+          />
+        ))}
+    </Helmet>
       <section className="main-body">
         <div className="main-con">
           <div className="container">

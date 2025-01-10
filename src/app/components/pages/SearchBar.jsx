@@ -44,7 +44,12 @@ const SearchBar = () => {
     }
 
     const response = await getAllProject({ name: query });
-    setProjectSuggestions(response.content || []); // Set project suggestions
+    const filteredProjects = response.content.filter((project) =>
+      project.configurations.some((config) =>
+        config.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+    setProjectSuggestions(filteredProjects || []); // Set project suggestions
   }, 500); // Delay the API call by 500ms
 
   // Handle Property Type Change
@@ -52,32 +57,34 @@ const SearchBar = () => {
     setPropertyType(e.target.value);
   };
 
-  const isInvalidQuery = (query) => {
-    const regex = /[^a-zA-Z\s]/; // Only allow alphabets and spaces
-    return regex.test(query);
-  };
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
   
+    // Handle search term redirection logic
+    const searchTerm = e.target.elements.search.value;
+    if (searchTerm) {
+      window.location.href = `/allProjects?search=${encodeURIComponent(searchTerm)}`;
+      return; // Prevent further execution if searchTerm is used
+    }
     // If a project name is provided, navigate to the dynamic project URL
     if (searchQuery) {
-        const matchedProject = projectSuggestions.find(
-          (project) => project.name.toLowerCase() === searchQuery.toLowerCase()
-        );
+      const matchedProject = projectSuggestions.find(
+        (project) =>
+          project.name.toLowerCase() === searchQuery.toLowerCase() ||
+          project.configurations.some((config) =>
+            config.toLowerCase() === searchQuery.toLowerCase()
+          )
+      );
   
-        if (matchedProject) {
-          // Navigate to the project's URL
-          navigate(`/project/${matchedProject.url}`);
-        } else {
-          // Navigate to 404 if no matching project
-          navigate("/404");
-        }
+      if (matchedProject) {
+        // Navigate to the project's URL
+        navigate(`/project/${matchedProject.url}`);
+      } else {
+        // Navigate to 404 if no matching project
+        navigate("/404");
       }
+    }
   
-
-
-    
     // If a location is selected and a property type is selected, navigate with both
     if (location && propertyType) {
       const selectedCity = localities.find(
@@ -175,7 +182,6 @@ const SearchBar = () => {
       </div>
     </div>
   </form>
-  
   );
 };
 

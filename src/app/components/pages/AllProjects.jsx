@@ -3,6 +3,7 @@ import "../styles/css/projectCard.css";
 import { getAllProject } from "../../apis/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import ProjectCard from "./ProjectCard";
+import { Helmet } from "react-helmet";
 
 const AllProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -37,6 +38,7 @@ const AllProjects = () => {
         console.log("Fetching with filters:", filters); // Debug filters
         const data = await getAllProject(filters);
         console.log("Fetched Projects:", data);
+        console.log(data)
         setProjects(data.content || []);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -55,6 +57,12 @@ const AllProjects = () => {
 
   return (
     <div>
+      
+<Helmet>
+<title>Best Residential And Commercial Projects</title> 
+<meta content="Find the Best Residential and commercial projects with ultra luxury amenities. Compare Price, Floor Plan, Amenities, Site Plan, and Payment Plan, Property Reviews." name="description"/>
+ <link rel="canonical" href="https://www.investmango.com/allProjects"/>
+</Helmet>
       <section className="main-body">
         <div className="container">
           <h1 className="project-title">

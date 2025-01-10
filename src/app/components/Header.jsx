@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../components/styles/css/header.css";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/img/logo.jpg";
-import Login from "./pages/Login/Login";
+// import Login from "./pages/Login/Login";
 import { Button } from "@mui/material";
 import { currentUser } from "../apis/api";
 // import { currentUser } from "apis/api";/
@@ -154,7 +154,7 @@ const Header = () => {
                   <FaPhoneAlt /> 7428-189-189
                 </a>
               </button>
-              <Login isOpen={modal} onClose={closeModal} />
+              {/* <Login isOpen={modal} onClose={closeModal} /> */}
             </Nav>
           </Nav>
         </Navbar.Collapse>

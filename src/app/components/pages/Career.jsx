@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-//import Footer from './Footer'; // Ensure you create a Footer component in the specified path
-// import './Career.css';
 import { fetchAllVacancies, submitHiringForm } from "../../apis/api";
 import "../styles/css/career.css";
 import Accordion from "./Accordion";
 import jobOpenings from "../../../utils/jobOpenings";
-
+import { Helmet } from "react-helmet";
 const Career = () => {
   const [formData, setFormData] = useState({
-    userposition: "",
+     userposition: "",
     username: "",
     usermobile: "",
     useremail: "",
@@ -51,15 +49,15 @@ const Career = () => {
 
     const data = new FormData();
     const hiringRequestJson = JSON.stringify({
-      userposition: formData.userposition, // Ensure this is set to the correct ID
-      username: formData.username,
-      usermobile: formData.usermobile,
-      useremail: formData.useremail,
-      userdob: formData.userdob,
-      userexp: formData.userexp,
-      current_ctc: formData.current_ctc,
-      expected_ctc: formData.expected_ctc,
-      notice_period: formData.notice_period,
+      name: formData.username,
+      phone: formData.usermobile,
+      email: formData.useremail,
+      dob: formData.userdob,
+      experience: formData.userexp,
+      currentCTC: formData.current_ctc,
+      expectedCTC: formData.expected_ctc,
+      noticePeriod: formData.notice_period,
+      vacancyId: formData.userposition, 
     });
 
     console.log("Payload Sent:", hiringRequestJson);
@@ -79,6 +77,13 @@ const Career = () => {
   };
 
   return (
+    <>
+       <Helmet>
+<title>Careers | Invest Mango</title> 
+<meta name="description" content="Invest Mango offers a dynamic culture that is all about winning and innovating oneself. Unleash your true potential much more than you have ever imagined. " /> 
+<link rel="canonical" href="https://www.investmango.com/careers" /> 
+</Helmet>
+   
     <div>
       <section className="main-body">
         <div className="container">
@@ -135,7 +140,7 @@ const Career = () => {
                         {positions
                           .filter((pos) => pos?.designation) // Only include positions with a designation
                           .map((pos) => (
-                            <option key={pos.id} value={pos.id}>
+                            <option key={pos.designation} value={pos.id}>
                               {" "}
                               {/* Ensure `pos.id` is valid */}
                               {pos.designation}
@@ -274,6 +279,7 @@ const Career = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

@@ -17,7 +17,7 @@ import "swiper/css";
 import "./Home.css";
 import withSafeLinks from "../../utils/rel";
 import SearchBar from "./pages/SearchBar"; // Import the SearchBar component
-
+import { Helmet } from "react-helmet";
 const Head = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +36,13 @@ const Head = () => {
 
     
     <div>
+    
+<Helmet>
+<title>Real Estate Portfolio & Strategic Management Company</title> 
+<meta content="Invest Mango: Real estate portfolio and strategic management services. Elevate your financial future through informed decisions and prime opportunities." name="description" /> 
+ <link rel="canonical" href="https://www.investmango.com" />  
+ <meta content="real estate company in noida, property in noida, property site, best property company in noida, real estate agency in noida, best real estate website, best property websites, best real estate sites, house search sites, top real estate companies in noida, best real estate company in noida." name="keyword" />
+</Helmet>
       <section className="main-body">
         {/* Render the SearchBar Component */}
         {/*  */}

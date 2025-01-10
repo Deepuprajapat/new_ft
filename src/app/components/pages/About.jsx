@@ -1,10 +1,22 @@
 import React from 'react'
-
+import { Helmet } from 'react-helmet';
 // import '../styles/css/about.css'
 import { aboutUsData } from '../../../utils/about'
 const About = () => {
   return (
-  
+    <>
+    <Helmet>
+    <title>About Us – Know About Invest Mango</title>
+        <meta 
+          name="description" 
+          content="Invest Mango | Reputed Investment and Real Estate Portfolio Management Organisation. We provide Real Estate Consulting services in Delhi NCR." 
+        />
+        <link rel="canonical" href="https://www.investmango.com/about" />
+        <meta 
+          name="keywords" 
+          content="real estate investment consultant, investment and portfolio management, top real estate agents in noida, property investment consultant, commercial property management, real estate consultants services, real estate advisory services, top real estate companies in noida." 
+        />
+      </Helmet>
         
         <section className="main-body">
       <div className="container">
@@ -65,7 +77,7 @@ const About = () => {
       </div>
     </section>
    
-
+</>
   )
 }
 

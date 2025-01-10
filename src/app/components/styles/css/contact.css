@@ -126,3 +126,26 @@ h1 {
 }
 
 
+.contact-details-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 90px; /* Increase the gap between the phone and email sections */
+  justify-content: flex-start;
+}
+
+.contact-details-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-details-column:first-child {
+  margin-right: 40px; /* Add some space between the phone and email sections */
+}
+
+/* Ensure the text links are aligned properly */
+.aRemove {
+  text-decoration: none;
+  color: #333;
+  margin-bottom: 5px;
+}
+

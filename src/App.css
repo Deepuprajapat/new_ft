@@ -36,6 +36,10 @@
     to {
       transform: rotate(360deg);
     }
+    
+  }
+  .MuiTextField-root .MuiOutlinedInput-root {
+    padding: 0px 0px;
   }
 
 

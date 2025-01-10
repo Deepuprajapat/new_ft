@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
-const BASE_URL1 = process.env.REACT_APP_BASE_URL || "http://3.111.119.169:8080";
+const BASE_URL1 = process.env.REACT_APP_BASE_URL || "https://api.virtualintelligence.co.in";
 let token = "";
 
 export const login = async (userName, password) => {
@@ -271,7 +271,13 @@ export const fetchAllVacancies = async () => {
   try {
     console.log("Starting fetchAllVacancies...");
 
-    const response = await fetch(`${BASE_URL1}/get/all/vacancies`);
+    const response = await fetch(`${BASE_URL1}/get/all/vacancies`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
     console.log("Response received:", response);
 
     if (!response.ok) {
@@ -282,7 +288,6 @@ export const fetchAllVacancies = async () => {
     const data = await response.json();
     console.log("Parsed JSON data:", data);
 
-    // Check if the expected structure exists
     if (data && data.content) {
       console.log("Vacancies content:", data.content);
     } else {
@@ -299,10 +304,12 @@ export const fetchAllVacancies = async () => {
 };
 
 
+
+
 // Function to submit hiring form data
 export const submitHiringForm = async (formData) => {
   try {
-    console.log("FormData Payload:", Array.from(formData.entries()));
+    console.log("FormData Payload:",formData);
 
     const response = await fetch(`${BASE_URL1}/user/save/hiring/by/ai`, {
       method: "POST",
@@ -351,3 +358,109 @@ export const getAllLocalities = async () => {
     return [];
   }
 };
+
+export const getLeadByPhone = async (phone) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/leads/get/by/phone/${phone}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching lead by phone:", error);
+    return [];
+  }
+}
+
+// API Call to Check Phone Number
+export const checkPhoneNumberExists = async (phone) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/leads/get/all`, {
+      params: {
+        phone: phone,
+        page: 0,
+        size: 50
+      }
+    });
+
+    console.log("Phone Check Response:", response.data);
+    
+    // Handle the paginated response properly
+    const leads = response.data?.content || [];  
+    return leads.some((lead) => lead.phone === phone);
+    
+  } catch (error) {
+    console.error("Error checking phone number:", error.response || error.message);
+    throw new Error("Failed to check phone number.");
+  }
+};
+// API Call to Submit New Lead
+export const submitLead = async (formData) => {
+  const payload = {
+    id: 0,
+    createdDate: new Date().getTime(),
+    updatedDate: new Date().getTime(),
+    name: formData.username,
+    phone: formData.usermobile,
+    email: formData.useremail,
+    projectName: formData.usermsg,
+    message: formData.message,
+    source: formData.source,
+    otp: "", // Sending OTP-related fields if needed
+    frequency: 1,
+  };
+
+  try {
+    const response = await axios.post(
+      "http://13.200.229.71:8282/leads/save/new",
+      payload
+    );
+    console.log("Lead Submission Response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting lead:", error);
+    throw new Error("Failed to submit lead.");
+  }
+};
+
+export const sendOTP = async (phone, projectName, source, name, email) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/leads/save/new/and/send-otp`, {
+      name: name,
+      phone: phone,
+      email: email,
+      projectName: projectName,
+      source: source,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error resending OTP:", error);
+    throw error;
+  }
+}
+
+export const verifyOTP = async (phone, otp) => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/leads/validate/otp?phone=${phone}&OTP=${otp}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    throw error;
+  }
+}
+
+export const resendOTP = async (phone) => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/leads/resend/otp?phone=${phone}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error resending OTP:", error);
+    throw error;
+  }
+}
+export const saveLead = async (lead) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/leads/save/new`, lead);
+    return response.data;
+  } catch (error) {
+    console.error("Error saving lead:", error);
+    throw error;
+  }
+}

@@ -1,8 +1,13 @@
 import React from "react";
-import BlogSection from "./BlogSection"; // Import the reusable component
-
+import BlogSection from "./BlogSection"; 
+import { Helmet } from "react-helmet";
 const MangoInsights = () => {
   return (
+    <> <Helmet>
+    <title>Blogs | Mango Insights</title> 
+   <meta name="description" content="Read our latest blogs to be updated. Our motto is to share our knowledge and experiences so that you make the right choice with your property investments." /> 
+    <link rel="canonical" href="https://www.investmango.com/mango-insights" />
+    </Helmet>
     <section className="main-body">
       <div className="container">
         <h1>Our Blogs</h1>
@@ -20,6 +25,7 @@ const MangoInsights = () => {
         </div>
       </div>
     </section>
+    </>
   );
 };
 

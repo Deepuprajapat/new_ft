@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getAllProject } from "../../apis/api"; // Assuming this is the API file
 import "../styles/css/video.css";
-
+import { Helmet } from "react-helmet";
 const Video = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true); // New loading state
@@ -24,6 +24,11 @@ const Video = () => {
 
   return (
     <div>
+     <Helmet>
+<title>Our Videos</title>
+  <link rel="canonical" href="https://www.investmango.com/video" /> 
+<meta name="description" content="Subscribe to our Youtube channel to know more about all other residential & commercial projects in Delhi/NCR region. Our video covers every aspect. " />
+</Helmet>
       <section className="main-body">
         <div className="container">
           <h1>Our Videos</h1>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getAllProject } from "../../apis/api"; // Importing the API function
-
+import { Helmet } from "react-helmet";
 const CompareProjects = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProjects, setSelectedProjects] = useState(["", "", ""]);
@@ -118,6 +118,14 @@ const CompareProjects = () => {
   };
 
   return (
+    <>
+       <Helmet>
+ <title>Compare projects</title>   
+<meta name="description" content="We bring to you a comparison of different projects after a thorough discussion with our in-house Experts. Information drafted after proper research. " />
+ <meta content="" name="keyword" />  
+<link rel="canonical" href="https://www.investmango.com/compare"/>
+ </Helmet>
+    
     <div className="container mt-5">
       <h1>Compare Projects</h1>
       <p>Home / Compare Projects</p>
@@ -205,6 +213,7 @@ const CompareProjects = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
