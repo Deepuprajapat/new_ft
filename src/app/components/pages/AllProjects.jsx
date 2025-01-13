@@ -27,19 +27,41 @@ const AllProjects = () => {
       setLoading(true);
       try {
         const { cityId, propertyType, search } = getQueryParams();
-  
+    
         const filters = {
           isDeleted: false,
           ...(cityId && { cityId }),
-          ...(search && { name: search }),
-          ...(propertyType && { type: propertyType }), // Pass propertyType as 'type'
+          ...(propertyType && { type: propertyType }),
         };
-  
-        console.log("Fetching with filters:", filters); // Debug filters
+    
         const data = await getAllProject(filters);
-        console.log("Fetched Projects:", data);
-        console.log(data)
-        setProjects(data.content || []);
+        
+        let filteredProjects = data.content || [];
+    
+        if (search) {
+          const normalizedSearch = search.trim().toLowerCase().replace(/\s+/g, "");
+    
+          filteredProjects = filteredProjects.filter((project) => {
+            // Check if configurations match the search term
+            const configMatch = project.configurations?.some((config) =>
+              config.toLowerCase().replace(/\s+/g, "").includes(normalizedSearch)
+            );
+    
+            // Check if property type matches
+            const propertyTypeMatch = project.configurationsType?.propertyType
+              ?.toLowerCase()
+              .includes(normalizedSearch);
+    
+            // Check if project name matches
+            const nameMatch = project.name
+              ?.toLowerCase()
+              .includes(normalizedSearch);
+    
+            return configMatch || propertyTypeMatch || nameMatch;
+          });
+        }
+    
+        setProjects(filteredProjects);
       } catch (error) {
         console.error("Error fetching projects:", error);
         setProjects([]);
@@ -47,12 +69,15 @@ const AllProjects = () => {
         setLoading(false);
       }
     };
+    
   
     fetchProjects();
   }, [location.search]); // Runs when query params change
 
   const handleMoreDetails = (name) => {
-    navigate(`/project/${name.toLowerCase().replace(/\s+/g, "-")}`);
+    const formattedName = name.toLowerCase().replace(/\s+/g, "-"); // Convert to URL-friendly format
+    const encodedName = encodeURIComponent(formattedName); // Encode special characters in the name
+    navigate(`/project/${encodedName}`);
   };
 
   return (

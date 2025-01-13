@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import "../components/styles/css/footer.css";
 import { footerItems } from "../../utils/footerItems";
 import logo from "../assets/img/logo_investmango.png";
-import withSafeLinks from "../../utils/rel";
+// import withSafeLinks from "../../utils/rel";
 
 const Footer = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -250,4 +250,4 @@ const Footer = () => {
   );
 };
 
-export default withSafeLinks(Footer);
+export default (Footer);

@@ -68,6 +68,7 @@ const ProjectDetails = () => {
           console.log("Fetched project data:", data);
           if (data) {
             setProjectData(data);
+            console.log("url",data.url)
             setDeveloperId(data.developerId); // Update developer ID
           }
         } catch (error) {
@@ -92,6 +93,7 @@ const ProjectDetails = () => {
       fetchAllProject();
     }
   }, [projectData]);
+  // console.log("Josn",projectData)
   // Fetch developer details when DeveloperId changes
   useEffect(() => {
     const fetchDeveloper = async () => {
@@ -368,25 +370,38 @@ const ProjectDetails = () => {
   const closePopup = () => {
     setShowPopup(false); // Close the popup
   };
+
+
+  const stripHTMLTags = (html) => {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || "";
+  };
+
+  const canonical = `https://investmango.com/project/${urlName}`
+  // console.log("can",canonical)
+  // console.log("mets tielle",projectData?.data)
   return (
     <>
-   <Helmet>
-  <title>{projectData.metaTitle || ""}</title>
-  <meta name="description" content={projectData.metaDescription || ""} />
-  <link rel="canonical" href={projectData.canonical || ""} />
-  <meta
-    name="keywords"
-    content={projectData.keywords && projectData.keywords.filter(keyword => keyword.trim() !== "").join(', ') || ""}
-  />
-  {projectData.schema &&
-    projectData.schema.map((schemaItem, index) => (
+  
+  {projectData && (
+  <Helmet>
+    <title>{projectData.metaTitle || "Default Title"}</title>
+    <meta name="description" content={projectData.metaDescription || "Default Description"} />
+    <meta
+      name="keywords"
+      content={projectData.keywords?.filter(k => k.trim() !== "").join(", ") || "default, keywords"}
+    />
+    <link rel="canonical" href={window.location.href} />
+    {projectData.schema && projectData.schema.map((schemaItem, index) => (
       <script
         key={index}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaItem) }}
       />
     ))}
-</Helmet>
+  </Helmet>
+)}
 
     <div className="w-100">
       <div className="container-fluid p-0 mb-0 w-100">
@@ -2401,7 +2416,7 @@ const ProjectDetails = () => {
                     <table className="table table-striped">
                       <tbody>
                         {projectData?.paymentPlans &&
-                          projectData?.paymentPlans?.map((plan, index) => (
+                          [...projectData?.paymentPlans].reverse().map((plan, index) => (
                             <tr key={index}>
                               <td
                                 style={{
@@ -3053,7 +3068,7 @@ const ProjectDetails = () => {
                               window.innerWidth <= 768 ? "12px" : "13px",
                           }}
                         >
-                          {faq.answer}
+                         {stripHTMLTags(faq.answer)}
                         </div>
                       )}
                     </div>

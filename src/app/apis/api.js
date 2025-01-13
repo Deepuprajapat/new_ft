@@ -1,6 +1,15 @@
 import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
+// const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
+
+// import axios from "axios";
+// console.log("Environment:", process.env.REACT_APP_ENV);
+// console.log("Base URL:", process.env.REACT_APP_BASE_URL);
+let BASE_URL = process.env.REACT_APP_BASE_URL;
+if (process.env.REACT_APP_ENV === "production") {
+  BASE_URL = process.env.REACT_APP_BASE_URL ;
+}
+// console.log("API Base URL: ", BASE_URL);
 const BASE_URL1 = process.env.REACT_APP_BASE_URL || "https://api.virtualintelligence.co.in";
 let token = "";
 
@@ -104,17 +113,7 @@ export const getAllPropertyConfiguration = async () => {
   }
 };
 
-// export const getAllProject = async (page = 0, size = 500) => {
-//   try {
-//     const res = await axios.get(
-//       `${BASE_URL}/project/get/all?isDeleted=false&page=${page}&size=${size}`
-//     );
-//     return res.data;
-//   } catch (error) {
-//     console.error("Error fetching projects:", error);
-//     return { content: [] };
-//   }
-// };
+
 
 export const getAllProject = async (filters = {}) => {
   const {
@@ -147,7 +146,7 @@ export const getAllProject = async (filters = {}) => {
       ...(name && { name }),
       ...(type && { type: type.toUpperCase() }),  
     };
-    console.log("Params sent to API:", params); // Debugging
+    // console.log("Params sent to API:", params); 
     const res = await axios.get(`${BASE_URL}/project/get/all`, { params });
     return res.data;
   } catch (error) {
@@ -330,15 +329,7 @@ export const submitHiringForm = async (formData) => {
   }
 };
 
-// export const getAllLocalities = async () => {
-//   try {
-//     const response = await axios.get(`${BASE_URL}/locality/get/all`);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching localities:", error);
-//     return [];
-//   }
-// };
+
 
 export const getAllLocalities = async () => {
   try {

@@ -3,7 +3,12 @@ import { fetchAllVacancies, submitHiringForm } from "../../apis/api";
 import "../styles/css/career.css";
 import Accordion from "./Accordion";
 import jobOpenings from "../../../utils/jobOpenings";
+import { useNavigate } from "react-router-dom";
+import swal from "sweetalert";
 import { Helmet } from "react-helmet";
+
+
+
 const Career = () => {
   const [formData, setFormData] = useState({
      userposition: "",
@@ -19,6 +24,7 @@ const Career = () => {
   });
 
   const [positions, setPositions] = useState([]);
+   const navigate = useNavigate();
 
   // Fetch positions on component mount
   useEffect(() => {
@@ -44,37 +50,45 @@ const Career = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+// Handle form submission
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const data = new FormData();
-    const hiringRequestJson = JSON.stringify({
-      name: formData.username,
-      phone: formData.usermobile,
-      email: formData.useremail,
-      dob: formData.userdob,
-      experience: formData.userexp,
-      currentCTC: formData.current_ctc,
-      expectedCTC: formData.expected_ctc,
-      noticePeriod: formData.notice_period,
-      vacancyId: formData.userposition, 
+  const data = new FormData();
+  const hiringRequestJson = JSON.stringify({
+    name: formData.username,
+    phone: formData.usermobile,
+    email: formData.useremail,
+    dob: formData.userdob,
+    experience: formData.userexp,
+    currentCTC: formData.current_ctc,
+    expectedCTC: formData.expected_ctc,
+    noticePeriod: formData.notice_period,
+    vacancyId: formData.userposition, 
+  });
+
+  console.log("Payload Sent:", hiringRequestJson);
+
+  data.append("hiringRequestJson", hiringRequestJson);
+  if (formData.fileToUpload) {
+    data.append("file", formData.fileToUpload);
+  }
+
+  try {
+    const response = await submitHiringForm(data);
+    console.log("Server Response:", response);
+    
+    // Show SweetAlert after successful submission
+    swal("Success", "Your application has been submitted successfully!", "success").then(() => {
+      // Redirect to the Thank You page after clicking "OK"
+      navigate("/thankYou");
     });
+  } catch (error) {
+    console.error("Submission Error:", error);
+    swal("Error", "There was an error submitting your application.", "error");
+  }
+};
 
-    console.log("Payload Sent:", hiringRequestJson);
-
-    data.append("hiringRequestJson", hiringRequestJson);
-    if (formData.fileToUpload) {
-      data.append("file", formData.fileToUpload);
-    }
-
-    try {
-      const response = await submitHiringForm(data);
-      console.log("Server Response:", response);
-    } catch (error) {
-      console.error("Submission Error:", error);
-      alert("There was an error submitting your application.");
-    }
-  };
 
   return (
     <>

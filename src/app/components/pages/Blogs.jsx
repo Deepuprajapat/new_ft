@@ -83,7 +83,9 @@ const Blogs = () => {
 
   return (
     <div>
-     <Helmet>
+   <Helmet>
+  {blogData && (
+    <>
       <title>{blogData.headings || ""}</title>
       <meta name="description" content={blogData.description || ""} />
       <link rel="canonical" href={blogData.canonical || ""} />
@@ -95,7 +97,10 @@ const Blogs = () => {
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaItem) }}
           />
         ))}
-    </Helmet>
+    </>
+  )}
+</Helmet>
+
       <section className="main-body">
         <div className="main-con">
           <div className="container">

@@ -15,7 +15,7 @@ import { sliderSettings } from "../../utils/common";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "./Home.css";
-import withSafeLinks from "../../utils/rel";
+// import withSafeLinks from "../../utils/rel";
 import SearchBar from "./pages/SearchBar"; // Import the SearchBar component
 import { Helmet } from "react-helmet";
 const Head = () => {
@@ -154,4 +154,4 @@ const Head = () => {
   );
 };
 
-export default withSafeLinks(Head);
+export default (Head);

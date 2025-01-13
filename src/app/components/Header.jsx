@@ -31,7 +31,7 @@ const Header = () => {
   };
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    console.log("token::::", token);
+    // console.log("token::::", token);
     if (token) {
       currentUser(token)
         .then((response) => {
