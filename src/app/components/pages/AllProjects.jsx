@@ -40,26 +40,24 @@ const AllProjects = () => {
     
         if (search) {
           const normalizedSearch = search.trim().toLowerCase().replace(/\s+/g, "");
-    
+          const isNumericSearch = !isNaN(search);
+        
           filteredProjects = filteredProjects.filter((project) => {
-            // Check if configurations match the search term
             const configMatch = project.configurations?.some((config) =>
-              config.toLowerCase().replace(/\s+/g, "").includes(normalizedSearch)
+              config.toLowerCase().replace(/\s+/g, "").includes(normalizedSearch) || 
+              (isNumericSearch && config.toLowerCase().includes(`${search}bhk`))
             );
-    
-            // Check if property type matches
+        
             const propertyTypeMatch = project.configurationsType?.propertyType
               ?.toLowerCase()
               .includes(normalizedSearch);
-    
-            // Check if project name matches
-            const nameMatch = project.name
-              ?.toLowerCase()
-              .includes(normalizedSearch);
-    
+        
+            const nameMatch = project.name?.toLowerCase().includes(normalizedSearch);
+        
             return configMatch || propertyTypeMatch || nameMatch;
           });
         }
+        
     
         setProjects(filteredProjects);
       } catch (error) {
@@ -96,11 +94,12 @@ const AllProjects = () => {
               : "All Projects"}
           </h1>
           <p>
-            <a href="/" className="styled-link">
-              Home
-            </a>{" "}
-            / {getQueryParams().locationName || "All Projects"}
-          </p>
+  <a href="/" className="styled-link">
+    Home
+  </a>{" "}
+  / {getQueryParams().locationName || "All Projects"} 
+  {getQueryParams().propertyType && ` / ${getQueryParams().propertyType}`}
+</p>
         </div>
 
         <div className="main-con">

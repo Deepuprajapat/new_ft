@@ -83,7 +83,7 @@ const Blogs = () => {
 
   return (
     <div>
-   <Helmet>
+   {/* <Helmet>
   {blogData && (
     <>
       <title>{blogData.headings || ""}</title>
@@ -99,7 +99,7 @@ const Blogs = () => {
         ))}
     </>
   )}
-</Helmet>
+</Helmet> */}
 
       <section className="main-body">
         <div className="main-con">

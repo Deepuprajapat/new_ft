@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import debounce from "lodash.debounce"; // Using lodash debounce to limit API calls
-import { getAllProject ,getAllLocalities} from "../../apis/api"; // Ensure this path is correct for your project
-// import { getAllLocalities } from "../../apis/api";
+import debounce from "lodash.debounce";
+import { getAllProject } from "../../apis/api";
+import { getAllLocalities } from "../../apis/api";
 import "../styles/css/search.css";
 
 const SearchBar = () => {
@@ -11,10 +11,11 @@ const SearchBar = () => {
   const [propertyType, setPropertyType] = useState("");
   const [projectSuggestions, setProjectSuggestions] = useState([]);
   const [localities, setLocalities] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false); // Track if suggestions should be shown
   const navigate = useNavigate();
 
   // Fetch localities when the component mounts
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchLocalities = async () => {
       const data = await getAllLocalities();
       setLocalities(data);
@@ -27,45 +28,23 @@ const SearchBar = () => {
     setLocation(e.target.value);
   };
 
-  // Handle Search Input Change with Debounced API Call
+  // Handle Project Name Change with Debounced API Call
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-
-    // Call the debounced search function
     debouncedSearch(value);
   };
 
   const debouncedSearch = debounce(async (query) => {
     if (query.trim() === "") {
-      setProjectSuggestions([]); // Clear suggestions if query is empty
+      setProjectSuggestions([]);
       return;
     }
-  
-    const normalizedQuery = query.trim().toLowerCase().replace(/\s+/g, ""); // Normalize the query by removing spaces
-  
+
     const response = await getAllProject({ name: query });
-  
-    console.log("test /",response);
-    // Filter projects based on the search query for both configurations and property types
-    const filteredProjects = response.content.filter((project) => {
-      // Safe check for configurations
-      const configMatch = project.configurations && project.configurations.some((config) => {
-        const normalizedConfig = config.toLowerCase().replace(/\s+/g, ""); // Normalize configurations
-        return normalizedConfig.includes(normalizedQuery);
-      });
-  
-      // Safe check for propertyType
-      const propertyTypeMatch = project.propertyType && project.propertyType.toLowerCase().replace(/\s+/g, "").includes(normalizedQuery);
-  
-      // Return true if either configuration or property type matches
-      return configMatch || propertyTypeMatch;
-    });
-  
-    setProjectSuggestions(filteredProjects || []); // Set the filtered project suggestions
-  }, 500); // Debounce delay for API calls
-  
-  
+    setProjectSuggestions(response.content || []);
+    setShowSuggestions(true); // Show suggestions when data is fetched
+  }, 500);
 
   // Handle Property Type Change
   const handlePropertyTypeChange = (e) => {
@@ -75,34 +54,24 @@ const SearchBar = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
 
-    // Handle search term redirection logic
-    const searchTerm = e.target.elements.search.value;
-    if (searchTerm) {
-      window.location.href = `/allProjects?search=${encodeURIComponent(searchTerm)}`;
-      return; // Prevent further execution if searchTerm is used
-    }
+    let queryParams = [];
 
-    // If a project name is provided, navigate to the dynamic project URL
+    // Include the search query in the URL
     if (searchQuery) {
       const matchedProject = projectSuggestions.find(
-        (project) =>
-          project.name.toLowerCase() === searchQuery.toLowerCase() ||
-          project.configurations.some((config) =>
-            config.toLowerCase() === searchQuery.toLowerCase()
-          )
+        (project) => project.name.toLowerCase() === searchQuery.toLowerCase()
       );
 
       if (matchedProject) {
-        // Navigate to the project's URL
         navigate(`/project/${matchedProject.url}`);
-      } else {
-        // Navigate to 404 if no matching project
-        navigate("/404");
+        return; // Exit since we found an exact match
       }
+
+      queryParams.push(`search=${encodeURIComponent(searchQuery)}`);
     }
 
-    // If a location is selected and a property type is selected, navigate with both
-    if (location && propertyType) {
+    // Include the location in the URL
+    if (location) {
       const selectedCity = localities.find(
         (city) => city.id === parseInt(location)
       );
@@ -110,31 +79,26 @@ const SearchBar = () => {
         const formattedLocationName = selectedCity.name
           .toLowerCase()
           .replace(/\s+/g, "-");
-        navigate(
-          `/allProjects?location=${formattedLocationName}&locationId=${selectedCity.id}&propertyType=${propertyType}`
+        queryParams.push(
+          `location=${formattedLocationName}&locationId=${selectedCity.id}`
         );
       }
     }
 
-    // If only a location is selected, navigate using location NAME
-    if (location && !propertyType) {
-      const selectedCity = localities.find(
-        (city) => city.id === parseInt(location)
-      );
-      if (selectedCity) {
-        const formattedLocationName = selectedCity.name
-          .toLowerCase()
-          .replace(/\s+/g, "-");
-        navigate(
-          `/allProjects?location=${formattedLocationName}&locationId=${selectedCity.id}`
-        );
-      }
+    // Include the property type in the URL
+    if (propertyType) {
+      queryParams.push(`propertyType=${propertyType}`);
     }
 
-    // If only property type is selected, navigate using property type
-    if (!location && propertyType) {
-      navigate(`/allProjects?propertyType=${propertyType}`);
+    // Navigate with all query parameters
+    if (queryParams.length > 0) {
+      navigate(`/allProjects?${queryParams.join("&")}`);
     }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchQuery(suggestion.name);
+    setShowSuggestions(false); // Hide suggestions after selection
   };
 
   return (
@@ -161,19 +125,27 @@ const SearchBar = () => {
         <div className="form-group">
           <input
             className="form-control"
-            list="projects"
-            id="search"
             type="text"
             name="search"
-            placeholder="Search by BHK, SHOP, VILLAS, etc."
+            id="search"
+            placeholder="Search Projects"
             value={searchQuery}
             onChange={handleSearchChange}
+            onFocus={() => setShowSuggestions(true)} // Show suggestions on focus
           />
-          <datalist id="projects">
-            {projectSuggestions.map((project) => (
-              <option key={project.id} value={project.name} />
-            ))}
-          </datalist>
+          {showSuggestions && searchQuery && (
+            <ul className="suggestions-list">
+              {projectSuggestions.map((project) => (
+                <li
+                  key={project.id}
+                  className="suggestion-item"
+                  onClick={() => handleSuggestionClick(project)}
+                >
+                  {project.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div className="form-group">
           <div className="form-top-home-select">

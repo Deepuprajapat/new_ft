@@ -81,7 +81,7 @@ const Header = () => {
   return (
     <Navbar bg="light" expand="lg">
       <Container>
-        <Navbar.Brand href="http://localhost:3000">
+        <Navbar.Brand href="https://propertymarvels.in">
           {" "}
           <img
             src={logo}
@@ -111,7 +111,7 @@ const Header = () => {
                   ))}
                 </NavDropdown>
               ) : (
-                <Nav.Link href={item.path} key={index} target="_blank">
+                <Nav.Link href={item.path} key={index} >
                   {item.label}
                 </Nav.Link>
               )
@@ -144,7 +144,7 @@ const Header = () => {
                   </div>
                 )}
               </div>
-              <button className="phoneButton">
+              <button className="phoneButton" style={{marginLeft:'50px'}}>
                 <a href="tel:+918595-189-189">
                   <FaPhoneAlt /> 8595-189-189
                 </a>

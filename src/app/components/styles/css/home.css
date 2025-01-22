@@ -145,12 +145,13 @@
 
 .project-card-title {
   font-family: lato, sans-serif;
-  font-size: 25px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 30px;
   color: #000;
   margin: 0;
   padding: 20px 0 0;
+  min-height:80px;
 }
 
 .project-card-location {

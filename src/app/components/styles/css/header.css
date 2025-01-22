@@ -169,4 +169,7 @@ button a {
     font-size: 12px;
   }
 }
+.ms-auto {
+  margin-left: 28px !important;
+}
 

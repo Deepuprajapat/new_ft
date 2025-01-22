@@ -44,10 +44,15 @@ const About = () => {
           <div className="row padding_im_about">
             <div className="col-md-6">
               <h2>Our Process</h2>
+              <hr/>
               {aboutUsData.process.map((item, index) => (
-                <p className="p_n" key={index}>
+                <div >
+                <p className="p_n" key={index} style={{marginBottom:'10px'}}>
                   <b>{item.title}</b> - {item.description}
+                  
                 </p>
+               
+                </div>
               ))}
             </div>
             <div className="col-md-6">

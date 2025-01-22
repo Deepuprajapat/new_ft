@@ -137,7 +137,7 @@ p {
   /* Medium screens (Tablets) */
   .card-im {
     flex: 1 1 45%; /* Two cards per row */
-    max-width: 45%;
+    max-width: 100%;
   }
 }
 

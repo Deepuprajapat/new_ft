@@ -1,18 +1,16 @@
 .swiper-horizontal {
   overflow: hidden;
 }
-
 .r-buttons {
     position: relative;
     gap: 1rem;
-    bottom: -2rem; 
+    bottom: -2rem;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     justify-content: center;
     top: 17px;
 }
-
 .r-buttons button {
     font-size: 1.2rem;
     padding: 0.2rem 0.8rem;
@@ -22,73 +20,58 @@
     background-color: white;
     cursor: pointer;
 }
-
 .r-buttons > :nth-child(1) {
-    background-color: #2067d1;
+    background-color: #2067D1;
     color: white;
 }
-
 .r-buttons > :nth-child(2) {
-    background-color: #2067d1;
+    background-color: #2067D1;
     color: white;
 }
-
 .main-slider {
   background: url('https://res.cloudinary.com/deiuirtja/image/upload/v1713934028/investmango/Image-01_1_bssioj.jpg') !important;
   background-position: center !important;
   background-size: cover !important;
   background-repeat: no-repeat !important;
 }
-
 .main-slider {
     position: relative;
   }
-  
- 
   .form-top-home form {
-    max-width: 600px; 
+    max-width: 600px;
     margin: 0 auto;
   }
-
   a:hover {
     text-decoration: none;
   }
-  
   @media (width <= 768px) {
     .form-top-home {
-      position: static; 
-      margin-top: 20px; 
+      position: static;
+      margin-top: 20px;
       transform: none;
     }
-  
     .main-slider {
       height: auto;
     }
   }
-  
-  @media (width >= 769px) {
+  /* @media (width >= 769px) {
     .main-slider {
-      height: 100vh; 
+      height: 80vh;
     }
-
-  }
-  
+  } */
   .card-im{
     border-radius: 20px;
     width: 340px;
     margin: auto;
     max-width: 100%;
-    background-color: #f7f7f7;
+    background-color: #F7F7F7;
     padding: 20px;
 }
-    
-  
 .testimonial-container {
   padding: 50px 0;
-  background-color: #f9f9f9;
+  background-color: #F9F9F9;
   text-align: center;
 }
-
 .testimonial-item {
   background: #fff;
   padding: 20px;
@@ -96,35 +79,93 @@
   box-shadow: 0 4px 10px rgb(0 0 0 / 10%);
   text-align: center;
 }
-
 .stars {
   margin-bottom: 10px;
 }
-
 .fa-star.checked {
   color: #fc0;
 }
-
 .testimonial-text {
   font-style: italic;
   margin-bottom: 15px;
 }
-
 .testimonial-name {
   font-weight: bold;
   font-size: 1.2em;
 }
-
 .testimonial-role {
   color: #666;
 }
-
-.swiper-button-next,
+/* .swiper-button-next,
 .swiper-button-prev {
-  color: black;
+  position: absolute;
+  top: 100%;
+  transform: translateY(-50%);
+  color: white;
   transition: color 0.3s;
-    width: 4%;
-    border-radius: 54px;
-    font-weight: 600;
-    font-size: 40px;
+  width: 5%;
+  height: 59px;
+  border-radius: 54px;
+  font-weight: 600;
+  font-size: 40px;
+  background-color: #2067D1;
+  z-index: 10;
+}
+.swiper-button-next {
+  right: 40%;
+}
+.swiper-button-prev {
+  left: 50%;
+} */
+/* Center the Swiper navigation buttons below the cards */
+.swiper-container {
+  position: relative;
+  padding-bottom: 50px; /* Add space for navigation buttons */
+}
+.swiper-button-prev,
+.swiper-button-next {
+  position: absolute;
+  bottom: 10px;
+  top: auto;
+  width: 59px;
+  height: 60px;
+  background: #2067D1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex
+;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.swiper-button-prev {
+  left: 45%;
+}
+.swiper-button-next {
+  right: 45%;
+}
+/* Optional: Add hover effect */
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background: #0056B3; /* Darker shade on hover */
+}
+@media (max-width: 850px) {
+  .swiper-button-prev {
+    left: 30%; /* Adjust based on your needs */
   }
+
+  .swiper-button-next {
+    right: 30%; /* Adjust based on your needs */
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 480px) {
+  .swiper-button-prev {
+    left: 33%; /* Adjust based on your needs */
+  }
+
+  .swiper-button-next {
+    right: 33%; /* Adjust based on your needs */
+  }
+}

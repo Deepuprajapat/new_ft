@@ -17,18 +17,27 @@ const ProjectCard = ({ project }) => {
   };
 
   // Extract floorplan sizes
-  const floorplanSizes = project.floorplans?.map((floorplan) => floorplan.size) || [];
+  const floorplanSizes =
+    project.floorplans?.map((floorplan) => floorplan.size) || [];
   const minSize = floorplanSizes.length ? Math.min(...floorplanSizes) : null;
   const maxSize = floorplanSizes.length ? Math.max(...floorplanSizes) : null;
 
   // Find the minimum price
   const minPrice = project.floorplans?.length
-  ? Math.min(...project.floorplans.map((floorplan) => floorplan.price))
-  : null;
+    ? Math.min(
+        ...project.floorplans
+          .filter((floorplan) => floorplan.price > 1.5) // Exclude prices <= 1.5
+          .map((floorplan) => floorplan.price)
+      )
+    : null;
 
   return (
     <div className="card-im">
-      <a href={"project/"+project.url} target="_blank" rel="noopener noreferrer">
+      <a
+        href={"project/" + project.url}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <img
           alt={project.name}
           src={(project.images && project.images[0]?.imageUrl) || defaultImage}
@@ -52,24 +61,56 @@ const ProjectCard = ({ project }) => {
         <span>
           <i className="fa fa-bed" aria-hidden="true"></i>{" "}
           <span>
-            {Array.isArray(project.configurations) &&
-            project.configurations.length > 0
-              ? project.configurations.join(", ") // Join configurations with commas
-              : "Property Type"}{" "}
-            {/* Fallback text when configurations are empty or not an array */}
-          </span>
+  {Array.isArray(project.configurations) && project.configurations.length > 0
+    ? (() => {
+        // Separate BHK configurations
+        const bhkConfigs = project.configurations
+          .filter((config) => /\d+BHK/.test(config)) // Match numeric BHK configurations
+          .map((config) => parseInt(config)) // Extract numeric part (e.g., 2 from 2BHK)
+          .filter((num) => !isNaN(num)); // Ensure valid numbers only
+
+        // Find unique configurations
+        const otherConfigs = project.configurations.filter(
+          (config) => !/\d+BHK/.test(config) // Exclude BHK configurations
+        );
+
+        // Prepare BHK output
+        let bhkOutput = null;
+        if (bhkConfigs.length > 0) {
+          const minBHK = Math.min(...bhkConfigs);
+          const maxBHK = Math.max(...bhkConfigs);
+          bhkOutput = minBHK === maxBHK ? `${minBHK}BHK` : `${minBHK}BHK, ${maxBHK}BHK`;
+        }
+
+        // Prepare other configurations output
+        const otherOutput =
+          otherConfigs.length > 1
+            ? `${otherConfigs[0]}, ${otherConfigs[otherConfigs.length - 1]}`
+            : otherConfigs[0] || null;
+
+        // Combine outputs
+        const combinedOutput = [bhkOutput, otherOutput].filter(Boolean).join(", ");
+
+        return combinedOutput || "Property Type"; // Fallback if no configurations exist
+      })()
+    : "Property Type"}
+</span>
+
         </span>
       </p>
       <div className="project-card-footer">
-      <p className="project-card-price">
+        <p className="project-card-price">
           Start from{" "}
           <b>
             ₹
-            {minPrice >= 10000000
-              ? (minPrice / 10000000).toFixed(2) + " Cr"
-              : (minPrice / 100000).toFixed(2) + " L"}
+            {minPrice
+              ? minPrice >= 10000000
+                ? parseFloat((minPrice / 10000000).toFixed(2)) + " Cr"
+                : parseFloat((minPrice / 100000).toFixed(2)) + " Lakh"
+              : "N/A"}
           </b>
         </p>
+
         <button
           onClick={() => handleMoreDetails(project.url)}
           className="project-card-details-btn"

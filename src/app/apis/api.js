@@ -6,11 +6,12 @@ import axios from "axios";
 // console.log("Environment:", process.env.REACT_APP_ENV);
 // console.log("Base URL:", process.env.REACT_APP_BASE_URL);
 let BASE_URL = process.env.REACT_APP_BASE_URL;
+
 if (process.env.REACT_APP_ENV === "production") {
-  BASE_URL = process.env.REACT_APP_BASE_URL ;
+  BASE_URL = process.env.REACT_APP_BASE_URL;
 }
 // console.log("API Base URL: ", BASE_URL);
-const BASE_URL1 = process.env.REACT_APP_BASE_URL || "https://api.virtualintelligence.co.in";
+const BASE_URL1 = "https://api.virtualintelligence.co.in";
 let token = "";
 
 export const login = async (userName, password) => {
@@ -113,12 +114,10 @@ export const getAllPropertyConfiguration = async () => {
   }
 };
 
-
-
 export const getAllProject = async (filters = {}) => {
   const {
     page,
-    size = 100,
+    size = 400,
     isPriority,
     isPremium,
     isFeatured,
@@ -128,7 +127,7 @@ export const getAllProject = async (filters = {}) => {
     cityId,
     localityId,
     name,
-    type, 
+    type,
   } = filters;
 
   try {
@@ -144,9 +143,9 @@ export const getAllProject = async (filters = {}) => {
       ...(cityId && { cityId }),
       ...(localityId && { localityId }),
       ...(name && { name }),
-      ...(type && { type: type.toUpperCase() }),  
+      ...(type && { type: type.toUpperCase() }),
     };
-    // console.log("Params sent to API:", params); 
+    // console.log("Params sent to API:", params);
     const res = await axios.get(`${BASE_URL}/project/get/all`, { params });
     return res.data;
   } catch (error) {
@@ -154,8 +153,6 @@ export const getAllProject = async (filters = {}) => {
     return { content: [] };
   }
 };
-
-
 
 //  get all project by urlname
 export const getAllProjectsByUrlName = async (urlName) => {
@@ -198,7 +195,9 @@ export const getAllFloor = async (params = {}) => {
 
 export const getAllBlog = async (page = 0, size = 500) => {
   try {
-    const res = await axios.get(`${BASE_URL}/blogs/get/all?isDeleted=false&page=${page}&size=${size}`);
+    const res = await axios.get(
+      `${BASE_URL}/blogs/get/all?isDeleted=false&page=${page}&size=${size}`
+    );
     return res.data;
   } catch (error) {
     console.error("Error fetching Blogs:", error);
@@ -271,9 +270,9 @@ export const fetchAllVacancies = async () => {
     console.log("Starting fetchAllVacancies...");
 
     const response = await fetch(`${BASE_URL1}/get/all/vacancies`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -302,13 +301,10 @@ export const fetchAllVacancies = async () => {
   }
 };
 
-
-
-
 // Function to submit hiring form data
 export const submitHiringForm = async (formData) => {
   try {
-    console.log("FormData Payload:",formData);
+    console.log("FormData Payload:", formData);
 
     const response = await fetch(`${BASE_URL1}/user/save/hiring/by/ai`, {
       method: "POST",
@@ -329,17 +325,20 @@ export const submitHiringForm = async (formData) => {
   }
 };
 
-
-
 export const getAllLocalities = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/locality/get/all`);
     const localities = response.data || []; // Default to an empty array if no data
 
-    // Map localities to extract city details and ensure uniqueness
+    // Filter out localities with 'unknown' or 'UNKNOWN' in the city name or any other relevant fields
+    const filteredLocalities = localities.filter(
+      (locality) => locality.city.name.toLowerCase() !== "unknown"
+    );
+
+    // Map filtered localities to extract city details and ensure uniqueness
     const uniqueCities = Array.from(
       new Map(
-        localities.map((locality) => [locality.city.id, locality.city])
+        filteredLocalities.map((locality) => [locality.city.id, locality.city])
       ).values()
     );
 
@@ -358,7 +357,7 @@ export const getLeadByPhone = async (phone) => {
     console.error("Error fetching lead by phone:", error);
     return [];
   }
-}
+};
 
 // API Call to Check Phone Number
 export const checkPhoneNumberExists = async (phone) => {
@@ -367,21 +366,24 @@ export const checkPhoneNumberExists = async (phone) => {
       params: {
         phone: phone,
         page: 0,
-        size: 50
-      }
+        size: 300,
+      },
     });
 
     console.log("Phone Check Response:", response.data);
-    
+
     // Handle the paginated response properly
-    const leads = response.data?.content || [];  
+    const leads = response.data?.content || [];
     return leads.some((lead) => lead.phone === phone);
-    
   } catch (error) {
-    console.error("Error checking phone number:", error.response || error.message);
+    console.error(
+      "Error checking phone number:",
+      error.response || error.message
+    );
     throw new Error("Failed to check phone number.");
   }
 };
+
 // API Call to Submit New Lead
 export const submitLead = async (formData) => {
   const payload = {
@@ -399,10 +401,7 @@ export const submitLead = async (formData) => {
   };
 
   try {
-    const response = await axios.post(
-      "http://13.200.229.71:8282/leads/save/new",
-      payload
-    );
+    const response = await axios.post(`${BASE_URL}/leads/save/new`, payload);
     console.log("Lead Submission Response:", response.data);
     return response.data;
   } catch (error) {
@@ -413,39 +412,46 @@ export const submitLead = async (formData) => {
 
 export const sendOTP = async (phone, projectName, source, name, email) => {
   try {
-    const response = await axios.post(`${BASE_URL}/leads/save/new/and/send-otp`, {
-      name: name,
-      phone: phone,
-      email: email,
-      projectName: projectName,
-      source: source,
-    });
+    const response = await axios.post(
+      `${BASE_URL}/leads/save/new/and/send-otp`,
+      {
+        name: name,
+        phone: phone,
+        email: email,
+        projectName: projectName,
+        source: source,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error resending OTP:", error);
     throw error;
   }
-}
+};
 
 export const verifyOTP = async (phone, otp) => {
   try {
-    const response = await axios.patch(`${BASE_URL}/leads/validate/otp?phone=${phone}&OTP=${otp}`);
+    const response = await axios.patch(
+      `${BASE_URL}/leads/validate/otp?phone=${phone}&OTP=${otp}`
+    );
     return response.data;
   } catch (error) {
     console.error("Error verifying OTP:", error);
     throw error;
   }
-}
+};
 
 export const resendOTP = async (phone) => {
   try {
-    const response = await axios.patch(`${BASE_URL}/leads/resend/otp?phone=${phone}`);
+    const response = await axios.patch(
+      `${BASE_URL}/leads/resend/otp?phone=${phone}`
+    );
     return response.data;
   } catch (error) {
     console.error("Error resending OTP:", error);
     throw error;
   }
-}
+};
 export const saveLead = async (lead) => {
   try {
     const response = await axios.post(`${BASE_URL}/leads/save/new`, lead);
@@ -454,4 +460,4 @@ export const saveLead = async (lead) => {
     console.error("Error saving lead:", error);
     throw error;
   }
-}
+};

@@ -216,7 +216,8 @@ header {
   box-shadow: 4px 7px 20px 6px #0000000a;
   border-radius: 0 0 20px 20px;
   justify-content: center;
-  margin-top: 150px;
+  margin-top: 100px;
+  background: #ffffff;
 
   .form-group {
     min-width: 181px;
@@ -735,7 +736,7 @@ header {
       font-family: Inter, sans-serif;
       font-size: 16px;
       color: #3f3f3f;
-      letter-spacing: 0.2px;
+      /* letter-spacing: 0.2px; */
     }
   }
 }

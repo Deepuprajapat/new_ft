@@ -66,25 +66,30 @@ const Head = () => {
                       <h1 className="h3" style={{ marginTop: "26px" }}>
                         Top Projects
                       </h1>
-                      <p className="head_p">
+                      <p className="head_p" style={{marginLeft:'39px'}}>
                         Connecting people with their dream properties
                       </p>
                     </div>
-                    <Swiper {...sliderSettings}>
-                      {loading ? (
-                        <div className="loader-container">
-                          <div className="loader">Loading...</div>
-                        </div>
-                      ) : (
-                        <div className="listing-home listing-page row">
-                          {projects?.map((project) => (
-                            <SwiperSlide key={project.id}>
-                              <ProjectCard project={project} />
-                            </SwiperSlide>
-                          ))}
-                        </div>
-                      )}
-                    </Swiper>
+                    <div className="swiper-container">
+                        <Swiper {...sliderSettings}>
+                          {loading ? (
+                            <div className="loader-container">
+                              <div className="loader">Loading...</div>
+                            </div>
+                          ) : (
+                            <div className="listing-home listing-page row">
+                              {projects?.map((project) => (
+                                <SwiperSlide key={project.id}>
+                                  <ProjectCard project={project} />
+                                </SwiperSlide>
+                              ))}
+                            </div>
+                          )}
+                        </Swiper>
+                        {/* Add custom navigation buttons */}
+                        <div className="swiper-button-prev"><i class="fas fa-chevron-left"></i></div>
+                        <div className="swiper-button-next"><i class="fas fa-chevron-right"></i></div>
+                      </div>
                   </div>
                 </div>
               </div>

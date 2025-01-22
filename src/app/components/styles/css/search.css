@@ -6,7 +6,7 @@
     width: 100%; 
     z-index: 10; 
   }
-  @media (width <= 1400px) and (width >= 676px) {
+  @media (width < 2500px) and (width >= 676px) {
     .form-top-home {
       position: relative;
     top: 20%; 
@@ -17,4 +17,36 @@
     }
    
   }
+
+
+  .suggestions-list {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 20%;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
   
+  .suggestion-item {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+
+  .suggestion-item:hover {
+    background-color: #f1f1f1;
+  }
+  
+  @media (max-width: 768px) {
+    .suggestions-list {
+      width: 100%; /* Full width on smaller screens */
+      max-width: 70%; /* Remove max-width on smaller screens */
+    }
+  
+    .suggestion-item {
+      font-size: 12px; /* Smaller font size on mobile */
+    }
+  }
