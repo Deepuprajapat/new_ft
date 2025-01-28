@@ -16,7 +16,7 @@ jobs:
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
           image: invest/frontend
-          tags: ${{ github.sha }}, latest
+          tags: ${{ github.sha }}
           registry: registry.virtualintelligence.co.in
           dockerfile: dockerfile
           username: ${{ secrets.REGISTRY_USERNAME }}
