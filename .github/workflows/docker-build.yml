@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Docker Image.
 
 on:
   push:
@@ -11,17 +11,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Log into Docker registry with debug
-        run: |
-          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login registry.virtualintelligence.co.in -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
-
+      
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
           image: invest/frontend
           tags: ${{ github.sha }}, latest
           registry: registry.virtualintelligence.co.in
-          dockerfile: Dockerfile
+          dockerfile: dockerfile
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
