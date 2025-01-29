@@ -11,13 +11,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
+
+      - name: Log into Docker registry with debug
+        run: |
+          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login registry.virtualintelligence.co.in -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin --debug
+
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
           image: invest/frontend
           tags: ${{ github.sha }}, latest
           registry: registry.virtualintelligence.co.in
-          dockerfile: dockerfile
+          dockerfile: Dockerfile
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
