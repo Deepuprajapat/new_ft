@@ -14,7 +14,7 @@ jobs:
 
       - name: Log into Docker registry with debug
         run: |
-          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login registry.virtualintelligence.co.in -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin --debug
+          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login registry.virtualintelligence.co.in -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
 
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6
