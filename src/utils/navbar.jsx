@@ -15,7 +15,7 @@
       label: 'Our Projects',
       dropdown: [
         { label: 'All Projects', path: '/allProjects' },
-        // { label: 'Properties', path: '/allProperties' },
+        { label: 'Properties', path: '/allProperties' },
       ],
     },
     { label: 'Mango Insights', path: '/mango-insights' },

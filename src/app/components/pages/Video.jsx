@@ -13,7 +13,14 @@ const Video = () => {
       console.log("Fetched Projects: ", JSON.stringify(data)); // Log the data to verify the structure
 
       const sortedProjects = data.content
-        ? data.content.sort((a, b) => b.videoCount - a.videoCount)
+        ? data.content
+            .filter(
+              (project) =>
+                project.videos &&
+                project.videos.length > 0 &&
+                project.videos.some((video) => video.trim() !== "") // Ensure videos have valid content
+            )
+            .sort((a, b) => b.videoCount - a.videoCount)
         : [];
 
       setProjects(sortedProjects);
@@ -24,17 +31,20 @@ const Video = () => {
 
   return (
     <div>
-     <Helmet>
-<title>Our Videos</title>
-  <link rel="canonical" href="https://www.investmango.com/video" /> 
-<meta name="description" content="Subscribe to our Youtube channel to know more about all other residential & commercial projects in Delhi/NCR region. Our video covers every aspect. " />
-</Helmet>
+      <Helmet>
+        <title>Our Videos</title>
+        <link rel="canonical" href="https://propertymarvels.in/video" />
+        <meta
+          name="description"
+          content="Subscribe to our Youtube channel to know more about all other residential & commercial projects in Delhi/NCR region. Our video covers every aspect. "
+        />
+      </Helmet>
       <section className="main-body">
         <div className="container">
           <h1>Our Videos</h1>
           <p>
             <a
-              href="https://www.investmango.com/"
+              href="https://propertymarvels.in/"
               target="_blank"
               rel="noopener"
               className="styled-link"
@@ -76,9 +86,9 @@ const Video = () => {
 
                     const minPrice = project.floorplans?.length
                       ? Math.min(
-                          ...project.floorplans.map(
-                            (floorplan) => floorplan.price
-                          )
+                          ...project.floorplans
+                            .filter((floorplan) => floorplan.price > 1.5) // Exclude prices <= 1.5
+                            .map((floorplan) => floorplan.price)
                         )
                       : null;
 
@@ -98,7 +108,6 @@ const Video = () => {
                                 height="200"
                                 src={`https://www.youtube.com/embed/${project.videos[0]}`}
                                 title={project.name}
-                                frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
                               ></iframe>
@@ -106,7 +115,12 @@ const Video = () => {
                           ) : (
                             <div className="no-video">No Video Available</div>
                           )}
-                          <p className="list_headline_two">{project.name}</p>
+                          <p
+                            className="list_headline_two"
+                            style={{ fontSize: "20px" }}
+                          >
+                            {project.name}
+                          </p>
                           <p className="location_im">
                             <i className="fas fa-map-marker-alt"></i>{" "}
                             {project.shortAddress}
@@ -123,7 +137,53 @@ const Video = () => {
 
                             <span>
                               <i className="fa fa-bed" aria-hidden="true"></i>{" "}
-                              {project.configurations.join(", ")}
+                              {Array.isArray(project.configurations) &&
+                              project.configurations.length > 0
+                                ? (() => {
+                                    // Separate BHK configurations
+                                    const bhkConfigs = project.configurations
+                                      .filter((config) => /\d+BHK/.test(config)) // Match numeric BHK configurations
+                                      .map((config) => parseInt(config)) // Extract numeric part (e.g., 2 from 2BHK)
+                                      .filter((num) => !isNaN(num)); // Ensure valid numbers only
+
+                                    // Find unique configurations
+                                    const otherConfigs =
+                                      project.configurations.filter(
+                                        (config) => !/\d+BHK/.test(config) // Exclude BHK configurations
+                                      );
+
+                                    // Prepare BHK output
+                                    let bhkOutput = null;
+                                    if (bhkConfigs.length > 0) {
+                                      const minBHK = Math.min(...bhkConfigs);
+                                      const maxBHK = Math.max(...bhkConfigs);
+                                      bhkOutput =
+                                        minBHK === maxBHK
+                                          ? `${minBHK}BHK`
+                                          : `${minBHK}BHK, ${maxBHK}BHK`;
+                                    }
+
+                                    // Prepare other configurations output
+                                    const otherOutput =
+                                      otherConfigs.length > 1
+                                        ? `${otherConfigs[0]}, ${
+                                            otherConfigs[
+                                              otherConfigs.length - 1
+                                            ]
+                                          }`
+                                        : otherConfigs[0] || null;
+
+                                    // Combine outputs
+                                    const combinedOutput = [
+                                      bhkOutput,
+                                      otherOutput,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(", ");
+
+                                    return combinedOutput || "Property Type"; // Fallback if no configurations exist
+                                  })()
+                                : "Property Type"}
                             </span>
                           </h3>
                           <div className="list-footer">
@@ -133,13 +193,17 @@ const Video = () => {
                                 ₹
                                 {minPrice
                                   ? minPrice >= 10000000
-                                    ? (minPrice / 10000000).toFixed(2) + " Cr"
-                                    : (minPrice / 100000).toFixed(2) + " L"
-                                  : "Price on Request"}
+                                    ? parseFloat(
+                                        (minPrice / 10000000).toFixed(2)
+                                      ) + " Cr"
+                                    : parseFloat(
+                                        (minPrice / 100000).toFixed(2)
+                                      ) + " Lakh"
+                                  : "N/A"}
                               </b>
                             </p>
                             <a
-                              href={`tel:+91${project.userPhone}`}
+                              href={`tel:+91-8595189189`}
                               target="_blank"
                               rel="noopener"
                               className="theme-btn"

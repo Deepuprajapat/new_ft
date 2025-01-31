@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const HowWeWork = () => {
   return (
 
-        <div className="col-md-12">
+        <div className="col-md-12" style={{marginTop: "50px"}}>
           <div className="headline">
             <p className="sub-headline">How We Work</p>
             <h3 className="h3">
@@ -13,7 +13,10 @@ const HowWeWork = () => {
               {/* <span className="mobiHide"> Every Stride</span> */}
             </h3>
           </div>
-          <div className="weWorkInner">
+          <div className="weWorkInner"   style={{
+    justifyContent: "space-around",
+    padding: "30px 0",
+  }}>
             <div className="item">
               <div className="img-ic">
                 <img

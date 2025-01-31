@@ -11,12 +11,12 @@ const Faq = () => {
  <Helmet>
 <title>FAQs | Invest Mango</title> 
 <meta name="description" content="Our FAQs are there to help you know about our services and have an understanding of your 'Property Investments." /> 
-<link rel="canonical" href="https://www.investmango.com/faq" />
+<link rel="canonical" href="https://propertymarvels.in/faq" />
 </Helmet>
     <section className="main-body">
         <div className="container">
             <h1>FAQs</h1>
-            <p><a href="https://www.investmango.com/" target="_blank" rel="noopener" className="styled-link">Home</a> / FAQs</p>
+            <p><a href="https://propertymarvels.in/" target="_blank" rel="noopener" className="styled-link">Home</a> / FAQs</p>
             <h2 style={{ textAlign: 'center' }}>Frequently Asked Questions</h2>
         </div>
         <div className="main-con">

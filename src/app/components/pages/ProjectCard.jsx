@@ -61,41 +61,48 @@ const ProjectCard = ({ project }) => {
         <span>
           <i className="fa fa-bed" aria-hidden="true"></i>{" "}
           <span>
-  {Array.isArray(project.configurations) && project.configurations.length > 0
-    ? (() => {
-        // Separate BHK configurations
-        const bhkConfigs = project.configurations
-          .filter((config) => /\d+BHK/.test(config)) // Match numeric BHK configurations
-          .map((config) => parseInt(config)) // Extract numeric part (e.g., 2 from 2BHK)
-          .filter((num) => !isNaN(num)); // Ensure valid numbers only
+            {Array.isArray(project.configurations) &&
+            project.configurations.length > 0
+              ? (() => {
+                  // Separate BHK configurations
+                  const bhkConfigs = project.configurations
+                    .filter((config) => /\d+BHK/.test(config)) // Match numeric BHK configurations
+                    .map((config) => parseInt(config)) // Extract numeric part (e.g., 2 from 2BHK)
+                    .filter((num) => !isNaN(num)); // Ensure valid numbers only
 
-        // Find unique configurations
-        const otherConfigs = project.configurations.filter(
-          (config) => !/\d+BHK/.test(config) // Exclude BHK configurations
-        );
+                  // Find unique configurations
+                  const otherConfigs = project.configurations.filter(
+                    (config) => !/\d+BHK/.test(config) // Exclude BHK configurations
+                  );
 
-        // Prepare BHK output
-        let bhkOutput = null;
-        if (bhkConfigs.length > 0) {
-          const minBHK = Math.min(...bhkConfigs);
-          const maxBHK = Math.max(...bhkConfigs);
-          bhkOutput = minBHK === maxBHK ? `${minBHK}BHK` : `${minBHK}BHK, ${maxBHK}BHK`;
-        }
+                  // Prepare BHK output
+                  let bhkOutput = null;
+                  if (bhkConfigs.length > 0) {
+                    const minBHK = Math.min(...bhkConfigs);
+                    const maxBHK = Math.max(...bhkConfigs);
+                    bhkOutput =
+                      minBHK === maxBHK
+                        ? `${minBHK}BHK`
+                        : `${minBHK}BHK, ${maxBHK}BHK`;
+                  }
 
-        // Prepare other configurations output
-        const otherOutput =
-          otherConfigs.length > 1
-            ? `${otherConfigs[0]}, ${otherConfigs[otherConfigs.length - 1]}`
-            : otherConfigs[0] || null;
+                  // Prepare other configurations output
+                  const otherOutput =
+                    otherConfigs.length > 1
+                      ? `${otherConfigs[0]}, ${
+                          otherConfigs[otherConfigs.length - 1]
+                        }`
+                      : otherConfigs[0] || null;
 
-        // Combine outputs
-        const combinedOutput = [bhkOutput, otherOutput].filter(Boolean).join(", ");
+                  // Combine outputs
+                  const combinedOutput = [bhkOutput, otherOutput]
+                    .filter(Boolean)
+                    .join(", ");
 
-        return combinedOutput || "Property Type"; // Fallback if no configurations exist
-      })()
-    : "Property Type"}
-</span>
-
+                  return combinedOutput || "Property Type"; // Fallback if no configurations exist
+                })()
+              : "Property Type"}
+          </span>
         </span>
       </p>
       <div className="project-card-footer">

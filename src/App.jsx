@@ -19,9 +19,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import DeveloperPage from "./app/components/pages/DeveloperPage";
-import AddNewProjects from "./app/components/pages/AddNewProjects";
-import OverviewProjects from "./app/components/pages/OverviewProjects";
-import Dashboard from "./app/components/pages/Dashboard";
 import CompareProjects from "./app/components/pages/CompareProjects";
 import NotFound from "./app/components/pages/NotFound";
 import ThankYouPage from "./app/components/ThankYouPage";
@@ -49,14 +46,7 @@ const router = createBrowserRouter([
       { path: "/propertyDetails", element: <PropertyDetails /> },
       { path: "/thankYou", element: <ThankYouPage /> },
       { path: "*", element: <NotFound /> }, // Not Found route
-      // {
-      //   path: "/dashboard",
-      //   element: <Dashboard />,
-      //   children: [
-      //     { path: "/dashboard", element: <OverviewProjects /> },
-      //     { path: "/addnew-projects", element: <AddNewProjects /> },
-      //   ],
-      // },
+ 
     ],
   },
 ]);

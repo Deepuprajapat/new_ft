@@ -5,13 +5,22 @@ import axios from "axios";
 // import axios from "axios";
 // console.log("Environment:", process.env.REACT_APP_ENV);
 // console.log("Base URL:", process.env.REACT_APP_BASE_URL);
+console.log("Environment:", process.env.REACT_APP_ENV);
+console.log("Base URL:", process.env.REACT_APP_BASE_URL1);
 let BASE_URL = process.env.REACT_APP_BASE_URL;
+let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
+console.log("API Base URL: ", BASE_URL1);
 
 if (process.env.REACT_APP_ENV === "production") {
   BASE_URL = process.env.REACT_APP_BASE_URL;
 }
-// console.log("API Base URL: ", BASE_URL);
-const BASE_URL1 = "https://api.virtualintelligence.co.in";
+
+
+if (process.env.REACT_APP_ENV === "production") {
+  BASE_URL1 = process.env.REACT_APP_BASE_URL1;
+}
+console.log("API Base URL1: ", BASE_URL1);
+// const BASE_URL1 = "https://api.virtualintelligence.co.in";
 let token = "";
 
 export const login = async (userName, password) => {
@@ -250,7 +259,7 @@ export const getAllTestimonials = async () => {
 export const fetchTestimonials = async () => {
   try {
     const response = await fetch(
-      `${BASE_URL}/testimonials/get/all?page=0&size=12`
+      `${BASE_URL}/testimonials/get/all?page=0&size=100`
     );
     if (response.ok) {
       const data = await response.json(); // Parse the JSON response
@@ -268,12 +277,13 @@ export const fetchTestimonials = async () => {
 export const fetchAllVacancies = async () => {
   try {
     console.log("Starting fetchAllVacancies...");
-
-    const response = await fetch(`${BASE_URL1}/get/all/vacancies`, {
+    console.log("API Base URL1: ", `${BASE_URL1}/get/all/vacancies?isActive=true&page=0&size=100`);
+    const response = await fetch(`${BASE_URL1}/get/all/vacancies?isActive=true&page=0&size=100`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
+ 
     });
 
     console.log("Response received:", response);
@@ -452,6 +462,7 @@ export const resendOTP = async (phone) => {
     throw error;
   }
 };
+
 export const saveLead = async (lead) => {
   try {
     const response = await axios.post(`${BASE_URL}/leads/save/new`, lead);
@@ -461,3 +472,33 @@ export const saveLead = async (lead) => {
     throw error;
   }
 };
+
+export const getAllGenericKeywords = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/generic/keywords/get/all`);
+    console.log("Generic Keywords:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Keywords:", error);
+    return [];
+  }
+ 
+};
+export const getGenericKeywordByPath = async (path) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/generic/keywords/get/by/path/${path}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Keywords:", error);
+    return [];
+  }
+}
+export const getAllCities = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/city/get/all`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching cities:", error);
+    return [];
+  } 
+}

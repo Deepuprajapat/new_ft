@@ -14,9 +14,9 @@
  
 }
 
-.recent-posts h2 {
+/* .recent-posts h2 {
   margin-bottom: 20px;
-}
+} */
 
 .blog-image {
   width: 100%;
@@ -24,13 +24,15 @@
   margin-bottom: 20px;
   display: block;   /* Prevents inline spacing issues */
   object-fit: contain;
-
+  border-radius: 0px;
   
 }
 
   
 #blog-title{
-    font-size: 35px;
+    font-size: 30px;
     font-weight: 500;
     color: black;
+    
 }
+

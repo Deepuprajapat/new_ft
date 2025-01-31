@@ -1,113 +1,265 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogActions, Button, TextField } from '@mui/material';
-import Swal from 'sweetalert2';
-import { checkPhoneNumberExists, submitLead } from '../../apis/api';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from "@mui/material";
+import Swal from "sweetalert2";
+import {
+  sendOTP,
+  verifyOTP,
+  resendOTP,
+  checkPhoneNumberExists,
+  submitLead,
+} from "../../apis/api";
+import { useNavigate } from "react-router-dom";
+import { jsPDF } from "jspdf";
 
-const BrochurePopupDialog = ({ open, onClose, projectName }) => {
-    const [formData, setFormData] = useState({
-        username: '',
-        usermobile: '',
-        usermsg: ''
-    });
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+const BASE_BROCHURE_URL =
+  "https://myimwebsite.s3.ap-south-1.amazonaws.com/images";
+const FALLBACK_BROCHURE = "/images/For-Website.jpg"; // Assuming it's in public/images
 
-    // Sync projectName with formData when the prop changes
-    useEffect(() => {
-        setFormData((prev) => ({ ...prev, usermsg: projectName }));
-    }, [projectName]);
+const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
+  const [formData, setFormData] = useState({
+    username: "",
+    usermobile: "",
+    usermsg: projectName || "",
+  });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+  const [error, setError] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const navigate = useNavigate();
 
-        // Phone validation: Only digits and max length of 10
-        if (name === 'usermobile') {
-            if (!/^\d*$/.test(value)) return; // Allow only digits
-            if (value.length > 10) return;   // Limit to 10 digits
-        }
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, usermsg: projectName }));
+  }, [projectName]);
 
-        setFormData({ ...formData, [name]: value });
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "usermobile") {
+      if (!/^\d*$/.test(value)) return; // Allow only digits
+      if (value.length > 10) return; // Limit to 10 digits
+    }
+    setFormData({ ...formData, [name]: value });
+  };
 
-    const handleSubmit = async () => {
-        const { username, usermobile } = formData;
+  const generateComingSoonPDF = (projectName) => {
+    const doc = new jsPDF();
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("BROCHURE COMING SOON", 50, 80);
+    doc.setFontSize(14);
+    doc.text(`Project: ${projectName || "Unknown Project"}`, 50, 100);
+    doc.save(`${projectName || "Brochure"}-Coming-Soon.pdf`);
+  };
 
-        // Basic field validation
-        if (!username || !usermobile) {
-            setError('Please fill in all fields.');
-            return;
-        }
+  const handleSubmit = async () => {
+    const { username, usermobile } = formData;
+  
+    if (!username || !usermobile) {
+      setError("Please fill in all fields.");
+      return;
+    }
+  
+    if (usermobile.length !== 10) {
+      setError("Phone number must be exactly 10 digits.");
+      return;
+    }
+  
+    try {
+      await sendOTP(usermobile, projectName, "brochure", username, "");
+      setIsOtpSent(true);
+      Swal.fire({
+        icon: "info",
+        title: "OTP Sent!",
+        text: `An OTP has been sent to ${formData.usermobile}. Please enter it below.`,
+        backdrop: true,
+        allowOutsideClick: false,
+        didOpen: () => {
+          document.querySelector(".swal2-container").style.zIndex = "2000";
+        },
+      });
+      
+      
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Something went wrong. Please try again.",
+      });
+    }
+  };
+  
 
-        // Phone number length validation
-        if (usermobile.length !== 10) {
-            setError('Phone number must be exactly 10 digits.');
-            return;
-        }
+  const handleOtpVerification = async () => {
+    try {
+      const response = await verifyOTP(formData.usermobile, otp);
+  
+      if (response.message === "OTP Validated Successfully") {
+        await submitLead(formData);
+  
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Your OTP has been verified successfully!",
+          backdrop: true,
+          allowOutsideClick: false,
+        }).then(() => {
+          // Redirect first
+          navigate("/thankYou");
+          
+          // Parallel PDF download
+          if (brochure) {
+            let brochureUrl = brochure.startsWith("http")
+              ? brochure
+              : `${BASE_BROCHURE_URL}/${brochure}`;
+  
+            const link = document.createElement("a");
+            link.href = brochureUrl;
+            link.setAttribute("download", `${projectName || "brochure"}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            generateComingSoonPDF(projectName);
+          }
+        });
+  
+        onClose();
+      } else {
+        Swal.fire({
+            icon: "error",
+            title: "Invalid OTP",
+            text: response.message || "Please enter the correct OTP.",
+            backdrop: true, // Keeps modal focus
+            allowOutsideClick: false, // Prevents accidental closure
+            didOpen: () => {
+              document.querySelector(".swal2-container").style.zIndex = "2000"; // Ensures visibility
+            },
+          });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "OTP Verification Failed",
+        text: error.response?.data?.message || "Invalid OTP, please try again.",
+        backdrop: true, // Keeps modal focus
+        allowOutsideClick: false, // Prevents accidental closure
+        didOpen: () => {
+          document.querySelector(".swal2-container").style.zIndex = "2000"; // Ensures visibility
+        },
+      });
+    }
+  };
+  
+  
+  
+  
 
-        try {
-            const phoneExists = await checkPhoneNumberExists(usermobile);
+  const handleResendOTP = async () => {
+    try {
+      await resendOTP(formData.usermobile);
+      Swal.fire({
+        icon: "info",
+        title: "OTP Resent",
+        text: "A new OTP has been sent to your phone.",
+        backdrop: true, // Keeps modal focus
+        allowOutsideClick: false, // Prevents accidental closure
+        didOpen: () => {
+          document.querySelector(".swal2-container").style.zIndex = "2000"; // Ensures visibility
+        },
+    
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Failed to resend OTP. Try again later.",
+        backdrop: true, // Keeps modal focus
+        allowOutsideClick: false, // Prevents accidental closure
+        didOpen: () => {
+          document.querySelector(".swal2-container").style.zIndex = "2000"; // Ensures visibility
+        },
+      });
+    }
+  };
 
-            if (phoneExists) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Number Already Exists',
-                    text: 'This phone number is already registered.',
-                });
-            } else {
-                await submitLead(formData);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Your details have been submitted successfully!',
-                }).then(() => {
-                    navigate('/thankYou');  // Redirect to Thank You Page
-                });
-                onClose();
-            }
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.message || 'Something went wrong. Please try again.',
-            });
-        }
-    };
-
-    return (
-        <Dialog open={open} onClose={onClose}>
-            <DialogContent>
-                <p style={{ padding: '10px', color: 'black' }}>
-                    Enter your contact details to download the brochure of <br />
-                    <strong style={{ fontSize: '24px', color: '#2067d1' }}>{projectName || 'Invest Mango'}</strong>
-                </p>
-                <TextField
-                    label="Enter Name:"
-                    type="text"
-                    fullWidth
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    required
-                />
-                <TextField
-                    margin="dense"
-                    label="Enter Phone:"
-                    type="text"
-                    fullWidth
-                    name="usermobile"
-                    value={formData.usermobile}
-                    onChange={handleChange}
-                    required
-                />
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} color="secondary">Cancel</Button>
-                <Button onClick={handleSubmit} color="primary">Download</Button>
-            </DialogActions>
-        </Dialog>
-    );
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogContent>
+        {!isOtpSent ? (
+          <>
+            <p style={{ padding: "10px", color: "black" }}>
+              Enter your contact details to download the brochure of <br />
+              <strong style={{ fontSize: "24px", color: "#2067d1" }}>
+                {projectName || "Invest Mango"}
+              </strong>
+            </p>
+            <TextField
+              label="Enter Name:"
+              type="text"
+              fullWidth
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+            <TextField
+              margin="dense"
+              label="Enter Phone:"
+              type="text"
+              fullWidth
+              name="usermobile"
+              value={formData.usermobile}
+              onChange={handleChange}
+              required
+            />
+            {error && <p style={{ color: "red" }}>{error}</p>}
+          </>
+        ) : (
+          <>
+            <p style={{ padding: "10px", color: "black" }}>
+              Enter the OTP sent to {formData.usermobile} to verify your
+              identity.
+            </p>
+            <TextField
+              label="Enter OTP:"
+              type="text"
+              fullWidth
+              name="otp"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              required
+            />
+          </>
+        )}
+      </DialogContent>
+      <DialogActions>
+        {!isOtpSent ? (
+          <>
+            <Button onClick={onClose} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} color="primary">
+              Send OTP
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={handleResendOTP} color="secondary">
+              Resend OTP
+            </Button>
+            <Button onClick={handleOtpVerification} color="primary">
+              Verify OTP
+            </Button>
+          </>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
 };
 
 export default BrochurePopupDialog;

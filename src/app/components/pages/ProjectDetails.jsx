@@ -27,6 +27,8 @@ import {
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { Helmet } from "react-helmet";
+import DOMPurify from "dompurify";
+import Swal from "sweetalert2";
 
 const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
@@ -186,7 +188,7 @@ const ProjectDetails = () => {
   const [formData, setFormData] = useState({
     username: "",
     useremail: "",
-    dial_code: "91",
+    // dial_code: "91",
     usermobile: "",
     intersted_in: "",
     usermsg: "",
@@ -215,12 +217,13 @@ const ProjectDetails = () => {
     }
     setError("");
     setTimer(60);
-    console.log("OTP sent to:", `${formData.dial_code}${formData.usermobile}`);
+    // console.log("OTP sent to:", `${formData.dial_code}${formData.usermobile}`);
     try {
       const response = await sendOTP(
-        `${formData.dial_code}${formData.usermobile}`,
+        formData.usermobile,
         projectData?.name || "",
         "Website",
+        "ORGAINc",
         formData.username,
         formData.useremail
       );
@@ -238,16 +241,22 @@ const ProjectDetails = () => {
   // Simulate OTP verification API
   const verifyOtp = async () => {
     try {
-      const response = await verifyOTP(
-        `${formData.dial_code}${formData.usermobile}`,
-        otp
-      );
-      console.log("OTP verification response:", response);
-      if (response) {
-        setError("");
+      const response = await verifyOTP(formData.usermobile, otp);
+
+      // Check the response structure and adjust based on the API response
+      if (response && response.message === "OTP Validated Successfully") {
+        Swal.fire({
+          title: "Success",
+          text: "OTP verified successfully!",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          window.location.href = "/thankYou"; // Redirect to Thank You page
+        });
         setOtpVerified(true);
+        setError("");
       } else {
-        setError("Failed to verify OTP. Please try again.");
+        setError("OTP verification failed. Please try again.");
         setOtpVerified(false);
       }
     } catch (error) {
@@ -260,9 +269,7 @@ const ProjectDetails = () => {
   // Resend OTP logic
   const resendOtp = async () => {
     try {
-      const response = await resendOTP(
-        `${formData.dial_code}${formData.usermobile}`
-      );
+      const response = await resendOTP(formData.usermobile);
       if (response) {
         setTimer(60);
         setError("");
@@ -284,38 +291,38 @@ const ProjectDetails = () => {
   }, [timer, otpSent]);
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // Check if lead exists
-      const existingLead = await getLeadByPhone(`${formData.usermobile}`);
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     // Check if lead exists
+  //     const existingLead = await getLeadByPhone(`${formData.usermobile}`);
 
-      // Only create new lead if getLeadByPhone fails with bad request
-      console.log("Existing lead:", existingLead);
-      if (existingLead.length == 0) {
-        // Lead doesn't exist, create new lead
-        const newLead = {
-          name: formData.username,
-          phone: `${formData.dial_code}${formData.usermobile}`,
-          email: formData.useremail,
-          projectName: projectData?.name,
-          source: "Website",
-        };
-        await saveLead(newLead);
-        alert(
-          "Thank you! We have already created a query for you. We will connect with you shortly."
-        );
-      } else {
-        alert("Thank you! We will connect with you shortly.");
-      }
+  //     // Only create new lead if getLeadByPhone fails with bad request
+  //     console.log("Existing lead:", existingLead);
+  //     if (existingLead.length == 0) {
+  //       // Lead doesn't exist, create new lead
+  //       const newLead = {
+  //         name: formData.username,
+  //         phone: `${formData.dial_code}${formData.usermobile}`,
+  //         email: formData.useremail,
+  //         projectName: projectData?.name,
+  //         source: "ORGANIC",
+  //       };
+  //       await saveLead(newLead);
+  //       alert(
+  //         "Thank you! We have already created a query for you. We will connect with you shortly."
+  //       );
+  //     } else {
+  //       alert("Thank you! We will connect with you shortly.");
+  //     }
 
-      setOtpSent(false);
-      setOtpVerified(false);
-    } catch (error) {
-      console.error("Error handling form submission:", error);
-      alert("Something went wrong. Please try again.");
-    }
-  };
+  //     setOtpSent(false);
+  //     setOtpVerified(false);
+  //   } catch (error) {
+  //     console.error("Error handling form submission:", error);
+  //     alert("Something went wrong. Please try again.");
+  //   }
+  // };
 
   // Update active section based on scroll position and handle nav fixing
   useEffect(() => {
@@ -378,13 +385,31 @@ const ProjectDetails = () => {
   const handleSitePopup = () => setShowSitePopup(true);
   const closeSitePopup = () => setShowSitePopup(false);
 
-  const stripHTMLTags = (html) => {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    return tempDiv.textContent || tempDiv.innerText || "";
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
   };
 
-  const canonical = `https://investmango.com/project/${urlName}`;
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
+  const [showImagePopup, setShowImagePopup] = useState(false); // State for image popup
+  const [selectedImage, setSelectedImage] = useState(""); // State to hold selected image URL
+
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setShowImagePopup(true); // Open the popup with the clicked image
+  };
+
+  const closeImagePopup = () => {
+    setShowImagePopup(false);
+    setSelectedImage(""); // Clear selected image
+  };
+
+  const canonical = `http://propertymarvels.in/project/${urlName}`;
   // console.log("can",canonical)
   // console.log("mets tielle",projectData?.data)
   return (
@@ -1557,7 +1582,7 @@ const ProjectDetails = () => {
                               name="dial_code"
                               className="form-select"
                               style={{ maxWidth: "100px" }}
-                              value={formData.dial_code}
+                             // value={formData.dial_code}
                               onChange={handleChange}
                             >
                               <option value="91">+91</option>
@@ -1613,7 +1638,7 @@ const ProjectDetails = () => {
                             type="button"
                             className="btn btn-primary w-100"
                             style={{ backgroundColor: "#2067d1" }}
-                            onClick={handleSubmit}
+                            onClick={sendOtp}
                           >
                             Get a Call back
                           </button>
@@ -1673,7 +1698,7 @@ const ProjectDetails = () => {
                     )}
 
                     {otpVerified && (
-                      <form onSubmit={handleSubmit}>
+                      <form onSubmit={sendOtp}>
                         <div className="alert alert-success">
                           OTP verified! We will connect with you shortly.
                         </div>
@@ -1687,7 +1712,7 @@ const ProjectDetails = () => {
                   <div className="bg-white rounded-3 p-3 pt-0 text-center d-flex justify-content-center">
                     <button
                       className="btn btn-primary w-100"
-                      style={{ fontSize: "16px" ,backgroundColor: "#2067d1"}}
+                      style={{ fontSize: "16px", backgroundColor: "#2067d1" }}
                       onClick={handleDownloadBrochuree}
                     >
                       <i className="fas fa-download me-2"></i>
@@ -1699,6 +1724,7 @@ const ProjectDetails = () => {
                       open={showBrochurePopup}
                       onClose={closeBrochurePopup}
                       projectName={projectData?.name || "Invest Mango"}
+                      brochure={projectData?.brochure}
                     />
                   </div>
                 </div>
@@ -1898,6 +1924,7 @@ const ProjectDetails = () => {
                                 projectName={
                                   projectData?.name || "Invest Mango"
                                 } // Set project name or default
+                                brochure={projectData?.brochure}
                               />
                               <div className="col-12 mt-2">
                                 <a
@@ -2078,8 +2105,6 @@ const ProjectDetails = () => {
                       }}
                     >
                       {projectData?.floorPara}
-                      {/* This is a brief description of the floor plan for the
-                      project. */}
                     </p>
                     <div className="d-flex gap-2 mb-3">
                       <button
@@ -2155,7 +2180,6 @@ const ProjectDetails = () => {
                     >
                       {(() => {
                         const filteredPlans = projectData?.floorplans || [];
-
                         const filtered = filteredPlans.filter(
                           (plan) =>
                             activeFilter === "all" ||
@@ -2193,12 +2217,15 @@ const ProjectDetails = () => {
                                     plan.imageUrl &&
                                     plan.imageUrl !== BASE_URL &&
                                     plan.imageUrl !== ""
-                                      ? plan.imageUrl // Use the image URL if it's valid and not empty
+                                      ? plan.imageUrl
                                       : "/images/Floor.png" // Fallback image in other cases
                                   }
                                   alt={`${plan.type} Floor Plan`}
                                   className="img-fluid mb-3"
                                   style={{ width: "100%" }}
+                                  onClick={() =>
+                                    handleImageClick(plan.imageUrl)
+                                  } // Add click handler to open the popup
                                 />
                                 <div className="row mb-3">
                                   <div className="col-6">
@@ -2280,12 +2307,14 @@ const ProjectDetails = () => {
                                   </button>
 
                                   {/* Floor Plan Dialog Popup */}
+
                                   <BrochurePopupDialog
                                     open={showFloorPlanPopup}
                                     onClose={closeFloorPlanPopup}
                                     projectName={
                                       projectData?.name || "Invest Mango"
                                     }
+                                    brochure={projectData?.brochure}
                                   />
                                 </div>
                               </div>
@@ -2294,31 +2323,82 @@ const ProjectDetails = () => {
                         ));
                       })()}
                     </Carousel>
+                    {/* Image Popup Modal */}
+                    {showImagePopup && (
+                      <div
+                        className="image-popup-modal"
+                        style={{
+                          position: "fixed",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: "rgba(0, 0, 0, 0.7)",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          zIndex: 1000,
+                        }}
+                      >
+                        <div
+                          className="image-popup-content"
+                          style={{
+                            position: "relative",
+                            maxWidth: "50%",
+                            // maxHeight: '40%',
+                          }}
+                        >
+                          <img
+                            src={selectedImage}
+                            alt="Floor Plan"
+                            style={{
+                              width: "100%",
+                              height: "auto",
+                              borderRadius: "8px",
+                            }}
+                          />
+                          <button
+                            onClick={closeImagePopup}
+                            style={{
+                              position: "absolute",
+                              top: "10px",
+                              right: "10px",
+                              backgroundColor: "rgba(0, 0, 0, 0.5)",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "50%",
+                              padding: "10px",
+                              cursor: "pointer",
+                              fontSize: "20px",
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     <style>
                       {`
-                                    .carousel-container {
-                                        position: relative;
-                                    }
-                                    .react-multiple-carousel__arrow {
-                                        background-color: #2067d1;
-                                        height: 35px;
-                                        width: 35px;
-                                        min-width: 35px;
-                                        min-height: 35px;
-                                        border-radius: 50%;
-                                        padding-right: 15px;
-                                        padding-left: 15px;
-                                    }
-                                    .react-multiple-carousel__arrow--left {
-                                        left: -10px;
-                                    }
-                                    .react-multiple-carousel__arrow--right {
-                                        right: -10px;
-                                    }
-                                    .react-multi-carousel-item  carousel-item-padding-40-px{
-                                        padding: 0px 20px;
-                                    }
-                                    `}
+              .carousel-container {
+                  position: relative;
+              }
+              .react-multiple-carousel__arrow {
+                  background-color: #2067d1;
+                  height: 35px;
+                  width: 35px;
+                  min-width: 35px;
+                  min-height: 35px;
+                  border-radius: 50%;
+                  padding-right: 15px;
+                  padding-left: 15px;
+              }
+              .react-multiple-carousel__arrow--left {
+                  left: -10px;
+              }
+              .react-multiple-carousel__arrow--right {
+                  right: -10px;
+              }
+            `}
                     </style>
                   </div>
                 </div>
@@ -2347,7 +2427,22 @@ const ProjectDetails = () => {
                         fontSize: window.innerWidth <= 768 ? "12px" : "16px",
                       }}
                     >
-                      {projectData?.priceListPara}
+                      {/* {projectData?.priceListPara} */}
+                      <div className="px-3">
+                        <p
+                          className="mb-3"
+                          style={{
+                            fontSize:
+                              window.innerWidth <= 768 ? "12px" : "16px",
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(
+                              projectData?.priceListPara ||
+                                "<p>Answer not available.</p>"
+                            ),
+                          }}
+                        />
+                      </div>
                     </p>
                     <div
                       style={{
@@ -2514,7 +2609,22 @@ const ProjectDetails = () => {
                         fontSize: window.innerWidth <= 768 ? "12px" : "16px",
                       }}
                     >
-                      {projectData?.paymentPara}
+                      {/* {projectData?.paymentPara} */}
+                      <div className="px-3">
+                        <p
+                          className="mb-3"
+                          style={{
+                            fontSize:
+                              window.innerWidth <= 768 ? "12px" : "16px",
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(
+                              projectData?.paymentPara ||
+                                "<p>Answer not available.</p>"
+                            ),
+                          }}
+                        />
+                      </div>
                     </p>
                     <div className="table-responsive">
                       <table className="table table-striped">
@@ -2911,6 +3021,7 @@ const ProjectDetails = () => {
                               maxWidth: "100%",
                               cursor: "grab",
                             }}
+                            onClick={openModal} // Open modal on image click
                             onMouseDown={(e) => {
                               const img = e.target;
                               img.style.cursor = "grabbing";
@@ -2960,70 +3071,131 @@ const ProjectDetails = () => {
                             }}
                           />
                         </div>
-                        <div className="position-absolute top-0 end-0">
-                          <button
-                            className="d-block border-0 mb-1"
-                            id="zoom-in"
-                            aria-label="Zoom In"
-                            style={{
-                              background: "#dddd",
-                              width: "40px",
-                              height: "40px",
-                              cursor: "pointer",
-                              color: "#000",
-                            }}
-                            onClick={() => {
-                              const img = document.getElementById("zoom-image");
-                              const currentScale = parseFloat(
-                                img.style.transform.match(/scale\((.*?)\)/)[1]
-                              );
-                              const [translateX, translateY] =
-                                img.style.transform
-                                  .match(/translate\((.*?), (.*?)\)/)
-                                  ?.slice(1)
-                                  .map(parseFloat) || [0, 0];
-                              img.style.transform = `scale(${Math.min(
-                                3,
-                                currentScale * 1.2
-                              )}) translate(${translateX}px, ${translateY}px)`;
-                            }}
-                          >
-                            +
-                          </button>
-                          <button
-                            className="d-block border-0"
-                            id="zoom-out"
-                            aria-label="Zoom Out"
-                            style={{
-                              background: "#dddd",
-                              width: "40px",
-                              height: "40px",
-                              cursor: "pointer",
-                              color: "#000",
-                            }}
-                            onClick={() => {
-                              const img = document.getElementById("zoom-image");
-                              const currentScale = parseFloat(
-                                img.style.transform.match(/scale\((.*?)\)/)[1]
-                              );
-                              const [translateX, translateY] =
-                                img.style.transform
-                                  .match(/translate\((.*?), (.*?)\)/)
-                                  ?.slice(1)
-                                  .map(parseFloat) || [0, 0];
-                              img.style.transform = `scale(${Math.max(
-                                1,
-                                currentScale / 1.2
-                              )}) translate(${translateX}px, ${translateY}px)`;
-                            }}
-                          >
-                            -
-                          </button>
-                        </div>
+                      </div>
+                      <div className="position-absolute top-0 end-0">
+                        <button
+                          className="d-block border-0 mb-1"
+                          id="zoom-in"
+                          aria-label="Zoom In"
+                          style={{
+                            background: "#dddd",
+                            width: "40px",
+                            height: "40px",
+                            cursor: "pointer",
+                            color: "#000",
+                          }}
+                          onClick={() => {
+                            const img = document.getElementById("zoom-image");
+                            const currentScale = parseFloat(
+                              img.style.transform.match(/scale\((.*?)\)/)[1]
+                            );
+                            const [translateX, translateY] = img.style.transform
+                              .match(/translate\((.*?), (.*?)\)/)
+                              ?.slice(1)
+                              .map(parseFloat) || [0, 0];
+                            img.style.transform = `scale(${Math.min(
+                              3,
+                              currentScale * 1.2
+                            )}) translate(${translateX}px, ${translateY}px)`;
+                          }}
+                        >
+                          +
+                        </button>
+                        <button
+                          className="d-block border-0"
+                          id="zoom-out"
+                          aria-label="Zoom Out"
+                          style={{
+                            background: "#dddd",
+                            width: "40px",
+                            height: "40px",
+                            cursor: "pointer",
+                            color: "#000",
+                          }}
+                          onClick={() => {
+                            const img = document.getElementById("zoom-image");
+                            const currentScale = parseFloat(
+                              img.style.transform.match(/scale\((.*?)\)/)[1]
+                            );
+                            const [translateX, translateY] = img.style.transform
+                              .match(/translate\((.*?), (.*?)\)/)
+                              ?.slice(1)
+                              .map(parseFloat) || [0, 0];
+                            img.style.transform = `scale(${Math.max(
+                              1,
+                              currentScale / 1.2
+                            )}) translate(${translateX}px, ${translateY}px)`;
+                          }}
+                        >
+                          -
+                        </button>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Modal for displaying the image in full view */}
+                {isModalOpen && (
+                  <div
+                    className="modal d-block"
+                    id="siteplan-modal"
+                    style={{
+                      display: "block",
+                      position: "fixed",
+                      top: "0",
+                      left: "0",
+                      right: "0",
+                      bottom: "0",
+                      backgroundColor: "rgba(0,0,0,0.7)",
+                      zIndex: "1000",
+                      overflow: "auto",
+                      paddingTop: "60px",
+                    }}
+                    onClick={closeModal} // Close modal when clicking outside the image
+                  >
+                    <div
+                      className="modal-content"
+                      style={{
+                        margin: "auto",
+                        padding: "20px",
+                        backgroundColor: "#fff",
+                        maxWidth: "60%",
+                      }}
+                      onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside it
+                    >
+                      <img
+                        src={
+                          projectData?.siteplanImg
+                            ? projectData.siteplanImg === BASE_URL
+                              ? FALLBACK_IMAGE
+                              : projectData.siteplanImg
+                            : FALLBACK_IMAGE
+                        }
+                        alt={`${projectData?.name} Site Plan`}
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                        }}
+                      />
+                      <button
+                        className="btn btn-close"
+                        style={{
+                          position: "absolute",
+                          top: "10px",
+                          right: "10px",
+                          backgroundColor: "#000",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: "70%",
+                          padding: "10px 10px",
+                        }}
+                        onClick={closeModal} // Close modal on button click
+                      >
+                        X
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
               {/* about group */}
               <div
@@ -3211,7 +3383,13 @@ const ProjectDetails = () => {
                                 window.innerWidth <= 768 ? "12px" : "13px",
                             }}
                           >
-                            {stripHTMLTags(faq.answer)}
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(
+                                  faq.answer || "<p>Answer not available.</p>"
+                                ),
+                              }}
+                            />
                           </div>
                         )}
                       </div>
@@ -3434,6 +3612,8 @@ const ProjectDetails = () => {
                 >
                   <div className="bg-white rounded-3 mb-4 p-4 pb-0">
                     <h4 className="mb-4 text-center">Connect to Our Expert</h4>
+
+                    {/* Form for sending OTP */}
                     {!otpSent && !otpVerified && (
                       <form onSubmit={(e) => e.preventDefault()}>
                         <div className="mb-3">
@@ -3462,7 +3642,7 @@ const ProjectDetails = () => {
                               name="dial_code"
                               className="form-select"
                               style={{ maxWidth: "100px" }}
-                              value={formData.dial_code}
+                              // value={formData.dial_code}
                               onChange={handleChange}
                             >
                               <option value="91">+91</option>
@@ -3514,7 +3694,7 @@ const ProjectDetails = () => {
                             type="button"
                             className="btn btn-primary w-100"
                             style={{ backgroundColor: "#2067d1" }}
-                            onClick={handleSubmit}
+                            onClick={sendOtp}
                           >
                             Get a Call back
                           </button>
@@ -3522,11 +3702,12 @@ const ProjectDetails = () => {
                       </form>
                     )}
 
+                    {/* Form for OTP verification */}
                     {otpSent && !otpVerified && (
                       <div>
                         <div className="alert alert-success">
                           <span className="fw-bold">
-                            OTP sent to your mobile number{" "}
+                            OTP sent to your {formData.usermobile}{" "}
                             <a
                               href="#"
                               onClick={() => setOtpSent(false)}
@@ -3573,8 +3754,9 @@ const ProjectDetails = () => {
                       </div>
                     )}
 
+                    {/* After OTP is verified */}
                     {otpVerified && (
-                      <form onSubmit={handleSubmit}>
+                      <form onSubmit={sendOtp}>
                         <div className="alert alert-success">
                           OTP verified! We will connect with you shortly.
                         </div>
@@ -3605,6 +3787,7 @@ const ProjectDetails = () => {
                       open={showPopup}
                       onClose={closePopup}
                       projectName={projectData?.name || "Invest Mango"}
+                      brochure={projectData?.brochure}
                     />
                   </div>
                 </div>

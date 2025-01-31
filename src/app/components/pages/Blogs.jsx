@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { getAllBlogByUrl, getAllBlog, checkPhoneNumberExists, submitLead } from "../../apis/api";
+import {
+  getAllBlogByUrl,
+  getAllBlog,
+  checkPhoneNumberExists,
+  submitLead,
+} from "../../apis/api";
 import { useParams, useNavigate } from "react-router-dom";
 import "../styles/css/blog.css";
-import swal from 'sweetalert';
+import swal from "sweetalert";
 import { Helmet } from "react-helmet";
 
 const Blogs = () => {
@@ -27,6 +32,7 @@ const Blogs = () => {
           setBlogData(data);
         } catch (error) {
           console.error("Error fetching blog data:", error);
+          navigate("*");
         }
       }
     };
@@ -61,11 +67,20 @@ const Blogs = () => {
     try {
       const phoneExists = await checkPhoneNumberExists(formData.usermobile);
       if (phoneExists) {
-        swal("Oops!", "You are already registered with this phone number.", "error");
+        swal(
+          "Oops!",
+          "You are already registered with this phone number.",
+          "error"
+        );
       } else {
-        await submitLead(formData);
+        const updatedFormData = {
+          ...formData,
+          projectName: ["BlogPage"], // Static field
+          source: "ORGANIC", // Static field
+        };
+        await submitLead(updatedFormData);
         swal("Success!", "Form submitted successfully!", "success").then(() => {
-          navigate('/thankYou');  // Redirect after clicking "OK"
+          navigate("/thankYou"); // Redirect after clicking "OK"
         });
 
         // Reset form data
@@ -75,7 +90,7 @@ const Blogs = () => {
           usermobile: "",
           message: "",
         });
-      } 
+      }
     } catch (error) {
       swal("Error", "An error occurred. Please try again.", "error");
     }
@@ -83,7 +98,7 @@ const Blogs = () => {
 
   return (
     <div>
-   {/* <Helmet>
+      {/* <Helmet>
   {blogData && (
     <>
       <title>{blogData.headings || ""}</title>
@@ -135,12 +150,67 @@ const Blogs = () => {
                           />
                         </div>
                         <div
-                          className="content"
-                          style={{ marginTop: "10px" }}
-                          dangerouslySetInnerHTML={{
-                            __html: blogData.description,
-                          }}
-                        ></div>
+  className="content"
+  style={{
+    marginTop: "10px",
+    fontFamily: "Arial, sans-serif",
+    lineHeight: "1.6",
+    fontSize: "16px",
+    color: "#333",
+    wordWrap: "break-word",
+  }}
+  dangerouslySetInnerHTML={{
+    __html: `
+      <style>
+        .content p {
+          margin-bottom: 15px;
+          font-size: 16px;
+        }
+        .content ul {
+          margin-bottom: 15px;
+          padding-left: 20px;
+        }
+        .content li {
+          font-size: 16px;
+          margin-bottom: 8px;
+        }
+        .content table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+        }
+        .content th, .content td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+        }
+        .content th {
+          background-color: #f4f4f4;
+        }
+        .content a {
+          color: #2067d1;
+          text-decoration: none;
+        }
+        .content a:hover {
+          text-decoration: underline;
+        }
+        .content h4 {
+          font-size: 18px;
+          margin-top: 20px;
+        }
+        /* Fixed size for all images */
+        .content img {
+          width: 776px; /* Set width to 776px */
+          height: 409px; /* Set height to 409px */
+          object-fit: cover; /* Maintain aspect ratio with cropping if needed */
+        }
+      </style>
+      ${blogData.description}
+    `,
+  }}
+></div>
+
+
                       </>
                     ) : (
                       <p>Loading blog content...</p>
@@ -149,7 +219,18 @@ const Blogs = () => {
                 </div>
 
                 {/* Recent Posts Section */}
-                <div className="recent-posts col-md-4">
+                <div
+                  className="recent-posts col-md-4"
+                  style={{
+                    fontSize: "20px",
+                    margin: "0",
+                    color: "#000",
+                    fontWeight: "400",
+                    marginLeft: "39px",
+                    marginTop: "40px",
+                    marginBottom: "17px",
+                  }}
+                >
                   <h2>Recent Posts</h2>
                   <div className="blogs-links">
                     <ul style={{ listStyleType: "none", padding: 0 }}>
@@ -160,7 +241,7 @@ const Blogs = () => {
                           <li
                             key={post.id}
                             style={{
-                              borderBottom: "1px solid #e7e7e7",
+                              borderBottom: "1px solidrgb(54, 50, 50)",
                               padding: "7px 0",
                               cursor: "pointer",
                             }}
@@ -214,11 +295,19 @@ const Blogs = () => {
                     placeholder="Phone :"
                     value={formData.usermobile}
                     onChange={handleChange}
+                    onInput={(e) => {
+                      // Allow only digits and limit to 10 digits
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 10);
+                      setFormData({ ...formData, usermobile: value });
+                    }}
                     style={{ marginBottom: "19px" }}
                     required
+                    maxLength="10"
                   />
                   <textarea
-                    className="form-control"x
+                    className="form-control"
                     name="message"
                     placeholder="Leave Comments :"
                     rows="6"

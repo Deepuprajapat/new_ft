@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const NotFound = () => {
   const goBack = () => {
@@ -8,7 +8,7 @@ const NotFound = () => {
   return (
     <section className="main">
       {/* <header> */}
-        {/* <div className="logo">
+      {/* <div className="logo">
           <a href="https://investmango.com">
             <img src="https://www.investmango.com/img/logo.jpg" alt="Logo" />
           </a>
@@ -17,11 +17,22 @@ const NotFound = () => {
       <div className="content">
         <div className="col-md-6">
           <h1>Oops!</h1>
-          <h2>We can't seem to find the page<br /> you're looking for.</h2>
+          <h2>
+            We can't seem to find the page
+            <br /> you're looking for.
+          </h2>
           <h5>Error code: 404</h5>
           <ul>
-            <li><a className="btn" href="http://localhost:3000">Home</a></li>
-            <li><button className="btn" onClick={goBack}>Back</button></li>
+            <li>
+              <a className="btn" href="https://propertymarvels.in/">
+                Home
+              </a>
+            </li>
+            <li>
+              <button className="btn" onClick={goBack}>
+                Back
+              </button>
+            </li>
           </ul>
         </div>
         <div className="col-md-6">
@@ -35,7 +46,7 @@ const NotFound = () => {
         }
         .main {
           padding: 50px 0px 0px;
-          font-family: 'Oxygen', sans-serif;
+          font-family: "Oxygen", sans-serif;
           max-width: 1170px;
           margin: auto;
           text-align: left;
@@ -51,7 +62,8 @@ const NotFound = () => {
           font-weight: bolder;
           margin-bottom: 20px;
         }
-        .main ul, li {
+        .main ul,
+        li {
           list-style: none;
           line-height: 30px;
           font-size: 13px;

@@ -293,3 +293,28 @@ p {
   width: fit-content;
   margin-top: 15px;
 }
+
+
+.read-more-span {
+  color: #2067d1;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 5px;
+  font-size: 10px;
+}
+
+.read-more-span:hover {
+  text-decoration: underline;
+}
+
+.normal {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.normal.expanded {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}

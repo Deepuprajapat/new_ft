@@ -1,11 +1,17 @@
-// Accordion.js
 import React, { useState } from 'react';
-import { Accordion as AccessibleAccordion, AccordionItem, AccordionItemHeading, AccordionItemButton, AccordionItemPanel } from 'react-accessible-accordion';
+import {
+  Accordion as AccessibleAccordion,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemButton,
+  AccordionItemPanel,
+} from 'react-accessible-accordion';
 import 'react-accessible-accordion/dist/fancy-example.css';
 import { MdOutlineArrowDropDown } from 'react-icons/md';
 import '../styles/css/accordion.css';
+import DOMPurify from 'dompurify'; // For sanitizing HTML
 
-const Accordion = ({ data, allowMultipleExpanded = false, preExpanded = [0] }) => {
+const Accordion = ({ data, allowMultipleExpanded = false, preExpanded = [0],scrollToForm }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const handleToggle = (index) => {
@@ -15,8 +21,8 @@ const Accordion = ({ data, allowMultipleExpanded = false, preExpanded = [0] }) =
   return (
     <AccessibleAccordion
       className="accordion"
-      // allowMultipleExpanded={allowMultipleExpanded}
-      preExpanded={preExpanded}  allowMultipleExpanded={false}
+      preExpanded={preExpanded}
+      allowMultipleExpanded={false}
     >
       {data.map((item, index) => {
         const isExpanded = expandedIndex === index;
@@ -30,28 +36,23 @@ const Accordion = ({ data, allowMultipleExpanded = false, preExpanded = [0] }) =
             <AccordionItemHeading>
               <AccordionItemButton
                 className="flexCenter accordionButton"
-                onClick={() => handleToggle(index)} 
+                onClick={() => handleToggle(index)}
               >
-                {/* <div className="flexCenter icon">
-                  {item.icon}
-                </div> */}
-                <span className="primary-text">
-                  {item.heading}
-                </span>
+                <span className="primary-text">{item.heading}</span>
                 <div className="flexCenter icon">
                   <MdOutlineArrowDropDown size={20} />
                 </div>
-               
               </AccordionItemButton>
             </AccordionItemHeading>
             <AccordionItemPanel>
-                {Array.isArray(item.detail) ? (
-                  item.detail.map((detail, i) => <p key={i} className="p_n">{detail}</p>)
-                ) : (
-                  <p className="p_n">{item.detail}</p>
-                )}
-              {/* <p className="secondaryText">{item.detail}</p>
-              <a class="theme-btn" href="#topform">Apply Now</a> */}
+              {/* Render sanitized HTML content */}
+              <div
+                className="accordionContent"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(item.detail || "<p>Job description not available.</p>"),
+                }}
+              />
+               {scrollToForm && <button onClick={() => scrollToForm()}>Apply Now</button>}
             </AccordionItemPanel>
           </AccordionItem>
         );
@@ -59,4 +60,5 @@ const Accordion = ({ data, allowMultipleExpanded = false, preExpanded = [0] }) =
     </AccessibleAccordion>
   );
 };
+
 export default Accordion;

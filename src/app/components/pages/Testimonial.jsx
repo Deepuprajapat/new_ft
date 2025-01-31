@@ -7,7 +7,6 @@ import "swiper/css/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { sliderSettings } from "../../../utils/common";
 
-// import "swiper/css/pagination";
 const Testimonial = () => {
   const [expanded, setExpanded] = useState({}); // Using an object to manage expanded state for each testimonial
   const [testimonials, setTestimonials] = useState([]); // State to hold testimonials fetched from the API
@@ -20,7 +19,7 @@ const Testimonial = () => {
       setTestimonials(
         fetchedTestimonials.map((item) => ({
           text: item.description,
-          name: item.userName,
+          name: item.name,
           role: item.type,
           rating: item.rating,
         }))
@@ -31,33 +30,30 @@ const Testimonial = () => {
     loadTestimonials();
   }, []);
 
-  // const toggleReadMore = (index) => {
-  //   setExpanded((prevState) => ({
-  //     ...prevState,
-  //     [index]: !prevState[index], // Toggle the expanded state for the clicked testimonial
-  //   }));
-  // };
+  const toggleReadMore = (index) => {
+    setExpanded((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index], // Toggle the expanded state for the clicked testimonial
+    }));
+  };
 
   if (loading) {
-    return (
-          <p>Loading testimonials...</p>
-       
-    );
+    return <p>Loading testimonials...</p>;
   }
 
   return (
-   
-        <div className="col-md-12">
-          <div className="headline">
-            <p className="sub-headline">Clients Testimonial</p>
-            <h3 className="h3">
-              A Relation Built on Trust & <br className="mobiHide"/>Experience
-            </h3>
-          </div>
-          <div className="client-slide owl-carousel owl-theme" id="testi_slide">
-          <Swiper {...sliderSettings}>
-            {testimonials.map((testimonial, index) => (
-              <SwiperSlide key={index}>
+    <div className="col-md-12">
+      <div className="headline">
+        <p className="sub-headline">Clients Testimonial</p>
+        <h3 className="h3">
+          A Relation Built on Trust & <br className="mobiHide" />
+          Experience
+        </h3>
+      </div>
+      <div className="client-slide owl-carousel owl-theme" id="testi_slide">
+        <Swiper {...sliderSettings}>
+          {testimonials.map((testimonial, index) => (
+            <SwiperSlide key={index}>
               <div className="item" key={index}>
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <span
@@ -66,18 +62,27 @@ const Testimonial = () => {
                   ></span>
                 ))}
                 <p className={`normal ${expanded[index] ? "expanded" : ""}`}>
-                  {testimonial.text}
+                  {expanded[index] || testimonial.text.length <= 100
+                    ? testimonial.text
+                    : `${testimonial.text.substring(0, 100)}...`}
                 </p>
-                <h3 className="title">{testimonial.name}</h3>
+                {testimonial.text.length > 100 && (
+                  <span
+                    className="read-more-span"
+                    onClick={() => toggleReadMore(index)}
+                  >
+                    {expanded[index] ? " Read Less" : " Read More"}
+                  </span>
+                )}
+                <h3 className="title">{testimonial?.name}</h3>
                 <p className="project">{testimonial.role}</p>
               </div>
-              </SwiperSlide>
-            ))}
-            </Swiper>
-          </div>
-        </div>
-     
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    </div>
   );
 };
 
-export default Testimonial
+export default Testimonial;

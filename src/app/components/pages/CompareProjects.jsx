@@ -9,7 +9,6 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GetAppIcon from "@mui/icons-material/GetApp";
 
-
 const CompareProjects = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProjects, setSelectedProjects] = useState(["", "", ""]);
@@ -30,7 +29,6 @@ const CompareProjects = () => {
     updatedSelection[index] = value;
     setSelectedProjects(updatedSelection);
   };
-
 
   const formatPriceInCrores = (price) => {
     if (price === 1.5) {
@@ -63,8 +61,6 @@ const CompareProjects = () => {
       setComparedProjects(selectedData);
     }
   };
-
-
 
   const handleShareClick = (platform) => {
     const url = encodeURIComponent(window.location.href);
@@ -193,7 +189,6 @@ const CompareProjects = () => {
       projects.forEach((project, index) => {
         let value = renderProjectData(project, row);
 
- 
         if (row === "Size/Price") {
           if (project.floorplans && project.floorplans.length > 0) {
             value = project.floorplans
@@ -229,17 +224,22 @@ const CompareProjects = () => {
 
   // Function to generate PDF
   const generatePDF = () => {
-    const doc = new jsPDF("landscape"); // Set orientation to landscape
-
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "pt", // Points for precise layout
+      format: "a3", // Larger page size (adjust as needed)
+    });
+  
+    // Title
     doc.setFontSize(16);
-    doc.text("Compared Projects", 14, 20);
-
+    doc.text("Compared Projects", 40, 40);
+  
     // Dynamic table headers for all compared projects
     const tableHeaders = [
       "Details",
       ...comparedProjects.map((project) => project.name),
     ];
-
+  
     // Fields to be displayed in the table
     const fields = [
       "Location",
@@ -255,14 +255,16 @@ const CompareProjects = () => {
       "Open Area",
       "Construction Type",
     ];
-
+  
     // Generate table rows dynamically
     const tableRows = fields.map((field) => {
       const row = [field];
-
+  
       comparedProjects.forEach((project) => {
+        let value = "";
+  
         if (field === "Size/Price") {
-          const sizePriceData =
+          value =
             project.floorplans?.length > 0
               ? project.floorplans
                   .map(
@@ -273,37 +275,68 @@ const CompareProjects = () => {
                   )
                   .join("\n")
               : "No Data Available";
-          row.push(sizePriceData);
         } else {
-          row.push(renderProjectData(project, field));
+          value = renderProjectData(project, field) || "No Data Available";
         }
+  
+        // Wrap text for long content
+        const wrappedText = doc.splitTextToSize(value, 150); // Split text to fit column width
+        row.push(wrappedText);
       });
-
+  
       return row;
     });
-
+  
+    // Define dynamic font size and column widths based on device
+    let fontSize = 8; // Default font size for desktop
+    let columnWidths = {
+      0: { cellWidth: 120 }, // 'Details' column width
+      1: { cellWidth: "wrap" }, // Dynamic width for project columns
+    };
+  
+    // Adjust font size and column width based on screen size (for responsiveness)
+    const windowWidth = window.innerWidth;
+    if (windowWidth <= 576) {
+      // Mobile
+      fontSize = 6; // Smaller font for mobile
+      columnWidths = {
+        0: { cellWidth: 80 }, // Smaller 'Details' column width for mobile
+        1: { cellWidth: "wrap" },
+      };
+    } else if (windowWidth <= 768) {
+      // Tablet
+      fontSize = 7; // Slightly larger font for tablet
+      columnWidths = {
+        0: { cellWidth: 100 }, // Adjust 'Details' column width for tablet
+        1: { cellWidth: "wrap" },
+      };
+    }
+  
     // Create the table with dynamic column handling
     doc.autoTable({
       head: [tableHeaders],
       body: tableRows,
-      startY: 30,
+      startY: 60, // Adjust to start below the title
       theme: "grid",
       styles: {
-        fontSize: 9, // Reduced font size
-        cellWidth: "wrap", // Allow text to wrap
-        overflow: "linebreak", // Break long text into lines
+        fontSize: fontSize, // Dynamic font size based on screen size
+        overflow: "linebreak", // Handle overflow by breaking text
+        valign: "middle", // Vertically align text
       },
-      columnStyles: {
-        0: { cellWidth: 40 }, // 'Details' column width
-      },
+      columnStyles: columnWidths,
+      margin: { top: 60 },
       didDrawPage: (data) => {
+        // Add a header to each page (adjusts to page size)
         doc.setFontSize(16);
-        doc.text("Compared Projects", data.settings.margin.left, 20);
+        doc.text("Compared Projects", data.settings.margin.left, 40);
       },
     });
-
+  
+    // Save PDF
     doc.save("Compared_Projects.pdf");
   };
+  
+
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -320,7 +353,7 @@ const CompareProjects = () => {
           name="description"
           content="Compare different projects with insights from experts. Detailed and researched information for better decision-making."
         />
-        <link rel="canonical" href="https://www.investmango.com/compare" />
+        <link rel="canonical" href="https://propertymarvels.in/compare" />
       </Helmet>
 
       <div className="container mt-5">
@@ -332,7 +365,7 @@ const CompareProjects = () => {
             <select
               key={index}
               className="custom-select form-select mx-2"
-              style={{ width: "200px" }}
+              style={{ width:  window.innerWidth <= 768 ? "100%" :"200px" , }}
               value={selectedProjects[index]}
               onChange={(e) => handleSelect(index, e.target.value)}
             >
@@ -354,6 +387,8 @@ const CompareProjects = () => {
               backgroundColor: "#2067d1",
               borderColor: "#2067d1",
               color: "#fff",
+              width: 
+              window.innerWidth <= 768 ? "100%" :"auto" ,
             }}
           >
             Compare Now
@@ -383,13 +418,12 @@ const CompareProjects = () => {
             <IconButton onClick={generatePDF} color="primary">
               <GetAppIcon />
             </IconButton>
-       
           </div>
-         
         </div>
 
         {comparedProjects.length > 0 && (
-          <table className="table table-bordered">
+          <div className="table-responsive">
+          <table className="table table-bordered" style={{ width: "100%" }}>
             <thead>
               <tr>
                 <th>Details</th>
@@ -425,6 +459,7 @@ const CompareProjects = () => {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </>

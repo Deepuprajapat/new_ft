@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useEffect } from "react";
 import { Helmet } from 'react-helmet';
-// import '../styles/css/about.css'
 import { aboutUsData } from '../../../utils/about'
+
 const About = () => {
+    useEffect(() => {
+      // Scroll to the top when the page loads
+      window.scrollTo(0, 0);
+    }, []);
   return (
     <>
     <Helmet>
@@ -46,7 +50,7 @@ const About = () => {
               <h2>Our Process</h2>
               <hr/>
               {aboutUsData.process.map((item, index) => (
-                <div >
+                <div style={{ fontSize: '25px'}} >
                 <p className="p_n" key={index} style={{marginBottom:'10px'}}>
                   <b>{item.title}</b> - {item.description}
                   
@@ -55,12 +59,12 @@ const About = () => {
                 </div>
               ))}
             </div>
-            <div className="col-md-6">
+            <div className="col-md-6" style={{ marginTop: '25px' }}>
               <img
                 src={aboutUsData.image.src}
                 alt={aboutUsData.image.alt}
                 className="responsive-image"
-                style={{ width: "100%", height: "400px",borderRadius:'5px'}}
+                style={{ width: "100%", height: "400px",borderRadius:'0px'}}
               />
             </div>
           </div>

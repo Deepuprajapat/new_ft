@@ -84,7 +84,7 @@ const AllProjects = () => {
 <Helmet>
 <title>Best Residential And Commercial Projects</title> 
 <meta content="Find the Best Residential and commercial projects with ultra luxury amenities. Compare Price, Floor Plan, Amenities, Site Plan, and Payment Plan, Property Reviews." name="description"/>
- <link rel="canonical" href="https://www.investmango.com/allProjects"/>
+ <link rel="canonical" href="https://propertymarvels.in/allProjects"/>
 </Helmet>
       <section className="main-body">
         <div className="container">

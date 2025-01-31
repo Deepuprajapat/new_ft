@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import swal from 'sweetalert';
+import swal from "sweetalert";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/css/home.css";
-import { checkPhoneNumberExists, submitLead } from "../../apis/api";
+import { sendOTP, verifyOTP, resendOTP } from "../../apis/api";
 
 const MailSection = () => {
   const [formData, setFormData] = useState({
@@ -11,7 +11,10 @@ const MailSection = () => {
     usermobile: "",
     message: "",
   });
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState("");
+  const [otpError, setOtpError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,6 +24,10 @@ const MailSection = () => {
     if (name === "usermobile" && !/^\d*$/.test(value)) return;
 
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleOtpChange = (e) => {
+    setOtp(e.target.value);
   };
 
   const handleFormSubmit = async (e) => {
@@ -34,35 +41,62 @@ const MailSection = () => {
     }
 
     try {
-      const phoneExists = await checkPhoneNumberExists(formData.usermobile);
-      if (phoneExists) {
-        setError("This phone number is already registered.");
-        return;
-      }
+      // Send OTP
+      await sendOTP(
+        formData.usermobile,
+        "index page", // Project Name
+        "website", // Source
+        formData.username,
+        formData.message
+      );
+      swal("OTP Sent!", "Please check your phone for the OTP.", "success");
+      setOtpSent(true);
+    } catch (error) {
+      console.error("Error sending OTP:", error.message);
+      setError("Failed to send OTP. Please try again later.");
+    }
+  };
 
-      await submitLead(formData);
-      swal({
-        title: 'Success!',
-        text: 'Your form has been submitted successfully.',
-        icon: 'success',
-        button: 'OK',
-      }).then(() => {
+  const handleOtpVerification = async (e) => {
+    e.preventDefault();
+    setOtpError("");
+
+    if (otp.length !== 6) {
+      setOtpError("OTP must be 6 digits.");
+      return;
+    }
+
+    try {
+      await verifyOTP(formData.usermobile, otp);
+      swal("Verified!", "OTP verification successful.", "success").then(() => {
         navigate("/thankYou");
       });
     } catch (error) {
-      console.error("Submission Error:", error.message);
-      setError("Failed to submit form. Please try again later.");
+      console.error("Error verifying OTP:", error.message);
+      setOtpError("Invalid OTP. Please try again.");
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setOtpError("");
+    try {
+      await resendOTP(formData.usermobile);
+      swal("OTP Resent!", "Please check your phone for the new OTP.", "success");
+    } catch (error) {
+      console.error("Error resending OTP:", error.message);
+      setOtpError("Failed to resend OTP. Please try again later.");
     }
   };
 
   return (
     <div className="container mail-background">
-      <div className="headline">
-        <h3 className="h3">Still Confused?</h3>
-        <p className="sub-headline">We are Here to Assist!</p>
-        <form id="contactpage" onSubmit={handleFormSubmit}>
-          <div className="row">
-            <div className="col-md-12">
+      {!otpSent ? (
+        // Form to Send OTP
+        <div className="headline">
+          <h3 className="h3">Still Confused?</h3>
+          <p className="sub-headline">We are Here to Assist!</p>
+          <form id="contactpage" onSubmit={handleFormSubmit}>
+            <div className="row">
               <div className="col-md-12">
                 <label>Name:</label>
                 <input
@@ -74,9 +108,7 @@ const MailSection = () => {
                   value={formData.username}
                   onChange={handleChange}
                 />
-              </div>
 
-              <div className="col-md-12">
                 <label>Phone Number:</label>
                 <input
                   required
@@ -88,9 +120,7 @@ const MailSection = () => {
                   value={formData.usermobile}
                   onChange={handleChange}
                 />
-              </div>
 
-              <div className="col-md-12">
                 <label>Message:</label>
                 <textarea
                   name="message"
@@ -100,23 +130,61 @@ const MailSection = () => {
                   value={formData.message}
                   onChange={handleChange}
                 ></textarea>
-              </div>
 
-              {error && (
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
-              )}
+                {error && (
+                  <div className="alert alert-danger" role="alert">
+                    {error}
+                  </div>
+                )}
 
-              <div className="col-md-12">
                 <button type="submit" className="theme-btn">
-                  Send
+                  Send 
                 </button>
               </div>
             </div>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      ) : (
+        // Form to Verify OTP
+        <div className="otp-verification">
+          <h3 className="h3">Verify OTP</h3>
+          <p className="sub-headline">
+            Enter the OTP sent to your phone number: {formData.usermobile}
+          </p>
+          <form onSubmit={handleOtpVerification}>
+            <div className="col-md-12">
+              <label>OTP:</label>
+              <input
+                required
+                type="text"
+                maxLength="6"
+                className="form-control"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={handleOtpChange}
+              />
+
+              {otpError && (
+                <div className="alert alert-danger" role="alert">
+                  {otpError}
+                </div>
+              )}
+
+              <button type="submit" className="theme-btn">
+                Verify OTP
+              </button>
+
+              <button
+                type="button"
+                className="theme-btn btn-secondary mt-2"
+                onClick={handleResendOtp}
+              >
+                Resend OTP
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

@@ -24,36 +24,38 @@ const Head = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      setLoading(true); 
+      setLoading(true);
       const response = await getAllProject({ isFeatured: true });
       setProjects(response.content || []);
-      setLoading(false); 
+      setLoading(false);
     };
     fetchProjects();
   }, []);
 
   return (
-
-    
     <div>
-    
-<Helmet>
-<title>Real Estate Portfolio & Strategic Management Company</title> 
-<meta content="Invest Mango: Real estate portfolio and strategic management services. Elevate your financial future through informed decisions and prime opportunities." name="description" /> 
- <link rel="canonical" href="https://www.investmango.com" />  
- <meta content="real estate company in noida, property in noida, property site, best property company in noida, real estate agency in noida, best real estate website, best property websites, best real estate sites, house search sites, top real estate companies in noida, best real estate company in noida." name="keyword" />
-</Helmet>
+      <Helmet>
+        <title>Real Estate Portfolio & Strategic Management Company</title>
+        <meta
+          content="Invest Mango: Real estate portfolio and strategic management services. Elevate your financial future through informed decisions and prime opportunities."
+          name="description"
+        />
+        <link rel="canonical" href="https://propertymarvels.in/" />
+        <meta
+          content="real estate company in noida, property in noida, property site, best property company in noida, real estate agency in noida, best real estate website, best property websites, best real estate sites, house search sites, top real estate companies in noida, best real estate company in noida."
+          name="keyword"
+        />
+      </Helmet>
       <section className="main-body">
         {/* Render the SearchBar Component */}
         {/*  */}
         <div className="main-slider">
           <div className="form-top-home">
             <div className="container">
-            <SearchBar />
+              <SearchBar />
             </div>
           </div>
         </div>
-
 
         <div className="listing-home">
           <div className="container-fluid">
@@ -66,30 +68,34 @@ const Head = () => {
                       <h1 className="h3" style={{ marginTop: "26px" }}>
                         Top Projects
                       </h1>
-                      <p className="head_p" style={{marginLeft:'39px'}}>
+                      <p className="head_p" style={{ marginLeft: "39px" }}>
                         Connecting people with their dream properties
                       </p>
                     </div>
                     <div className="swiper-container">
-                        <Swiper {...sliderSettings}>
-                          {loading ? (
-                            <div className="loader-container">
-                              <div className="loader">Loading...</div>
-                            </div>
-                          ) : (
-                            <div className="listing-home listing-page row">
-                              {projects?.map((project) => (
-                                <SwiperSlide key={project.id}>
-                                  <ProjectCard project={project} />
-                                </SwiperSlide>
-                              ))}
-                            </div>
-                          )}
-                        </Swiper>
-                        {/* Add custom navigation buttons */}
-                        <div className="swiper-button-prev"><i class="fas fa-chevron-left"></i></div>
-                        <div className="swiper-button-next"><i class="fas fa-chevron-right"></i></div>
+                      <Swiper {...sliderSettings}>
+                        {loading ? (
+                          <div className="loader-container">
+                            <div className="loader">Loading...</div>
+                          </div>
+                        ) : (
+                          <div className="listing-home listing-page row">
+                            {projects?.map((project) => (
+                              <SwiperSlide key={project.id}>
+                                <ProjectCard project={project} />
+                              </SwiperSlide>
+                            ))}
+                          </div>
+                        )}
+                      </Swiper>
+                      {/* Add custom navigation buttons */}
+                      <div className="swiper-button-prev">
+                        <i class="fas fa-chevron-left"></i>
                       </div>
+                      <div className="swiper-button-next">
+                        <i class="fas fa-chevron-right"></i>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -159,4 +165,4 @@ const Head = () => {
   );
 };
 
-export default (Head);
+export default Head;
