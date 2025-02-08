@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import { sliderSettings } from "../../../utils/common";
-import { Navigation, Pagination } from "swiper/modules";
 import { getAllBlog } from "../../apis/api";
 import "../styles/css/blogCard.css";
+
 const BlogSection = ({ isSwiper }) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,7 +60,7 @@ const BlogSection = ({ isSwiper }) => {
 };
 
 const BlogCard = ({ blog, stripHtml, formatDate }) => (
-  <div className="item" style={{ padding: '20px' }}>
+  <div className="itemm">
     <a href={`/blogs/${blog.blogUrl}`}>
       <img
         src={blog?.images[0] || "path/to/default-image.jpg"}
@@ -71,16 +71,15 @@ const BlogCard = ({ blog, stripHtml, formatDate }) => (
       />
     </a>
     <p className="title">{blog.headings}</p>
-    <small style={{ color: "#666a6f" }}>
-      Date - {formatDate(blog.createdDate)}  {/* Fixed date formatting */}
-    </small>
-    <p className="des">{stripHtml(blog.description).slice(0, 100)} . . .</p> {/* Strip HTML from description */}
+    <small style={{ color: "#666a6f" }}>Date - {formatDate(blog.createdDate)}</small>
+    <p className="des">{stripHtml(blog.description).slice(0, 100)} . . .</p>
     <hr />
     <a href={`/blogs/${blog.blogUrl}`} className="theme-btn">
       Read More
     </a>
   </div>
 );
+
 
 
 

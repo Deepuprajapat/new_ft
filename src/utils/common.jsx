@@ -1,6 +1,7 @@
 import { Navigation, Autoplay } from "swiper/modules";  
 export const sliderSettings = {
     modules: [Navigation,Autoplay],
+    navigation: true, 
     navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',

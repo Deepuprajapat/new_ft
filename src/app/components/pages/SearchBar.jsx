@@ -113,12 +113,19 @@ const SearchBar = () => {
               value={location}
               onChange={handleLocationChange}
             >
-              <option value="">Location --</option>
-              {localities.map((city) => (
-                <option key={city.id} value={city.id}>
-                  {city.name}
-                </option>
-              ))}
+              <option value="">Location--</option>
+              {localities
+                .map((city) => ({
+                  ...city,
+                  name: city.name.toUpperCase(), // Convert name to uppercase
+                }))
+               // .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
+                .map((city) => (
+                  <option key={city.id} value={city.id}
+                  style={{ fontSize: "13px", color: "#000" }}> 
+                    {city.name}
+                  </option>
+                ))}
             </select>
           </div>
         </div>

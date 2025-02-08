@@ -76,6 +76,15 @@ button {
 
 .dropdown-item {
   color: black;
+  font-size: 12px;
+  font-weight: bold; /* Makes the font bold */
+  padding: 8px 8px;
+}
+
+.dropdown-item:hover {
+  background: lightgray; /* Changes background color on hover */
+  color: blue; /* Changes text color on hover */
+  cursor: pointer; /* Shows a pointer cursor on hover */
 }
 
 .search-button svg {

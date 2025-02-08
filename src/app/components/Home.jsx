@@ -68,12 +68,12 @@ const Head = () => {
                       <h1 className="h3" style={{ marginTop: "26px" }}>
                         Top Projects
                       </h1>
-                      <p className="head_p" style={{ marginLeft: "39px" }}>
-                        Connecting people with their dream properties
+                      <p className="head_p" style={{ marginLeft: "45px" }}>
+                        Connecting People With Their Dream Properties
                       </p>
                     </div>
                     <div className="swiper-container">
-                      <Swiper {...sliderSettings}>
+                      <Swiper {...sliderSettings} >
                         {loading ? (
                           <div className="loader-container">
                             <div className="loader">Loading...</div>

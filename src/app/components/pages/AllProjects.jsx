@@ -27,38 +27,47 @@ const AllProjects = () => {
       setLoading(true);
       try {
         const { cityId, propertyType, search } = getQueryParams();
-    
+
         const filters = {
           isDeleted: false,
           ...(cityId && { cityId }),
           ...(propertyType && { type: propertyType }),
         };
-    
+
         const data = await getAllProject(filters);
-        
+
         let filteredProjects = data.content || [];
-    
+
         if (search) {
-          const normalizedSearch = search.trim().toLowerCase().replace(/\s+/g, "");
+          const normalizedSearch = search
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "");
           const isNumericSearch = !isNaN(search);
-        
+
           filteredProjects = filteredProjects.filter((project) => {
-            const configMatch = project.configurations?.some((config) =>
-              config.toLowerCase().replace(/\s+/g, "").includes(normalizedSearch) || 
-              (isNumericSearch && config.toLowerCase().includes(`${search}bhk`))
+            const configMatch = project.configurations?.some(
+              (config) =>
+                config
+                  .toLowerCase()
+                  .replace(/\s+/g, "")
+                  .includes(normalizedSearch) ||
+                (isNumericSearch &&
+                  config.toLowerCase().includes(`${search}bhk`))
             );
-        
+
             const propertyTypeMatch = project.configurationsType?.propertyType
               ?.toLowerCase()
               .includes(normalizedSearch);
-        
-            const nameMatch = project.name?.toLowerCase().includes(normalizedSearch);
-        
+
+            const nameMatch = project.name
+              ?.toLowerCase()
+              .includes(normalizedSearch);
+
             return configMatch || propertyTypeMatch || nameMatch;
           });
         }
-        
-    
+
         setProjects(filteredProjects);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -67,8 +76,7 @@ const AllProjects = () => {
         setLoading(false);
       }
     };
-    
-  
+
     fetchProjects();
   }, [location.search]); // Runs when query params change
 
@@ -78,28 +86,41 @@ const AllProjects = () => {
     navigate(`/project/${encodedName}`);
   };
 
+  const capitalizeWords = (string) => {
+    return string
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   return (
     <div>
-      
-<Helmet>
-<title>Best Residential And Commercial Projects</title> 
-<meta content="Find the Best Residential and commercial projects with ultra luxury amenities. Compare Price, Floor Plan, Amenities, Site Plan, and Payment Plan, Property Reviews." name="description"/>
- <link rel="canonical" href="https://propertymarvels.in/allProjects"/>
-</Helmet>
+      <Helmet>
+        <title>Best Residential And Commercial Projects</title>
+        <meta
+          content="Find the Best Residential and commercial projects with ultra luxury amenities. Compare Price, Floor Plan, Amenities, Site Plan, and Payment Plan, Property Reviews."
+          name="description"
+        />
+        <link rel="canonical" href="https://propertymarvels.in/allProjects" />
+      </Helmet>
       <section className="main-body">
         <div className="container">
           <h1 className="project-title">
             {getQueryParams().locationName
-              ? `Projects in ${getQueryParams().locationName}`
+              ? `Projects In ${capitalizeWords(getQueryParams().locationName)}`
               : "All Projects"}
           </h1>
           <p>
-  <a href="/" className="styled-link">
-    Home
-  </a>{" "}
-  / {getQueryParams().locationName || "All Projects"} 
-  {getQueryParams().propertyType && ` / ${getQueryParams().propertyType}`}
-</p>
+            <a href="/" className="styled-link">
+              Home
+            </a>{" "}
+            /
+            {getQueryParams().locationName
+              ? ` ${capitalizeWords(getQueryParams().locationName)}`
+              : " All Projects"}
+            {getQueryParams().propertyType &&
+              ` / ${capitalizeWords(getQueryParams().propertyType)}`}
+          </p>
         </div>
 
         <div className="main-con">
@@ -115,7 +136,9 @@ const AllProjects = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="no-projects-message">No projects available...</p>
+                  <p className="no-projects-message">
+                    No projects available...
+                  </p>
                 )}
               </div>
             </div>

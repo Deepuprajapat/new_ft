@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../components/styles/css/header.css";
-import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/img/logo.jpg";
-// import Login from "./pages/Login/Login";
 import { Button } from "@mui/material";
 import { currentUser } from "../apis/api";
-// import { currentUser } from "apis/api";/
 import Nav from "react-bootstrap/Nav";
-// import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Container, Navbar, NavbarBrand } from "react-bootstrap";
-// import navItems from "../../utils/navbar";
 import navItems from "../../utils/navbar";
 import Form from "react-bootstrap/Form";
 import { FaSearch, FaPhoneAlt } from "react-icons/fa";

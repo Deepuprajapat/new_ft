@@ -1,0 +1,240 @@
+/* General Styling */
+.main-body {
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+  }
+  
+  /* Breadcrumb */
+  .property-breadcrumb {
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 10px;
+  }
+  
+  /* Heading */
+  .property-heading {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 20px;
+  }
+  
+  /* Filters Section */
+  .property-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .property-filters select {
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #333;
+    transition: all 0.3s ease;
+    min-width: 250px;
+  }
+  
+  .property-filters select:hover,
+  .property-filters select:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {  /* Tablet View */
+    .property-filters {
+      flex-direction: row;
+      gap: 10px;
+    }
+    
+    .property-filters select {
+      min-width: 220px;
+    }
+  }
+  
+  @media (max-width: 768px) {  /* Mobile View */
+    .property-filters {
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+  
+    .property-filters select {
+      width: 100%;
+      max-width: 320px;
+    }
+  
+    .property-heading {
+      font-size: 24px;
+    }
+  }
+  
+  @media (max-width: 480px) {  /* Small Mobile View */
+    .property-filters select {
+      font-size: 14px;
+      padding: 10px;
+    }
+  
+    .property-heading {
+      font-size: 22px;
+    }
+  
+    .property-breadcrumb {
+      font-size: 12px;
+    }
+  }
+  
+
+  /* General Styling */
+.property-list-container {
+  width: 100%;
+  padding: 20px;
+}
+
+.sticky-scroll {
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.property-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Property Row */
+.property-row {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+
+/* Property Image */
+.property-image {
+  flex: 1;
+  max-width: 250px;
+}
+
+.property-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Property Details */
+.property-details {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.property-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff6600;
+}
+
+.dropdown .btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  padding: 5px;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+/* Property Info */
+.property-info p {
+  font-size: 14px;
+  color: #555;
+  margin: 5px 0;
+}
+
+/* Contact Button */
+.theme-btn {
+  text-decoration: none;
+  background-color: #ff6600;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  background: #ff6600;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .property-row {
+    flex-direction: column;
+  }
+
+  .property-image {
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .property-card {
+    padding: 10px;
+  }
+
+  .property-info p {
+    font-size: 12px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: center;
+  }
+}

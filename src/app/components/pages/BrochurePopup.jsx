@@ -11,7 +11,7 @@ import {
   sendOTP,
   verifyOTP,
   resendOTP,
-  checkPhoneNumberExists,
+  // checkPhoneNumberExists,
   submitLead,
 } from "../../apis/api";
 import { useNavigate } from "react-router-dom";
@@ -58,17 +58,17 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
 
   const handleSubmit = async () => {
     const { username, usermobile } = formData;
-  
+
     if (!username || !usermobile) {
       setError("Please fill in all fields.");
       return;
     }
-  
+
     if (usermobile.length !== 10) {
       setError("Phone number must be exactly 10 digits.");
       return;
     }
-  
+
     try {
       await sendOTP(usermobile, projectName, "brochure", username, "");
       setIsOtpSent(true);
@@ -82,8 +82,6 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
           document.querySelector(".swal2-container").style.zIndex = "2000";
         },
       });
-      
-      
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -92,15 +90,14 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
       });
     }
   };
-  
 
   const handleOtpVerification = async () => {
     try {
       const response = await verifyOTP(formData.usermobile, otp);
-  
+
       if (response.message === "OTP Validated Successfully") {
         await submitLead(formData);
-  
+
         Swal.fire({
           icon: "success",
           title: "Success!",
@@ -110,13 +107,13 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
         }).then(() => {
           // Redirect first
           navigate("/thankYou");
-          
+
           // Parallel PDF download
           if (brochure) {
             let brochureUrl = brochure.startsWith("http")
               ? brochure
               : `${BASE_BROCHURE_URL}/${brochure}`;
-  
+
             const link = document.createElement("a");
             link.href = brochureUrl;
             link.setAttribute("download", `${projectName || "brochure"}.pdf`);
@@ -127,19 +124,19 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
             generateComingSoonPDF(projectName);
           }
         });
-  
+
         onClose();
       } else {
         Swal.fire({
-            icon: "error",
-            title: "Invalid OTP",
-            text: response.message || "Please enter the correct OTP.",
-            backdrop: true, // Keeps modal focus
-            allowOutsideClick: false, // Prevents accidental closure
-            didOpen: () => {
-              document.querySelector(".swal2-container").style.zIndex = "2000"; // Ensures visibility
-            },
-          });
+          icon: "error",
+          title: "Invalid OTP",
+          text: response.message || "Please enter the correct OTP.",
+          backdrop: true, // Keeps modal focus
+          allowOutsideClick: false, // Prevents accidental closure
+          didOpen: () => {
+            document.querySelector(".swal2-container").style.zIndex = "2000"; // Ensures visibility
+          },
+        });
       }
     } catch (error) {
       Swal.fire({
@@ -154,10 +151,6 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
       });
     }
   };
-  
-  
-  
-  
 
   const handleResendOTP = async () => {
     try {
@@ -171,7 +164,6 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
         didOpen: () => {
           document.querySelector(".swal2-container").style.zIndex = "2000"; // Ensures visibility
         },
-    
       });
     } catch (error) {
       Swal.fire({
@@ -198,24 +190,34 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
                 {projectName || "Invest Mango"}
               </strong>
             </p>
-            <TextField
-              label="Enter Name:"
+            <input
               type="text"
-              fullWidth
               name="username"
               value={formData.username}
               onChange={handleChange}
+              placeholder="Enter Name"
               required
+              style={{
+                width: "100%",
+                padding: "8px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
             />
-            <TextField
-              margin="dense"
-              label="Enter Phone:"
+            <input
               type="text"
-              fullWidth
               name="usermobile"
               value={formData.usermobile}
               onChange={handleChange}
+              placeholder="Enter Phone"
               required
+              style={{
+                width: "100%",
+                padding: "8px",
+                margin: "8px 0", // Similar to `margin="dense"`
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
             />
             {error && <p style={{ color: "red" }}>{error}</p>}
           </>
@@ -225,14 +227,20 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
               Enter the OTP sent to {formData.usermobile} to verify your
               identity.
             </p>
-            <TextField
-              label="Enter OTP:"
+            <input
               type="text"
-              fullWidth
               name="otp"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter OTP"
               required
+              style={{
+                width: "100%",
+                padding: "8px",
+                margin: "8px 0",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
             />
           </>
         )}

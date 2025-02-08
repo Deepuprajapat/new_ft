@@ -8,8 +8,8 @@ import {
   sendOTP,
   verifyOTP,
   resendOTP,
-  getLeadByPhone,
-  saveLead,
+  // getLeadByPhone,
+  // saveLead,
 } from "../../apis/api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -33,6 +33,8 @@ import Swal from "sweetalert2";
 const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
 // const FALLBACK_Floor_IMAGE = "/images/coming_soon_floor.jpg";
+
+
 
 const ProjectDetails = () => {
   const [activeSection, setActiveSection] = useState("overview");
@@ -63,7 +65,6 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log(urlName, "jkasdgdiyta");
       if (urlName) {
         try {
           const data = await getAllProjectsByUrlName(urlName);
@@ -323,6 +324,7 @@ const ProjectDetails = () => {
   //     alert("Something went wrong. Please try again.");
   //   }
   // };
+  
 
   // Update active section based on scroll position and handle nav fixing
   useEffect(() => {
@@ -338,7 +340,7 @@ const ProjectDetails = () => {
         "location",
         "siteplan",
         "developer",
-        "faqs",
+        "FAQs",
         "similar projects",
       ];
 
@@ -409,9 +411,28 @@ const ProjectDetails = () => {
     setSelectedImage(""); // Clear selected image
   };
 
+// Function to clean and extract numbers for sorting
+const cleanQuestion = (question) => {
+  const match = question.match(/^(\d+)[.\s\t]+(.*)/); // Extracts number and question
+  return match ? { number: parseInt(match[1]), text: match[2] } : { number: null, text: question.trim() };
+};
+
+// Sort FAQs based on extracted number
+const sortedFaqs = projectData?.faqs
+  ?.map(faq => ({ ...faq, ...cleanQuestion(faq.question) })) // Add cleaned data
+  ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); // Sort numerically if a number exists
+
+
   const canonical = `http://propertymarvels.in/project/${urlName}`;
   // console.log("can",canonical)
   // console.log("mets tielle",projectData?.data)
+
+  const imageSrc =
+  projectData?.siteplanImg && projectData.siteplanImg.trim() !== ""
+    ? projectData.siteplanImg.startsWith("http")
+      ? projectData.siteplanImg
+      : `${BASE_URL}${projectData.siteplanImg}`
+    : FALLBACK_IMAGE;
   return (
     <>
       {projectData && (
@@ -621,7 +642,7 @@ const ProjectDetails = () => {
                 "location",
                 "siteplan",
                 "developer",
-                "faqs",
+                "FAQs",
                 "similar_projects",
               ].map((item) => (
                 <li key={item} className="mx-1">
@@ -731,7 +752,7 @@ const ProjectDetails = () => {
                     "location",
                     "siteplan",
                     "developer",
-                    "faqs",
+                    "FAQs",
                     "similar_projects",
                   ].map((item) => (
                     <a
@@ -2301,6 +2322,7 @@ const ProjectDetails = () => {
                                         window.innerWidth <= 768
                                           ? "12px"
                                           : "14px",
+                                          margin:"0px",
                                     }}
                                   >
                                     Download Floor Plan
@@ -2580,7 +2602,7 @@ const ProjectDetails = () => {
                 Get Free Consultation for this property. Call us at:{" "}
                 <a
                   href="tel:+918595-189-189"
-                  style={{ color: "#2067d1", textDecoration: "underline" }}
+                  style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
                   8595-189-189
                 </a>
@@ -3007,11 +3029,7 @@ const ProjectDetails = () => {
                             id="zoom-image"
                             alt={`${projectData?.name} Site Plan`}
                             src={
-                              projectData?.siteplanImg
-                                ? projectData.siteplanImg === BASE_URL
-                                  ? FALLBACK_IMAGE
-                                  : projectData.siteplanImg
-                                : FALLBACK_IMAGE
+                              imageSrc
                             }
                             fetchpriority="high"
                             style={{
@@ -3165,11 +3183,12 @@ const ProjectDetails = () => {
                     >
                       <img
                         src={
-                          projectData?.siteplanImg
-                            ? projectData.siteplanImg === BASE_URL
-                              ? FALLBACK_IMAGE
-                              : projectData.siteplanImg
-                            : FALLBACK_IMAGE
+                          imageSrc
+                          // projectData?.siteplanImg
+                          //   ? projectData.siteplanImg === BASE_URL
+                          //     ? FALLBACK_IMAGE
+                          //     : projectData.siteplanImg
+                          //   : FALLBACK_IMAGE
                         }
                         alt={`${projectData?.name} Site Plan`}
                         style={{
@@ -3329,74 +3348,57 @@ const ProjectDetails = () => {
                 </div>
               </div>
               {/* Frequently Asked Questions */}
+              <div className="mb-4" style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }} id="FAQs">
+    <div className="p-0 pb-2">
+      <h4
+        className="mb-3 py-2 fw-bold text-white ps-3"
+        style={{
+          fontSize: window.innerWidth <= 768 ? "14px" : "16px",
+          backgroundColor: "#2067d1",
+          borderRadius: "4px 4px 0 0",
+        }}
+      >
+        Frequently Asked Questions (FAQs)
+      </h4>
+      <div className="px-3">
+        {sortedFaqs?.map((faq, index) => (
+          <div key={index} className="mb-3">
+            <div
+              className="d-flex justify-content-between align-items-center p-3"
+              style={{
+                backgroundColor: expandedIndex === index ? "#f8f9fa" : "white",
+                cursor: "pointer",
+                border: "1px solid #dee2e6",
+                borderRadius: "4px",
+                fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+              }}
+              onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+            >
+              <span className="fw-bold">{faq.text}</span> {/* Display cleaned question */}
+              <span>{expandedIndex === index ? "−" : "+"}</span>
+            </div>
+            {expandedIndex === index && (
               <div
-                className="mb-4"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-                id="faqs"
+                className="p-3"
+                style={{
+                  border: "1px solid #dee2e6",
+                  borderTop: "none",
+                  borderRadius: "0 0 4px 4px",
+                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                }}
               >
-                <div className="p-0 pb-2">
-                  <h4
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    Frequently Asked Questions (FAQs)
-                  </h4>
-                  <div className="px-3">
-                    <script type="application/ld+json">
-                      {/* JSON-LD content */}
-                    </script>
-
-                    {projectData?.faqs?.map((faq, index) => (
-                      <div key={index} className="mb-3">
-                        <div
-                          className="d-flex justify-content-between align-items-center p-3"
-                          style={{
-                            backgroundColor:
-                              expandedIndex === index ? "#f8f9fa" : "white",
-                            cursor: "pointer",
-                            border: "1px solid #dee2e6",
-                            borderRadius: "4px",
-                            fontSize:
-                              window.innerWidth <= 768 ? "12px" : "13px",
-                          }}
-                          onClick={() =>
-                            setExpandedIndex(
-                              expandedIndex === index ? null : index
-                            )
-                          }
-                        >
-                          <span className="fw-bold">{faq.question}</span>
-                          <span>{expandedIndex === index ? "−" : "+"}</span>
-                        </div>
-                        {expandedIndex === index && (
-                          <div
-                            className="p-3"
-                            style={{
-                              border: "1px solid #dee2e6",
-                              borderTop: "none",
-                              borderRadius: "0 0 4px 4px",
-                              fontSize:
-                                window.innerWidth <= 768 ? "12px" : "13px",
-                            }}
-                          >
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html: DOMPurify.sanitize(
-                                  faq.answer || "<p>Answer not available.</p>"
-                                ),
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(faq.answer || "<p>Answer not available.</p>"),
+                  }}
+                />
               </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
               {/* Similar Projects */}
               <div
                 className="mb-4"

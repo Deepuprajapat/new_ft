@@ -20,6 +20,9 @@ footer .top-footer .footer-logo {
     display:none;
 }
 }
+.custom-link {
+    color: #737373 !important;
+  }
 
 footer .top-footer {
     padding: 30px 0 0;

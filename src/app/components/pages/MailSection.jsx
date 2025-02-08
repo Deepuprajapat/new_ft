@@ -137,7 +137,7 @@ const MailSection = () => {
                   </div>
                 )}
 
-                <button type="submit" className="theme-btn">
+                <button type="submit" className="theme-btn" style={{margintop:"10px"}}>
                   Send 
                 </button>
               </div>

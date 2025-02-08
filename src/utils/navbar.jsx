@@ -1,6 +1,6 @@
 // navData.js
 
- const navItems = [
+const navItems = [
     { label: 'Home', path: '/' },
     {
       label: 'About Us',
@@ -15,7 +15,9 @@
       label: 'Our Projects',
       dropdown: [
         { label: 'All Projects', path: '/allProjects' },
+        { label: 'Featured Properties', path: '/featuredProperties' },
         { label: 'Properties', path: '/allProperties' },
+        
       ],
     },
     { label: 'Mango Insights', path: '/mango-insights' },

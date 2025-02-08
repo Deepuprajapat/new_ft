@@ -277,7 +277,7 @@ export const fetchTestimonials = async () => {
 export const fetchAllVacancies = async () => {
   try {
     console.log("Starting fetchAllVacancies...");
-    console.log("API Base URL1: ", `${BASE_URL1}/get/all/vacancies?isActive=true&page=0&size=100`);
+   // console.log("API Base URL1: ", `${BASE_URL1}/get/all/vacancies?isActive=true&page=0&size=100`);
     const response = await fetch(`${BASE_URL1}/get/all/vacancies?isActive=true&page=0&size=100`, {
       method: "GET",
       headers: {
@@ -335,23 +335,21 @@ export const submitHiringForm = async (formData) => {
   }
 };
 
+
 export const getAllLocalities = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/locality/get/all`);
     const localities = response.data || []; // Default to an empty array if no data
-
     // Filter out localities with 'unknown' or 'UNKNOWN' in the city name or any other relevant fields
     const filteredLocalities = localities.filter(
       (locality) => locality.city.name.toLowerCase() !== "unknown"
     );
-
     // Map filtered localities to extract city details and ensure uniqueness
     const uniqueCities = Array.from(
       new Map(
         filteredLocalities.map((locality) => [locality.city.id, locality.city])
       ).values()
     );
-
     return uniqueCities; // Returns an array of { id, name } objects
   } catch (error) {
     console.error("Error fetching localities:", error);
@@ -359,15 +357,39 @@ export const getAllLocalities = async () => {
   }
 };
 
-export const getLeadByPhone = async (phone) => {
+export const getAllLocalitiess = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/leads/get/by/phone/${phone}`);
-    return response.data;
+    const response = await axios.get(`${BASE_URL}/locality/get/all`);
+    const localities = response.data || []; 
+
+    // // Filter out localities with 'unknown' or 'UNKNOWN' in the city name or any other relevant fields
+    // const filteredLocalities = localities.filter(
+    //   (locality) => locality.city.name.toLowerCase() !== "unknown"
+    // );
+
+    // // Map filtered localities to extract city details and ensure uniqueness
+    // const uniqueCities = Array.from(
+    //   new Map(
+    //     filteredLocalities.map((locality) => [locality.city.id, locality.city])
+    //   ).values()
+    // );
+
+    return localities; // Returns an array of { id, name } objects
   } catch (error) {
-    console.error("Error fetching lead by phone:", error);
+    console.error("Error fetching localities:", error);
     return [];
   }
 };
+
+// export const getLeadByPhone = async (phone) => {
+//   try {
+//     const response = await axios.get(`${BASE_URL}/leads/get/by/phone/${phone}`);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching lead by phone:", error);
+//     return [];
+//   }
+// };
 
 // API Call to Check Phone Number
 export const checkPhoneNumberExists = async (phone) => {
@@ -463,15 +485,15 @@ export const resendOTP = async (phone) => {
   }
 };
 
-export const saveLead = async (lead) => {
-  try {
-    const response = await axios.post(`${BASE_URL}/leads/save/new`, lead);
-    return response.data;
-  } catch (error) {
-    console.error("Error saving lead:", error);
-    throw error;
-  }
-};
+// export const saveLead = async (lead) => {
+//   try {
+//     const response = await axios.post(`${BASE_URL}/leads/save/new`, lead);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error saving lead:", error);
+//     throw error;
+//   }
+// };
 
 export const getAllGenericKeywords = async () => {
   try {
@@ -502,3 +524,99 @@ export const getAllCities = async () => {
     return [];
   } 
 }
+
+export const getAllProperties = async (page, pageSize, propertyType, configuration, locality) => {
+
+  const url = new URL(`${BASE_URL}/property/get/all`);
+  const params = {
+    isDeleted: 'false',
+    page: page,
+    size: pageSize,
+  };
+
+  if (propertyType) {
+    params.propertyType = propertyType;
+  }
+
+  // Only add configuration if it's provided
+  if (configuration) {
+    params.configurationName = configuration;
+  }
+
+  // Only add locality if it's provided
+  if (locality) {
+    params.cityId = locality;
+  }
+  Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
+};
+
+
+// export const getAllProperties = async (filters = {}) => {
+//   const {
+//     page = 0,
+//     size = 10,
+//     propertyType,
+//     configTypeName,
+//     configurationName,
+//     name,
+//     localityId,
+//   } = filters;
+
+//   try {
+//     const params = {
+//       ...(page !== undefined && { page }),
+//       ...(size !== undefined && { size }),
+//       isDeleted: false, // This will always be 'false'
+//       ...(propertyType && { propertyType }),
+//       ...(configTypeName && { configTypeName }),
+//       ...(configurationName && { configurationName }),
+//       ...(name && { name }),
+//       ...(localityId && { localityId }),
+//     };
+
+//     const response = await axios.get(`${BASE_URL}/property/get/all`, { params });
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching properties:", error);
+//     return { content: [], totalPages: 0 };
+//   }
+// };
+
+
+
+// const getAllProperties = async (page, pageSize, propertyType, configuration, locality) => {
+//   // const url = new URL('http://15.207.69.218:9191/get/all/projects');
+//   const url = new URL(`${BASE_URL}/property/get/all`);
+//   const params = {
+//     isDeleted: 'false',
+//     page: page,
+//     size: pageSize,
+//     propertyType: propertyType || '', // Pass the selected property type (empty string if not selected)
+//     projectConfigurationName: configuration || '', // Pass the selected configuration (empty string if not selected)
+//     locality: locality || '' // Pass the selected locality (empty string if not selected)
+//   };
+//   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  
+//   const response = await fetch(url);
+//   const data = await response.json();
+//   return data;
+// };
+
+
+
+export const getPropertyByUrlName = async (urlName) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/property/get/by/url/${urlName}`);
+    //const res = await axios.get(`http://3.7.237.167:8282/property/get/by/url/${urlName}`);
+    
+    console.log("Data fetch:", res.data); // Logs the data for debugging
+    return res.data || {}; // Ensures that if the response body is empty, we return an empty object
+  } catch (error) {
+    console.error("Error fetching project by urlName:", error);
+    return {}; // Return an empty object if there's an error
+  }
+};
