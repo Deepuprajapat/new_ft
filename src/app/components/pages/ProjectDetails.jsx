@@ -8,6 +8,7 @@ import {
   sendOTP,
   verifyOTP,
   resendOTP,
+  getReraInfoByProjectId,
   // getLeadByPhone,
   // saveLead,
 } from "../../apis/api";
@@ -34,14 +35,14 @@ const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
 // const FALLBACK_Floor_IMAGE = "/images/coming_soon_floor.jpg";
 
-
-
 const ProjectDetails = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const [projectData, setProjectData] = useState(null);
   const [allSimilarProjects, setAllSimilarProjects] = useState(null);
   const [developerId, setDeveloperId] = useState("");
+  const [projectId, setProjectId] = useState("");
   const [developerDetails, setDeveloperDetails] = useState(null);
+  const [reraDetails, setReraDetails] = useState(null);
   const { urlName } = useParams();
   const [expandedIndex, setExpandedIndex] = useState(null); // To track which FAQ is expanded
   const [showReraDetails, setShowReraDetails] = useState(false);
@@ -73,6 +74,7 @@ const ProjectDetails = () => {
             setProjectData(data);
             console.log("url", data.url);
             setDeveloperId(data.developerId); // Update developer ID
+            setProjectId(data.id); // Update developer ID
           }
         } catch (error) {
           console.error("Error fetching project data:", error);
@@ -114,6 +116,23 @@ const ProjectDetails = () => {
     };
     fetchDeveloper();
   }, [developerId]);
+
+  useEffect(() => {
+    const fetchReraInfo = async () => {
+      if (!projectId) return;
+
+      try {
+        const data = await getReraInfoByProjectId(projectId);
+        console.log("Fetched RERA data:", data);
+        setReraDetails(data || []); // Ensures state is always an array
+      } catch (error) {
+        console.error("Error fetching RERA data:", error);
+        setReraDetails([]); // Resets state on error
+      }
+    };
+
+    fetchReraInfo();
+  }, [projectId]);
 
   const formatPrice = (price) => {
     if (!price) return "";
@@ -223,9 +242,9 @@ const ProjectDetails = () => {
       const response = await sendOTP(
         formData.usermobile,
         projectData?.name || "",
-        "Website",
         "ORGAINc",
         formData.username,
+        formData.usermsg,
         formData.useremail
       );
       if (response) {
@@ -324,7 +343,6 @@ const ProjectDetails = () => {
   //     alert("Something went wrong. Please try again.");
   //   }
   // };
-  
 
   // Update active section based on scroll position and handle nav fixing
   useEffect(() => {
@@ -411,28 +429,29 @@ const ProjectDetails = () => {
     setSelectedImage(""); // Clear selected image
   };
 
-// Function to clean and extract numbers for sorting
-const cleanQuestion = (question) => {
-  const match = question.match(/^(\d+)[.\s\t]+(.*)/); // Extracts number and question
-  return match ? { number: parseInt(match[1]), text: match[2] } : { number: null, text: question.trim() };
-};
+  // Function to clean and extract numbers for sorting
+  const cleanQuestion = (question) => {
+    const match = question.match(/^(\d+)[.\s\t]+(.*)/); // Extracts number and question
+    return match
+      ? { number: parseInt(match[1]), text: match[2] }
+      : { number: null, text: question.trim() };
+  };
 
-// Sort FAQs based on extracted number
-const sortedFaqs = projectData?.faqs
-  ?.map(faq => ({ ...faq, ...cleanQuestion(faq.question) })) // Add cleaned data
-  ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); // Sort numerically if a number exists
-
+  // Sort FAQs based on extracted number
+  const sortedFaqs = projectData?.faqs
+    ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) })) // Add cleaned data
+    ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); // Sort numerically if a number exists
 
   const canonical = `http://propertymarvels.in/project/${urlName}`;
   // console.log("can",canonical)
   // console.log("mets tielle",projectData?.data)
 
   const imageSrc =
-  projectData?.siteplanImg && projectData.siteplanImg.trim() !== ""
-    ? projectData.siteplanImg.startsWith("http")
-      ? projectData.siteplanImg
-      : `${BASE_URL}${projectData.siteplanImg}`
-    : FALLBACK_IMAGE;
+    projectData?.siteplanImg && projectData.siteplanImg.trim() !== ""
+      ? projectData.siteplanImg.startsWith("http")
+        ? projectData.siteplanImg
+        : `${BASE_URL}${projectData.siteplanImg}`
+      : FALLBACK_IMAGE;
   return (
     <>
       {projectData && (
@@ -474,7 +493,11 @@ const sortedFaqs = projectData?.faqs
                     {projectData?.images[0] && (
                       <div
                         className="h-100 d-flex align-items-center justify-content-center"
-                        style={{ minHeight: "184px", maxHeight: "700px" }}
+                        style={{
+                          minHeight: "184px",
+                          maxHeight: "700px",
+                          padding: ".5px",
+                        }}
                       >
                         <a
                           href={projectData?.images[0]?.imageUrl}
@@ -488,7 +511,7 @@ const sortedFaqs = projectData?.faqs
                           }}
                         >
                           <img
-                            alt={projectData?.images[0]?.category || "Image"}
+                            alt={projectData?.images[0]?.caption || "Image"}
                             src={projectData?.images[0]?.imageUrl}
                             className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
                             style={{ objectFit: "cover", cursor: "pointer" }}
@@ -523,7 +546,7 @@ const sortedFaqs = projectData?.faqs
                               >
                                 <img
                                   alt={
-                                    projectData?.images[index]?.category ||
+                                    projectData?.images[index]?.caption ||
                                     "Image"
                                   }
                                   src={projectData?.images[index]?.imageUrl}
@@ -531,6 +554,7 @@ const sortedFaqs = projectData?.faqs
                                   style={{
                                     objectFit: "cover",
                                     cursor: "pointer",
+                                    padding: ".5px",
                                   }}
                                   fetchpriority="high"
                                 />
@@ -562,7 +586,7 @@ const sortedFaqs = projectData?.faqs
                 <img
                   src={projectData?.images[currentImageIndex]?.imageUrl}
                   alt={
-                    projectData?.images[currentImageIndex]?.category ||
+                    projectData?.images[currentImageIndex]?.caption ||
                     "Full Screen Image"
                   }
                   className="img-fluid w-100 h-100"
@@ -828,13 +852,21 @@ const sortedFaqs = projectData?.faqs
               <div className="col-12 col-md-6 p-0 p-md-0">
                 {/* Upper Section */}
                 <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start mb-2 mt-2 mt-md-3">
-                  <div className="mb-2 mb-md-0 me-md-3 text-center text-md-start">
+                  <div
+                    className="mb-2 mb-md-0 me-md-3 text-center text-md-start"
+                    style={{
+                      maxWidth: "90px",
+                      border: "1px solid grey",
+                      height: "66px",
+                    }}
+                  >
                     <img
                       src={projectData?.projectLogo || "defaultLogo.jpg"}
                       alt={projectData?.projectLogo || "Project Logo"}
                       className="img-fluid"
                       style={{
                         maxWidth: "80px",
+                        height: "64px",
                       }}
                     />
                   </div>
@@ -863,20 +895,25 @@ const sortedFaqs = projectData?.faqs
 
                 {/* Lower Section - Buttons */}
                 <div className="d-flex flex-wrap justify-content-center justify-content-md-start position-relative">
+                  {/* RERA Badge */}
                   <span
                     className="badge bg-primary"
                     style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
+                      padding: "6px 10px",
+                      fontSize: "12px",
+                      marginRight: "5px",
+                      marginBottom: "5px",
+                      borderRadius: "4px",
                       backgroundColor: "#2067d1",
+                      cursor: "pointer",
                     }}
                     onMouseEnter={() => setShowReraDetails(true)}
+                    onMouseLeave={() => setShowReraDetails(false)}
                   >
                     Rera
                   </span>
+
+                  {/* RERA Details Popup */}
                   {showReraDetails && (
                     <div
                       onMouseEnter={() => setIsReraDetailHovered(true)}
@@ -890,11 +927,12 @@ const sortedFaqs = projectData?.faqs
                         left: 0,
                         zIndex: 1000,
                         backgroundColor: "white",
-                        padding: "10px",
-                        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                        borderRadius: "4px",
-                        minWidth: "300px",
+                        padding: "15px",
+                        boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                        borderRadius: "6px",
+                        minWidth: "350px",
                         maxWidth: "90vw",
+                        overflowX: "auto",
                       }}
                     >
                       <div className="d-flex justify-content-between align-items-center mb-0">
@@ -902,7 +940,7 @@ const sortedFaqs = projectData?.faqs
                           className="m-0"
                           style={{ fontWeight: 700, fontSize: "14px" }}
                         >
-                          Rera Detail
+                          RERA Details
                         </h6>
                         <i
                           className="fa fa-close"
@@ -913,32 +951,31 @@ const sortedFaqs = projectData?.faqs
                           }}
                         />
                       </div>
+
                       <div className="table-responsive">
                         <table className="w-100">
                           <thead>
                             <tr>
                               <th
                                 style={{
-                                  width: "45%",
+                                  width: "40%",
                                   textAlign: "left",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "11px",
+                                  fontSize: "12px",
                                   color: "black",
                                   fontWeight: 500,
                                   border: "none",
                                   backgroundColor: "white",
+                                  padding: "8px",
                                 }}
                               >
                                 Phase
                               </th>
                               <th
                                 style={{
-                                  width: "34%",
+                                  width: "30%",
                                   textAlign: "left",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "11px",
+                                  fontSize: "12px",
+                                  padding: "8px",
                                   color: "black",
                                   fontWeight: 500,
                                   border: "none",
@@ -949,43 +986,76 @@ const sortedFaqs = projectData?.faqs
                               </th>
                               <th
                                 style={{
-                                  width: "40%",
+                                  width: "30%",
                                   textAlign: "left",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "11px",
+                                  fontSize: "12px",
+                                  padding: "8px",
                                   color: "black",
                                   fontWeight: 500,
                                   border: "none",
                                   backgroundColor: "white",
                                 }}
                               >
-                                Rera Number
+                                RERA Number
                               </th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <td
-                                style={{ fontSize: "11px", padding: "8px 0" }}
-                              ></td>
-                              <td
-                                style={{ fontSize: "11px", padding: "8px 0" }}
-                              >
-                                {projectData?.status}
-                              </td>
-                              <td
-                                style={{ fontSize: "11px", padding: "8px 0" }}
-                              >
-                                {projectData?.reraLink}
-                              </td>
-                            </tr>
+                            {reraDetails.length > 0 ? (
+                              reraDetails.map((item, index) => (
+                                <tr key={index}>
+                                  <td
+                                    style={{
+                                      fontSize: "12px",
+                                      padding: "10px",
+                                      fontWeight: "500",
+                                    }}
+                                  >
+                                    {item.phase?.join(", ") || "-"}
+                                  </td>
+                                  <td
+                                    style={{
+                                      fontSize: "12px",
+                                      padding: "10px",
+                                    }}
+                                  >
+                                    {item.status || "-"}
+                                  </td>
+                                  <td
+                                    style={{
+                                      fontSize: "12px",
+                                      padding: "10px",
+                                      fontWeight: "600",
+                                    }}
+                                  >
+                                    {item.reraNumber || "-"}
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td
+                                  colSpan="3"
+                                  style={{
+                                    textAlign: "center",
+                                    padding: "10px",
+                                    fontSize: "12px",
+                                    fontWeight: "500",
+                                    color: "gray",
+                                  }}
+                                >
+                                  No RERA data available
+                                </td>
+                              </tr>
+                            )}
                           </tbody>
                         </table>
                       </div>
                     </div>
                   )}
-                  <span
+
+                        {/* Additional Badges */}
+                        <span
                     className="badge text-dark"
                     style={{
                       padding: "4px 8px",
@@ -1266,8 +1336,14 @@ const sortedFaqs = projectData?.faqs
                               }}
                             >
                               {projectData?.launchDate
+                                ?.toLowerCase()
+                                .includes("coming")
+                                ? "Coming Soon"
+                                : projectData?.launchDate
                                 ? new Date(
-                                    projectData.launchDate
+                                    isNaN(projectData.launchDate)
+                                      ? projectData.launchDate
+                                      : Number(projectData.launchDate)
                                   ).toLocaleDateString("en-US", {
                                     year: "numeric",
                                     month: "long",
@@ -1309,9 +1385,13 @@ const sortedFaqs = projectData?.faqs
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.possessionDate
+                              {projectData?.possessionDate === "Coming, Soon"
+                                ? "Coming Soon"
+                                : projectData?.possessionDate
                                 ? new Date(
-                                    projectData.possessionDate
+                                    isNaN(projectData.possessionDate)
+                                      ? projectData.possessionDate
+                                      : Number(projectData.possessionDate)
                                   ).toLocaleDateString("en-US", {
                                     year: "numeric",
                                     month: "long",
@@ -1512,6 +1592,7 @@ const sortedFaqs = projectData?.faqs
                                   (value, index, self) =>
                                     self.indexOf(value) === index
                                 ) // Remove duplicates
+                                ?.sort((a, b) => parseInt(a) - parseInt(b)) // Sort numerically based on the number
                                 ?.join(", ")}
                             </p>
                           </div>
@@ -1603,7 +1684,7 @@ const sortedFaqs = projectData?.faqs
                               name="dial_code"
                               className="form-select"
                               style={{ maxWidth: "100px" }}
-                             // value={formData.dial_code}
+                              // value={formData.dial_code}
                               onChange={handleChange}
                             >
                               <option value="91">+91</option>
@@ -1777,16 +1858,6 @@ const sortedFaqs = projectData?.faqs
                           padding: "20px",
                         }}
                       >
-                        <p
-                          className="text-muted mb-4"
-                          style={{
-                            fontSize:
-                              window.innerWidth <= 768 ? "12px" : "16px",
-                          }}
-                        >
-                          {projectData?.whyPara ||
-                            "This is the reason why you should choose this project. It offers excellent amenities and prime location."}
-                        </p>
                         <div className="row">
                           <div className="col-md-6">
                             <div className="row g-1">
@@ -1794,30 +1865,30 @@ const sortedFaqs = projectData?.faqs
                               {projectData?.images &&
                                 projectData?.images[0] && (
                                   <div className="col-12 mb-1">
-                                    <a
+                                    {/* <a
                                       href={projectData?.images[0].imageUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="d-block"
-                                    >
-                                      <img
-                                        alt={
-                                          projectData?.images[0].caption ||
-                                          "Project Image 1"
-                                        }
-                                        src={projectData?.images[0].imageUrl}
-                                        className="img-fluid rounded w-100"
-                                        style={{
-                                          height:
-                                            window.innerWidth <= 768
-                                              ? "200px"
-                                              : "185px",
-                                          objectFit: "cover",
-                                          borderRadius: "16px",
-                                        }}
-                                        fetchpriority="high"
-                                      />
-                                    </a>
+                                    > */}
+                                    <img
+                                      alt={
+                                        projectData?.images[0].caption ||
+                                        "Project Image 1"
+                                      }
+                                      src={projectData?.images[0].imageUrl}
+                                      className="img-fluid rounded w-100"
+                                      style={{
+                                        height:
+                                          window.innerWidth <= 768
+                                            ? "200px"
+                                            : "185px",
+                                        objectFit: "cover",
+                                        borderRadius: "16px",
+                                      }}
+                                      fetchpriority="high"
+                                    />
+                                    {/* </a> */}
                                   </div>
                                 )}
 
@@ -2124,8 +2195,14 @@ const sortedFaqs = projectData?.faqs
                       style={{
                         fontSize: window.innerWidth <= 768 ? "12px" : "16px",
                       }}
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(
+                          projectData?.floorPara ||
+                            "<p>Answer not available.</p>"
+                        ),
+                      }}
                     >
-                      {projectData?.floorPara}
+                      {/* {projectData?.floorPara} */}
                     </p>
                     <div className="d-flex gap-2 mb-3">
                       <button
@@ -2322,7 +2399,7 @@ const sortedFaqs = projectData?.faqs
                                         window.innerWidth <= 768
                                           ? "12px"
                                           : "14px",
-                                          margin:"0px",
+                                      margin: "0px",
                                     }}
                                   >
                                     Download Floor Plan
@@ -2371,7 +2448,13 @@ const sortedFaqs = projectData?.faqs
                           }}
                         >
                           <img
-                            src={selectedImage}
+                            src={
+                              selectedImage &&
+                              selectedImage !== BASE_URL &&
+                              selectedImage !== ""
+                                ? selectedImage
+                                : "/images/Floor.png" // Fallback image when no image is available
+                            }
                             alt="Floor Plan"
                             style={{
                               width: "100%",
@@ -2597,6 +2680,7 @@ const sortedFaqs = projectData?.faqs
                   color: "#ffffff",
                   borderTop: "1px solid #686060",
                   borderRadius: "8px",
+                  textAlign: "center",
                 }}
               >
                 Get Free Consultation for this property. Call us at:{" "}
@@ -3028,9 +3112,7 @@ const sortedFaqs = projectData?.faqs
                             className="img-fluid"
                             id="zoom-image"
                             alt={`${projectData?.name} Site Plan`}
-                            src={
-                              imageSrc
-                            }
+                            src={imageSrc}
                             fetchpriority="high"
                             style={{
                               transform: "scale(1) translate(0px, 0px)",
@@ -3267,11 +3349,18 @@ const sortedFaqs = projectData?.faqs
                         {developerDetails?.about && (
                           <>
                             <div
-                              style={{ padding: "0px 10px" }}
                               dangerouslySetInnerHTML={{
                                 __html:
                                   expandedIndex === "about"
                                     ? developerDetails.about
+                                        .replace(
+                                          /<ul>/g,
+                                          '<ul style="padding-left: 20px; margin-top: 10px;">'
+                                        )
+                                        .replace(
+                                          /<li>/g,
+                                          '<li style="font-size: 1em; color: #666;">'
+                                        ) // Adds inline styles to <li>
                                     : developerDetails.about.substring(0, 150) +
                                       "...",
                               }}
@@ -3348,57 +3437,71 @@ const sortedFaqs = projectData?.faqs
                 </div>
               </div>
               {/* Frequently Asked Questions */}
-              <div className="mb-4" style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }} id="FAQs">
-    <div className="p-0 pb-2">
-      <h4
-        className="mb-3 py-2 fw-bold text-white ps-3"
-        style={{
-          fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-          backgroundColor: "#2067d1",
-          borderRadius: "4px 4px 0 0",
-        }}
-      >
-        Frequently Asked Questions (FAQs)
-      </h4>
-      <div className="px-3">
-        {sortedFaqs?.map((faq, index) => (
-          <div key={index} className="mb-3">
-            <div
-              className="d-flex justify-content-between align-items-center p-3"
-              style={{
-                backgroundColor: expandedIndex === index ? "#f8f9fa" : "white",
-                cursor: "pointer",
-                border: "1px solid #dee2e6",
-                borderRadius: "4px",
-                fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-              }}
-              onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-            >
-              <span className="fw-bold">{faq.text}</span> {/* Display cleaned question */}
-              <span>{expandedIndex === index ? "−" : "+"}</span>
-            </div>
-            {expandedIndex === index && (
               <div
-                className="p-3"
-                style={{
-                  border: "1px solid #dee2e6",
-                  borderTop: "none",
-                  borderRadius: "0 0 4px 4px",
-                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                }}
+                className="mb-4"
+                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
+                id="FAQs"
               >
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(faq.answer || "<p>Answer not available.</p>"),
-                  }}
-                />
+                <div className="p-0 pb-2">
+                  <h4
+                    className="mb-3 py-2 fw-bold text-white ps-3"
+                    style={{
+                      fontSize: window.innerWidth <= 768 ? "14px" : "16px",
+                      backgroundColor: "#2067d1",
+                      borderRadius: "4px 4px 0 0",
+                    }}
+                  >
+                    Frequently Asked Questions (FAQs)
+                  </h4>
+                  <div className="px-3">
+                    {sortedFaqs?.map((faq, index) => (
+                      <div key={index} className="mb-3">
+                        <div
+                          className="d-flex justify-content-between align-items-center p-2"
+                          style={{
+                            backgroundColor:
+                              expandedIndex === index ? "#f8f9fa" : "white",
+                            cursor: "pointer",
+                            border: "1px solid #dee2e6",
+                            borderRadius: "4px",
+                            fontSize:
+                              window.innerWidth <= 768 ? "12px" : "13px",
+                          }}
+                          onClick={() =>
+                            setExpandedIndex(
+                              expandedIndex === index ? null : index
+                            )
+                          }
+                        >
+                          <span className="fw-bold">{faq.text}</span>{" "}
+                          {/* Display cleaned question */}
+                          <span>{expandedIndex === index ? "−" : "+"}</span>
+                        </div>
+                        {expandedIndex === index && (
+                          <div
+                            className="p-3"
+                            style={{
+                              border: "1px solid #dee2e6",
+                              borderTop: "none",
+                              borderRadius: "0 0 4px 4px",
+                              fontSize:
+                                window.innerWidth <= 768 ? "12px" : "13px",
+                            }}
+                          >
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(
+                                  faq.answer || "<p>Answer not available.</p>"
+                                ),
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
               {/* Similar Projects */}
               <div
                 className="mb-4"
@@ -3422,7 +3525,7 @@ const sortedFaqs = projectData?.faqs
                         <Carousel
                           containerClass="carousel-container"
                           itemClass="carousel-item-padding-40-px"
-                          style={{ width: "60%", margin: "0 auto" }}
+                          style={{ width: "100%", margin: "0 auto" }}
                           focusOnSelect={false}
                           responsive={{
                             desktop: {
@@ -3650,7 +3753,117 @@ const sortedFaqs = projectData?.faqs
                               <option value="91">+91</option>
                               <option value="61">+61</option>
                               <option value="852">+852</option>
+                              <option value="968">+968</option>
+                              <option value="974">+974</option>
+                              <option value="65">+65</option>
+                              <option value="971">+971</option>
+                              <option value="44">+44</option>
                               <option value="1">+1</option>
+                              <option value="27">+27</option>
+                              <option value="60">+60</option>
+                              <option value="64">+64</option>
+                              <option value="66">+66</option>
+                              <option value="966">+966</option>
+                              <option value="31">+31</option>
+                              <option value="973">+973</option>
+                              <option value="54">+54</option>
+                              <option value="43">+43</option>
+                              <option value="880">+880</option>
+                              <option value="32">+32</option>
+                              <option value="55">+55</option>
+                              <option value="86">+86</option>
+                              <option value="385">+385</option>
+                              <option value="42">+42</option>
+                              <option value="45">+45</option>
+                              <option value="1809">+1809</option>
+                              <option value="20">+20</option>
+                              <option value="358">+358</option>
+                              <option value="679">+679</option>
+                              <option value="33">+33</option>
+                              <option value="49">+49</option>
+                              <option value="30">+30</option>
+                              <option value="592">+592</option>
+                              <option value="36">+36</option>
+                              <option value="62">+62</option>
+                              <option value="353">+353</option>
+                              <option value="972">+972</option>
+                              <option value="39">+39</option>
+                              <option value="81">+81</option>
+                              <option value="962">+962</option>
+                              <option value="82">+82</option>
+                              <option value="965">+965</option>
+                              <option value="853">+853</option>
+                              <option value="52">+52</option>
+                              <option value="212">+212</option>
+                              <option value="47">+47</option>
+                              <option value="48">+48</option>
+                              <option value="351">+351</option>
+                              <option value="40">+40</option>
+                              <option value="7">+7</option>
+                              <option value="34">+34</option>
+                              <option value="46">+46</option>
+                              <option value="41">+41</option>
+                              <option value="1868">+1868</option>
+                              <option value="216">+216</option>
+                              <option value="90">+90</option>
+                              <option value="84">+84</option>
+                              <option value="91">+91</option>
+                              <option value="61">+61</option>
+                              <option value="852">+852</option>
+                              <option value="968">+968</option>
+                              <option value="974">+974</option>
+                              <option value="65">+65</option>
+                              <option value="971">+971</option>
+                              <option value="44">+44</option>
+                              <option value="1">+1</option>
+                              <option value="27">+27</option>
+                              <option value="60">+60</option>
+                              <option value="64">+64</option>
+                              <option value="66">+66</option>
+                              <option value="966">+966</option>
+                              <option value="31">+31</option>
+                              <option value="973">+973</option>
+                              <option value="54">+54</option>
+                              <option value="43">+43</option>
+                              <option value="880">+880</option>
+                              <option value="32">+32</option>
+                              <option value="55">+55</option>
+                              <option value="86">+86</option>
+                              <option value="385">+385</option>
+                              <option value="42">+42</option>
+                              <option value="45">+45</option>
+                              <option value="1809">+1809</option>
+                              <option value="20">+20</option>
+                              <option value="358">+358</option>
+                              <option value="679">+679</option>
+                              <option value="33">+33</option>
+                              <option value="49">+49</option>
+                              <option value="30">+30</option>
+                              <option value="592">+592</option>
+                              <option value="36">+36</option>
+                              <option value="62">+62</option>
+                              <option value="353">+353</option>
+                              <option value="972">+972</option>
+                              <option value="39">+39</option>
+                              <option value="81">+81</option>
+                              <option value="962">+962</option>
+                              <option value="82">+82</option>
+                              <option value="965">+965</option>
+                              <option value="853">+853</option>
+                              <option value="52">+52</option>
+                              <option value="212">+212</option>
+                              <option value="47">+47</option>
+                              <option value="48">+48</option>
+                              <option value="351">+351</option>
+                              <option value="40">+40</option>
+                              <option value="7">+7</option>
+                              <option value="34">+34</option>
+                              <option value="46">+46</option>
+                              <option value="41">+41</option>
+                              <option value="1868">+1868</option>
+                              <option value="216">+216</option>
+                              <option value="90">+90</option>
+                              <option value="84">+84</option>
                             </select>
                             <input
                               name="usermobile"
@@ -3674,10 +3887,20 @@ const sortedFaqs = projectData?.faqs
                             onChange={handleChange}
                           >
                             <option value="">Select</option>
-                            <option value="2bhk">2 BHK</option>
-                            <option value="3bhk">3 BHK</option>
+                            {console.log(
+                              "test check ",
+                              projectData?.configurations
+                            )}
+                            {projectData?.configurations?.map(
+                              (config, index) => (
+                                <option key={index} value={config}>
+                                  {config}
+                                </option>
+                              )
+                            )}
                           </select>
                         </div>
+
                         <div className="mb-3">
                           <textarea
                             name="usermsg"
@@ -3686,6 +3909,7 @@ const sortedFaqs = projectData?.faqs
                             rows="3"
                             value={formData.usermsg}
                             onChange={handleChange}
+                            style={{ resize: "none", overflowY: "auto" }}
                           ></textarea>
                         </div>
                         {error && (

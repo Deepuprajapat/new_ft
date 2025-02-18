@@ -129,6 +129,7 @@ const MailSection = () => {
                   placeholder="Message"
                   value={formData.message}
                   onChange={handleChange}
+                  style={{ resize: "none", overflowY: "auto" }}
                 ></textarea>
 
                 {error && (
@@ -137,7 +138,7 @@ const MailSection = () => {
                   </div>
                 )}
 
-                <button type="submit" className="theme-btn" style={{margintop:"10px"}}>
+                <button type="submit" className="theme-btn" style={{margintop:"20px!important"}}>
                   Send 
                 </button>
               </div>

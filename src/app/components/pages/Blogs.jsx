@@ -124,7 +124,7 @@ const Blogs = () => {
                 className="row d-flex"
                 style={{ justifyContent: "start", alignItems: "flex-start" }}
               >
-                <div className="col-md-8 blog-container">
+                <div className="col-md-8 blog-container" style={{ padding: "25px" }}>
                   <div className="blog-content">
                     {blogData ? (
                       <>
@@ -150,17 +150,17 @@ const Blogs = () => {
                           />
                         </div>
                         <div
-  className="content"
-  style={{
-    marginTop: "10px",
-    fontFamily: "Arial, sans-serif",
-    lineHeight: "1.6",
-    fontSize: "16px",
-    color: "#333",
-    wordWrap: "break-word",
-  }}
-  dangerouslySetInnerHTML={{
-    __html: `
+                          className="content"
+                          style={{
+                            marginTop: "10px",
+                            fontFamily: "Arial, sans-serif",
+                            lineHeight: "1.6",
+                            fontSize: "16px",
+                            color: "#333",
+                            wordWrap: "break-word",
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: `
       <style>
         .content p {
           margin-bottom: 15px;
@@ -207,10 +207,8 @@ const Blogs = () => {
       </style>
       ${blogData.description}
     `,
-  }}
-></div>
-
-
+                          }}
+                        ></div>
                       </>
                     ) : (
                       <p>Loading blog content...</p>
@@ -313,7 +311,7 @@ const Blogs = () => {
                     rows="6"
                     value={formData.message}
                     onChange={handleChange}
-                    style={{ marginBottom: "19px" }}
+                    style={{ marginBottom: "19px" , resize: "none", overflowY: "auto"}}
                     required
                   ></textarea>
                   {error && <p style={{ color: "red" }}>{error}</p>}
@@ -325,6 +323,12 @@ const Blogs = () => {
                       color: "white",
                       padding: "11px 18px",
                       fontWeight: 700,
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                      fontSize: "16px",
+                      width: "auto",
+                      maxWidth: "100%",
                     }}
                   >
                     Submit

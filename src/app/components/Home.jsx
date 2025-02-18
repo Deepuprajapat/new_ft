@@ -1,5 +1,5 @@
 // src/components/Head.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../components/styles/css/style.css";
 import "../components/styles/css/Head.css";
@@ -11,13 +11,15 @@ import Testimonial from "./pages/Testimonial";
 import ProjectCard from "./pages/ProjectCard";
 import BlogSection from "./pages/BlogSection";
 import { getAllProject } from "../apis/api";
-import { sliderSettings } from "../../utils/common";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
+import "swiper/css/navigation"; // Import styles
 import "./Home.css";
-// import withSafeLinks from "../../utils/rel";
 import SearchBar from "./pages/SearchBar"; // Import the SearchBar component
 import { Helmet } from "react-helmet";
+import Loading from "./Loader";
+
 const Head = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +33,32 @@ const Head = () => {
     };
     fetchProjects();
   }, []);
+
+  const swiperRef = useRef(null);
+
+  useEffect(() => {
+    if (swiperRef.current) {
+      swiperRef.current.swiper.autoplay.start(); // Ensure autoplay starts
+    }
+  }, []);
+
+  const sliderSettings = {
+    modules: [Navigation, Autoplay],
+    navigation: true,
+    autoplay: {
+      delay: 4000,
+      disableOnInteraction: false,
+    },
+    loop: true,
+    spaceBetween: 10, // Reduce space to avoid layout issues
+    slidesPerView: 1, // Default to 1 slide per view for mobile
+    breakpoints: {
+      480: { slidesPerView: 1, spaceBetween: 10 }, // Small screens
+      600: { slidesPerView: 2, spaceBetween: 15 }, // Tablet portrait
+      768: { slidesPerView: 2, spaceBetween: 20 }, // Tablet landscape
+      1024: { slidesPerView: 3, spaceBetween: 30 }, // Desktop
+    },
+  };
 
   return (
     <div>
@@ -65,7 +93,16 @@ const Head = () => {
                 <div className="main-con">
                   <div className="container">
                     <div className="headline" style={{ display: "contents" }}>
-                      <h1 className="h3" style={{ marginTop: "26px" }}>
+                      <h1
+                        className="h3"
+                        style={{
+                          marginTop: "26px",
+                          fontFamily: "Lato, sans-serif",
+                          fontSize: "32px",
+                          fontWeight: 600,
+                          color: "#000",
+                        }}
+                      >
                         Top Projects
                       </h1>
                       <p className="head_p" style={{ marginLeft: "45px" }}>
@@ -73,27 +110,33 @@ const Head = () => {
                       </p>
                     </div>
                     <div className="swiper-container">
-                      <Swiper {...sliderSettings} >
+                      <Swiper
+                        ref={swiperRef}
+                        {...sliderSettings}
+                        modules={[Navigation, Autoplay]} // Ensure modules are passed here too
+                        navigation={{
+                          nextEl: ".swiper-button-next",
+                          prevEl: ".swiper-button-prev",
+                        }}
+                        autoplay={{ delay: 5000, disableOnInteraction: false }} // Directly define autoplay
+                      >
                         {loading ? (
-                          <div className="loader-container">
-                            <div className="loader">Loading...</div>
-                          </div>
+                          <Loading isFullScreen={false} />
                         ) : (
-                          <div className="listing-home listing-page row">
-                            {projects?.map((project) => (
-                              <SwiperSlide key={project.id}>
-                                <ProjectCard project={project} />
-                              </SwiperSlide>
-                            ))}
-                          </div>
+                          projects?.map((project) => (
+                            <SwiperSlide key={project.id}>
+                              <ProjectCard project={project} />
+                            </SwiperSlide>
+                          ))
                         )}
                       </Swiper>
-                      {/* Add custom navigation buttons */}
-                      <div className="swiper-button-prev">
-                        <i class="fas fa-chevron-left"></i>
+
+                      {/* Custom navigation buttons */}
+                      <div className="swiper-button-prev custom-prev">
+                        <i className="fas fa-chevron-left"></i>
                       </div>
-                      <div className="swiper-button-next">
-                        <i class="fas fa-chevron-right"></i>
+                      <div className="swiper-button-next custom-next">
+                        <i className="fas fa-chevron-right"></i>
                       </div>
                     </div>
                   </div>
@@ -104,12 +147,12 @@ const Head = () => {
           </div>
         </div>
 
-        <div className="about-us">
+        <div className="about-us" style={{ marginTop: "20px" }}>
           <div className="container">
             <AboutUs />
           </div>
         </div>
-        <div className="weWork">
+        <div className="weWork" style={{ marginTop: "20px" }}>
           <div className="container">
             <HowWeWork />
           </div>
@@ -141,7 +184,7 @@ const Head = () => {
           </div>
         </div>
 
-        <div className="home-blog">
+        <div className="home-blog" style={{ marginTop: "40px" }}>
           <div className="container">
             <div className="headline">
               <h3 className="h3">Our Associations</h3>
@@ -157,7 +200,7 @@ const Head = () => {
             )}
           </div>
         </div>
-        <div className="mail-section">
+        <div className="mail-section" style={{ marginTop: "20px" }}>
           <MailSection />
         </div>
       </section>

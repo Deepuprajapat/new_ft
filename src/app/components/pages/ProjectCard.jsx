@@ -7,8 +7,6 @@ const ProjectCard = ({ project }) => {
   const defaultImage = "http://localhost:3000/img/building_soon.jpg"; // Placeholder image
   const navigate = useNavigate();
   const handleMoreDetails = (url) => {
-    // console.log("tetsing url"+ this.project.name);
-    // Open the project details in a new tab
     window.open(
       `/project/${url.toLowerCase().replace(/\s+/g, "-")}`,
       "_blank",
@@ -22,14 +20,11 @@ const ProjectCard = ({ project }) => {
   const minSize = floorplanSizes.length ? Math.min(...floorplanSizes) : null;
   const maxSize = floorplanSizes.length ? Math.max(...floorplanSizes) : null;
 
-  // Find the minimum price
-  const minPrice = project.floorplans?.length
-    ? Math.min(
-        ...project.floorplans
-          .filter((floorplan) => floorplan.price > 1.5) // Exclude prices <= 1.5
-          .map((floorplan) => floorplan.price)
-      )
-    : null;
+  const validPrices = project.floorplans
+    ?.filter((floorplan) => floorplan.price && floorplan.price > 1.5) // Exclude falsy values (0, "", null) and <= 1.5
+    .map((floorplan) => floorplan.price);
+
+  const minPrice = validPrices?.length ? Math.min(...validPrices) : null;
 
   return (
     <div className="card-im">
@@ -114,7 +109,7 @@ const ProjectCard = ({ project }) => {
               ? minPrice >= 10000000
                 ? parseFloat((minPrice / 10000000).toFixed(2)) + " Cr"
                 : parseFloat((minPrice / 100000).toFixed(2)) + " Lakh"
-              : "N/A"}
+              : " "}
           </b>
         </p>
 

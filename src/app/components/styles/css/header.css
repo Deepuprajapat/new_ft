@@ -182,3 +182,68 @@ button a {
   margin-left: 28px !important;
 }
 
+.custom-navbar {
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  z-index: 1000;
+}
+
+.custom-navbar.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95); /* Slight transparency */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logo-img {
+  max-height: 60px;
+}
+
+/* Search Box */
+.search-form-container {
+  position: relative;
+}
+
+.search-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.search-overlay {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.search-input {
+  width: 200px;
+  padding: 5px;
+}
+
+/* Phone Button */
+.phoneButton {
+  background-color: #007bff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.phoneButton a {
+  color: white;
+  text-decoration: none;
+}
+
+.phoneButton:hover {
+  background-color: #0056b3;
+}

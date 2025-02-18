@@ -287,6 +287,7 @@ const ContactUs = () => {
                                 rows="3"
                                 placeholder="Message"
                                 value={formData.message}
+                                style={{ resize: "none", overflowY: "auto" }}
                                 onChange={handleChange}
                               ></textarea>
 

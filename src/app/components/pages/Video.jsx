@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { getAllProject } from "../../apis/api"; // Assuming this is the API file
 import "../styles/css/video.css";
 import { Helmet } from "react-helmet";
+import Loading from "../Loader"; 
+
+
+
 const Video = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true); // New loading state
@@ -60,18 +64,9 @@ const Video = () => {
             <div className="listing-home listing-page">
               <div className="listing-slide row">
                 {loading ? (
-                  <p
-                    style={{
-                      fontSize: "24px",
-                      fontWeight: "bold",
-                      alignItems: "center",
-                      display: "flex",
-                      justifyContent: "center",
-                      height: "20vh",
-                    }}
-                  >
-                    Loading...
-                  </p>
+                  
+                  <Loading isFullScreen={false} />
+                
                 ) : projects.length > 0 ? (
                   projects.map((project) => {
                     const floorplanSizes =

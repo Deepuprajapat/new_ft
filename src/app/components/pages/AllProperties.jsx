@@ -112,6 +112,12 @@ const PropertyListing = () => {
   const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images";
 
   return (
+    <>
+
+<title>Top Property in Noida</title>
+    <meta content="Invest mango have a lot of projects in Noida, Greater Noida, or Noida Extension. All projects are affordable or luxury." name="description"/>
+    <link rel="canonical" href="https://www.investmango.com/property.php"/>
+   <link rel="shortcut icon" type="image/icon" href="https://www.investmango.com/favicon.ico" />
     <section className="main-body" style={{ marginTop: "5px" }}>
       <div className="main-con">
         <div className="container">
@@ -185,7 +191,7 @@ const PropertyListing = () => {
                     <option value="">All Localities</option>
                     {localities.map((city) => (
                       <option key={city.id} value={city.id}>
-                        {city.name}
+                      {city.name.toUpperCase()} {/* Convert to uppercase */}
                       </option>
                     ))}
                   </select>
@@ -472,6 +478,7 @@ const PropertyListing = () => {
         </div>
       </div>
     </section>
+    </>
   );
 };
 

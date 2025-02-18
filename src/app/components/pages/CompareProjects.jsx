@@ -229,17 +229,17 @@ const CompareProjects = () => {
       unit: "pt", // Points for precise layout
       format: "a3", // Larger page size (adjust as needed)
     });
-  
+
     // Title
     doc.setFontSize(16);
     doc.text("Compared Projects", 40, 40);
-  
+
     // Dynamic table headers for all compared projects
     const tableHeaders = [
       "Details",
       ...comparedProjects.map((project) => project.name),
     ];
-  
+
     // Fields to be displayed in the table
     const fields = [
       "Location",
@@ -255,14 +255,14 @@ const CompareProjects = () => {
       "Open Area",
       "Construction Type",
     ];
-  
+
     // Generate table rows dynamically
     const tableRows = fields.map((field) => {
       const row = [field];
-  
+
       comparedProjects.forEach((project) => {
         let value = "";
-  
+
         if (field === "Size/Price") {
           value =
             project.floorplans?.length > 0
@@ -278,22 +278,22 @@ const CompareProjects = () => {
         } else {
           value = renderProjectData(project, field) || "No Data Available";
         }
-  
+
         // Wrap text for long content
         const wrappedText = doc.splitTextToSize(value, 150); // Split text to fit column width
         row.push(wrappedText);
       });
-  
+
       return row;
     });
-  
+
     // Define dynamic font size and column widths based on device
     let fontSize = 8; // Default font size for desktop
     let columnWidths = {
       0: { cellWidth: 120 }, // 'Details' column width
       1: { cellWidth: "wrap" }, // Dynamic width for project columns
     };
-  
+
     // Adjust font size and column width based on screen size (for responsiveness)
     const windowWidth = window.innerWidth;
     if (windowWidth <= 576) {
@@ -311,7 +311,7 @@ const CompareProjects = () => {
         1: { cellWidth: "wrap" },
       };
     }
-  
+
     // Create the table with dynamic column handling
     doc.autoTable({
       head: [tableHeaders],
@@ -331,11 +331,10 @@ const CompareProjects = () => {
         doc.text("Compared Projects", data.settings.margin.left, 40);
       },
     });
-  
+
     // Save PDF
     doc.save("Compared_Projects.pdf");
   };
-  
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -365,18 +364,27 @@ const CompareProjects = () => {
             <select
               key={index}
               className="custom-select form-select mx-2"
-              style={{ width:  window.innerWidth <= 768 ? "100%" :"200px" , }}
+              style={{ width: window.innerWidth <= 768 ? "100%" : "200px" }}
               value={selectedProjects[index]}
               onChange={(e) => handleSelect(index, e.target.value)}
             >
               <option value="">Select</option>
               {projects
                 .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically by project name
-                .map((project) => (
-                  <option key={project.id} value={project.id}>
-                    {project.name}
-                  </option>
-                ))}
+                .map((project) => {
+                  // Convert to title case (each word's first letter uppercase, rest lowercase)
+                  const formattedName = project.name
+                    .toLowerCase()
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ");
+
+                  return (
+                    <option key={project.id} value={project.id}>
+                      {formattedName}
+                    </option>
+                  );
+                })}
             </select>
           ))}
 
@@ -387,8 +395,7 @@ const CompareProjects = () => {
               backgroundColor: "#2067d1",
               borderColor: "#2067d1",
               color: "#fff",
-              width: 
-              window.innerWidth <= 768 ? "100%" :"auto" ,
+              width: window.innerWidth <= 768 ? "100%" : "auto",
             }}
           >
             Compare Now
@@ -423,42 +430,42 @@ const CompareProjects = () => {
 
         {comparedProjects.length > 0 && (
           <div className="table-responsive">
-          <table className="table table-bordered" style={{ width: "100%" }}>
-            <thead>
-              <tr>
-                <th>Details</th>
-                {comparedProjects.map((project) => (
-                  <th key={project.id}>{project.name}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                "Image",
-                "Location",
-                "Total Area",
-                "No of Unit",
-                "Possession Date",
-                "Size/Price",
-                "Per Sq.ft. Rate",
-                "Property Type",
-                "No. of Towers",
-                "Total Floors",
-                "Per Tower Lifts",
-                "Open Area",
-                "Construction Type",
-              ].map((field) => (
-                <tr key={field}>
-                  <td>{field}</td>
+            <table className="table table-bordered" style={{ width: "100%" }}>
+              <thead>
+                <tr>
+                  <th>Details</th>
                   {comparedProjects.map((project) => (
-                    <td key={project.id}>
-                      {renderProjectData(project, field)}
-                    </td>
+                    <th key={project.id}>{project.name}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {[
+                  "Image",
+                  "Location",
+                  "Total Area",
+                  "No of Unit",
+                  "Possession Date",
+                  "Size/Price",
+                  "Per Sq.ft. Rate",
+                  "Property Type",
+                  "No. of Towers",
+                  "Total Floors",
+                  "Per Tower Lifts",
+                  "Open Area",
+                  "Construction Type",
+                ].map((field) => (
+                  <tr key={field}>
+                    <td>{field}</td>
+                    {comparedProjects.map((project) => (
+                      <td key={project.id}>
+                        {renderProjectData(project, field)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

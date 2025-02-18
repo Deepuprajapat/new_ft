@@ -103,11 +103,11 @@
   text-decoration: none;
 } */
 
-.project-title {
-  margin-top: 50px; /* Control spacing from the header */
-  margin-bottom: 10px; /* Control spacing below the title */
-  font-size: 2em; /* Adjust size for better visual hierarchy */
-}
+/* .project-title {
+  margin-top: 50px; 
+  margin-bottom: 10px; 
+  font-size: 2em; 
+} */
 
 /* .styled-link {
   text-decoration: none;

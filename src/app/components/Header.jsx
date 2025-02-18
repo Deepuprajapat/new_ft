@@ -1,66 +1,88 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../components/styles/css/header.css";
+import { useNavigate } from "react-router-dom";
+import debounce from "lodash.debounce";
+import { getAllProject } from "../apis/api";
+// import { getAllProject } from "../../apis/api";
 import logo from "../assets/img/logo.jpg";
 import { Button } from "@mui/material";
-import { currentUser } from "../apis/api";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import { Container, Navbar, NavbarBrand } from "react-bootstrap";
+import { Container, Navbar } from "react-bootstrap";
 import navItems from "../../utils/navbar";
 import Form from "react-bootstrap/Form";
 import { FaSearch, FaPhoneAlt } from "react-icons/fa";
+import { useLocation } from "react-router-dom"; // Import useLocation
 
 const Header = () => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const [modal, setModal] = useState(false);
-  const [username, setUserName] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [projectSuggestions, setProjectSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const openModal = () => {
-    setModal(true); // Open the modal
-  };
 
-  const closeModal = () => {
-    setModal(false); // Close the modal
-  };
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    // console.log("token::::", token);
-    if (token) {
-      currentUser(token)
-        .then((response) => {
-          // console.log("responce check neeshu",JSON.stringify(response.data.firstName));
-          if (response?.data?.firstName && response?.data?.lastName) {
-            const fullName = `${response.data.firstName} ${response.data.lastName}`;
-            setUserName(fullName);
-            localStorage.setItem("username", fullName);
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to fetch user details:", error);
-        });
-    }
+   // Sticky Navbar on Scroll
+   useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleSearchClick = () => {
-    setShowSearch(!showSearch);
+  // Debounced API call for searching projects
+  const debouncedSearch = debounce(async (query) => {
+    if (query.trim() === "") {
+      setProjectSuggestions([]);
+      return;
+    }
+    const response = await getAllProject({ name: query });
+    setProjectSuggestions(response.content || []);
+    setShowSuggestions(true);
+  }, 500);
+
+  // Handle Search Change
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    debouncedSearch(value);
   };
 
-  const handleSearchSubmit = (event) => {
-    event.preventDefault();
-    const searchTerm = event.target.elements.search.value;
-    if (searchTerm) {
-      window.location.href = `/allProjects?search=${encodeURIComponent(
-        searchTerm
-      )}`;
+  // Handle Search Submission
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    let queryParams = [];
+
+    if (searchQuery) {
+      const matchedProject = projectSuggestions.find(
+        (project) => project.name.toLowerCase() === searchQuery.toLowerCase()
+      );
+      if (matchedProject) {
+        navigate(`/project/${matchedProject.url}`);
+        return;
+      }
+      queryParams.push(`search=${encodeURIComponent(searchQuery)}`);
     }
+
+    if (queryParams.length > 0) {
+      navigate(`/allProjects?${queryParams.join("&")}`);
+    }
+    setShowSearch(false); // Hide search input after navigation
   };
 
   useEffect(() => {
     const handleScroll = () => {
       const navbarCollapse = document.querySelector(".navbar-collapse");
-      if (window.scrollY > 0) {
+      if (navbarCollapse) {
         navbarCollapse.classList.remove("show");
       }
     };
@@ -69,15 +91,20 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const toggleSearch = () => {
-    setIsSearchVisible(!isSearchVisible);
+  // Toggle Search Visibility
+  const handleSearchClick = () => {
+    setShowSearch((prev) => !prev);
   };
 
+  useEffect(() => {
+    setShowSearch(false); // Hide search input when route changes
+    setSearchQuery(""); // Clear search input
+  }, [location.pathname]);
+  
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar bg="light" expand="lg" className={`custom-navbar ${isSticky ? "sticky" : ""}`}>
       <Container>
         <Navbar.Brand href="https://propertymarvels.in">
-          {" "}
           <img
             src={logo}
             alt="Invest Mango"
@@ -87,7 +114,7 @@ const Header = () => {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto">
+          <Nav className="ms-auto" >
             {navItems.map((item, index) =>
               item.dropdown ? (
                 <NavDropdown
@@ -100,56 +127,54 @@ const Header = () => {
                       href={subItem.path}
                       key={subIndex}
                       target="_blank"
+                      style={{ paddingLeft: 2, paddingRight: 4 }}
                     >
                       {subItem.label}
                     </NavDropdown.Item>
                   ))}
                 </NavDropdown>
               ) : (
-                <Nav.Link href={item.path} key={index} >
+                <Nav.Link href={item.path} key={index}   style={{ paddingLeft: 2, paddingRight: 4 }}>
                   {item.label}
                 </Nav.Link>
               )
             )}
             <Nav>
+              {/* Search Button */}
               <div className="search-form-container">
-                {/* Search button */}
-                <button
-                  onClick={handleSearchClick}
-                  variant="light"
-                  className="search-button"
-                >
+                <button onClick={handleSearchClick} className="search-button">
                   <FaSearch />
                 </button>
 
-                {/* Conditionally render the search input */}
+                {/* Search Input */}
                 {showSearch && (
                   <div className="search-overlay">
                     <Form className="d-flex" onSubmit={handleSearchSubmit}>
                       <Form.Control
                         type="search"
-                        name="search"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
                         placeholder="Search"
                         className="search-input"
                         aria-label="Search"
                       />
-                      <Button type="submit" variant="primary">
-                      </Button>
                     </Form>
                   </div>
                 )}
               </div>
-              <button className="phoneButton" style={{marginLeft:'50px'}}>
-                <a href="tel:+918595-189-189">
+
+              {/* Phone Buttons */}
+              <button className="phoneButton" style={{ marginLeft: "50px",marginLeft: '169px', display: window.innerWidth <= 1250 ? "none" : "block" ,background: '#2067d1'}}>
+
+                <a href="tel:+918595189189">
                   <FaPhoneAlt /> 8595-189-189
                 </a>
               </button>
-              <button className="phoneButton">
-                <a href="tel:+918595-189-189">
+              <button className="phoneButton" style={{display: window.innerWidth <= 991 ? "none" : "block"  ,background: '#2067d1'}}>
+                <a href="tel:+917428189189">
                   <FaPhoneAlt /> 7428-189-189
                 </a>
               </button>
-              {/* <Login isOpen={modal} onClose={closeModal} /> */}
             </Nav>
           </Nav>
         </Navbar.Collapse>

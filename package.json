@@ -26,6 +26,7 @@
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "lodash.debounce": "^4.0.8",
+    "lottie-react": "^2.4.1",
     "multiselect-react-dropdown": "^2.0.25",
     "my-app": "file:",
     "owl.carousel": "^2.3.4",

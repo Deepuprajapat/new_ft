@@ -442,7 +442,7 @@ export const submitLead = async (formData) => {
   }
 };
 
-export const sendOTP = async (phone, projectName, source, name, email) => {
+export const sendOTP = async (phone, projectName, source, name, usermsg,email) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/leads/save/new/and/send-otp`,
@@ -450,6 +450,7 @@ export const sendOTP = async (phone, projectName, source, name, email) => {
         name: name,
         phone: phone,
         email: email,
+        message:usermsg,
         projectName: projectName,
         source: source,
       }
@@ -504,17 +505,22 @@ export const getAllGenericKeywords = async () => {
     console.error("Error fetching Keywords:", error);
     return [];
   }
- 
 };
+
 export const getGenericKeywordByPath = async (path) => {
   try {
-    const response = await axios.get(`${BASE_URL}/generic/keywords/get/by/path/${path}`);
+    const response = await axios.get(
+      `${BASE_URL}/generic/keywords/get/by/path/data/${path}` 
+    );
     return response.data;
   } catch (error) {
-    console.error("Error fetching Keywords:", error);
-    return [];
+    console.error("Error fetching Keywords by Path:", error);
+    return null;
   }
-}
+};
+
+
+
 export const getAllCities = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/city/get/all`);
@@ -618,5 +624,15 @@ export const getPropertyByUrlName = async (urlName) => {
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
     return {}; // Return an empty object if there's an error
+  }
+};
+
+export const getReraInfoByProjectId = async (projectId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/rera-info/get/by/project/${projectId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching lead by phone:", error);
+    return [];
   }
 };

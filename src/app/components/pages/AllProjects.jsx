@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "../styles/css/projectCard.css";
-import { getAllProject } from "../../apis/api";
+import { getAllProject,getGenericKeywordByPath } from "../../apis/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import ProjectCard from "./ProjectCard";
 import { Helmet } from "react-helmet";
+import Loading from "../Loader"; 
 
 const AllProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -14,60 +15,75 @@ const AllProjects = () => {
   // Function to extract query params
   const getQueryParams = () => {
     const searchParams = new URLSearchParams(location.search);
+    let keyword = null;
+  
+    // Extract keyword if no standard key-value pairs are present
+    if (![...searchParams.keys()].some(key => ["locationId", "location", "propertyType", "search"].includes(key))) {
+      keyword = [...searchParams.keys()][0];
+    }
+  
     return {
-      cityId: searchParams.get("locationId"), // Extract locationId as cityId
-      locationName: searchParams.get("location"), // Optional: Get location name
-      propertyType: searchParams.get("propertyType"), // Get property type
-      search: searchParams.get("search"), // Search term (project name)
+      cityId: searchParams.get("locationId"), 
+      locationName: searchParams.get("location"),
+      propertyType: searchParams.get("propertyType"),
+      search: searchParams.get("search"),
+      keyword,
     };
   };
+  
+  
 
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const { cityId, propertyType, search } = getQueryParams();
-
-        const filters = {
+        const { cityId, propertyType, search, keyword } = getQueryParams();
+  
+        let filters = {
           isDeleted: false,
           ...(cityId && { cityId }),
           ...(propertyType && { type: propertyType }),
         };
-
-        const data = await getAllProject(filters);
-
+  
+        let data = await getAllProject(filters); // Fetch all projects first
         let filteredProjects = data.content || [];
-
+  
+        // If a keyword exists, try fetching specific projects using it
+        if (keyword) {
+          const keywordData = await getGenericKeywordByPath(keyword);
+          if (keywordData.content.length > 0) {
+            filteredProjects = keywordData.content;
+          } else {
+            // If keyword API returns no data, fallback to filtering manually
+            const normalizedKeyword = keyword.toLowerCase().replace(/-/g, " ");
+            filteredProjects = filteredProjects.filter((project) =>
+              project.name?.toLowerCase().includes(normalizedKeyword)
+            );
+          }
+        }
+  
+        // Apply additional search filtering
         if (search) {
-          const normalizedSearch = search
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, "");
+          const normalizedSearch = search.trim().toLowerCase().replace(/\s+/g, "");
           const isNumericSearch = !isNaN(search);
-
+  
           filteredProjects = filteredProjects.filter((project) => {
             const configMatch = project.configurations?.some(
               (config) =>
-                config
-                  .toLowerCase()
-                  .replace(/\s+/g, "")
-                  .includes(normalizedSearch) ||
-                (isNumericSearch &&
-                  config.toLowerCase().includes(`${search}bhk`))
+                config.toLowerCase().replace(/\s+/g, "").includes(normalizedSearch) ||
+                (isNumericSearch && config.toLowerCase().includes(`${search}bhk`))
             );
-
+  
             const propertyTypeMatch = project.configurationsType?.propertyType
               ?.toLowerCase()
               .includes(normalizedSearch);
-
-            const nameMatch = project.name
-              ?.toLowerCase()
-              .includes(normalizedSearch);
-
+  
+            const nameMatch = project.name?.toLowerCase().includes(normalizedSearch);
+  
             return configMatch || propertyTypeMatch || nameMatch;
           });
         }
-
+  
         setProjects(filteredProjects);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -76,9 +92,10 @@ const AllProjects = () => {
         setLoading(false);
       }
     };
-
+  
     fetchProjects();
-  }, [location.search]); // Runs when query params change
+  }, [location.search]);
+  
 
   const handleMoreDetails = (name) => {
     const formattedName = name.toLowerCase().replace(/\s+/g, "-"); // Convert to URL-friendly format
@@ -121,6 +138,18 @@ const AllProjects = () => {
             {getQueryParams().propertyType &&
               ` / ${capitalizeWords(getQueryParams().propertyType)}`}
           </p>
+          <h2
+            style={{
+              textAlign: "center",
+              padding: "10px 10px",
+              margin: "20px 0",
+              fontSize: "30px",
+              fontWeight: "bold",
+              color: "#333",
+            }}
+          >
+            Best Residential And Commercial Projects
+          </h2>
         </div>
 
         <div className="main-con">
@@ -128,7 +157,7 @@ const AllProjects = () => {
             <div className="listing-home listing-page">
               <div className="listing-slide row">
                 {loading ? (
-                  <p>Loading projects...</p>
+                 <Loading isFullScreen={false} />
                 ) : projects.length > 0 ? (
                   projects.map((project, index) => (
                     <div className="col-md-4" key={index}>

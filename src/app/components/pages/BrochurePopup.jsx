@@ -94,10 +94,8 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
   const handleOtpVerification = async () => {
     try {
       const response = await verifyOTP(formData.usermobile, otp);
-
+  
       if (response.message === "OTP Validated Successfully") {
-        await submitLead(formData);
-
         Swal.fire({
           icon: "success",
           title: "Success!",
@@ -107,13 +105,13 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
         }).then(() => {
           // Redirect first
           navigate("/thankYou");
-
+  
           // Parallel PDF download
           if (brochure) {
             let brochureUrl = brochure.startsWith("http")
               ? brochure
               : `${BASE_BROCHURE_URL}/${brochure}`;
-
+  
             const link = document.createElement("a");
             link.href = brochureUrl;
             link.setAttribute("download", `${projectName || "brochure"}.pdf`);
@@ -124,17 +122,17 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
             generateComingSoonPDF(projectName);
           }
         });
-
+  
         onClose();
       } else {
         Swal.fire({
           icon: "error",
           title: "Invalid OTP",
           text: response.message || "Please enter the correct OTP.",
-          backdrop: true, // Keeps modal focus
-          allowOutsideClick: false, // Prevents accidental closure
+          backdrop: true,
+          allowOutsideClick: false,
           didOpen: () => {
-            document.querySelector(".swal2-container").style.zIndex = "2000"; // Ensures visibility
+            document.querySelector(".swal2-container").style.zIndex = "2000";
           },
         });
       }
@@ -143,14 +141,15 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
         icon: "error",
         title: "OTP Verification Failed",
         text: error.response?.data?.message || "Invalid OTP, please try again.",
-        backdrop: true, // Keeps modal focus
-        allowOutsideClick: false, // Prevents accidental closure
+        backdrop: true,
+        allowOutsideClick: false,
         didOpen: () => {
-          document.querySelector(".swal2-container").style.zIndex = "2000"; // Ensures visibility
+          document.querySelector(".swal2-container").style.zIndex = "2000";
         },
       });
     }
   };
+  
 
   const handleResendOTP = async () => {
     try {

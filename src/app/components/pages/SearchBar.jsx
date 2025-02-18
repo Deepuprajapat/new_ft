@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
-import { getAllProject } from "../../apis/api";
-import { getAllLocalities } from "../../apis/api";
+import { getAllProject, getAllLocalities } from "../../apis/api";
 import "../styles/css/search.css";
 
 const SearchBar = () => {
@@ -119,10 +118,13 @@ const SearchBar = () => {
                   ...city,
                   name: city.name.toUpperCase(), // Convert name to uppercase
                 }))
-               // .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
+                // .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
                 .map((city) => (
-                  <option key={city.id} value={city.id}
-                  style={{ fontSize: "13px", color: "#000" }}> 
+                  <option
+                    key={city.id}
+                    value={city.id}
+                    style={{ fontSize: "13px", color: "#000" }}
+                  >
                     {city.name}
                   </option>
                 ))}
@@ -170,7 +172,20 @@ const SearchBar = () => {
           </div>
         </div>
         <div className="form-group">
-          <button type="submit" className="btn btn-dark">
+          <button
+            type="submit"
+            className="btn btn-dark"
+            style={{
+              maxWidth: "150px", // Smaller width than dropdowns
+              width: "100%",
+              padding: "12px 20px",
+              fontSize: "16px",
+              borderRadius: "5px",
+              backgroundColor: "#000",
+              color: "#fff",
+              fontWeight: "bold",
+            }}
+          >
             Search
           </button>
         </div>

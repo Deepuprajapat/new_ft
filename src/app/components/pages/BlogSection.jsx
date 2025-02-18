@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import { sliderSettings } from "../../../utils/common";
 import { getAllBlog } from "../../apis/api";
 import "../styles/css/blogCard.css";
+import Loading from "../Loader"; 
 
 const BlogSection = ({ isSwiper }) => {
   const [blogs, setBlogs] = useState([]);
@@ -24,9 +25,7 @@ const BlogSection = ({ isSwiper }) => {
 
   if (loading) {
     return (
-      <div className="loader-container">
-        <div className="loader">Loading...</div>
-      </div>
+     <Loading isFullScreen={false} />
     );
   }
 

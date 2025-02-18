@@ -61,3 +61,27 @@ footer .top-footer li a:hover {
     height: 34px;
     width: 34px;
 }
+
+
+
+@media (max-width: 576px) {
+    .top-footer .col {
+      flex: 0 0 50%; /* 2 columns for small screens */
+      max-width: 50%;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .top-footer .col {
+      flex: 0 0 33.33%; /* 3 columns for tablets */
+      max-width: 33.33%;
+    }
+  }
+  
+  @media (min-width: 992px) {
+    .top-footer .col {
+      flex: 0 0 25%; /* 4 columns for desktops */
+      max-width: 25%;
+    }
+  }
+  
