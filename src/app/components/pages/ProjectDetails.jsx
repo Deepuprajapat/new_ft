@@ -461,6 +461,7 @@ const ProjectDetails = () => {
             name="description"
             content={projectData.metaDesciption || "Default Description"}
           />
+
           <meta
             name="keywords"
             content={
@@ -469,6 +470,12 @@ const ProjectDetails = () => {
             }
           />
           <link rel="canonical" href={window.location.href} />
+          <meta property="og:title" content={projectData.metaTitle || "Default Title"}/> 
+          <meta property="og:site_name" content="Invest Mango"/> 
+          <meta property="og:url" content={window.location.href}/>
+          <meta property="og:description" content={projectData.metaDesciption || "Default Description"}/> 
+          <meta property="og:type" content="website"/> 
+          <meta property="og:image" content={projectData?.images[0]?.imageUrl}/>
           {projectData.schema &&
             projectData.schema.map((schemaItem, index) => (
               <script
