@@ -94,7 +94,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
   const handleOtpVerification = async () => {
     try {
       const response = await verifyOTP(formData.usermobile, otp);
-  
+
       if (response.message === "OTP Validated Successfully") {
         Swal.fire({
           icon: "success",
@@ -105,13 +105,13 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
         }).then(() => {
           // Redirect first
           navigate("/thankYou");
-  
+
           // Parallel PDF download
           if (brochure) {
             let brochureUrl = brochure.startsWith("http")
               ? brochure
               : `${BASE_BROCHURE_URL}/${brochure}`;
-  
+
             const link = document.createElement("a");
             link.href = brochureUrl;
             link.setAttribute("download", `${projectName || "brochure"}.pdf`);
@@ -122,7 +122,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
             generateComingSoonPDF(projectName);
           }
         });
-  
+
         onClose();
       } else {
         Swal.fire({
@@ -149,7 +149,6 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
       });
     }
   };
-  
 
   const handleResendOTP = async () => {
     try {
@@ -184,10 +183,22 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
         {!isOtpSent ? (
           <>
             <p style={{ padding: "10px", color: "black" }}>
+              <img
+                src="/images/IM-Fabicon.png"
+                alt="Favicon"
+                style={{ width: "24px", height: "24px", marginRight: "8px" }}
+              />
               Enter your contact details to download the brochure of <br />
-              <strong style={{ fontSize: "24px", color: "#2067d1" }}>
+              <div
+                style={{
+                  fontSize: "24px",
+                  color: "#2067d1",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
                 {projectName || "Invest Mango"}
-              </strong>
+              </div>
             </p>
             <input
               type="text"
