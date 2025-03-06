@@ -263,6 +263,41 @@ const PropertyDetails = () => {
   //   const sortedFloorPlan = [...floorPlan].sort((a, b) => b.price - a.price);
   //   return sortedFloorPlan[0].price;
   // };
+// useEffect(() => {
+//   const handleScroll = () => {
+//     const sections = [
+//       "overview",
+//       "about",
+//       "floor",
+//       "amenities",
+//       "video",
+//       "location"
+//     ];
+
+//     if (navInitialPosition !== null) {
+//       const scrollPosition = window.scrollY;
+//       setIsNavFixed(scrollPosition >= navInitialPosition);
+//     }
+
+//     for (const section of sections) {
+//       const element = document.getElementById(section);
+//       if (element) {
+//         const rect = element.getBoundingClientRect();
+//         if (rect.top <= 100 && rect.bottom >= 100) {
+//           setActiveSection(section);
+//           break;
+//         }
+//       }
+//     }
+//   };
+
+//   window.addEventListener("scroll", handleScroll);
+  
+//   return () => {
+//     window.removeEventListener("scroll", handleScroll);
+//   };
+// }, [navInitialPosition]); // Ensure dependencies are correctly set
+
 
   return (
     <>
@@ -292,7 +327,7 @@ const PropertyDetails = () => {
         </Helmet>
       )}
 
-      <div className="w-100 S">
+      <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
           {/* Gallery Section */}
           <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
@@ -319,6 +354,7 @@ const PropertyDetails = () => {
                         <img
                           alt={property?.images[0]?.category || "Image"}
                           src={property?.images[0]}
+                          loading="lazy"
                           className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
                           style={{ objectFit: "cover", cursor: "pointer" }}
                           fetchpriority="high"
@@ -355,6 +391,7 @@ const PropertyDetails = () => {
                                   property?.images[index]?.category || "Image"
                                 }
                                 src={property?.images[index]}
+                                loading="lazy"
                                 className="w-100 h-100 rounded-0"
                                 style={{
                                   objectFit: "cover",
@@ -393,6 +430,7 @@ const PropertyDetails = () => {
                     property?.images[currentImageIndex]?.category ||
                     "Full Screen Image"
                   }
+                  loading="lazy"
                   className="img-fluid w-100 h-100"
                   style={{ objectFit: "contain" }}
                 />
@@ -440,14 +478,23 @@ const PropertyDetails = () => {
           id="navigation-section"
           className="w-full"
           style={{
+            // backgroundColor: showMobileNav ? "white" : "#2067d1",
+            // transition: "all 0.3s ease",
+            // position: isNavFixed ? "fixed" : "relative",
+            // top: isNavFixed ? '66px': "auto",
+            // left: 0,
+            // right: 0,
+            // zIndex: 500,
+            // marginTop: isNavFixed ? "0" : "auto",
             backgroundColor: showMobileNav ? "white" : "#2067d1",
             transition: "all 0.3s ease",
             position: isNavFixed ? "fixed" : "relative",
-            top: isNavFixed ? 0 : "auto",
+            top: isNavFixed ? 66 : "auto",
             left: 0,
             right: 0,
-            zIndex: 1000,
+            zIndex: 500,
             marginTop: isNavFixed ? "0" : "auto",
+            
           }}
         >
           <div
@@ -463,15 +510,9 @@ const PropertyDetails = () => {
                 "overview",
                 "about",
                 "floor",
-                //  "price",
-                // "payment_plan",
                 "amenities",
                 "video",
-                "location",
-                // "siteplan",
-                //  "developer",
-                // "faqs",
-                //  "similar_projects",
+                "location"
               ].map((item) => (
                 <li key={item} className="mx-1">
                   <a
@@ -662,6 +703,7 @@ const PropertyDetails = () => {
                     <img
                       src={property?.projectLogo || "defaultLogo.jpg"}
                       alt={property?.projectLogo || "Project Logo"}
+                      loading="lazy"
                       className="img-fluid"
                       style={{
                         maxWidth: "80px",
@@ -1759,6 +1801,7 @@ const PropertyDetails = () => {
                                 }
                                 className="img-fluid"
                                 alt="Developer Logo"
+                                loading="lazy"
                                 fetchPriority="high"
                                 style={{
                                   maxWidth: "80px",
@@ -1842,6 +1885,7 @@ const PropertyDetails = () => {
                                         "Project Image 1"
                                       }
                                       src={property?.images[0]}
+                                      loading="lazy"
                                       className="img-fluid rounded w-100"
                                       style={{
                                         height:
@@ -1874,6 +1918,7 @@ const PropertyDetails = () => {
                                       <img
                                         className="me-2"
                                         src="https://www.investmango.com/img/icon/interior-icon4.svg"
+                                        loading="lazy"
                                         style={{
                                           height:
                                             window.innerWidth <= 768
@@ -1988,7 +2033,7 @@ const PropertyDetails = () => {
                         },
                         mobile: { breakpoint: { max: 464, min: 0 }, items: 1 },
                       }}
-                      // infinite={true}
+                      infinite={true}
                       containerClass="carousel-container"
                       itemClass="carousel-item-padding-40-px"
                       style={{ width: "60%", margin: "0 auto" }}
@@ -2043,6 +2088,7 @@ const PropertyDetails = () => {
                                 <img
                                   src={plan.imageUrl}
                                   alt={plan.title}
+                                  loading="lazy"
                                   className="img-fluid mb-3"
                                   style={{
                                     width: "100%",
@@ -2126,6 +2172,7 @@ const PropertyDetails = () => {
                           <img
                             src={selectedImage}
                             alt="Floor Plan"
+                            loading="lazy"
                             style={{
                               width: "100%",
                               height: "100%",
@@ -2316,6 +2363,7 @@ const PropertyDetails = () => {
                                   <img
                                     src={amenity.icon}
                                     alt={amenity.name}
+                                    loading="lazy"
                                     style={{
                                       width: "35px",
                                       height: "35px",
@@ -2685,6 +2733,7 @@ const PropertyDetails = () => {
                                 }
                                 className="img-fluid"
                                 alt="Developer Logo"
+                                loading="lazy"
                                 fetchPriority="high"
                                 style={{
                                   maxWidth: "80px",

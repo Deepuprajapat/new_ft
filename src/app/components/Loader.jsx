@@ -24,6 +24,7 @@ export default function Loader({ isFullScreen = true }) {
       <img
         alt="loader"
         src="/images/loading-load.gif"
+        loading="lazy"
         style={{
           ...imgStyles,
           "@media (max-width: 1024px)": { width: "80px", height: "80px" }, // Tablet

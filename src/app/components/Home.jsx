@@ -68,7 +68,7 @@ const Head = () => {
           content="Invest Mango: Real estate portfolio and strategic management services. Elevate your financial future through informed decisions and prime opportunities."
           name="description"
         />
-        <link rel="canonical" href="https://propertymarvels.in/" />
+        <link rel="canonical" href="https://www.investmango.com/" />
         <meta
           content="real estate company in noida, property in noida, property site, best property company in noida, real estate agency in noida, best real estate website, best property websites, best real estate sites, house search sites, top real estate companies in noida, best real estate company in noida."
           name="keyword"

@@ -3,19 +3,19 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../components/styles/css/header.css";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
-import { getAllProject } from "../apis/api";
-// import { getAllProject } from "../../apis/api";
+import { getAllProject, getAllCityForMobile } from "../apis/api";
 import logo from "../assets/img/logo.jpg";
-import { Button } from "@mui/material";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Container, Navbar } from "react-bootstrap";
 import navItems from "../../utils/navbar";
 import Form from "react-bootstrap/Form";
 import { FaSearch, FaPhoneAlt } from "react-icons/fa";
-import { useLocation } from "react-router-dom"; // Import useLocation
+import { useLocation } from "react-router-dom";
 
-const Header = () => {
+const Header = ({ shortAddress }) => {
+  // const [matchedCity, setMatchedCity] = useState(null);
+  const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,9 +25,8 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-
-   // Sticky Navbar on Scroll
-   useEffect(() => {
+  // Sticky Navbar on Scroll
+  useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
         setIsSticky(true);
@@ -67,7 +66,7 @@ const Header = () => {
         (project) => project.name.toLowerCase() === searchQuery.toLowerCase()
       );
       if (matchedProject) {
-        navigate(`/project/${matchedProject.url}`);
+        navigate(`/${matchedProject.url}`);
         return;
       }
       queryParams.push(`search=${encodeURIComponent(searchQuery)}`);
@@ -100,13 +99,57 @@ const Header = () => {
     setShowSearch(false); // Hide search input when route changes
     setSearchQuery(""); // Clear search input
   }, [location.pathname]);
-  
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await getAllCityForMobile(); // Fetch city data
+        const cityData = Array.isArray(response) ? response : response?.data;
+
+        if (!Array.isArray(cityData) || cityData.length === 0) {
+          console.error("No data found in response");
+          return;
+        }
+
+        // Extract city names and corresponding phone numbers
+        const cityMap = cityData.reduce((acc, item) => {
+          if (item?.city?.name) {
+            acc[item.city.name.toLowerCase()] = item.city.phoneNumber;
+          }
+
+          return acc;
+        }, {});
+        // console.log(cityMap, "cityMap");
+        // Match shortAddress with city names
+        if (shortAddress) {
+          const matchedCity = Object.keys(cityMap).find((city) =>
+            shortAddress.toLowerCase().includes(city)
+          );
+          // console.log(matchedCity);
+          if (matchedCity) {
+            // console.log(cityMap[matchedCity]);
+            setMatchedPhoneNumber(cityMap[matchedCity]); // Set the matched phone number
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    };
+
+    fetchCities();
+  }, [shortAddress]);
+
   return (
-    <Navbar bg="light" expand="lg" className={`custom-navbar ${isSticky ? "sticky" : ""}`}>
+    <Navbar
+      bg="light"
+      expand="lg"
+      className={`custom-navbar ${isSticky ? "sticky" : ""}`}
+    >
       <Container>
-        <Navbar.Brand href="https://propertymarvels.in">
+        <Navbar.Brand href="https://www.investmango.com/">
           <img
             src={logo}
+            loading="lazy"
             alt="Invest Mango"
             title="Invest Mango"
             className="logo-img"
@@ -121,20 +164,25 @@ const Header = () => {
                   title={item.label}
                   id={`nav-dropdown-${index}`}
                   key={index}
+                  style={{ paddingBottom: "0px"}}
                 >
                   {item.dropdown.map((subItem, subIndex) => (
                     <NavDropdown.Item
                       href={subItem.path}
                       key={subIndex}
                       target="_blank"
-                      style={{ paddingLeft: 2, paddingRight: 4 }}
+                      style={{ paddingLeft: 2, paddingRight: 4,borderBottom:"1px solid #d4cfcf",textAlign: 'center'}}
                     >
                       {subItem.label}
                     </NavDropdown.Item>
                   ))}
                 </NavDropdown>
               ) : (
-                <Nav.Link href={item.path} key={index}   style={{ paddingLeft: 2, paddingRight: 4 }}>
+                <Nav.Link
+                  href={item.path}
+                  key={index}
+                  style={{ paddingLeft: 2, paddingRight: 4 }}
+                >
                   {item.label}
                 </Nav.Link>
               )
@@ -142,6 +190,8 @@ const Header = () => {
             <Nav>
               {/* Search Button */}
               <div className="search-form-container">
+                {/* <h3>{shortAddress ? `Location: ${shortAddress}` : "Welcome!"}</h3> */}
+
                 <button onClick={handleSearchClick} className="search-button">
                   <FaSearch />
                 </button>
@@ -162,19 +212,42 @@ const Header = () => {
                   </div>
                 )}
               </div>
-
-              {/* Phone Buttons */}
-              <button className="phoneButton" style={{ marginLeft: "50px",marginLeft: '169px', display: window.innerWidth <= 1250 ? "none" : "block" ,background: '#2067d1'}}>
-
-                <a href="tel:+918595189189">
-                  <FaPhoneAlt /> 8595-189-189
-                </a>
-              </button>
-              <button className="phoneButton" style={{display: window.innerWidth <= 991 ? "none" : "block"  ,background: '#2067d1'}}>
-                <a href="tel:+917428189189">
-                  <FaPhoneAlt /> 7428-189-189
-                </a>
-              </button>
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                {/* Phone Buttons */}
+                {/* Phone Number Display */}
+                {matchedPhoneNumber && matchedPhoneNumber.length > 0 ? (
+                  matchedPhoneNumber.map((number, index) => (
+                    <button
+                      key={index}
+                      className="phoneButton"
+                      style={{ background: "#2067d1", marginLeft: "320px" }}
+                    >
+                      <a href={`tel:${number}`}>
+                        <FaPhoneAlt /> {number}
+                      </a>
+                    </button>
+                  ))
+                ) : (
+                  <>
+                    <button
+                      className="phoneButton"
+                      style={{ background: "#2067d1", marginLeft: "185px" }}
+                    >
+                      <a href="tel:+918595189189">
+                        <FaPhoneAlt /> 8595-189-189
+                      </a>
+                    </button>
+                    <button
+                      className="phoneButton"
+                      style={{ background: "#2067d1" }}
+                    >
+                      <a href="tel:+917428189189">
+                        <FaPhoneAlt /> 7428-189-189
+                      </a>
+                    </button>
+                  </>
+                )}
+              </div>
             </Nav>
           </Nav>
         </Navbar.Collapse>

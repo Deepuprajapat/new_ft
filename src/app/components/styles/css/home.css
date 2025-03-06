@@ -102,9 +102,12 @@
 
 .swiper-button-prev::after, .swiper-button-next::after{
   font-size: 10px!important;
+  z-index: 10 !important;
  
 }
-
+/* .swiper-button-next, .swiper-button-prev {
+  z-index: 10 !important;
+} */
 
 .testimonial .client-slide .project {
   font-size: 0.9rem;
@@ -157,7 +160,7 @@
 .project-card-location {
   color: #282c35ad;
   font-weight: 700;
-  min-height: 61px;
+  /* min-height: 61px; */
   font-size: 12px;
   padding: 5px 0 20px;
   margin: 0;

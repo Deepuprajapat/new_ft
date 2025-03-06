@@ -16,6 +16,7 @@ const   OurAssociations = () => {
             <img
               src={group.src}
               alt={group.alt}
+              loading="lazy"
               title={group.title}
               className="img-fluid icon-hover"
             />

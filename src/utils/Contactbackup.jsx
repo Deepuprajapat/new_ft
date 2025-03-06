@@ -88,7 +88,7 @@
 //        <Helmet>
 // <title>Contact Us</title> 
 // <meta name="description" content="For more details on On-Site Visits, Locations, Developers' Information, Property Age, Documentation, Bank Assistance, and many more feel free to connect." />
-//  <link rel="canonical" href="https://propertymarvels.in/contact" />
+//  <link rel="canonical" href="https://www.investmango.com/contact" />
 //  </Helmet>
     
 //     <div>

@@ -73,9 +73,9 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
       await sendOTP(usermobile, projectName, "brochure", username, "");
       setIsOtpSent(true);
       Swal.fire({
-        icon: "info",
+        icon: "success",
         title: "OTP Sent!",
-        text: `An OTP has been sent to ${formData.usermobile}. Please enter it below.`,
+        text: `An OTP has been sent to ${formData.usermobile}.`,
         backdrop: true,
         allowOutsideClick: false,
         didOpen: () => {
@@ -104,20 +104,15 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
           allowOutsideClick: false,
         }).then(() => {
           // Redirect first
-          navigate("/thankYou");
+          // navigate("/thankYou");
 
           // Parallel PDF download
           if (brochure) {
             let brochureUrl = brochure.startsWith("http")
               ? brochure
               : `${BASE_BROCHURE_URL}/${brochure}`;
-
-            const link = document.createElement("a");
-            link.href = brochureUrl;
-            link.setAttribute("download", `${projectName || "brochure"}.pdf`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+      
+            window.open(brochureUrl, "_blank"); // Open brochure in new tab
           } else {
             generateComingSoonPDF(projectName);
           }
@@ -186,6 +181,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
               <img
                 src="/images/IM-Fabicon.png"
                 alt="Favicon"
+                loading="lazy"
                 style={{ width: "24px", height: "24px", marginRight: "8px" }}
               />
               Enter your contact details to download the brochure of <br />
@@ -259,7 +255,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
         {!isOtpSent ? (
           <>
             <Button onClick={onClose} color="secondary">
-              Cancel
+              Close
             </Button>
             <Button onClick={handleSubmit} color="primary">
               Send OTP

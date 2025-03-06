@@ -24,7 +24,7 @@ const CityPopup = ({ onClose }) => {
         <div className="city-grid">
           {cities.map((city, index) => (
             <div key={index} className="city-card">
-              <img src={city.image} alt={city.name} className="city-image" />
+              <img src={city.image} alt={city.name} loading="lazy" className="city-image" />
               <p className="city-name">{city.name}</p>
             </div>
           ))}

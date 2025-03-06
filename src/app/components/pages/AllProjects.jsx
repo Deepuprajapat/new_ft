@@ -97,11 +97,11 @@ const AllProjects = () => {
   }, [location.search]);
   
 
-  const handleMoreDetails = (name) => {
-    const formattedName = name.toLowerCase().replace(/\s+/g, "-"); // Convert to URL-friendly format
-    const encodedName = encodeURIComponent(formattedName); // Encode special characters in the name
-    navigate(`/project/${encodedName}`);
-  };
+  // const handleMoreDetails = (name) => {
+  //   const formattedName = name.toLowerCase().replace(/\s+/g, "-"); // Convert to URL-friendly format
+  //   const encodedName = encodeURIComponent(formattedName); // Encode special characters in the name
+  //   navigate(`/project/${encodedName}`);
+  // };
 
   const capitalizeWords = (string) => {
     return string
@@ -118,7 +118,7 @@ const AllProjects = () => {
           content="Find the Best Residential and commercial projects with ultra luxury amenities. Compare Price, Floor Plan, Amenities, Site Plan, and Payment Plan, Property Reviews."
           name="description"
         />
-        <link rel="canonical" href="https://propertymarvels.in/allProjects" />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
       <section className="main-body">
         <div className="container">

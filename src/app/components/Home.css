@@ -30,7 +30,7 @@
 }
 .main-slider {
   /* background: url('https://res.cloudinary.com/deiuirtja/image/upload/v1713934028/investmango/Image-01_1_bssioj.jpg') !important; */
-  background: url('/public/images/imbanner.png') !important;
+  background: url('/public/images/imbanner.png')!important;
   background-position: center !important;
   background-size: cover !important;
   background-repeat: no-repeat !important;
@@ -53,6 +53,13 @@
     }
     .main-slider {
       height: auto;
+    }
+    .main-slider {
+      /* background: url('https://res.cloudinary.com/deiuirtja/image/upload/v1713934028/investmango/Image-01_1_bssioj.jpg') !important; */
+      background: url('/public/images/mobile-banner.jpg')!important;
+      background-position: center !important;
+      background-size: cover !important;
+      background-repeat: no-repeat !important;
     }
   }
   /* @media (width >= 769px) {
@@ -133,17 +140,18 @@
   background: #2067D1;
   color: #fff;
   border-radius: 50%;
-  display: flex
-;
+  display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
 }
 .swiper-button-prev {
   left: 45%;
+  z-index: 10 !important;
 }
 .swiper-button-next {
   right: 45%;
+  z-index: 10 !important;
 }
 /* Optional: Add hover effect */
 .swiper-button-prev:hover,
@@ -153,10 +161,12 @@
 @media (max-width: 850px) {
   .swiper-button-prev {
     left: 30%; /* Adjust based on your needs */
+    z-index: 10 !important;
   }
 
   .swiper-button-next {
     right: 30%; /* Adjust based on your needs */
+    z-index: 10 !important;
   }
 }
 
@@ -171,3 +181,6 @@
   }
 }
 
+.swiper-button-next, .swiper-button-prev {
+  z-index: 10 !important;
+}

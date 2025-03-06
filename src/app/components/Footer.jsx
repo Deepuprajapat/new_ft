@@ -3,19 +3,20 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
 import "../components/styles/css/footer.css";
 import logo from "../assets/img/logo_investmango.png";
-import { getAllGenericKeywords, getGenericKeywordByPath } from "../apis/api";
+import { getAllGenericKeywords, getGenericKeywordByPath,getAllCityForMobile } from "../apis/api";
 import { useNavigate } from "react-router-dom";
 
-const Footer = () => {
+const Footer = ({shortAddress}) => {
   const [footerItems, setFooterItems] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
+    const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFooterItems = async () => {
       try {
         const keywords = await getAllGenericKeywords();
-        console.log("Fetched Keywords:", keywords);
+        // console.log("Fetched Keywords:", keywords);
         setFooterItems(keywords);
       } catch (error) {
         console.error("Error fetching footer items:", error);
@@ -66,7 +67,44 @@ const Footer = () => {
       behavior: "smooth",
     });
   };
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await getAllCityForMobile(); // Fetch city data
+        const cityData = Array.isArray(response) ? response : response?.data;
 
+        if (!Array.isArray(cityData) || cityData.length === 0) {
+          console.error("No data found in response");
+          return;
+        }
+
+        // Extract city names and corresponding phone numbers
+        const cityMap = cityData.reduce((acc, item) => {
+          if (item?.city?.name) {
+            acc[item.city.name.toLowerCase()] = item.city.phoneNumber;
+          }
+
+          return acc;
+        }, {});
+        // console.log(cityMap,'cityMap');
+        // Match shortAddress with city names
+        if (shortAddress) {
+          const matchedCity = Object.keys(cityMap).find((city) =>
+            shortAddress.toLowerCase().includes(city)
+          );
+          // console.log(matchedCity);
+          if (matchedCity) {
+            // console.log(cityMap[matchedCity]);
+            setMatchedPhoneNumber(cityMap[matchedCity]); // Set the matched phone number
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    };
+
+    fetchCities();
+  }, [shortAddress]);
   return (
     <div>
       <div className="CTA">
@@ -79,6 +117,19 @@ const Footer = () => {
             <i className="fab fa-whatsapp"></i> WhatsApp
           </a>
         </div>
+        { matchedPhoneNumber && matchedPhoneNumber.length > 0? (
+          matchedPhoneNumber.map((number, index) => (
+        <div className="callnow">
+        <a href={`tel:+91${number}`}>
+            <i
+              style={{ transform: "rotate(95deg)" }}
+              className="fas fa-phone"
+            ></i>{" "}
+            {number}
+          </a>
+          </div>
+           ))
+        ):(
         <div className="callnow">
           <a href="tel:+918368547490">
             <i
@@ -88,7 +139,9 @@ const Footer = () => {
             8368547490
           </a>
         </div>
+      )}
       </div>
+      
       <button
         onClick={scrollToTop}
         id="ScrollTop"
@@ -107,6 +160,7 @@ const Footer = () => {
           >
             <img
               src="https://www.investmango.com/images/whatsapp1.gif"
+              loading="lazy"
               title="SMS NOW"
               style={{ height: "59px", marginBottom: "3px" }}
               alt="WhatsApp"
@@ -152,6 +206,7 @@ const Footer = () => {
                 <img
                   src={logo}
                   title="Invest Mango"
+                  loading="lazy"
                   alt="Invest Mango logo"
                   className="img-fluid footer-logo"
                   style={{ cursor: "pointer" }}
@@ -179,6 +234,7 @@ const Footer = () => {
                     <img
                      // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/e6391943-c9b2-40a0-0eb9-1e14df3c8800/public"
                       src="/images/facebook.webp"
+                      loading="lazy"
                       alt="Facebook"
                       className="social-icon"
                       style={{ width: "35px", height: "35px", borderRadius: "50%", objectFit: "cover" }}
@@ -188,6 +244,7 @@ const Footer = () => {
                     <img
                       //src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/1f2fc408-b9a8-4fff-ccae-874028f56400/public"
                       src="/images/twitter.png"
+                      loading="lazy"
                       alt="Twitter"
                       className="social-icon"
                     />
@@ -196,6 +253,7 @@ const Footer = () => {
                     <img
                      // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/00c6899a-05e6-488c-2ff6-1c5fd2d8bc00/public"
                       src="/images/instagram.jpg"
+                      loading="lazy"
                       alt="Instagram"
                       className="social-icon"
                       style={{ width: "35px", height: "35px", borderRadius: "50%", objectFit: "cover" }}
@@ -208,6 +266,7 @@ const Footer = () => {
                     <img
                       // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/6e591ec2-b5f2-4a01-6a43-4287e23c2300/public"
                       src="/images/LIn.jpg"
+                      loading="lazy"
                       alt="Linkedin"
                       className="social-icon"
                       style={{ width: "35px", height: "35px", borderRadius: "50%", objectFit: "cover" }}
@@ -220,6 +279,7 @@ const Footer = () => {
                     <img
                       //src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/a3003793-d9c2-4393-222e-b1dd3deb6e00/public"
                       src="/images/ytube.png"
+                      loading="lazy"
                       alt="YouTube"
                       className="social-icon"
                       style={{ width: "35px", height: "35px", borderRadius: "50%", objectFit: "cover" }}
@@ -268,6 +328,9 @@ const Footer = () => {
                     <Link to="/contact">Contact Us</Link>
                   </li>
                   <li>
+                    <Link to="/compare">Compare Projects</Link>
+                  </li>
+                  <li>
                     <Link to="/career">Careers</Link>
                   </li>
                   <li>
@@ -280,32 +343,32 @@ const Footer = () => {
                 <h5 className="headline">Our Projects</h5>
                 <ul>
                   <li>
-                    <a href="https://propertymarvels.in/project/ace-divino">
+                    <a href="https://www.investmango.com/ace-divino">
                       ACE Divino
                     </a>
                   </li>
                   <li>
-                    <a href="https://propertymarvels.in/project/godrej-woods-sector-43-noida">
+                    <a href="https://www.investmango.com/godrej-woods-sector-43-noida">
                       Godrej Woods
                     </a>
                   </li>
                   <li>
-                    <a href="https://propertymarvels.in/project/ace-starlit-sector-152-noida">
+                    <a href="https://www.investmango.com/ace-starlit-sector-152-noida">
                       ACE Starlit
                     </a>
                   </li>
                   <li>
-                    <a href="https://propertymarvels.in//project/nirala-aspire-sector-16-greater-noida-west">
+                    <a href="https://www.investmango.com/nirala-aspire-sector-16-greater-noida-west">
                       Nirala Aspire Low Rise Phase IV
                     </a>
                   </li>
                   <li>
-                    <a href="https://propertymarvels.in/project/ace-terra-yamuna-expressway">
+                    <a href="https://www.investmango.com/ace-terra-yamuna-expressway">
                       ACE Terra
                     </a>
                   </li>
                   <li>
-                    <a href="https://propertymarvels.in/project/max-antara-sector-150-noida">
+                    <a href="https://www.investmango.com/max-antara-sector-150-noida">
                       Max Antara
                     </a>
                   </li>

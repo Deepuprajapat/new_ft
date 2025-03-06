@@ -62,7 +62,7 @@ const SearchBar = () => {
       );
 
       if (matchedProject) {
-        navigate(`/project/${matchedProject.url}`);
+        navigate(`/${matchedProject.url}`);
         return; // Exit since we found an exact match
       }
 

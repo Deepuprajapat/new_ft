@@ -10,7 +10,7 @@ const NotFound = () => {
       {/* <header> */}
       {/* <div className="logo">
           <a href="https://investmango.com">
-            <img src="https://www.investmango.com/img/logo.jpg" alt="Logo" />
+            <img src="https://www.investmango.com/img/logo.jpg" loading="lazy" alt="Logo" />
           </a>
         </div> */}
       {/* </header> */}
@@ -24,7 +24,7 @@ const NotFound = () => {
           <h5>Error code: 404</h5>
           <ul>
             <li>
-              <a className="btn" href="https://propertymarvels.in/">
+              <a className="btn" href="https://www.investmango.com/">
                 Home
               </a>
             </li>
@@ -36,7 +36,7 @@ const NotFound = () => {
           </ul>
         </div>
         <div className="col-md-6">
-          <img src="https://investmango.com/images/404.webp" alt="404 Image" />
+          <img src="https://investmango.com/images/404.webp" loading="lazy" alt="404 Image" />
         </div>
       </div>
       <style jsx>{`

@@ -79,7 +79,7 @@ const Testimonial = () => {
               <div
                 style={{
                   backgroundColor: "#fff",
-                  padding: "20px",
+                  padding: "10px",
                   borderRadius: "8px",
                   boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.1)",
                   margin: "10px auto",
@@ -101,7 +101,7 @@ const Testimonial = () => {
                   style={{
                     fontSize: "1rem",
                     lineHeight: "1.5",
-                    margin: "15px 0",
+                    margin: "20px 0",
                     maxHeight: expanded[index] ? "none" : "130px",
                     overflow: expanded[index] ? "visible" : "hidden",
                   }}

@@ -1,6 +1,15 @@
 @import url("http://fonts.cdnfonts.com/css/sofia-pro");
 @import url("https://fonts.googleapis.com/css2?family=Jost:wght@300;400;600&display=swap");
 
+/* @font-face {
+  font-family: "Inter";
+  src: url("/fonts/font.woff2") format("woff2"),
+       url("/fonts/font.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+} */
+
 body {
   font-family: Inter, sans-serif;
   position: relative;

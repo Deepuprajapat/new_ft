@@ -64,6 +64,7 @@ const BlogCard = ({ blog, stripHtml, formatDate }) => (
       <img
         src={blog?.images[0] || "path/to/default-image.jpg"}
         alt={blog.alt || "Blog Image"}
+        loading="lazy"
         style={{ width: "100%", height: "250px" }}
         className="img-fluid"
         fetchpriority="high"

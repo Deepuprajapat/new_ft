@@ -5,10 +5,10 @@ import "../styles/css/home.css"; // Link to the updated CSS file
 
 const ProjectCard = ({ project }) => {
   const defaultImage = "http://localhost:3000/img/building_soon.jpg"; // Placeholder image
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const handleMoreDetails = (url) => {
     window.open(
-      `/project/${url.toLowerCase().replace(/\s+/g, "-")}`,
+      `/${url.toLowerCase().replace(/\s+/g, "-")}`,
       "_blank",
       "noopener,noreferrer"
     );
@@ -29,13 +29,14 @@ const ProjectCard = ({ project }) => {
   return (
     <div className="card-im">
       <a
-        href={"project/" + project.url}
+        href={project.url}
         target="_blank"
         rel="noopener noreferrer"
       >
         <img
           alt={project.name}
-          src={(project.images && project.images[0]?.imageUrl) || defaultImage}
+          src={(project.images && project.images[2]?.imageUrl) || defaultImage}
+          loading="lazy"
           className="project-card-image"
         />
         <p className="project-card-title">{project.name}</p>

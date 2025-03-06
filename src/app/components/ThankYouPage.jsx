@@ -55,6 +55,7 @@ const ThankYouPage = () => {
                 <img
                   style={{ width: "550px" }}
                   src="https://www.investmango.com/update/img/2.png"
+                  loading="lazy"
                   alt="Thank You"
                   className="img-fluid"
                 />
@@ -83,7 +84,7 @@ const ThankYouPage = () => {
                   style={{ listStyle: "none", justifyContent: "space-evenly" }}
                 >
                   <li>
-                    <a className="theme-btn" href="https://propertymarvels.in/">
+                    <a className="theme-btn" href="https://www.investmango.com/">
                       Home
                     </a>
                   </li>

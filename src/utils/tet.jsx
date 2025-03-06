@@ -78,7 +78,7 @@ const SearchBar = () => {
   
       if (matchedProject) {
         // Navigate to the project's URL
-        navigate(`/project/${matchedProject.url}`);
+        navigate(`/${matchedProject.url}`);
       } else {
         // Navigate to 404 if no matching project
         navigate("/404");

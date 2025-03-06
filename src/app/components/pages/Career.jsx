@@ -120,7 +120,7 @@ const Career = () => {
           name="description"
           content="Invest Mango offers a dynamic culture that is all about winning and innovating oneself. Unleash your true potential much more than you have ever imagined. "
         />
-        <link rel="canonical" href="https://propertymarvels.in/career" />
+        <link rel="canonical" href="https://www.investmango.com/career" />
       </Helmet>
 
       <div>
@@ -129,7 +129,7 @@ const Career = () => {
             <h1>Career</h1>
             <p>
               <a
-                href="https://propertymarvels.in/"
+                href="https://www.investmango.com/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="styled-link"

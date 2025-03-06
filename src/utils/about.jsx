@@ -28,7 +28,7 @@ export const aboutUsData = {
     },
     keyTakeaway: {
       title: "Key Takeaway",
-      description: "Our experience is in fostering long-term relationships with our renowned investors and purchasers through seamless services, seeing possibilities at the right time, and taking full advantage of them. We work incredibly hard to give YOU the lifestyle of the 'Platinum' class that you've been yearning to!"
+      description: "Our experience is in fostering long-term relationships with our renowned investors and purchasers through seamless services, seeing possibilities at the right time, and taking full advantage of them. We work incredibly hard to give you the lifestyle of the 'Platinum' class that you've been yearning to!"
     },
     differentiation: {
       title: "HOW WE ARE DIFFERENT?",

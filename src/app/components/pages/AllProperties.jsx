@@ -275,6 +275,7 @@ const PropertyListing = () => {
                                         : `${BASE_URL}/${property.images[0]}`
                                       : "default-image.jpg"
                                   }
+                                  loading="lazy"
                                   style={{
                                     maxWidth: "100%",
                                     borderRadius: "10px",
@@ -398,6 +399,7 @@ const PropertyListing = () => {
                       src="https://www.investmango.com/img/ace-divino/ace-divino-outside-image.webp"
                       className="d-block w-100"
                       alt="Top Image"
+                      loading="lazy"
                       style={{
                         borderRadius: "10px",
                         height: "262px",
@@ -417,6 +419,7 @@ const PropertyListing = () => {
                                 src="https://www.investmango.com/img/ace-divino/ace-divino-dinning-room.webp"
                                 className="d-block w-100"
                                 alt="First Slide"
+                                loading="lazy"
                                 style={{
                                   borderRadius: "10px",
                                   height: "131px",
@@ -428,6 +431,7 @@ const PropertyListing = () => {
                                 src="https://www.investmango.com/img/ace-divino/ace-divino-outside-image.webp"
                                 className="d-block w-100"
                                 alt="Second Slide"
+                                loading="lazy"
                                 style={{
                                   borderRadius: "10px",
                                   height: "131px",

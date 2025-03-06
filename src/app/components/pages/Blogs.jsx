@@ -147,6 +147,7 @@ const Blogs = () => {
                             className="img-fluid blog-image"
                             src={blogData.images[0] || ""}
                             alt={blogData.alt || "Blog Image"}
+                            loading="lazy"
                           />
                         </div>
                         <div

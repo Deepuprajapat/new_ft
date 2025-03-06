@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
+import PopupDialog from "./CommanPopup";
+import { useOutletContext } from "react-router-dom";
 import {
   getAllProjectsByUrlName,
   getDeveloperById,
@@ -30,8 +32,9 @@ import "react-multi-carousel/lib/styles.css";
 import { Helmet } from "react-helmet";
 import DOMPurify from "dompurify";
 import Swal from "sweetalert2";
+import Header from "../Header";
 
-const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
+const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
 // const FALLBACK_Floor_IMAGE = "/images/coming_soon_floor.jpg";
 
@@ -69,10 +72,10 @@ const ProjectDetails = () => {
       if (urlName) {
         try {
           const data = await getAllProjectsByUrlName(urlName);
-          console.log("Fetched project data:", data);
+          // console.log("Fetched project data:", data);
           if (data) {
             setProjectData(data);
-            console.log("url", data.url);
+            // console.log("url", data.url);
             setDeveloperId(data.developerId); // Update developer ID
             setProjectId(data.id); // Update developer ID
           }
@@ -88,8 +91,8 @@ const ProjectDetails = () => {
     if (projectData) {
       const fetchAllProject = async () => {
         const data = await getAllProject(projectData?.locality?.city?.id);
-        console.log("fetc name ", data?.content[0].name);
-        console.log("Fetched all project data:", data?.content);
+        // console.log("fetc name ", data?.content[0].name);
+        // console.log("Fetched all project data:", data?.content);
 
         if (data) {
           setAllSimilarProjects(data?.content);
@@ -105,7 +108,7 @@ const ProjectDetails = () => {
       if (developerId) {
         try {
           const data = await getDeveloperById(developerId);
-          console.log("Fetched developer data:", data);
+          // console.log("Fetched developer data:", data);
           if (data) {
             setDeveloperDetails(data);
           }
@@ -123,7 +126,7 @@ const ProjectDetails = () => {
 
       try {
         const data = await getReraInfoByProjectId(projectId);
-        console.log("Fetched RERA data:", data);
+        // console.log("Fetched RERA data:", data);
         setReraDetails(data || []); // Ensures state is always an array
       } catch (error) {
         console.error("Error fetching RERA data:", error);
@@ -135,9 +138,14 @@ const ProjectDetails = () => {
   }, [projectId]);
 
   const formatPrice = (price) => {
-    if (!price) return "";
+    if (!price) return "Prices On Request";
 
     const numPrice = typeof price === "string" ? parseFloat(price) : price;
+
+    // Check if the price is 1.5, then return "Sold Out"
+    if (numPrice === 1.5) {
+      return "Sold Out";
+    }
 
     if (numPrice < 100 && numPrice > 0) {
       return `${numPrice} Cr`;
@@ -188,7 +196,15 @@ const ProjectDetails = () => {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
       return 0;
     }
-    const sortedFloorPlan = [...floorPlan].sort((a, b) => a.price - b.price);
+
+    // Filter out prices that are exactly 1.5
+    const validFloorPlans = floorPlan.filter((plan) => plan.price !== 1.5);
+
+    if (validFloorPlans.length === 0) return 0; // If all prices were 1.5, return 0
+
+    const sortedFloorPlan = [...validFloorPlans].sort(
+      (a, b) => a.price - b.price
+    );
     return sortedFloorPlan[0].price;
   };
 
@@ -196,7 +212,15 @@ const ProjectDetails = () => {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
       return 0;
     }
-    const sortedFloorPlan = [...floorPlan].sort((a, b) => b.price - a.price);
+
+    // Filter out prices that are exactly 1.5
+    const validFloorPlans = floorPlan.filter((plan) => plan.price !== 1.5);
+
+    if (validFloorPlans.length === 0) return 0; // If all prices were 1.5, return 0
+
+    const sortedFloorPlan = [...validFloorPlans].sort(
+      (a, b) => b.price - a.price
+    );
     return sortedFloorPlan[0].price;
   };
 
@@ -442,7 +466,7 @@ const ProjectDetails = () => {
     ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) })) // Add cleaned data
     ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); // Sort numerically if a number exists
 
-  const canonical = `http://propertymarvels.in/project/${urlName}`;
+  // const canonical = `http://propertymarvels.in/project/${urlName}`;
   // console.log("can",canonical)
   // console.log("mets tielle",projectData?.data)
 
@@ -452,6 +476,13 @@ const ProjectDetails = () => {
         ? projectData.siteplanImg
         : `${BASE_URL}${projectData.siteplanImg}`
       : FALLBACK_IMAGE;
+  const { setShortAddress } = useOutletContext();
+
+  useEffect(() => {
+    if (projectData?.shortAddress) {
+      setShortAddress(projectData.shortAddress); // 🔹 Update shortAddress in AppLayout
+    }
+  }, [projectData, setShortAddress]);
   return (
     <>
       {projectData && (
@@ -461,7 +492,6 @@ const ProjectDetails = () => {
             name="description"
             content={projectData.metaDesciption || "Default Description"}
           />
-
           <meta
             name="keywords"
             content={
@@ -470,22 +500,27 @@ const ProjectDetails = () => {
             }
           />
           <link rel="canonical" href={window.location.href} />
-          <meta property="og:title" content={projectData.metaTitle || "Default Title"}/> 
-          <meta property="og:site_name" content="Invest Mango"/> 
-          <meta property="og:url" content={window.location.href}/>
-          <meta property="og:description" content={projectData.metaDesciption || "Default Description"}/> 
-          <meta property="og:type" content="website"/> 
-          <meta property="og:image" content={projectData?.images[0]?.imageUrl}/>
           {projectData.schema &&
             projectData.schema.map((schemaItem, index) => (
               <script
                 key={index}
                 type="application/ld+json"
+                
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaItem) }}
               />
             ))}
         </Helmet>
       )}
+      {/* {projectData && (
+      <div >
+      <Header shortAddress={projectData?.shortAddress} />
+      </div>
+    )} */}
+      {/* {projectData && (
+      <div className="container-fluid p-0">
+      <h1>Helo</h1>
+      {projectData?.shortAddress}
+      </div> */}
 
       <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
@@ -520,6 +555,7 @@ const ProjectDetails = () => {
                           <img
                             alt={projectData?.images[0]?.caption || "Image"}
                             src={projectData?.images[0]?.imageUrl}
+                            loading="lazy"
                             className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
                             style={{ objectFit: "cover", cursor: "pointer" }}
                             fetchpriority="high"
@@ -557,6 +593,7 @@ const ProjectDetails = () => {
                                     "Image"
                                   }
                                   src={projectData?.images[index]?.imageUrl}
+                                  loading="lazy"
                                   className="w-100 h-100 rounded-0"
                                   style={{
                                     objectFit: "cover",
@@ -596,6 +633,7 @@ const ProjectDetails = () => {
                     projectData?.images[currentImageIndex]?.caption ||
                     "Full Screen Image"
                   }
+                  loading="lazy"
                   className="img-fluid w-100 h-100"
                   style={{ objectFit: "contain" }}
                 />
@@ -646,10 +684,10 @@ const ProjectDetails = () => {
             backgroundColor: showMobileNav ? "white" : "#2067d1",
             transition: "all 0.3s ease",
             position: isNavFixed ? "fixed" : "relative",
-            top: isNavFixed ? 0 : "auto",
+            top: isNavFixed ? 66 : "auto",
             left: 0,
             right: 0,
-            zIndex: 1000,
+            zIndex: 500,
             marginTop: isNavFixed ? "0" : "auto",
           }}
         >
@@ -870,6 +908,7 @@ const ProjectDetails = () => {
                     <img
                       src={projectData?.projectLogo || "defaultLogo.jpg"}
                       alt={projectData?.projectLogo || "Project Logo"}
+                      loading="lazy"
                       className="img-fluid"
                       style={{
                         maxWidth: "80px",
@@ -915,7 +954,7 @@ const ProjectDetails = () => {
                       cursor: "pointer",
                     }}
                     onMouseEnter={() => setShowReraDetails(true)}
-                    onMouseLeave={() => setShowReraDetails(false)}
+                    // onMouseLeave={() => setShowReraDetails(false)}
                   >
                     Rera
                   </span>
@@ -960,6 +999,7 @@ const ProjectDetails = () => {
                       </div>
 
                       <div className="table-responsive">
+                      <span style={{fontSize:"10px",color:"black"}}>Website Link<a href={projectData?.reraLink || "N/A"} target="_blank"> {projectData?.reraLink || "N/A"}</a></span>
                         <table className="w-100">
                           <thead>
                             <tr>
@@ -1005,6 +1045,20 @@ const ProjectDetails = () => {
                               >
                                 RERA Number
                               </th>
+                              <th
+                                style={{
+                                  width: "30%",
+                                  textAlign: "left",
+                                  fontSize: "12px",
+                                  padding: "8px",
+                                  color: "black",
+                                  fontWeight: 500,
+                                  border: "none",
+                                  backgroundColor: "white",
+                                }}
+                              >
+                                RERA QR
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1037,6 +1091,19 @@ const ProjectDetails = () => {
                                   >
                                     {item.reraNumber || "-"}
                                   </td>
+                                  <td
+                                    style={{
+                                      fontSize: "12px",
+                                      padding: "10px",
+                                      fontWeight: "600",
+                                    }}
+                                  >
+                                  {item.qrImages?.length > 0 ? (
+                                    <img src={item.qrImages || "-"} alt="qrImage" style={{height:"200",width:"200%",objectFit:"cover"}}/>
+                                  ) : (
+                                    <span>N/A</span>
+                                  )}
+                                  </td>
                                 </tr>
                               ))
                             ) : (
@@ -1061,8 +1128,8 @@ const ProjectDetails = () => {
                     </div>
                   )}
 
-                        {/* Additional Badges */}
-                        <span
+                  {/* Additional Badges */}
+                  <span
                     className="badge text-dark"
                     style={{
                       padding: "4px 8px",
@@ -1174,7 +1241,7 @@ const ProjectDetails = () => {
                       }}
                     >
                       {projectData?.overviewPara ? (
-                        <div
+                        <div className="project-description"
                           dangerouslySetInnerHTML={{
                             __html: projectData.overviewPara,
                           }}
@@ -1477,7 +1544,7 @@ const ProjectDetails = () => {
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.totalFloor}
+                              {projectData?.totalFloor} Floors
                             </p>
                           </div>
                         </div>
@@ -1884,6 +1951,7 @@ const ProjectDetails = () => {
                                         "Project Image 1"
                                       }
                                       src={projectData?.images[0].imageUrl}
+                                      loading="lazy"
                                       className="img-fluid rounded w-100"
                                       style={{
                                         height:
@@ -1919,6 +1987,7 @@ const ProjectDetails = () => {
                                                 `Project Image ${index + 2}`
                                               }
                                               src={image.imageUrl}
+                                              loading="lazy"
                                               className="img-fluid rounded w-100"
                                               style={{
                                                 height: "150px",
@@ -1950,6 +2019,7 @@ const ProjectDetails = () => {
                                       <img
                                         className="me-2"
                                         src="https://www.investmango.com/img/icon/interior-icon4.svg"
+                                        loading="lazy"
                                         style={{
                                           height:
                                             window.innerWidth <= 768
@@ -2017,13 +2087,13 @@ const ProjectDetails = () => {
                               </div>
 
                               {/* Floor Plan Dialog Popup */}
-                              <BrochurePopupDialog
+                              <PopupDialog
                                 open={showSitePopup} // Use state to control visibility
                                 onClose={closeSitePopup} // Close popup when necessary
                                 projectName={
                                   projectData?.name || "Invest Mango"
                                 } // Set project name or default
-                                brochure={projectData?.brochure}
+                                
                               />
                               <div className="col-12 mt-2">
                                 <a
@@ -2103,7 +2173,7 @@ const ProjectDetails = () => {
                         }}
                       >
                         {projectData?.about && (
-                          <div
+                          <div className="project-description"
                             dangerouslySetInnerHTML={{
                               __html: projectData.about,
                             }}
@@ -2204,8 +2274,7 @@ const ProjectDetails = () => {
                       }}
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(
-                          projectData?.floorPara ||
-                            "<p>Answer not available.</p>"
+                          projectData?.floorPara || "<p>Not Available.</p>"
                         ),
                       }}
                     >
@@ -2230,30 +2299,39 @@ const ProjectDetails = () => {
                       >
                         All
                       </button>
-                      {projectData?.configurations.map((config, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setActiveFilter(config)}
-                          className={`btn ${
-                            activeFilter === config ? "btn-primary" : ""
-                          }`}
-                          style={{
-                            border: "2px solid #000",
-                            borderRadius: "15px",
-                            padding:
-                              window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
-                            fontSize:
-                              window.innerWidth <= 768 ? "10px" : "14px",
-                            fontWeight: "600",
-                            backgroundColor:
-                              activeFilter === config
-                                ? "rgb(32, 103, 209)"
-                                : "",
-                          }}
-                        >
-                          {config}
-                        </button>
-                      ))}
+                      {projectData?.configurations
+                        ?.slice()
+                        .sort((a, b) => {
+                          const numA = parseInt(a); // Extract the numeric part of the string
+                          const numB = parseInt(b);
+                          return numA - numB; // Sort in ascending order
+                        })
+                        .map((config, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setActiveFilter(config)}
+                            className={`btn ${
+                              activeFilter === config ? "btn-primary" : ""
+                            }`}
+                            style={{
+                              border: "2px solid #000",
+                              borderRadius: "15px",
+                              padding:
+                                window.innerWidth <= 768
+                                  ? "2px 5px"
+                                  : "5px 15px",
+                              fontSize:
+                                window.innerWidth <= 768 ? "10px" : "14px",
+                              fontWeight: "600",
+                              backgroundColor:
+                                activeFilter === config
+                                  ? "rgb(32, 103, 209)"
+                                  : "",
+                            }}
+                          >
+                            {config}
+                          </button>
+                        ))}
                     </div>
                     <Carousel
                       responsive={{
@@ -2291,7 +2369,14 @@ const ProjectDetails = () => {
                             plan.projectConfigurationName === activeFilter
                         );
 
-                        return filtered.map((plan, index) => (
+                        // Sort based on numeric BHK values (e.g., 2 BHK, 3 BHK, etc.)
+                        const sortedPlans = filtered.sort((a, b) => {
+                          const numA = parseInt(a.projectConfigurationName); // Extract number
+                          const numB = parseInt(b.projectConfigurationName);
+                          return numA - numB;
+                        });
+
+                        return sortedPlans.map((plan, index) => (
                           <div
                             key={index}
                             className="px-2 d-flex justify-content-center"
@@ -2326,6 +2411,7 @@ const ProjectDetails = () => {
                                       : "/images/Floor.png" // Fallback image in other cases
                                   }
                                   alt={`${plan.type} Floor Plan`}
+                                  loading="lazy"
                                   className="img-fluid mb-3"
                                   style={{ width: "100%" }}
                                   onClick={() =>
@@ -2355,7 +2441,7 @@ const ProjectDetails = () => {
                                         fontWeight: "600",
                                       }}
                                     >
-                                      {plan.size}
+                                      {plan.size} sq.ft
                                     </p>
                                   </div>
                                   <div className="col-6">
@@ -2414,13 +2500,13 @@ const ProjectDetails = () => {
 
                                   {/* Floor Plan Dialog Popup */}
 
-                                  <BrochurePopupDialog
+                                  <PopupDialog
                                     open={showFloorPlanPopup}
                                     onClose={closeFloorPlanPopup}
                                     projectName={
                                       projectData?.name || "Invest Mango"
                                     }
-                                    brochure={projectData?.brochure}
+                                  
                                   />
                                 </div>
                               </div>
@@ -2463,6 +2549,7 @@ const ProjectDetails = () => {
                                 : "/images/Floor.png" // Fallback image when no image is available
                             }
                             alt="Floor Plan"
+                            loading="lazy"
                             style={{
                               width: "100%",
                               height: "auto",
@@ -2475,7 +2562,7 @@ const ProjectDetails = () => {
                               position: "absolute",
                               top: "10px",
                               right: "10px",
-                              backgroundColor: "rgba(0, 0, 0, 0.5)",
+                              // backgroundColor: "rgba(0, 0, 0, 0.5)",
                               color: "white",
                               border: "none",
                               borderRadius: "50%",
@@ -2550,7 +2637,7 @@ const ProjectDetails = () => {
                           dangerouslySetInnerHTML={{
                             __html: DOMPurify.sanitize(
                               projectData?.priceListPara ||
-                                "<p>Answer not available.</p>"
+                                "<p>Not Available.</p>"
                             ),
                           }}
                         />
@@ -2623,54 +2710,57 @@ const ProjectDetails = () => {
                         </thead>
                         <tbody>
                           {projectData?.floorplans &&
-                            projectData?.floorplans?.map((plan, index) => (
-                              <tr key={index}>
-                                <td
-                                  style={{
-                                    fontSize:
-                                      window.innerWidth <= 768
-                                        ? "11px"
-                                        : "14px",
-                                    padding:
-                                      window.innerWidth <= 768
-                                        ? "8px 4px"
-                                        : "8px",
-                                  }}
-                                >
-                                  {plan.title}
-                                </td>
-                                <td
-                                  style={{
-                                    fontSize:
-                                      window.innerWidth <= 768
-                                        ? "11px"
-                                        : "14px",
-                                    padding:
-                                      window.innerWidth <= 768
-                                        ? "8px 4px"
-                                        : "8px",
-                                  }}
-                                >
-                                  {plan.size} sq ft
-                                </td>
-                                <td
-                                  style={{
-                                    fontSize:
-                                      window.innerWidth <= 768
-                                        ? "11px"
-                                        : "14px",
-                                    padding:
-                                      window.innerWidth <= 768
-                                        ? "8px 4px"
-                                        : "8px",
-                                  }}
-                                >
-                                  {!plan.isSoldOut
-                                    ? formatPrice(plan.price)
-                                    : "Sold Out"}
-                                </td>
-                              </tr>
-                            ))}
+                            projectData.floorplans
+                              .slice() // Create a copy to avoid mutating the original array
+                              .sort((a, b) => a.size - b.size) // Sort in ascending order based on size
+                              .map((plan, index) => (
+                                <tr key={index}>
+                                  <td
+                                    style={{
+                                      fontSize:
+                                        window.innerWidth <= 768
+                                          ? "11px"
+                                          : "14px",
+                                      padding:
+                                        window.innerWidth <= 768
+                                          ? "8px 4px"
+                                          : "8px",
+                                    }}
+                                  >
+                                    {plan.title}
+                                  </td>
+                                  <td
+                                    style={{
+                                      fontSize:
+                                        window.innerWidth <= 768
+                                          ? "11px"
+                                          : "14px",
+                                      padding:
+                                        window.innerWidth <= 768
+                                          ? "8px 4px"
+                                          : "8px",
+                                    }}
+                                  >
+                                    {plan.size} sq ft
+                                  </td>
+                                  <td
+                                    style={{
+                                      fontSize:
+                                        window.innerWidth <= 768
+                                          ? "11px"
+                                          : "14px",
+                                      padding:
+                                        window.innerWidth <= 768
+                                          ? "8px 4px"
+                                          : "8px",
+                                    }}
+                                  >
+                                    {!plan.isSoldOut
+                                      ? formatPrice(plan.price)
+                                      : "Sold Out"}
+                                  </td>
+                                </tr>
+                              ))}
                         </tbody>
                       </table>
                     </div>
@@ -2733,7 +2823,7 @@ const ProjectDetails = () => {
                           dangerouslySetInnerHTML={{
                             __html: DOMPurify.sanitize(
                               projectData?.paymentPara ||
-                                "<p>Answer not available.</p>"
+                                "<p>Not Available.</p>"
                             ),
                           }}
                         />
@@ -2861,6 +2951,7 @@ const ProjectDetails = () => {
                                   <img
                                     src={amenity.icon}
                                     alt={amenity.name}
+                                    loading="lazy"
                                     style={{
                                       width: "35px",
                                       height: "35px",
@@ -2914,28 +3005,38 @@ const ProjectDetails = () => {
                     </p>
 
                     <div className="d-flex flex-column">
-                      {projectData?.videos && projectData.videos.length > 0 ? (
-                        projectData.videos.map((videoUrl, index) => (
-                          <div key={index} className="ratio ratio-16x9 mb-3">
-                            <iframe
-                              src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                              title={`${projectData?.name} Video Presentation ${
-                                index + 1
-                              }`}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              style={{
-                                border: "none",
-                                borderRadius: "8px",
-                              }}
-                            ></iframe>
-                          </div>
-                        ))
+                      {projectData?.videos &&
+                      projectData.videos.length > 0 &&
+                      projectData.videos.some(
+                        (videoUrl) => videoUrl.trim() !== ""
+                      ) ? (
+                        projectData.videos.map(
+                          (videoUrl, index) =>
+                            videoUrl.trim() !== "" && ( // Ignore empty strings
+                              <div
+                                key={index}
+                                className="ratio ratio-16x9 mb-3"
+                              >
+                                <iframe
+                                  src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
+                                  title={`${
+                                    projectData?.name
+                                  } Video Presentation ${index + 1}`}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  style={{
+                                    border: "none",
+                                    borderRadius: "8px",
+                                  }}
+                                ></iframe>
+                              </div>
+                            )
+                        )
                       ) : (
                         <div
                           style={{
                             width: "100%",
-                            height: "300px",
+                            height: "150px",
                             backgroundImage:
                               "url('/images/investmango-youtube-banner.webp')",
                             backgroundSize: "cover",
@@ -2950,9 +3051,7 @@ const ProjectDetails = () => {
                             textAlign: "center",
                             backgroundColor: "#f0f0f0",
                           }}
-                        >
-                          No Videos Available
-                        </div>
+                        ></div>
                       )}
                     </div>
                   </div>
@@ -2960,7 +3059,7 @@ const ProjectDetails = () => {
               </div>
 
               {/* Location Advantage */}
-              <div
+              {/* <div
                 className="mb-4"
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
@@ -2977,38 +3076,28 @@ const ProjectDetails = () => {
                   </h4>
                   <div className="px-3">
                     <div className="inner-item">
-                      <p
-                        className="mb-3 mb-md-4"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                        }}
-                      >
-                        The residential development of{" "}
-                        <b>{projectData?.name}</b> has been strategically
-                        located in Sector-1 Greater Noida West.{" "}
-                        <b>{projectData?.name} location</b> places you near top
-                        schools, colleges, sports complexes, entertainment
-                        centers, and much more.
-                      </p>
-
                       <div
                         style={{
                           fontSize: window.innerWidth <= 768 ? "12px" : "14px",
                         }}
                       >
-                        {projectData?.locationPara && (
+                        {projectData?.locationPara ? (
                           <div
                             style={{ padding: "0px 10px" }}
                             dangerouslySetInnerHTML={{
                               __html: projectData.locationPara,
                             }}
                           />
+                        ) : (
+                          <p style={{ padding: "0px 10px", color: "gray" }}>
+                            {projectData?.name} Location Advantage Not Available
+                          </p>
                         )}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
               {/* Location Map */}
               <div className="bg-white rounded-3 mb-4" id="location">
                 <h2
@@ -3120,6 +3209,7 @@ const ProjectDetails = () => {
                             id="zoom-image"
                             alt={`${projectData?.name} Site Plan`}
                             src={imageSrc}
+                            loading="lazy"
                             fetchpriority="high"
                             style={{
                               transform: "scale(1) translate(0px, 0px)",
@@ -3280,6 +3370,7 @@ const ProjectDetails = () => {
                           //   : FALLBACK_IMAGE
                         }
                         alt={`${projectData?.name} Site Plan`}
+                        loading="lazy"
                         style={{
                           width: "100%",
                           height: "auto",
@@ -3329,6 +3420,7 @@ const ProjectDetails = () => {
                           src={developerDetails?.logo}
                           className="img-fluid me-3"
                           alt={developerDetails?.altLogo}
+                          loading="lazy"
                           style={{ maxWidth: "90px", border: "1px solid grey" }}
                           fetchpriority="high"
                         />
@@ -3355,7 +3447,7 @@ const ProjectDetails = () => {
                       >
                         {developerDetails?.about && (
                           <>
-                            <div
+                            <div className="project-description"
                               dangerouslySetInnerHTML={{
                                 __html:
                                   expandedIndex === "about"
@@ -3498,7 +3590,7 @@ const ProjectDetails = () => {
                             <div
                               dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(
-                                  faq.answer || "<p>Answer not available.</p>"
+                                  faq.answer || "<p>Not Available.</p>"
                                 ),
                               }}
                             />
@@ -3570,6 +3662,7 @@ const ProjectDetails = () => {
                                       <img
                                         src={project?.images[0]?.imageUrl}
                                         alt={project?.name}
+                                        loading="lazy"
                                         style={{
                                           height: "150px",
                                           width: "100%",
@@ -3635,7 +3728,7 @@ const ProjectDetails = () => {
                                                   )
                                                 ) + "BHK"
                                               }`
-                                            : "Configuration not available"}
+                                            : ""}
                                         </p>
                                       )}
                                       {project?.floorplans && (
@@ -3894,10 +3987,7 @@ const ProjectDetails = () => {
                             onChange={handleChange}
                           >
                             <option value="">Select</option>
-                            {console.log(
-                              "test check ",
-                              projectData?.configurations
-                            )}
+                           
                             {projectData?.configurations?.map(
                               (config, index) => (
                                 <option key={index} value={config}>

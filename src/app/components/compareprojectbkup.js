@@ -54,6 +54,7 @@ const CompareProjects = () => {
         return image ? (
           <img
             src={image}
+            loading="lazy"
             alt={project.name}
             style={{ width: "300px", height: "300px", borderRadius: "10px" }}
           />

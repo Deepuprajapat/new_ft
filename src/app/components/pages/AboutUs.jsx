@@ -10,6 +10,7 @@ const AboutUs = () => {
             <img
               src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/870dad0c-7f7a-440b-70a3-afc3df3a8300/public"
               title="About Invest Mango"
+              loading="lazy"
               alt="About Invest Mango"
               className="img-fluid"
             />

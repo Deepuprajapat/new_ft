@@ -28,7 +28,7 @@ const SiteMap = () => {
                 <ul style={{ listStyle: "none" }}>
                   <li>
                     <a
-                      href="https://propertymarvels.in/about"
+                      href="https://www.investmango.com/about"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -37,7 +37,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://propertymarvels.in/video"
+                      href="https://www.investmango.com/video"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -46,7 +46,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://propertymarvels.in/faq"
+                      href="https://www.investmango.com/faq"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -55,7 +55,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://propertymarvels.in/career"
+                      href="https://www.investmango.com/career"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -64,7 +64,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://propertymarvels.in/contact"
+                      href="https://www.investmango.com/contact"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -77,7 +77,7 @@ const SiteMap = () => {
                 <ul style={{ listStyle: "none" }}>
                   <li>
                     <a
-                      href="https://propertymarvels.in/allProjects"
+                      href="https://www.investmango.com/allProjects"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -86,7 +86,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://propertymarvels.in/allProperties"
+                      href="https://www.investmango.com/allProperties"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -193,7 +193,7 @@ const SiteMap = () => {
                 <ul style={{ listStyle: "none" }}>
                   <li>
                     <a
-                      href="https://propertymarvels.in/mango-insights"
+                      href="https://www.investmango.com/mango-insights"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -207,6 +207,7 @@ const SiteMap = () => {
                 <img
                   src="/images/sitemap.webp"
                   alt="Sitemap"
+                  loading="lazy"
                   id="sitemapImage"
                   style={{ width: "100%" }}
                 />

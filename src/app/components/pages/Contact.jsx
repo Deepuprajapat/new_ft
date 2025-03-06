@@ -108,7 +108,7 @@ const ContactUs = () => {
           name="description"
           content="For more details on On-Site Visits, Locations, Developers' Information, Property Age, Documentation, Bank Assistance, and many more feel free to connect."
         />
-        <link rel="canonical" href="https://propertymarvels.in/contact" />
+        <link rel="canonical" href="https://www.investmango.com/contact" />
       </Helmet>
 
       <div>
@@ -184,6 +184,7 @@ const ContactUs = () => {
                           <img
                             src="https://www.investmango.com/images/Noida.png"
                             alt="Noida Location"
+                            loading="lazy"
                             className="location-icon"
                           />
                           <span className="city-name">
@@ -201,6 +202,7 @@ const ContactUs = () => {
                           <img
                             src="https://www.investmango.com/images/Gurugram.png"
                             alt="Gurugram Location"
+                            loading="lazy"
                             className="location-icon"
                           />
                           <span className="city-name">
@@ -218,6 +220,7 @@ const ContactUs = () => {
                           <img
                             src="	https://www.investmango.com/images/Pune.png"
                             alt="Pune Location"
+                            loading="lazy"
                             className="location-icon"
                           />
                           <span className="city-name">

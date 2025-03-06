@@ -37,7 +37,7 @@ const Video = () => {
     <div>
       <Helmet>
         <title>Our Videos</title>
-        <link rel="canonical" href="https://propertymarvels.in/video" />
+        <link rel="canonical" href="https://www.investmango.com/video" />
         <meta
           name="description"
           content="Subscribe to our Youtube channel to know more about all other residential & commercial projects in Delhi/NCR region. Our video covers every aspect. "
@@ -48,7 +48,7 @@ const Video = () => {
           <h1>Our Videos</h1>
           <p>
             <a
-              href="https://propertymarvels.in/"
+              href="https://www.investmango.com/"
               target="_blank"
               rel="noopener"
               className="styled-link"
@@ -94,6 +94,7 @@ const Video = () => {
                           style={{
                             boxShadow: "2px 2px 5px 0px #00000057",
                             background: "white",
+                            marginTop: "10px",
                           }}
                         >
                           {project.videos && project.videos.length > 0 ? (

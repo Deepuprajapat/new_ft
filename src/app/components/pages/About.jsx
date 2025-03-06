@@ -64,6 +64,7 @@ const About = () => {
                 <div className="col-md-6" style={{ marginTop: "25px" }}>
                   <img
                     src={aboutUsData.image.src}
+                    loading="lazy"
                     alt={aboutUsData.image.alt}
                     className="responsive-image"
                     style={{

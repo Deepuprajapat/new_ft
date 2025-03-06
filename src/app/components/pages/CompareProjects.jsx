@@ -86,6 +86,11 @@ const CompareProjects = () => {
     setAnchorEl(null);
   };
 
+    useEffect(() => {
+      // Scroll to the top when the page loads
+      window.scrollTo(0, 0);
+    }, []);
+
   const renderProjectData = (project, field) => {
     switch (field) {
       case "Image":
@@ -94,6 +99,7 @@ const CompareProjects = () => {
           <img
             src={image}
             alt={project.name}
+            loading="lazy"
             style={{ width: "300px", height: "300px", borderRadius: "10px" }}
           />
         ) : (
@@ -352,7 +358,7 @@ const CompareProjects = () => {
           name="description"
           content="Compare different projects with insights from experts. Detailed and researched information for better decision-making."
         />
-        <link rel="canonical" href="https://propertymarvels.in/compare" />
+        <link rel="canonical" href="https://www.investmango.com/compare" />
       </Helmet>
 
       <div className="container mt-5">

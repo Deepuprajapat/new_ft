@@ -91,7 +91,8 @@ const AddHeadScripts = () => {
     const fbPixelNoScript = document.createElement("noscript");
     fbPixelNoScript.innerHTML = `
       <img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=708184850359382&ev=PageView&noscript=1"
+      src="https://www.facebook.com/tr?id=708184850359382&ev=PageView&noscript=1" 
+      loading="lazy"
       alt="facebook"/>
     `;
     document.body.appendChild(fbPixelNoScript);

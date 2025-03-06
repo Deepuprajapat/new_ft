@@ -43,3 +43,56 @@
   }
 
 
+  .swiper-button-next, .swiper-button-prev {
+    z-index: 10 !important;
+}
+
+.react-multiple-carousel__arrow--right {
+  /* right: -10px; */
+margin-right:10px;
+  z-index: 10 !important;
+}
+.react-multiple-carousel__arrow--left {
+  /* right: -10px; */
+  z-index: 10 !important;
+}
+/* .dropdown-item{
+  border-bottom: solid 1px #e6dfdf;
+} */
+.navbar-expand-lg .navbar-nav .dropdown-menu {
+  padding-bottom: 0px;
+}
+.project-description p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.project-description ul {
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.project-description li {
+  margin-bottom: 8px;
+}
+
+.project-description h1, 
+.project-description h2, 
+.project-description h3 {
+  font-size: 15px;
+  color: black;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.project-description strong {
+  font-weight: bold;
+  /* color: #ff5733; */
+}
+
+/* Handle new lines (\n) by adding block display */
+.project-description br {
+  display: block;
+  margin-bottom: 10px;
+}
