@@ -182,7 +182,7 @@ const ContactUs = () => {
                         {/* Noida Location */}
                         <div className="col-md-4 location-item">
                           <img
-                            src="https://www.investmango.com/images/Noida.png"
+                            src="/images/Noida.png"
                             alt="Noida Location"
                             loading="lazy"
                             className="location-icon"
@@ -200,7 +200,7 @@ const ContactUs = () => {
                         {/* Gurugram Location */}
                         <div className="col-md-4 location-item">
                           <img
-                            src="https://www.investmango.com/images/Gurugram.png"
+                            src="/images/Gurugram.png"
                             alt="Gurugram Location"
                             loading="lazy"
                             className="location-icon"
@@ -218,7 +218,7 @@ const ContactUs = () => {
                         {/* Pune Location */}
                         <div className="col-md-4 location-item">
                           <img
-                            src="	https://www.investmango.com/images/Pune.png"
+                            src="/images/Pune.png"
                             alt="Pune Location"
                             loading="lazy"
                             className="location-icon"

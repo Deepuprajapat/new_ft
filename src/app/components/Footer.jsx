@@ -110,7 +110,7 @@ const Footer = ({shortAddress}) => {
       <div className="CTA">
         <div className="whatsapp">
           <a
-            href="https://api.whatsapp.com/send?phone=+918368547490&text=Hi%2C%20I%27m%20interested%20in%20Invest%20Mango.%20Please%20share%20details%20about%20this%20project."
+            href="https://api.whatsapp.com/send?phone=+918448141652&text=Hi%2C%20I%27m%20interested%20in%20Invest%20Mango.%20Please%20share%20details%20about%20this%20project."
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -136,7 +136,7 @@ const Footer = ({shortAddress}) => {
               style={{ transform: "rotate(95deg)" }}
               className="fas fa-phone"
             ></i>{" "}
-            8368547490
+          8595189189
           </a>
         </div>
       )}
@@ -154,7 +154,7 @@ const Footer = ({shortAddress}) => {
       <footer>
         <div className="Whatsupbuttn" style={{ width: "70px" }}>
           <a
-            href="https://web.whatsapp.com/send?phone=+91-8368547490&text=Hi%2C%20I%27m%20interested%20in%20Invest%20Mango.%20Please%20share%20details%20about%20this%20project."
+            href="https://web.whatsapp.com/send?phone=+91-8448141652&text=Hi%2C%20I%27m%20interested%20in%20Invest%20Mango.%20Please%20share%20details%20about%20this%20project."
             target="_blank"
             style={{ float: "right" }}
           >

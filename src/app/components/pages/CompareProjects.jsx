@@ -86,10 +86,10 @@ const CompareProjects = () => {
     setAnchorEl(null);
   };
 
-    useEffect(() => {
-      // Scroll to the top when the page loads
-      window.scrollTo(0, 0);
-    }, []);
+  useEffect(() => {
+    // Scroll to the top when the page loads
+    window.scrollTo(0, 0);
+  }, []);
 
   const renderProjectData = (project, field) => {
     switch (field) {
@@ -144,6 +144,26 @@ const CompareProjects = () => {
 
       case "Property Type":
         return project.configurationsType?.propertyType || "N/A";
+      case "Highlights":
+        return project?.usps?.length ? (
+          <ul
+            style={{
+              paddingLeft: "15px",
+              margin: "0",
+              // listStylePosition: "inside",
+              fontSize: "13px", // Makes the font smaller
+              fontWeight: "600", // Ensures normal font weight
+            }}
+          >
+            {project.usps.map((point, index) => (
+              <li key={index} style={{ padding: "5px 0" }}>
+                {point}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          "N/A"
+        );
 
       case "No. of Towers":
         return project?.totalTowers || "N/A";
@@ -181,6 +201,7 @@ const CompareProjects = () => {
       "Size/Price",
       "Per Sq.ft. Rate",
       "Property Type",
+      "Highlights",
       "No. of Towers",
       "Total Floors",
       "Per Tower Lifts",
@@ -255,6 +276,7 @@ const CompareProjects = () => {
       "Size/Price",
       "Per Sq.ft. Rate",
       "Property Type",
+      "Highlights",
       "No. of Towers",
       "Total Floors",
       "Per Tower Lifts",
@@ -455,6 +477,7 @@ const CompareProjects = () => {
                   "Size/Price",
                   "Per Sq.ft. Rate",
                   "Property Type",
+                  "Highlights",
                   "No. of Towers",
                   "Total Floors",
                   "Per Tower Lifts",

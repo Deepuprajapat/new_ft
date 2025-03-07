@@ -142,11 +142,14 @@ const ProjectDetails = () => {
 
     const numPrice = typeof price === "string" ? parseFloat(price) : price;
 
-    // Check if the price is 1.5, then return "Sold Out"
+    // Check if the price is 1, then return "Sold Out"
+    if (numPrice === 1) {
+      return "Prices On Request";
+    }
+     // Check if the price is 1.5, then return "Sold Out"
     if (numPrice === 1.5) {
       return "Sold Out";
     }
-
     if (numPrice < 100 && numPrice > 0) {
       return `${numPrice} Cr`;
     }
@@ -505,7 +508,6 @@ const ProjectDetails = () => {
               <script
                 key={index}
                 type="application/ld+json"
-                
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaItem) }}
               />
             ))}
@@ -999,7 +1001,16 @@ const ProjectDetails = () => {
                       </div>
 
                       <div className="table-responsive">
-                      <span style={{fontSize:"10px",color:"black"}}>Website Link<a href={projectData?.reraLink || "N/A"} target="_blank"> {projectData?.reraLink || "N/A"}</a></span>
+                        <span style={{ fontSize: "10px", color: "black" }}>
+                          Website Link
+                          <a
+                            href={projectData?.reraLink || "N/A"}
+                            target="_blank"
+                          >
+                            {" "}
+                            {projectData?.reraLink || "N/A"}
+                          </a>
+                        </span>
                         <table className="w-100">
                           <thead>
                             <tr>
@@ -1098,11 +1109,19 @@ const ProjectDetails = () => {
                                       fontWeight: "600",
                                     }}
                                   >
-                                  {item.qrImages?.length > 0 ? (
-                                    <img src={item.qrImages || "-"} alt="qrImage" style={{height:"200",width:"200%",objectFit:"cover"}}/>
-                                  ) : (
-                                    <span>N/A</span>
-                                  )}
+                                    {item.qrImages?.length > 0 ? (
+                                      <img
+                                        src={item.qrImages || "-"}
+                                        alt="qrImage"
+                                        style={{
+                                          height: "200",
+                                          width: "200%",
+                                          objectFit: "cover",
+                                        }}
+                                      />
+                                    ) : (
+                                      <span>N/A</span>
+                                    )}
                                   </td>
                                 </tr>
                               ))
@@ -1241,7 +1260,8 @@ const ProjectDetails = () => {
                       }}
                     >
                       {projectData?.overviewPara ? (
-                        <div className="project-description"
+                        <div
+                          className="project-description"
                           dangerouslySetInnerHTML={{
                             __html: projectData.overviewPara,
                           }}
@@ -1666,7 +1686,7 @@ const ProjectDetails = () => {
                                   (value, index, self) =>
                                     self.indexOf(value) === index
                                 ) // Remove duplicates
-                                ?.sort((a, b) => parseInt(a) - parseInt(b)) // Sort numerically based on the number
+                                ?.sort((a, b) => parseFloat(a) - parseFloat(b)) // Sort numerically based on the number
                                 ?.join(", ")}
                             </p>
                           </div>
@@ -1788,8 +1808,19 @@ const ProjectDetails = () => {
                             onChange={handleChange}
                           >
                             <option value="">Select</option>
-                            <option value="2bhk">2 BHK</option>
-                            <option value="3bhk">3 BHK</option>
+                            {projectData?.configurations
+                              ?.slice()
+                              .sort((a, b) => {
+                                const numA = parseFloat(a) || 0; // Extract numeric part
+                                const numB = parseFloat(b) || 0;
+
+                                return numA - numB; // Sort numerically
+                              })
+                              .map((config, index) => (
+                                <option key={index} value={config}>
+                                  {config}
+                                </option>
+                              ))}
                           </select>
                         </div>
                         <div className="mb-3">
@@ -2093,7 +2124,6 @@ const ProjectDetails = () => {
                                 projectName={
                                   projectData?.name || "Invest Mango"
                                 } // Set project name or default
-                                
                               />
                               <div className="col-12 mt-2">
                                 <a
@@ -2173,7 +2203,8 @@ const ProjectDetails = () => {
                         }}
                       >
                         {projectData?.about && (
-                          <div className="project-description"
+                          <div
+                            className="project-description"
                             dangerouslySetInnerHTML={{
                               __html: projectData.about,
                             }}
@@ -2302,8 +2333,8 @@ const ProjectDetails = () => {
                       {projectData?.configurations
                         ?.slice()
                         .sort((a, b) => {
-                          const numA = parseInt(a); // Extract the numeric part of the string
-                          const numB = parseInt(b);
+                          const numA = parseFloat(a) || 0; // Extract numeric part
+                          const numB = parseFloat(b) || 0;
                           return numA - numB; // Sort in ascending order
                         })
                         .map((config, index) => (
@@ -2371,8 +2402,8 @@ const ProjectDetails = () => {
 
                         // Sort based on numeric BHK values (e.g., 2 BHK, 3 BHK, etc.)
                         const sortedPlans = filtered.sort((a, b) => {
-                          const numA = parseInt(a.projectConfigurationName); // Extract number
-                          const numB = parseInt(b.projectConfigurationName);
+                          const numA = parseFloat(a.projectConfigurationName); // Extract number
+                          const numB = parseFloat(b.projectConfigurationName);
                           return numA - numB;
                         });
 
@@ -2506,7 +2537,6 @@ const ProjectDetails = () => {
                                     projectName={
                                       projectData?.name || "Invest Mango"
                                     }
-                                  
                                   />
                                 </div>
                               </div>
@@ -2782,10 +2812,14 @@ const ProjectDetails = () => {
               >
                 Get Free Consultation for this property. Call us at:{" "}
                 <a
-                  href="tel:+918595-189-189"
+                  href={`tel:+91${
+                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                    "8595189189"
+                  }`}
                   style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
-                  8595-189-189
+                  {projectData?.locality?.city?.phoneNumber?.[0] ||
+                    "8595-189-189"}
                 </a>
               </div>
               {/* Payment Plan */}
@@ -3447,7 +3481,8 @@ const ProjectDetails = () => {
                       >
                         {developerDetails?.about && (
                           <>
-                            <div className="project-description"
+                            <div
+                              className="project-description"
                               dangerouslySetInnerHTML={{
                                 __html:
                                   expandedIndex === "about"
@@ -3508,14 +3543,18 @@ const ProjectDetails = () => {
                         <br />
                         <b>Phone:</b>{" "}
                         <a
-                          href="tel:+918595-189-189"
+                          href={`tel:+91${
+                            projectData?.locality?.city?.phoneNumber?.[0] ||
+                            "8595189189"
+                          }`}
                           style={{
                             textDecoration: "none",
                             color: "#2067d1",
                             fontWeight: "bold",
                           }}
                         >
-                          +91-8595-189-189
+                          {projectData?.locality?.city?.phoneNumber?.[0] ||
+                            "8595-189-189"}
                         </a>
                         <br />
                         <b>Book Your Site Visit</b>{" "}
@@ -3987,14 +4026,20 @@ const ProjectDetails = () => {
                             onChange={handleChange}
                           >
                             <option value="">Select</option>
-                           
-                            {projectData?.configurations?.map(
-                              (config, index) => (
+
+                            {projectData?.configurations
+                              ?.slice()
+                              .sort((a, b) => {
+                                const numA = parseFloat(a) || 0; // Extract numeric part
+                                const numB = parseFloat(b) || 0;
+
+                                return numA - numB; // Sort numerically
+                              })
+                              .map((config, index) => (
                                 <option key={index} value={config}>
                                   {config}
                                 </option>
-                              )
-                            )}
+                              ))}
                           </select>
                         </div>
 
