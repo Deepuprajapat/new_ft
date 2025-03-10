@@ -146,7 +146,7 @@ const ProjectDetails = () => {
     if (numPrice === 1) {
       return "Prices On Request";
     }
-     // Check if the price is 1.5, then return "Sold Out"
+    // Check if the price is 1.5, then return "Sold Out"
     if (numPrice === 1.5) {
       return "Sold Out";
     }
@@ -489,16 +489,16 @@ const ProjectDetails = () => {
   return (
     <>
       {projectData && (
-        <Helmet>
+      <Helmet>
           <title>{projectData.metaTitle || "Default Title"}</title>
           <meta
             name="description"
             content={projectData.metaDesciption || "Default Description"}
           />
           <meta
-            name="keywords"
+            name="metaKeywords"
             content={
-              projectData.keywords?.filter((k) => k.trim() !== "").join(", ") ||
+              projectData.metaKeywords?.filter((k) => k.trim() !== "").join(", ") ||
               "default, keywords"
             }
           />
@@ -2675,9 +2675,12 @@ const ProjectDetails = () => {
                     </p>
                     <div
                       style={{
-                        overflowX: "auto",
-                        maxHeight: "400px",
-                        overflowY: "auto",
+                        // overflowX: "auto",
+                        // maxHeight: "400px",
+                        // overflowY: "auto",
+                        width: "100%",
+                        overflowX: "auto", // Horizontal scroll if needed
+                        overflowY: "hidden", // No vertical scroll
                       }}
                     >
                       <table

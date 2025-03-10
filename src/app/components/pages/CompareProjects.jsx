@@ -34,6 +34,10 @@ const CompareProjects = () => {
     if (price === 1.5) {
       return "Sold Out";
     }
+    if (price === 1) {
+      return "Price On Request";
+    }
+
     if (!price) return "N/A";
 
     if (price >= 10000000) {
