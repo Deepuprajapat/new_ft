@@ -343,33 +343,33 @@ const Footer = ({shortAddress}) => {
                 <h5 className="headline">Our Projects</h5>
                 <ul>
                   <li>
-                    <a href="https://www.investmango.com/ace-divino">
-                      ACE Divino
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.investmango.com/godrej-woods-sector-43-noida">
-                      Godrej Woods
-                    </a>
-                  </li>
-                  <li>
                     <a href="https://www.investmango.com/ace-starlit-sector-152-noida">
                       ACE Starlit
                     </a>
                   </li>
                   <li>
                     <a href="https://www.investmango.com/nirala-aspire-sector-16-greater-noida-west">
-                      Nirala Aspire Low Rise Phase IV
+                    Nirala Aspire Low Rise Phase IV
                     </a>
                   </li>
                   <li>
-                    <a href="https://www.investmango.com/ace-terra-yamuna-expressway">
-                      ACE Terra
+                    <a href="https://www.investmango.com/ace-acreville">
+                    Ace Acreville
                     </a>
                   </li>
                   <li>
-                    <a href="https://www.investmango.com/max-antara-sector-150-noida">
-                      Max Antara
+                    <a href="https://www.investmango.com/godrej-vrikshya-sector-103-dwarka-expressway-gurugram">
+                    Godrej Vrikshya
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.investmango.com/lodha-altero-pune">
+                    Lodha Altero
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.investmango.com/conscient-parq-sector-80-gurugram">
+                    Conscient Parq
                     </a>
                   </li>
                 </ul>

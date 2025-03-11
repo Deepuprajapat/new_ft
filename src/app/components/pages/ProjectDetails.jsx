@@ -2304,7 +2304,7 @@ const ProjectDetails = () => {
                       }}
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(
-                          projectData?.floorPara || "<p>Not Available.</p>"
+                          projectData?.floorPara
                         ),
                       }}
                     >
@@ -3021,22 +3021,15 @@ const ProjectDetails = () => {
                     Video Presentation of {projectData && projectData?.name}
                   </h4>
                   <div className="px-3">
-                    <p
-                      className="mb-3 mb-md-5"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                      }}
-                    >
-                      {projectData?.videoPara ? (
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: projectData.videoPara,
-                          }}
-                        />
-                      ) : (
-                        `VIDEO PRESENTATION OF ${projectData?.name}`
-                      )}
-                    </p>
+                  {projectData?.videoPara && (
+          <p
+            className="mb-3 mb-md-5"
+            style={{
+              fontSize: window.innerWidth <= 768 ? "14px" : "16px",
+            }}
+            dangerouslySetInnerHTML={{ __html: projectData.videoPara }}
+          />
+        )}
 
                     <div className="d-flex flex-column">
                       {projectData?.videos &&
