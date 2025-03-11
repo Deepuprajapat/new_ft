@@ -489,7 +489,7 @@ const ProjectDetails = () => {
   return (
     <>
       {projectData && (
-      <Helmet>
+        <Helmet>
           <title>{projectData.metaTitle || "Default Title"}</title>
           <meta
             name="description"
@@ -498,8 +498,9 @@ const ProjectDetails = () => {
           <meta
             name="metaKeywords"
             content={
-              projectData.metaKeywords?.filter((k) => k.trim() !== "").join(", ") ||
-              "default, keywords"
+              projectData.metaKeywords
+                ?.filter((k) => k.trim() !== "")
+                .join(", ") || "default, keywords"
             }
           />
           <link rel="canonical" href={window.location.href} />
@@ -1259,15 +1260,13 @@ const ProjectDetails = () => {
                         fontSize: window.innerWidth <= 768 ? "12px" : "16px",
                       }}
                     >
-                      {projectData?.overviewPara ? (
+                      {projectData?.overviewPara && (
                         <div
                           className="project-description"
                           dangerouslySetInnerHTML={{
                             __html: projectData.overviewPara,
                           }}
                         />
-                      ) : (
-                        <p>No overview available</p>
                       )}
                     </p>
 
@@ -2666,8 +2665,7 @@ const ProjectDetails = () => {
                           }}
                           dangerouslySetInnerHTML={{
                             __html: DOMPurify.sanitize(
-                              projectData?.priceListPara ||
-                                "<p>Not Available.</p>"
+                              projectData?.priceListPara 
                             ),
                           }}
                         />
@@ -2826,6 +2824,7 @@ const ProjectDetails = () => {
                 </a>
               </div>
               {/* Payment Plan */}
+              {(projectData?.paymentPara || projectData?.paymentPlans?.length > 0) && (
               <div
                 className="mb-4"
                 id="payment_plan"
@@ -2850,7 +2849,7 @@ const ProjectDetails = () => {
                       }}
                     >
                       {/* {projectData?.paymentPara} */}
-                      <div className="px-3">
+                      {projectData?.paymentPara && (
                         <p
                           className="mb-3"
                           style={{
@@ -2858,13 +2857,10 @@ const ProjectDetails = () => {
                               window.innerWidth <= 768 ? "12px" : "16px",
                           }}
                           dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(
-                              projectData?.paymentPara ||
-                                "<p>Not Available.</p>"
-                            ),
+                            __html: DOMPurify.sanitize(projectData.paymentPara),
                           }}
                         />
-                      </div>
+                      )}
                     </p>
                     <div className="table-responsive">
                       <table className="table table-striped">
@@ -2910,6 +2906,7 @@ const ProjectDetails = () => {
                   </div>
                 </div>
               </div>
+            )}
               {/* Amenities */}
               <div
                 className="mb-4"
