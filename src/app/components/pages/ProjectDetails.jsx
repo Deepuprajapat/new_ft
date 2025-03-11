@@ -2303,9 +2303,7 @@ const ProjectDetails = () => {
                         fontSize: window.innerWidth <= 768 ? "12px" : "16px",
                       }}
                       dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(
-                          projectData?.floorPara
-                        ),
+                        __html: DOMPurify.sanitize(projectData?.floorPara),
                       }}
                     >
                       {/* {projectData?.floorPara} */}
@@ -2665,7 +2663,7 @@ const ProjectDetails = () => {
                           }}
                           dangerouslySetInnerHTML={{
                             __html: DOMPurify.sanitize(
-                              projectData?.priceListPara 
+                              projectData?.priceListPara
                             ),
                           }}
                         />
@@ -2824,89 +2822,92 @@ const ProjectDetails = () => {
                 </a>
               </div>
               {/* Payment Plan */}
-              {(projectData?.paymentPara || projectData?.paymentPlans?.length > 0) && (
-              <div
-                className="mb-4"
-                id="payment_plan"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h4
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    {projectData?.name} Payment Plan
-                  </h4>
-                  <div className="p-3">
-                    <p
-                      className="mb-3"
+              {(projectData?.paymentPara ||
+                projectData?.paymentPlans?.length > 0) && (
+                <div
+                  className="mb-4"
+                  id="payment_plan"
+                  style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
+                >
+                  <div className="p-0 pb-2">
+                    <h4
+                      className="mb-3 py-2 fw-bold text-white ps-3"
                       style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "16px",
+                        fontSize: window.innerWidth <= 768 ? "16px" : "18px",
+                        backgroundColor: "#2067d1",
+                        borderRadius: "4px 4px 0 0",
                       }}
                     >
-                      {/* {projectData?.paymentPara} */}
-                      {projectData?.paymentPara && (
-                        <p
-                          className="mb-3"
-                          style={{
-                            fontSize:
-                              window.innerWidth <= 768 ? "12px" : "16px",
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(projectData.paymentPara),
-                          }}
-                        />
-                      )}
-                    </p>
-                    <div className="table-responsive">
-                      <table className="table table-striped">
-                        <tbody>
-                          {projectData?.paymentPlans &&
-                            [...projectData?.paymentPlans]
-                              .reverse()
-                              .map((plan, index) => (
-                                <tr key={index}>
-                                  <td
-                                    style={{
-                                      fontSize:
-                                        window.innerWidth <= 768
-                                          ? "11px"
-                                          : "14px",
-                                      padding:
-                                        window.innerWidth <= 768
-                                          ? "8px 4px"
-                                          : "8px",
-                                    }}
-                                  >
-                                    {plan.planName}
-                                  </td>
-                                  <td
-                                    style={{
-                                      fontSize:
-                                        window.innerWidth <= 768
-                                          ? "11px"
-                                          : "14px",
-                                      padding:
-                                        window.innerWidth <= 768
-                                          ? "8px 4px"
-                                          : "8px",
-                                    }}
-                                  >
-                                    {plan.details}
-                                  </td>
-                                </tr>
-                              ))}
-                        </tbody>
-                      </table>
+                      {projectData?.name} Payment Plan
+                    </h4>
+                    <div className="p-3">
+                      <p
+                        className="mb-3"
+                        style={{
+                          fontSize: window.innerWidth <= 768 ? "12px" : "16px",
+                        }}
+                      >
+                        {/* {projectData?.paymentPara} */}
+                        {projectData?.paymentPara && (
+                          <p
+                            className="mb-3"
+                            style={{
+                              fontSize:
+                                window.innerWidth <= 768 ? "12px" : "16px",
+                            }}
+                            dangerouslySetInnerHTML={{
+                              __html: DOMPurify.sanitize(
+                                projectData.paymentPara
+                              ),
+                            }}
+                          />
+                        )}
+                      </p>
+                      <div className="table-responsive">
+                        <table className="table table-striped">
+                          <tbody>
+                            {projectData?.paymentPlans &&
+                              [...projectData?.paymentPlans]
+                                .reverse()
+                                .map((plan, index) => (
+                                  <tr key={index}>
+                                    <td
+                                      style={{
+                                        fontSize:
+                                          window.innerWidth <= 768
+                                            ? "11px"
+                                            : "14px",
+                                        padding:
+                                          window.innerWidth <= 768
+                                            ? "8px 4px"
+                                            : "8px",
+                                      }}
+                                    >
+                                      {plan.planName}
+                                    </td>
+                                    <td
+                                      style={{
+                                        fontSize:
+                                          window.innerWidth <= 768
+                                            ? "11px"
+                                            : "14px",
+                                        padding:
+                                          window.innerWidth <= 768
+                                            ? "8px 4px"
+                                            : "8px",
+                                      }}
+                                    >
+                                      {plan.details}
+                                    </td>
+                                  </tr>
+                                ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
               {/* Amenities */}
               <div
                 className="mb-4"
@@ -2925,26 +2926,17 @@ const ProjectDetails = () => {
                     {projectData?.name} Amenities
                   </h4>
                   <div className="px-3">
-                    <p
-                      className="mb-3"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                      }}
-                    >
-                      {projectData?.amenitiesPara ? (
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: projectData.amenitiesPara,
-                          }}
-                        />
-                      ) : (
-                        <p>
-                          World class amenities are there in {projectData?.name}{" "}
-                          for the residents to enjoy a luxurious lifestyle. Know
-                          in detail about the amenities in the list below.
-                        </p>
-                      )}
-                    </p>
+                    {projectData?.amenitiesPara && (
+                      <p
+                        className="mb-3"
+                        style={{
+                          fontSize: window.innerWidth <= 768 ? "12px" : "16px",
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: projectData.amenitiesPara,
+                        }}
+                      />
+                    )}
 
                     <div
                       className="inner-item"
@@ -3021,15 +3013,17 @@ const ProjectDetails = () => {
                     Video Presentation of {projectData && projectData?.name}
                   </h4>
                   <div className="px-3">
-                  {projectData?.videoPara && (
-          <p
-            className="mb-3 mb-md-5"
-            style={{
-              fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-            }}
-            dangerouslySetInnerHTML={{ __html: projectData.videoPara }}
-          />
-        )}
+                    {projectData?.videoPara && (
+                      <p
+                        className="mb-3 mb-md-5"
+                        style={{
+                          fontSize: window.innerWidth <= 768 ? "14px" : "16px",
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: projectData.videoPara,
+                        }}
+                      />
+                    )}
 
                     <div className="d-flex flex-column">
                       {projectData?.videos &&
