@@ -425,6 +425,7 @@ const ProjectDetails = () => {
   const handleDownloadBrochuree = () => setShowBrochurePopup(true);
 
   const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
+  const [modalType, setModalType] = useState("");
   const handleDownloadFloorPlan = () => setShowFloorPlanPopup(true);
   const closeFloorPlanPopup = () => setShowFloorPlanPopup(false);
 
@@ -2528,12 +2529,13 @@ const ProjectDetails = () => {
 
                                   {/* Floor Plan Dialog Popup */}
 
-                                  <PopupDialog
+                                  <BrochurePopupDialog
                                     open={showFloorPlanPopup}
                                     onClose={closeFloorPlanPopup}
                                     projectName={
                                       projectData?.name || "Invest Mango"
                                     }
+                                    brochure={projectData?.brochure}
                                   />
                                 </div>
                               </div>

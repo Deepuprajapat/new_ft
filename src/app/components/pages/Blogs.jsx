@@ -99,22 +99,24 @@ const Blogs = () => {
   return (
     <div>
       {/* <Helmet>
-  {blogData && (
-    <>
-      <title>{blogData.headings || ""}</title>
-      <meta name="description" content={blogData.description || ""} />
-      <link rel="canonical" href={blogData.canonical || ""} />
-      {blogData.schema &&
-        blogData.schema.map((schemaItem, index) => (
-          <script
-            key={index}
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaItem) }}
-          />
-        ))}
-    </>
-  )}
-</Helmet> */}
+        {blogData && (
+          <>
+            <title>{blogData.headings || ""}</title>
+            <meta name="description" content={blogData.description || ""} />
+            <link rel="canonical" href={blogData.canonical || ""} />
+            {blogData.schema &&
+              blogData.schema.map((schemaItem, index) => (
+                <script
+                  key={index}
+                  type="application/ld+json"
+                  dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(schemaItem),
+                  }}
+                />
+              ))}
+          </>
+        )}
+      </Helmet> */}
 
       <section className="main-body">
         <div className="main-con">
@@ -124,7 +126,10 @@ const Blogs = () => {
                 className="row d-flex"
                 style={{ justifyContent: "start", alignItems: "flex-start" }}
               >
-                <div className="col-md-8 blog-container" style={{ padding: "25px" }}>
+                <div
+                  className="col-md-8 blog-container"
+                  style={{ padding: "25px" }}
+                >
                   <div className="blog-content">
                     {blogData ? (
                       <>
@@ -312,7 +317,11 @@ const Blogs = () => {
                     rows="6"
                     value={formData.message}
                     onChange={handleChange}
-                    style={{ marginBottom: "19px" , resize: "none", overflowY: "auto"}}
+                    style={{
+                      marginBottom: "19px",
+                      resize: "none",
+                      overflowY: "auto",
+                    }}
                     required
                   ></textarea>
                   {error && <p style={{ color: "red" }}>{error}</p>}

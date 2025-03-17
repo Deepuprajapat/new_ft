@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const Footer = ({shortAddress}) => {
   const [footerItems, setFooterItems] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
-    const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
+  const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -159,7 +159,7 @@ const Footer = ({shortAddress}) => {
             style={{ float: "right" }}
           >
             <img
-              src="https://www.investmango.com/images/whatsapp1.gif"
+              src="/images/whatsappGif.gif"
               loading="lazy"
               title="SMS NOW"
               style={{ height: "59px", marginBottom: "3px" }}
