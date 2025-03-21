@@ -1,15 +1,9 @@
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 // const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
 
-// import axios from "axios";
-// console.log("Environment:", process.env.REACT_APP_ENV);
-// console.log("Base URL:", process.env.REACT_APP_BASE_URL);
-console.log("Environment:", process.env.REACT_APP_ENV);
-console.log("Base URL:", process.env.REACT_APP_BASE_URL1);
 let BASE_URL = process.env.REACT_APP_BASE_URL;
 let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
-console.log("API Base URL: ", BASE_URL1);
 
 if (process.env.REACT_APP_ENV === "production") {
   BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -19,7 +13,6 @@ if (process.env.REACT_APP_ENV === "production") {
 if (process.env.REACT_APP_ENV === "production") {
   BASE_URL1 = process.env.REACT_APP_BASE_URL1;
 }
-console.log("API Base URL1: ", BASE_URL1);
 // const BASE_URL1 = "https://api.virtualintelligence.co.in";
 let token = "";
 
@@ -32,7 +25,6 @@ export const login = async (userName, password) => {
     token = response.data.token;
     localStorage.setItem("authToken", token);
     localStorage.setItem("userName", userName);
-    console.log("userName" + userName);
     return token;
   } catch (error) {
     console.error("Login failed:", error);
@@ -45,7 +37,6 @@ axios.interceptors.request.use(
     const token = localStorage.getItem("x-auth-token");
     if (token) {
       config.headers.Authorization = `${token}`;
-      console.log("this user ", token);
     }
     return config;
   },
@@ -54,14 +45,12 @@ axios.interceptors.request.use(
 
 export const currentUser = async (token) => {
   try {
-    console.log("token", token);
 
     const res = await axios.get(`${BASE_URL}/auth/current`, {
       headers: {
         "x-auth-token": `${token}`,
       },
     });
-    console.log("repsonse : :", res);
     return res;
   } catch (error) {
     console.error("Error fetching Current User:", error);
@@ -115,7 +104,6 @@ export const getAllPropertyConfiguration = async () => {
     const res = await axios.get(
       `${BASE_URL}/project-configuration-type/get/all`
     );
-    console.log(JSON.stringify(res.data));
     return res.data;
   } catch (error) {
     console.error("Error fetching in Property Configuration");
@@ -154,7 +142,6 @@ export const getAllProject = async (filters = {}) => {
       ...(name && { name }),
       ...(type && { type: type.toUpperCase() }),
     };
-    // console.log("Params sent to API:", params);
     const res = await axios.get(`${BASE_URL}/project/get/all`, { params });
     return res.data;
   } catch (error) {
@@ -164,13 +151,15 @@ export const getAllProject = async (filters = {}) => {
 };
 
 //  get all project by urlname
-export const getAllProjectsByUrlName = async (urlName) => {
+export const getAllProjectsByUrlName = async (urlName ,navigate) => {
   try {
     const res = await axios.get(`${BASE_URL}/project/get/by/url/${urlName}`);
-    console.log("Data fetch:", res.data); // Logs the data for debugging
     return res.data || {}; // Ensures that if the response body is empty, we return an empty object
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
+    if (error.response && error.response.status === 400) {
+      navigate("/404"); // Redirects to the 404 page
+    }
     return {}; // Return an empty object if there's an error
   }
 };
@@ -178,7 +167,6 @@ export const getAllProjectsByUrlName = async (urlName) => {
 export const getAllBlogByUrl = async (blogUrl) => {
   try {
     const res = await axios.get(`${BASE_URL}/blogs/get/by/url/${blogUrl}`);
-    console.log("Data fetch:", res.data); // Logs the data for debugging
     return res.data || {}; // Ensures that if the response body is empty, we return an empty object
   } catch (error) {
     console.error("Error fetching Blogs By URl:", error);
@@ -194,7 +182,6 @@ export const getAllFloor = async (params = {}) => {
         ...params,
       },
     });
-    console.log("Data fetched:", res.data); // Logs the data for debugging
     return res.data || {}; // Ensures that if the response body is empty, we return an empty object
   } catch (error) {
     console.error("Error fetching floor plans:", error);
@@ -276,8 +263,6 @@ export const fetchTestimonials = async () => {
 
 export const fetchAllVacancies = async () => {
   try {
-    console.log("Starting fetchAllVacancies...");
-   // console.log("API Base URL1: ", `${BASE_URL1}/get/all/vacancies?isActive=true&page=0&size=100`);
     const response = await fetch(`${BASE_URL1}/get/all/vacancies?isActive=true&page=0&size=100`, {
       method: "GET",
       headers: {
@@ -285,19 +270,14 @@ export const fetchAllVacancies = async () => {
       },
  
     });
-
-    console.log("Response received:", response);
-
     if (!response.ok) {
       console.error("Response not OK:", response.statusText);
       throw new Error(`Error fetching vacancies: ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log("Parsed JSON data:", data);
 
     if (data && data.content) {
-      console.log("Vacancies content:", data.content);
     } else {
       console.warn("No 'content' field in the response data.");
     }
@@ -314,8 +294,6 @@ export const fetchAllVacancies = async () => {
 // Function to submit hiring form data
 export const submitHiringForm = async (formData) => {
   try {
-    console.log("FormData Payload:", formData);
-
     const response = await fetch(`${BASE_URL1}/user/save/hiring/by/ai`, {
       method: "POST",
       body: formData,
@@ -327,7 +305,6 @@ export const submitHiringForm = async (formData) => {
     }
 
     const data = await response.json();
-    console.log("API Response:", data);
     return data;
   } catch (error) {
     console.error("Error Submitting Form:", error);
@@ -402,8 +379,6 @@ export const checkPhoneNumberExists = async (phone) => {
       },
     });
 
-    console.log("Phone Check Response:", response.data);
-
     // Handle the paginated response properly
     const leads = response.data?.content || [];
     return leads.some((lead) => lead.phone === phone);
@@ -434,7 +409,6 @@ export const submitLead = async (formData) => {
 
   try {
     const response = await axios.post(`${BASE_URL}/leads/save/new`, payload);
-    console.log("Lead Submission Response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error submitting lead:", error);
@@ -442,7 +416,7 @@ export const submitLead = async (formData) => {
   }
 };
 
-export const sendOTP = async (phone, projectName, source, name, usermsg,email) => {
+export const sendOTP = async (phone, projectName, source, name, usermsg,email,userType) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/leads/save/new/and/send-otp`,
@@ -453,6 +427,7 @@ export const sendOTP = async (phone, projectName, source, name, usermsg,email) =
         message:usermsg,
         projectName: projectName,
         source: source,
+        userType: userType,
       }
     );
     return response.data;
@@ -499,7 +474,6 @@ export const resendOTP = async (phone) => {
 export const getAllGenericKeywords = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/generic/keywords/get/all`);
-    // console.log("Generic Keywords:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching Keywords:", error);
@@ -617,9 +591,6 @@ export const getAllProperties = async (page, pageSize, propertyType, configurati
 export const getPropertyByUrlName = async (urlName) => {
   try {
     const res = await axios.get(`${BASE_URL}/property/get/by/url/${urlName}`);
-    //const res = await axios.get(`http://3.7.237.167:8282/property/get/by/url/${urlName}`);
-    
-    console.log("Data fetch:", res.data); // Logs the data for debugging
     return res.data || {}; // Ensures that if the response body is empty, we return an empty object
   } catch (error) {
     console.error("Error fetching project by urlName:", error);

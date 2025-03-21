@@ -59,7 +59,7 @@ const Blogs = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+  const metakeywords = blogData?.metaKeywords || []; 
   // Handle form submission with phone validation
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,28 +95,29 @@ const Blogs = () => {
       swal("Error", "An error occurred. Please try again.", "error");
     }
   };
-
   return (
-    <div>
-      {/* <Helmet>
-        {blogData && (
-          <>
-            <title>{blogData.headings || ""}</title>
-            <meta name="description" content={blogData.description || ""} />
-            <link rel="canonical" href={blogData.canonical || ""} />
-            {blogData.schema &&
-              blogData.schema.map((schemaItem, index) => (
-                <script
-                  key={index}
-                  type="application/ld+json"
-                  dangerouslySetInnerHTML={{
-                    __html: JSON.stringify(schemaItem),
-                  }}
-                />
-              ))}
-          </>
-        )}
-      </Helmet> */}
+   
+    <>
+ 
+    
+ <Helmet>
+  <title>
+    {Array.isArray(blogData?.headings)
+      ? blogData.headings.join(" ")
+      : blogData?.headings || "Default Title"}
+  </title>
+  <meta name="keywords" content={Array.isArray(metakeywords?.length > 0 )? metakeywords?.join(", ") : "default keyword"} />
+
+  <meta
+    name="description"
+    content={blogData?.subHeadings || "Default description"}
+  />
+  {Array.isArray(blogData?.schema)? blogData?.schema.join(" "):blogData?.schema|| "default schema"}
+  {blogData?.canonical && <link rel="canonical" href={blogData.canonical} />}
+</Helmet>
+
+
+
 
       <section className="main-body">
         <div className="main-con">
@@ -349,7 +350,7 @@ const Blogs = () => {
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 };
 

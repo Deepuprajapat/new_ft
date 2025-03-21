@@ -1,6 +1,6 @@
 // ProjectCard.js
 import React from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import "../styles/css/home.css"; // Link to the updated CSS file
 
 const ProjectCard = ({ project }) => {
@@ -33,12 +33,15 @@ const ProjectCard = ({ project }) => {
         target="_blank"
         rel="noopener noreferrer"
       >
+       
+       {project.isPremium && <span className="premium-tag">Premium</span>}
         <img
           alt={project.name}
           src={(project.images && project.images[2]?.imageUrl) || defaultImage}
           loading="lazy"
           className="project-card-image"
         />
+       
         <p className="project-card-title">{project.name}</p>
       </a>
       <p className="project-card-location">
@@ -63,7 +66,7 @@ const ProjectCard = ({ project }) => {
                   // Separate BHK configurations
                   const bhkConfigs = project.configurations
                     .filter((config) => /\d+BHK/.test(config)) // Match numeric BHK configurations
-                    .map((config) => parseInt(config)) // Extract numeric part (e.g., 2 from 2BHK)
+                    .map((config) => parseFloat(config)) // Extract numeric part (e.g., 2 from 2BHK)
                     .filter((num) => !isNaN(num)); // Ensure valid numbers only
 
                   // Find unique configurations

@@ -47,7 +47,10 @@ const MailSection = () => {
         "index page", // Project Name
         "website", // Source
         formData.username,
-        formData.message
+        formData.message,
+        "",
+        formData.userType
+        
       );
       swal("OTP Sent!", "Please check your phone for the OTP.", "success");
       setOtpSent(true);
@@ -81,7 +84,11 @@ const MailSection = () => {
     setOtpError("");
     try {
       await resendOTP(formData.usermobile);
-      swal("OTP Resent!", "Please check your phone for the new OTP.", "success");
+      swal(
+        "OTP Resent!",
+        "Please check your phone for the new OTP.",
+        "success"
+      );
     } catch (error) {
       console.error("Error resending OTP:", error.message);
       setOtpError("Failed to resend OTP. Please try again later.");
@@ -98,6 +105,27 @@ const MailSection = () => {
           <form id="contactpage" onSubmit={handleFormSubmit}>
             <div className="row">
               <div className="col-md-12">
+                <label>Role:</label>
+                <select
+                  name="userType"
+                  className="form-select"
+                  // style={{
+                  //   width: "100%",
+                  //   padding: "8px",
+                  //   margin: "8px 0", // Similar to `margin="dense"`
+                  //   borderRadius: "4px",
+                  //   border: "1px solid #ccc",
+                  // }}
+                  value={formData.userType} // Ensure this is in your state
+                  onChange={handleChange}
+                >
+                  <option value="">Select</option>
+                  <option value="Associate">Associate</option>
+                  <option value="Builder">Builder</option>
+                  <option value="Broker">Broker</option>
+                  <option value="Seller">Seller</option>
+                  <option value="Buyer">Buyer</option>
+                </select>
                 <label>Name:</label>
                 <input
                   required
@@ -138,8 +166,12 @@ const MailSection = () => {
                   </div>
                 )}
 
-                <button type="submit" className="theme-btn" style={{margintop:"20px!important"}}>
-                  Send 
+                <button
+                  type="submit"
+                  className="theme-btn"
+                  style={{ margintop: "20px!important" }}
+                >
+                  Send
                 </button>
               </div>
             </div>

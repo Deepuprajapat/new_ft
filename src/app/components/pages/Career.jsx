@@ -34,7 +34,6 @@ const Career = () => {
         const validPositions = positionsData.filter(
           (pos) => pos.id && pos.designation
         );
-        console.log("Valid Positions:", validPositions);
         setPositions(validPositions);
 
         // Prepare jobOpenings data for the Accordion
@@ -85,9 +84,6 @@ const Career = () => {
       noticePeriod: formData.notice_period,
       vacancyId: formData.userposition,
     });
-
-    console.log("Payload Sent:", hiringRequestJson);
-
     data.append("hiringRequestJson", hiringRequestJson);
     if (formData.fileToUpload) {
       data.append("file", formData.fileToUpload);
@@ -95,7 +91,6 @@ const Career = () => {
 
     try {
       const response = await submitHiringForm(data);
-      console.log("Server Response:", response);
 
       // Show SweetAlert after successful submission
       swal(

@@ -27,7 +27,7 @@ const Head = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
-      const response = await getAllProject({ isFeatured: true });
+      const response = await getAllProject({ isPriority: true });
       setProjects(response.content || []);
       setLoading(false);
     };
@@ -59,6 +59,17 @@ const Head = () => {
       1024: { slidesPerView: 3, spaceBetween: 30 }, // Desktop
     },
   };
+
+  const projectOrder = [
+    330, 216, 142, 299, 300, 283, 48, 135, 1, 169, 149, 289, 320, 202, 210, 297, 298, 
+    215, 313, 218, 134, 317, 133, 269, 15, 37, 138, 212
+  ];
+  
+  const sortedProjects = projects
+    ?.sort((a, b) => {
+      return projectOrder.indexOf(a.id) - projectOrder.indexOf(b.id);
+    })
+    .slice(0, 30); // Limit to 30 projects
 
   return (
     <div>
@@ -123,10 +134,10 @@ const Head = () => {
                         {loading ? (
                           <Loading isFullScreen={false} />
                         ) : (
-                          projects?.map((project) => (
-                            <SwiperSlide key={project.id}>
-                              <ProjectCard project={project} />
-                            </SwiperSlide>
+                          sortedProjects.map((project) => (
+                      <SwiperSlide key={project.id}>
+                        <ProjectCard project={project} />
+                      </SwiperSlide>
                           ))
                         )}
                       </Swiper>

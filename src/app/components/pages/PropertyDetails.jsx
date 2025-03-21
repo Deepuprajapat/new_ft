@@ -107,7 +107,6 @@ const PropertyDetails = () => {
     }
     setError("");
     setTimer(60);
-    // console.log("OTP sent to:", `${formData.dial_code}${formData.usermobile}`);
     try {
       const response = await sendOTP(
         formData.usermobile,

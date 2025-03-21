@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import PopupDialog from "./CommanPopup";
 import { useOutletContext } from "react-router-dom";
@@ -57,6 +57,7 @@ const ProjectDetails = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isNavFixed, setIsNavFixed] = useState(false);
   const [navInitialPosition, setNavInitialPosition] = useState(null);
+  const navigate = useNavigate();
 
   // Store initial nav position on mount
   useEffect(() => {
@@ -71,11 +72,9 @@ const ProjectDetails = () => {
     const fetchData = async () => {
       if (urlName) {
         try {
-          const data = await getAllProjectsByUrlName(urlName);
-          // console.log("Fetched project data:", data);
+          const data = await getAllProjectsByUrlName(urlName, navigate);
           if (data) {
             setProjectData(data);
-            // console.log("url", data.url);
             setDeveloperId(data.developerId); // Update developer ID
             setProjectId(data.id); // Update developer ID
           }
@@ -85,14 +84,12 @@ const ProjectDetails = () => {
       }
     };
     fetchData();
-  }, [urlName]);
+  }, [urlName, navigate]);
 
   useEffect(() => {
     if (projectData) {
       const fetchAllProject = async () => {
         const data = await getAllProject(projectData?.locality?.city?.id);
-        // console.log("fetc name ", data?.content[0].name);
-        // console.log("Fetched all project data:", data?.content);
 
         if (data) {
           setAllSimilarProjects(data?.content);
@@ -101,14 +98,12 @@ const ProjectDetails = () => {
       fetchAllProject();
     }
   }, [projectData]);
-  // console.log("Josn",projectData)
   // Fetch developer details when DeveloperId changes
   useEffect(() => {
     const fetchDeveloper = async () => {
       if (developerId) {
         try {
           const data = await getDeveloperById(developerId);
-          // console.log("Fetched developer data:", data);
           if (data) {
             setDeveloperDetails(data);
           }
@@ -126,7 +121,6 @@ const ProjectDetails = () => {
 
       try {
         const data = await getReraInfoByProjectId(projectId);
-        // console.log("Fetched RERA data:", data);
         setReraDetails(data || []); // Ensures state is always an array
       } catch (error) {
         console.error("Error fetching RERA data:", error);
@@ -235,6 +229,7 @@ const ProjectDetails = () => {
   const [formData, setFormData] = useState({
     username: "",
     useremail: "",
+    userType: "",
     // dial_code: "91",
     usermobile: "",
     intersted_in: "",
@@ -264,7 +259,6 @@ const ProjectDetails = () => {
     }
     setError("");
     setTimer(60);
-    // console.log("OTP sent to:", `${formData.dial_code}${formData.usermobile}`);
     try {
       const response = await sendOTP(
         formData.usermobile,
@@ -272,7 +266,8 @@ const ProjectDetails = () => {
         "ORGAINc",
         formData.username,
         formData.usermsg,
-        formData.useremail
+        formData.useremail,
+        formData.userType
       );
       if (response) {
         setOtpSent(true);
@@ -425,7 +420,7 @@ const ProjectDetails = () => {
   const handleDownloadBrochuree = () => setShowBrochurePopup(true);
 
   const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
-  const [modalType, setModalType] = useState("");
+  // const [modalType, setModalType] = useState("");
   const handleDownloadFloorPlan = () => setShowFloorPlanPopup(true);
   const closeFloorPlanPopup = () => setShowFloorPlanPopup(false);
 
@@ -470,10 +465,6 @@ const ProjectDetails = () => {
     ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) })) // Add cleaned data
     ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); // Sort numerically if a number exists
 
-  // const canonical = `http://propertymarvels.in/project/${urlName}`;
-  // console.log("can",canonical)
-  // console.log("mets tielle",projectData?.data)
-
   const imageSrc =
     projectData?.siteplanImg && projectData.siteplanImg.trim() !== ""
       ? projectData.siteplanImg.startsWith("http")
@@ -487,6 +478,7 @@ const ProjectDetails = () => {
       setShortAddress(projectData.shortAddress); // 🔹 Update shortAddress in AppLayout
     }
   }, [projectData, setShortAddress]);
+
   return (
     <>
       {projectData && (
@@ -1210,14 +1202,16 @@ const ProjectDetails = () => {
                   className="h2 mb-0 fw-bold text-center text-md-end"
                   style={{ fontSize: "25px", fontWeight: "800" }}
                 >
-                  ₹
+                  ₹{" "}
                   {formatPrice(
-                    getLeastPriceOfFloorPlan(projectData?.floorplans)
-                  ) || "0"}{" "}
-                  - ₹
+                    getLeastPriceOfFloorPlan(
+                      projectData?.floorplans?.filter((plan) => plan.price > 1)
+                    )
+                  )}{" "}
+                  - ₹{" "}
                   {formatPrice(
                     getHighestPriceOfFloorPlan(projectData?.floorplans)
-                  ) || "0"}
+                  )}
                 </h2>
               </div>
             </div>
@@ -1643,7 +1637,10 @@ const ProjectDetails = () => {
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.configurationsType?.propertyType}
+                              {projectData?.configurationsType?.propertyType &&
+                                projectData.configurationsType.propertyType
+                                  .toLowerCase()
+                                  .replace(/^\w/, (c) => c.toUpperCase())}
                             </p>
                           </div>
                         </div>
@@ -1772,6 +1769,23 @@ const ProjectDetails = () => {
                             onChange={handleChange}
                           />
                         </div>
+                        <div className="mb-3">
+                          <select
+                            name="userType"
+                            className="form-select"
+                            // style={{ maxWidth: "150px" }}
+                            value={formData.userType} // Ensure this is in your state
+                            onChange={handleChange}
+                          >
+                            <option value="">Select Role</option>
+                            <option value="Associate">Associate</option>
+                            <option value="Builder">Builder</option>
+                            <option value="Broker">Broker</option>
+                            <option value="Seller">Seller</option>
+                            <option value="Buyer">Buyer</option>
+                          </select>
+                        </div>
+
                         <div className="mb-3">
                           <div className="input-group">
                             <select
@@ -3458,7 +3472,7 @@ const ProjectDetails = () => {
                           <b>{developerDetails?.establishedYear}</b>
                           <br />
                           TOTAL PROJECTS -{" "}
-                          <b>{developerDetails?.totalProjects}</b>
+                          <b>{developerDetails?.totalProjects}+</b>
                         </p>
                       </div>
 
@@ -3869,6 +3883,24 @@ const ProjectDetails = () => {
                             onChange={handleChange}
                           />
                         </div>
+
+                        <div className="mb-3">
+                          <select
+                            name="userType"
+                            className="form-select"
+                            // style={{ maxWidth: "100px" }}
+                            value={formData.userType} // Ensure this is in your state
+                            onChange={handleChange}
+                          >
+                            <option value="">Select Role</option>
+                            <option value="Associate">Associate</option>
+                            <option value="Builder">Builder</option>
+                            <option value="Broker">Broker</option>
+                            <option value="Seller">Seller</option>
+                            <option value="Buyer">Buyer</option>
+                          </select>
+                        </div>
+
                         <div className="mb-3">
                           <div className="input-group">
                             <select

@@ -8,13 +8,24 @@ import ShareIcon from "@mui/icons-material/Share";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import LeadFormModal from "./LeadFormModal";
 
 const CompareProjects = () => {
   const [projects, setProjects] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("");
   const [selectedProjects, setSelectedProjects] = useState(["", "", ""]);
   const [comparedProjects, setComparedProjects] = useState([]);
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [openForm, setOpenForm] = useState(false);
+
+  const handleOpenForm = () => {
+    setOpenForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setOpenForm(false);
+  };
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -73,7 +84,9 @@ const CompareProjects = () => {
     const tableContent = generateTableString(comparedProjects);
 
     let shareURL = "";
-    const message = encodeURIComponent(`${tableContent}\n\nDetails: ${url}`);
+    const message = encodeURIComponent(
+      `${tableContent}\n\nDetails: https://www.investmango.com/compare\n\nOur expert portfolio managers will connect with you soon to tailor the perfect investment strategy for your needs.`
+    );
 
     switch (platform) {
       case "whatsapp":
@@ -118,7 +131,15 @@ const CompareProjects = () => {
       case "No of Unit":
         return project.units;
       case "Possession Date":
-        return new Date(project.possessionDate).toLocaleDateString();
+        const possessionDate = project.possessionDate;
+        if (possessionDate === "Coming, Soon") {
+          return possessionDate; // If it's "Coming, Soon", display it as is
+        } else {
+          const date = new Date(possessionDate);
+          return isNaN(date.getTime())
+            ? "Invalid Date"
+            : date.toLocaleDateString(); // Check if it's a valid date
+        }
       case "Size/Price":
         return (
           <table className="nested-table">
@@ -203,12 +224,9 @@ const CompareProjects = () => {
       "No of Unit",
       "Possession Date",
       "Size/Price",
-      "Per Sq.ft. Rate",
       "Property Type",
-      "Highlights",
       "No. of Towers",
       "Total Floors",
-      "Per Tower Lifts",
       "Open Area",
       "Construction Type",
     ];
@@ -255,117 +273,100 @@ const CompareProjects = () => {
 
   // Function to generate PDF
   const generatePDF = () => {
-    const doc = new jsPDF({
-      orientation: "landscape",
-      unit: "pt", // Points for precise layout
-      format: "a3", // Larger page size (adjust as needed)
-    });
-
-    // Title
-    doc.setFontSize(16);
-    doc.text("Compared Projects", 40, 40);
-
-    // Dynamic table headers for all compared projects
-    const tableHeaders = [
-      "Details",
-      ...comparedProjects.map((project) => project.name),
-    ];
-
-    // Fields to be displayed in the table
-    const fields = [
-      "Location",
-      "Total Area",
-      "No of Unit",
-      "Possession Date",
-      "Size/Price",
-      "Per Sq.ft. Rate",
-      "Property Type",
-      "Highlights",
-      "No. of Towers",
-      "Total Floors",
-      "Per Tower Lifts",
-      "Open Area",
-      "Construction Type",
-    ];
-
-    // Generate table rows dynamically
-    const tableRows = fields.map((field) => {
-      const row = [field];
-
-      comparedProjects.forEach((project) => {
-        let value = "";
-
-        if (field === "Size/Price") {
-          value =
-            project.floorplans?.length > 0
-              ? project.floorplans
-                  .map(
-                    (config) =>
-                      `${config.title} - ${
-                        config.size
-                      } Sq.ft. - ${formatPriceInCrores(config.price)}`
-                  )
-                  .join("\n")
-              : "No Data Available";
-        } else {
-          value = renderProjectData(project, field) || "No Data Available";
-        }
-
-        // Wrap text for long content
-        const wrappedText = doc.splitTextToSize(value, 150); // Split text to fit column width
-        row.push(wrappedText);
+    setTimeout(() => {
+      const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "pt",
+        format: "a3",
       });
 
-      return row;
-    });
+      doc.setFontSize(16);
+      doc.text("Compared Projects", 40, 40);
 
-    // Define dynamic font size and column widths based on device
-    let fontSize = 8; // Default font size for desktop
-    let columnWidths = {
-      0: { cellWidth: 120 }, // 'Details' column width
-      1: { cellWidth: "wrap" }, // Dynamic width for project columns
-    };
+      const tableHeaders = [
+        "Details",
+        ...comparedProjects.map((project) => project.name),
+      ];
 
-    // Adjust font size and column width based on screen size (for responsiveness)
-    const windowWidth = window.innerWidth;
-    if (windowWidth <= 576) {
-      // Mobile
-      fontSize = 6; // Smaller font for mobile
-      columnWidths = {
-        0: { cellWidth: 80 }, // Smaller 'Details' column width for mobile
+      const fields = [
+        "Location",
+        "Total Area",
+        "No of Unit",
+        "Possession Date",
+        "Size/Price",
+        "Property Type",
+        "No. of Towers",
+        "Total Floors",
+        "Open Area",
+        "Construction Type",
+      ];
+
+      const tableRows = fields.map((field) => {
+        const row = [field];
+
+        comparedProjects.forEach((project) => {
+          let value =
+            field === "Size/Price"
+              ? project.floorplans?.length > 0
+                ? project.floorplans
+                    .map(
+                      (config) =>
+                        `${config.title} - ${
+                          config.size
+                        } Sq.ft. - ${formatPriceInCrores(config.price)}`
+                    )
+                    .join("\n")
+                : "No Data Available"
+              : renderProjectData(project, field) || "No Data Available";
+
+          const wrappedText = doc.splitTextToSize(value, 150);
+          row.push(wrappedText);
+        });
+
+        return row;
+      });
+
+      let fontSize = 8;
+      let columnWidths = {
+        0: { cellWidth: 120 },
         1: { cellWidth: "wrap" },
       };
-    } else if (windowWidth <= 768) {
-      // Tablet
-      fontSize = 7; // Slightly larger font for tablet
-      columnWidths = {
-        0: { cellWidth: 100 }, // Adjust 'Details' column width for tablet
-        1: { cellWidth: "wrap" },
-      };
-    }
 
-    // Create the table with dynamic column handling
-    doc.autoTable({
-      head: [tableHeaders],
-      body: tableRows,
-      startY: 60, // Adjust to start below the title
-      theme: "grid",
-      styles: {
-        fontSize: fontSize, // Dynamic font size based on screen size
-        overflow: "linebreak", // Handle overflow by breaking text
-        valign: "middle", // Vertically align text
-      },
-      columnStyles: columnWidths,
-      margin: { top: 60 },
-      didDrawPage: (data) => {
-        // Add a header to each page (adjusts to page size)
-        doc.setFontSize(16);
-        doc.text("Compared Projects", data.settings.margin.left, 40);
-      },
-    });
+      const windowWidth = window.innerWidth;
+      if (windowWidth <= 576) {
+        fontSize = 6;
+        columnWidths = {
+          0: { cellWidth: 80 },
+          1: { cellWidth: "wrap" },
+        };
+      } else if (windowWidth <= 768) {
+        fontSize = 7;
+        columnWidths = {
+          0: { cellWidth: 100 },
+          1: { cellWidth: "wrap" },
+        };
+      }
 
-    // Save PDF
-    doc.save("Compared_Projects.pdf");
+      doc.autoTable({
+        head: [tableHeaders],
+        body: tableRows,
+        startY: 60,
+        theme: "grid",
+        styles: {
+          fontSize: fontSize,
+          overflow: "linebreak",
+          valign: "middle",
+        },
+        columnStyles: columnWidths,
+        margin: { top: 60 },
+        didDrawPage: (data) => {
+          doc.setFontSize(16);
+          doc.text("Compared Projects", data.settings.margin.left, 40);
+        },
+      });
+
+      doc.save("Compared_Projects.pdf");
+    }, 100); // Delay added
   };
 
   const handleMenuClick = (event) => {
@@ -375,6 +376,25 @@ const CompareProjects = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const handleCitySelect = (city) => {
+    setSelectedCity(city);
+    setSelectedProjects(["", "", ""]); // Reset selected projects when city changes
+  };
+
+  // Extract unique cities
+  const cities = [
+    ...new Set(
+      projects.map((project) => project?.locality?.city?.name).filter(Boolean)
+    ),
+  ].sort((a, b) => a.localeCompare(b));
+
+  // Filter projects based on selected city
+  const filteredProjects = selectedCity
+    ? projects.filter(
+        (project) => project?.locality?.city?.name === selectedCity
+      )
+    : projects;
 
   return (
     <>
@@ -392,6 +412,21 @@ const CompareProjects = () => {
         <p>Home / Compare Projects</p>
 
         <div className="d-flex flex-wrap justify-content-center mb-4">
+          {/* City Dropdown */}
+          <select
+            className="custom-select form-select mx-2"
+            style={{ width: window.innerWidth <= 768 ? "100%" : "200px" }}
+            value={selectedCity}
+            onChange={(e) => handleCitySelect(e.target.value)}
+          >
+            <option value="">Select City</option>
+            {cities.map((city, index) => (
+              <option key={index} value={city}>
+                {city.charAt(0).toUpperCase() + city.slice(1).toLowerCase()}
+              </option>
+            ))}
+          </select>
+          {/* Project Dropdowns */}
           {[0, 1, 2].map((index) => (
             <select
               key={index}
@@ -401,16 +436,14 @@ const CompareProjects = () => {
               onChange={(e) => handleSelect(index, e.target.value)}
             >
               <option value="">Select</option>
-              {projects
-                .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically by project name
+              {filteredProjects
+                .sort((a, b) => a.name.localeCompare(b.name))
                 .map((project) => {
-                  // Convert to title case (each word's first letter uppercase, rest lowercase)
                   const formattedName = project.name
                     .toLowerCase()
                     .split(" ")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(" ");
-
                   return (
                     <option key={project.id} value={project.id}>
                       {formattedName}
@@ -423,6 +456,7 @@ const CompareProjects = () => {
           <button
             className="btn mx-2"
             onClick={handleCompare}
+            // onClick={() => console.log("Compare clicked", selectedProjects)}
             style={{
               backgroundColor: "#2067d1",
               borderColor: "#2067d1",
@@ -454,9 +488,14 @@ const CompareProjects = () => {
                 <ListItemText>Facebook</ListItemText>
               </MenuItem>
             </Menu>
-            <IconButton onClick={generatePDF} color="primary">
+            <IconButton onClick={handleOpenForm} color="primary">
               <GetAppIcon />
             </IconButton>
+            <LeadFormModal
+              open={openForm}
+              onClose={handleCloseForm}
+              onDownload={generatePDF}
+            />
           </div>
         </div>
 
@@ -475,16 +514,14 @@ const CompareProjects = () => {
                 {[
                   "Image",
                   "Location",
+                  "Highlights",
                   "Total Area",
                   "No of Unit",
                   "Possession Date",
                   "Size/Price",
-                  "Per Sq.ft. Rate",
                   "Property Type",
-                  "Highlights",
                   "No. of Towers",
                   "Total Floors",
-                  "Per Tower Lifts",
                   "Open Area",
                   "Construction Type",
                 ].map((field) => (

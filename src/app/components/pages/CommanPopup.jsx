@@ -26,6 +26,7 @@ const PopupDialog = ({ open, onClose, projectName }) => {
     username: "",
     usermobile: "",
     usermsg: projectName || "",
+    userType: "",
   });
 
   const [error, setError] = useState("");
@@ -46,15 +47,15 @@ const PopupDialog = ({ open, onClose, projectName }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const generateComingSoonPDF = (projectName) => {
-    const doc = new jsPDF();
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.text("BROCHURE COMING SOON", 50, 80);
-    doc.setFontSize(14);
-    doc.text(`Project: ${projectName || "Unknown Project"}`, 50, 100);
-    doc.save(`${projectName || "Brochure"}-Coming-Soon.pdf`);
-  };
+  // const generateComingSoonPDF = (projectName) => {
+  //   const doc = new jsPDF();
+  //   doc.setFont("helvetica", "bold");
+  //   doc.setFontSize(20);
+  //   doc.text("BROCHURE COMING SOON", 50, 80);
+  //   doc.setFontSize(14);
+  //   doc.text(`Project: ${projectName || "Unknown Project"}`, 50, 100);
+  //   doc.save(`${projectName || "Brochure"}-Coming-Soon.pdf`);
+  // };
 
   const handleSubmit = async () => {
     const { username, usermobile } = formData;
@@ -70,7 +71,7 @@ const PopupDialog = ({ open, onClose, projectName }) => {
     }
 
     try {
-      await sendOTP(usermobile, projectName, "brochure", username, "");
+      await sendOTP(usermobile, projectName, "brochure", username, "", "", formData.userType);
       setIsOtpSent(true);
       Swal.fire({
         icon: "success",
@@ -184,6 +185,26 @@ const PopupDialog = ({ open, onClose, projectName }) => {
                 {projectName || "Invest Mango"}
               </div>
             </p>
+            <select
+              name="userType"
+              className="form-select"
+              style={{
+                width: "100%",
+                padding: "8px",
+                margin: "8px 0", // Similar to `margin="dense"`
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
+              value={formData.userType} // Ensure this is in your state
+              onChange={handleChange}
+            >
+              <option value="">Select Role</option>
+              <option value="Associate">Associate</option>
+              <option value="Builder">Builder</option>
+              <option value="Broker">Broker</option>
+              <option value="Seller">Seller</option>
+              <option value="Buyer">Buyer</option>
+            </select>
             <input
               type="text"
               name="username"

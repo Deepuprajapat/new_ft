@@ -16,7 +16,6 @@ const Footer = ({shortAddress}) => {
     const fetchFooterItems = async () => {
       try {
         const keywords = await getAllGenericKeywords();
-        // console.log("Fetched Keywords:", keywords);
         setFooterItems(keywords);
       } catch (error) {
         console.error("Error fetching footer items:", error);
@@ -86,15 +85,12 @@ const Footer = ({shortAddress}) => {
 
           return acc;
         }, {});
-        // console.log(cityMap,'cityMap');
         // Match shortAddress with city names
         if (shortAddress) {
           const matchedCity = Object.keys(cityMap).find((city) =>
             shortAddress.toLowerCase().includes(city)
           );
-          // console.log(matchedCity);
-          if (matchedCity) {
-            // console.log(cityMap[matchedCity]);
+          if (matchedCity) {;
             setMatchedPhoneNumber(cityMap[matchedCity]); // Set the matched phone number
           }
         }

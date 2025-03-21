@@ -26,6 +26,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
     username: "",
     usermobile: "",
     usermsg: projectName || "",
+    userType: "",
   });
 
   const [error, setError] = useState("");
@@ -70,7 +71,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
     }
 
     try {
-      await sendOTP(usermobile, projectName, "brochure", username, "");
+      await sendOTP(usermobile, projectName, "brochure", username,  "", "", formData.userType);
       setIsOtpSent(true);
       Swal.fire({
         icon: "success",
@@ -111,7 +112,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
             let brochureUrl = brochure.startsWith("http")
               ? brochure
               : `${BASE_BROCHURE_URL}/${brochure}`;
-      
+
             window.open(brochureUrl, "_blank"); // Open brochure in new tab
           } else {
             generateComingSoonPDF(projectName);
@@ -196,6 +197,26 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
                 {projectName || "Invest Mango"}
               </div>
             </p>
+            <select
+              name="userType"
+              className="form-select"
+              style={{
+                width: "100%",
+                padding: "8px",
+                margin: "8px 0", // Similar to `margin="dense"`
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
+              value={formData.userType} // Ensure this is in your state
+              onChange={handleChange}
+            >
+              <option value="">Select Role</option>
+              <option value="Associate">Associate</option>
+              <option value="Builder">Builder</option>
+              <option value="Broker">Broker</option>
+              <option value="Seller">Seller</option>
+              <option value="Buyer">Buyer</option>
+            </select>
             <input
               type="text"
               name="username"
@@ -225,6 +246,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
                 border: "1px solid #ccc",
               }}
             />
+
             {error && <p style={{ color: "red" }}>{error}</p>}
           </>
         ) : (

@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/css/contact.css";
 import { sendOTP, verifyOTP, resendOTP } from "../../apis/api";
 import { useNavigate } from "react-router-dom";
@@ -12,12 +12,13 @@ const ContactUs = () => {
     useremail: "",
     message: "",
     projectName: "",
+    userType: "",
   });
 
-      useEffect(() => {
-        // Scroll to the top when the page loads
-        window.scrollTo(0, 0);
-      }, []);
+  useEffect(() => {
+    // Scroll to the top when the page loads
+    window.scrollTo(0, 0);
+  }, []);
 
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -55,7 +56,9 @@ const ContactUs = () => {
         "Contact Page", // Project Name
         "ORGANIC", // Source
         formData.username,
-        formData.message
+        formData.message,
+        "",
+        formData.userType
       );
       swal("OTP Sent!", "Please check your phone for the OTP.", "success");
       setOtpSent(true);
@@ -246,6 +249,27 @@ const ContactUs = () => {
                         <form id="contactpage" onSubmit={handleFormSubmit}>
                           <div className="row">
                             <div className="col-md-12">
+                              <label>Role:</label>
+                              <select
+                                name="userType"
+                                className="form-select"
+                                // style={{
+                                //   width: "100%",
+                                //   padding: "8px",
+                                //   margin: "8px 0", // Similar to `margin="dense"`
+                                //   borderRadius: "4px",
+                                //   border: "1px solid #ccc",
+                                // }}
+                                value={formData.userType} // Ensure this is in your state
+                                onChange={handleChange}
+                              >
+                                <option value="">Select</option>
+                                <option value="Associate">Associate</option>
+                                <option value="Builder">Builder</option>
+                                <option value="Broker">Broker</option>
+                                <option value="Seller">Seller</option>
+                                <option value="Buyer">Buyer</option>
+                              </select>
                               <label>Name:</label>
                               <input
                                 required
@@ -269,19 +293,16 @@ const ContactUs = () => {
                                 onChange={handleChange}
                               />
 
-                              
-                                <label>Email :</label>
-                                <input
-                                  name="useremail"
-                                  type="email"
-                                  placeholder="Enter Email"
-                                   maxLength="10"
-                                  className="form-control"
-                                  value={formData.useremail}
-                                  onChange={handleChange}
-                            
-                                />
-                          
+                              <label>Email :</label>
+                              <input
+                                name="useremail"
+                                type="email"
+                                placeholder="Enter Email"
+                                maxLength="10"
+                                className="form-control"
+                                value={formData.useremail}
+                                onChange={handleChange}
+                              />
 
                               <label>Message:</label>
                               <textarea

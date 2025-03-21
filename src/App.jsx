@@ -23,6 +23,8 @@ import CompareProjects from "./app/components/pages/CompareProjects";
 import NotFound from "./app/components/pages/NotFound";
 import ThankYouPage from "./app/components/ThankYouPage";
 import FeaturedProperties from "./app/components/pages/FeaturedProperties";
+
+
 // import PropertyForSale from "./app/components/pages/PropertyForSale";
 
 
@@ -49,10 +51,9 @@ const router = createBrowserRouter([
       { path: "/propertyforsale", element: <PropertyDetails /> },
       { path: "/propertyforsale/:urlName", element: <PropertyDetails /> },
       { path: "/featuredProperties", element: <FeaturedProperties /> },
-      // { path: "/propertyforsale", element: <PropertyForSale /> },
-      
       { path: "/thankYou", element: <ThankYouPage /> },
       { path: "*", element: <NotFound /> }, // Not Found route
+      { path: "/404", element: <NotFound /> }
  
     ],
   },

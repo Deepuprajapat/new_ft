@@ -10,8 +10,12 @@ const FeaturedProperties = () => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const response = await getAllProject({ isFeatured: true, isPremium: true });
-        const filteredProjects = response.content?.filter(project => project.isFeatured && project.isPremium) || [];
+        const response = await getAllProject({ isDeleted: false });
+        // const filteredProjects = response.content?.filter(project => project.isFeatured && project.isPremium) || [];
+        const filteredProjects =
+        response.content?.filter(
+          (project) => project.isFeatured || project.isPremium
+        ) || [];
         setProjects(filteredProjects);
       } catch (error) {
         console.error("Error fetching featured and premium projects:", error);

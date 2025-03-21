@@ -323,3 +323,16 @@ p {
 }
 
 
+.premium-tag {
+  background-color: #2067d1;
+  color: white;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 5px;
+  position: absolute;
+  top:20px;
+  left: 35px;
+  font-size: 10px;
+  text-transform: uppercase;
+  /* z-index: 10; */
+}

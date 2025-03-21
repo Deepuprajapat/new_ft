@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import {
   getAllFloor,
   getAllLocalities,
@@ -101,7 +102,6 @@ const PropertyListing = () => {
   };
 
   const handleMoreDetail = (url) => {
-    console.log(url);
     window.open(
       `/propertyforsale/${url.toLowerCase().replace(/\s+/g, "-")}`,
       "_blank",
@@ -113,11 +113,13 @@ const PropertyListing = () => {
 
   return (
     <>
-
-<title>Top Property in Noida</title>
+<Helmet>
+    <title>Top Property in Noida</title>
     <meta content="Invest mango have a lot of projects in Noida, Greater Noida, or Noida Extension. All projects are affordable or luxury." name="description"/>
-    <link rel="canonical" href="https://www.investmango.com/property.php"/>
+    <link rel="canonical" href="https://www.investmango.com/allProperties"/>
    <link rel="shortcut icon" type="image/icon" href="https://www.investmango.com/favicon.ico" />
+</Helmet>
+
     <section className="main-body" style={{ marginTop: "5px" }}>
       <div className="main-con">
         <div className="container">
@@ -396,7 +398,7 @@ const PropertyListing = () => {
                     }}
                   >
                     <img
-                      src="https://www.investmango.com/img/ace-divino/ace-divino-outside-image.webp"
+                      src="images/Image-01.jpg"
                       className="d-block w-100"
                       alt="Top Image"
                       loading="lazy"
@@ -416,7 +418,7 @@ const PropertyListing = () => {
                           <div className="row">
                             <div className="col-md-6">
                               <img
-                                src="https://www.investmango.com/img/ace-divino/ace-divino-dinning-room.webp"
+                                src="images/Image-02.jpg"
                                 className="d-block w-100"
                                 alt="First Slide"
                                 loading="lazy"
@@ -428,7 +430,7 @@ const PropertyListing = () => {
                             </div>
                             <div className="col-md-6">
                               <img
-                                src="https://www.investmango.com/img/ace-divino/ace-divino-outside-image.webp"
+                                src="images/Image-03.jpg"
                                 className="d-block w-100"
                                 alt="Second Slide"
                                 loading="lazy"
