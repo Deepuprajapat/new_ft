@@ -300,7 +300,7 @@ const PropertyDetails = () => {
 
   return (
     <>
-      {property && (
+      {/* {property && (
         <Helmet>
           <title>{property.metaTitle || "Default Title"}</title>
           <meta
@@ -324,7 +324,7 @@ const PropertyDetails = () => {
               />
             ))}
         </Helmet>
-      )}
+      )} */}
 
       <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
@@ -1916,7 +1916,7 @@ const PropertyDetails = () => {
                                     <div className="d-flex align-items-start">
                                       <img
                                         className="me-2"
-                                        src="https://www.investmango.com/img/icon/interior-icon4.svg"
+                                        src="/images/usp-icon.svg"
                                         loading="lazy"
                                         style={{
                                           height:

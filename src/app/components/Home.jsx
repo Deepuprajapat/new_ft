@@ -158,7 +158,7 @@ const Head = () => {
           </div>
         </div>
 
-        <div className="about-us" style={{ marginTop: "20px" }}>
+        <div className="about-us" style={{ marginTop: "-20px" }}>
           <div className="container">
             <AboutUs />
           </div>

@@ -2,14 +2,21 @@ import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
 import "../components/styles/css/footer.css";
-import logo from "../assets/img/logo_investmango.png";
-import { getAllGenericKeywords, getGenericKeywordByPath,getAllCityForMobile } from "../apis/api";
+import logo from "../assets/img/Logo-footer.png";
+import {
+  getAllGenericKeywords,
+  getGenericKeywordByPath,
+  getAllCityForMobile,
+  // getAllProjectsByUrlName,
+} from "../apis/api";
 import { useNavigate } from "react-router-dom";
 
-const Footer = ({shortAddress}) => {
+const Footer = ({ shortAddress }) => {
   const [footerItems, setFooterItems] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
+  const [projectName, setProjectName] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,8 +30,6 @@ const Footer = ({shortAddress}) => {
     };
 
     fetchFooterItems();
-
-    // Scroll visibility logic for ScrollTop button
     const handleScroll = () => {
       setIsVisible(window.scrollY > 20);
     };
@@ -37,12 +42,9 @@ const Footer = ({shortAddress}) => {
     try {
       // Fetch data based on path
       const keywordData = await getGenericKeywordByPath(path);
-  
       if (keywordData) {
         // Navigate first
         navigate(`allProjects?${path}`);
-  
-        // Scroll to top after a slight delay to ensure the page loads first
         setTimeout(() => {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }, 500); // Adjust delay if needed
@@ -58,7 +60,6 @@ const Footer = ({shortAddress}) => {
     navigate("/"); // Navigate to the home page
     window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top smoothly
   };
-  
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -90,7 +91,7 @@ const Footer = ({shortAddress}) => {
           const matchedCity = Object.keys(cityMap).find((city) =>
             shortAddress.toLowerCase().includes(city)
           );
-          if (matchedCity) {;
+          if (matchedCity) {
             setMatchedPhoneNumber(cityMap[matchedCity]); // Set the matched phone number
           }
         }
@@ -101,43 +102,61 @@ const Footer = ({shortAddress}) => {
 
     fetchCities();
   }, [shortAddress]);
+
+  // useEffect(() => {
+  //   const fetchProject = async () => {
+  //     const urlName = window.location.pathname.split("/").pop(); // or use `useParams()` if using react-router
+  //     const project = await getAllProjectsByUrlName(urlName, navigate);
+  //     setProjectName(project?.name || "");
+  //   };
+
+  //   fetchProject();
+  // }, []);
+
+  // const message = encodeURIComponent(
+  //   projectName
+  //     ? `I'm interested in the "${projectName}" project. Please provide more details!`
+  //     : `I'm interested in a project. Please provide more details!`
+  // );
+  // const whatsappLink = `https://api.whatsapp.com/send?phone=+918448141652&text=${message}`;
+
   return (
     <div>
       <div className="CTA">
         <div className="whatsapp">
-          <a
-            href="https://api.whatsapp.com/send?phone=+918448141652&text=Hi%2C%20I%27m%20interested%20in%20Invest%20Mango.%20Please%20share%20details%20about%20this%20project."
+        <a
+            href="https://api.whatsapp.com/send?phone=+918448141652&text=I%27m%20interested%20in%20this%20project.%20Please%20provide%20more%20details!"
             target="_blank"
             rel="noopener noreferrer"
           >
             <i className="fab fa-whatsapp"></i> WhatsApp
           </a>
         </div>
-        { matchedPhoneNumber && matchedPhoneNumber.length > 0? (
+        {matchedPhoneNumber && matchedPhoneNumber.length > 0 ? (
           matchedPhoneNumber.map((number, index) => (
-        <div className="callnow">
-        <a href={`tel:+91${number}`}>
-            <i
-              style={{ transform: "rotate(95deg)" }}
-              className="fas fa-phone"
-            ></i>{" "}
-            {number}
-          </a>
+            <div className="callnow">
+              <a href={`tel:+91${number}`}>
+                <i
+                  style={{ transform: "rotate(95deg)" }}
+                  className="fas fa-phone"
+                ></i>{" "}
+                {number}
+              </a>
+            </div>
+          ))
+        ) : (
+          <div className="callnow">
+            <a href="tel:+918368547490">
+              <i
+                style={{ transform: "rotate(95deg)" }}
+                className="fas fa-phone"
+              ></i>{" "}
+              8595189189
+            </a>
           </div>
-           ))
-        ):(
-        <div className="callnow">
-          <a href="tel:+918368547490">
-            <i
-              style={{ transform: "rotate(95deg)" }}
-              className="fas fa-phone"
-            ></i>{" "}
-          8595189189
-          </a>
-        </div>
-      )}
+        )}
       </div>
-      
+
       <button
         onClick={scrollToTop}
         id="ScrollTop"
@@ -149,8 +168,8 @@ const Footer = ({shortAddress}) => {
 
       <footer>
         <div className="Whatsupbuttn" style={{ width: "70px" }}>
-          <a
-            href="https://web.whatsapp.com/send?phone=+91-8448141652&text=Hi%2C%20I%27m%20interested%20in%20Invest%20Mango.%20Please%20share%20details%20about%20this%20project."
+        <a 
+            href="https://web.whatsapp.com/send?phone=+91-8448141652&text=I%27m%20interested%20in%20this%20project.%20Please%20provide%20more%20details!"
             target="_blank"
             style={{ float: "right" }}
           >
@@ -224,19 +243,24 @@ const Footer = ({shortAddress}) => {
                 </ul>
                 <div className="social-links">
                   <a
-                    href="https://www.facebook.com/InvestMangoofficial/"
+                    href="https://www.facebook.com/InvestMango/"
                     target="_blank"
                   >
                     <img
-                     // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/e6391943-c9b2-40a0-0eb9-1e14df3c8800/public"
+                      // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/e6391943-c9b2-40a0-0eb9-1e14df3c8800/public"
                       src="/images/facebook.webp"
                       loading="lazy"
                       alt="Facebook"
                       className="social-icon"
-                      style={{ width: "35px", height: "35px", borderRadius: "50%", objectFit: "cover" }}
+                      style={{
+                        width: "35px",
+                        height: "35px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                      }}
                     />
                   </a>
-                  <a href="https://twitter.com/investmang" target="_blank">
+                  <a href="https://x.com/investmango" target="_blank">
                     <img
                       //src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/1f2fc408-b9a8-4fff-ccae-874028f56400/public"
                       src="/images/twitter.png"
@@ -247,12 +271,17 @@ const Footer = ({shortAddress}) => {
                   </a>
                   <a href="https://instagram.com/investmango" target="_blank">
                     <img
-                     // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/00c6899a-05e6-488c-2ff6-1c5fd2d8bc00/public"
+                      // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/00c6899a-05e6-488c-2ff6-1c5fd2d8bc00/public"
                       src="/images/instagram.jpg"
                       loading="lazy"
                       alt="Instagram"
                       className="social-icon"
-                      style={{ width: "35px", height: "35px", borderRadius: "50%", objectFit: "cover" }}
+                      style={{
+                        width: "35px",
+                        height: "35px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                      }}
                     />
                   </a>
                   <a
@@ -265,7 +294,12 @@ const Footer = ({shortAddress}) => {
                       loading="lazy"
                       alt="Linkedin"
                       className="social-icon"
-                      style={{ width: "35px", height: "35px", borderRadius: "50%", objectFit: "cover" }}
+                      style={{
+                        width: "35px",
+                        height: "35px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                      }}
                     />
                   </a>
                   <a
@@ -278,14 +312,19 @@ const Footer = ({shortAddress}) => {
                       loading="lazy"
                       alt="YouTube"
                       className="social-icon"
-                      style={{ width: "35px", height: "35px", borderRadius: "50%", objectFit: "cover" }}
+                      style={{
+                        width: "35px",
+                        height: "35px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                      }}
                     />
                   </a>
                 </div>
               </div>
 
               <div className="col-md-3">
-                <h5 className="headline">Contact</h5>
+                <p className="headline">Contact</p>
                 <ul>
                   <li className="subhead">
                     <i className="fas fa-map-marker-alt"></i> HEAD OFFICE
@@ -315,7 +354,7 @@ const Footer = ({shortAddress}) => {
               </div>
 
               <div className="col-md-3">
-                <h5 className="headline">Quick Links</h5>
+                <p className="headline">Quick Links</p>
                 <ul>
                   <li>
                     <Link to="/about">About Us</Link>
@@ -336,7 +375,7 @@ const Footer = ({shortAddress}) => {
               </div>
 
               <div className="col-md-3" id="our-project">
-                <h5 className="headline">Our Projects</h5>
+                <p className="headline">Our Projects</p>
                 <ul>
                   <li>
                     <a href="https://www.investmango.com/ace-starlit-sector-152-noida">
@@ -345,27 +384,27 @@ const Footer = ({shortAddress}) => {
                   </li>
                   <li>
                     <a href="https://www.investmango.com/nirala-aspire-sector-16-greater-noida-west">
-                    Nirala Aspire Low Rise Phase IV
+                      Nirala Aspire Low Rise Phase IV
                     </a>
                   </li>
                   <li>
                     <a href="https://www.investmango.com/ace-acreville">
-                    Ace Acreville
+                      Ace Acreville
                     </a>
                   </li>
                   <li>
                     <a href="https://www.investmango.com/godrej-vrikshya-sector-103-dwarka-expressway-gurugram">
-                    Godrej Vrikshya
+                      Godrej Vrikshya
                     </a>
                   </li>
                   <li>
                     <a href="https://www.investmango.com/lodha-altero-pune">
-                    Lodha Altero
+                      Lodha Altero
                     </a>
                   </li>
                   <li>
                     <a href="https://www.investmango.com/conscient-parq-sector-80-gurugram">
-                    Conscient Parq
+                      Conscient Parq
                     </a>
                   </li>
                 </ul>

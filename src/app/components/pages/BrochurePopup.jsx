@@ -104,6 +104,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
           backdrop: true,
           allowOutsideClick: false,
         }).then(() => {
+          window.location.reload();
           // Redirect first
           // navigate("/thankYou");
 

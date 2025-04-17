@@ -102,8 +102,8 @@ const Testimonial = () => {
                     fontSize: "1rem",
                     lineHeight: "1.5",
                     margin: "20px 0",
-                    maxHeight: expanded[index] ? "none" : "130px",
-                    overflow: expanded[index] ? "visible" : "hidden",
+                    minHeight: "100px", // Ensures enough space
+                    overflow: "visible", // Allow content to be fully displayed
                   }}
                 >
                   {testimonial.text.length > 250 && !expanded[index]

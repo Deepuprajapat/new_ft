@@ -11,6 +11,34 @@ const AllProjects = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const allowedConfigurations = [
+    "1BHK", "1.5BHK", "2BHK", "2.5BHK", "3BHK", "3.5BHK",
+    "4BHK", "4.5BHK", "5BHK", "5.5BHK", "6BHK",
+    "shop", "villa", "penthouse", "office"
+  ];
+   
+
+  const updateUrlWithConfiguration = (search) => {
+    const currentParams = new URLSearchParams(location.search);
+    
+    // Remove existing configuration-related params
+    const paramsToRemove = ['configurations', 'propertyType', 'search'];
+    paramsToRemove.forEach(param => currentParams.delete(param));
+    
+    // Check if the search is a valid configuration
+    const normalizedSearch = search?.trim().toUpperCase();
+    if (allowedConfigurations.includes(normalizedSearch)) {
+      // Add configurations param
+      currentParams.set('configurations', normalizedSearch);
+    } else {
+      // If not a configuration, set as search
+      currentParams.set('search', search);
+    }
+
+    // Update URL without page reload
+    const newUrl = `${location.pathname}?${currentParams.toString()}`;
+    window.history.replaceState({}, '', newUrl);
+  };
 
   // Function to extract query params
   const getQueryParams = () => {
@@ -25,12 +53,14 @@ const AllProjects = () => {
     ) {
       keyword = [...searchParams.keys()][0];
     }
+    console.log(searchParams.get("search"),"search")
 
     return {
       cityId: searchParams.get("locationId"),
       locationName: searchParams.get("location"),
       propertyType: searchParams.get("propertyType"),
       search: searchParams.get("search"),
+      configurations: searchParams.get("configurations"),
       keyword,
     };
   };
@@ -39,10 +69,23 @@ const AllProjects = () => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const { cityId, propertyType, search, keyword } = getQueryParams();
+        const { cityId, propertyType, search, keyword  } = getQueryParams();
+        const allowedConfigurations = [
+          "1BHK", "1.5BHK", "2BHK", "2.5BHK", "3BHK", "3.5BHK",
+          "4BHK", "4.5BHK", "5BHK", "5.5BHK", "6BHK",
+          "shop", "villa", "penthouse", "office"
+        ];
+        const normalizedSearch = search?.trim().toUpperCase();
+        const isValidConfiguration = allowedConfigurations.includes(normalizedSearch);
+
+        if (isValidConfiguration && search) {
+          updateUrlWithConfiguration(search);
+        }
+
 
         let filters = {
           isDeleted: false,
+          ...(isValidConfiguration && { configurations: search }), // Only add if valid
           ...(cityId && { cityId }),
           ...(propertyType && { type: propertyType }),
         };

@@ -22,6 +22,7 @@ const Blogs = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { blogUrl } = useParams();
+  const [schema, setSchema] = useState(null); // Store processed schema
   const navigate = useNavigate(); // For programmatic navigation
 
   useEffect(() => {
@@ -30,6 +31,21 @@ const Blogs = () => {
         try {
           const data = await getAllBlogByUrl(blogUrl);
           setBlogData(data);
+          // Process schema if available
+          // Process schema if available and in correct format
+          if (Array.isArray(data.schema) && data.schema.length > 0) {
+            try {
+              const rawSchema = data.schema[0] // Get first schema entry
+                .replace(/<script[^>]*>/g, "") // Remove opening <script> tag
+                .replace(/<\/script>/g, "") // Remove closing </script> tag
+                .trim();
+
+              const parsedSchema = JSON.parse(rawSchema); // Convert string to JSON object
+              setSchema(parsedSchema);
+            } catch (error) {
+              console.error("Error parsing schema JSON:", error);
+            }
+          }
         } catch (error) {
           console.error("Error fetching blog data:", error);
           navigate("*");
@@ -59,7 +75,7 @@ const Blogs = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const metakeywords = blogData?.metaKeywords || []; 
+  const metakeywords = blogData?.metaKeywords || [];
   // Handle form submission with phone validation
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,28 +112,35 @@ const Blogs = () => {
     }
   };
   return (
-   
     <>
- 
-    
- <Helmet>
-  <title>
-    {Array.isArray(blogData?.headings)
-      ? blogData.headings.join(" ")
-      : blogData?.headings || "Default Title"}
-  </title>
-  <meta name="keywords" content={Array.isArray(metakeywords?.length > 0 )? metakeywords?.join(", ") : "default keyword"} />
+      <Helmet>
+        <title>
+          {Array.isArray(blogData?.headings)
+            ? blogData.headings.join(" ")
+            : blogData?.headings || "Default Title"}
+        </title>
+        <meta
+          name="keywords"
+          content={
+            Array.isArray(metakeywords?.length > 0)
+              ? metakeywords?.join(", ")
+              : "default keyword"
+          }
+        />
 
-  <meta
-    name="description"
-    content={blogData?.subHeadings || "Default description"}
-  />
-  {Array.isArray(blogData?.schema)? blogData?.schema.join(" "):blogData?.schema|| "default schema"}
-  {blogData?.canonical && <link rel="canonical" href={blogData.canonical} />}
-</Helmet>
-
-
-
+        <meta
+          name="description"
+          content={blogData?.subHeadings || "Default description"}
+        />
+        {/* {Array.isArray(blogData?.schema)? blogData?.schema.join(" "):blogData?.schema|| "default schema"} */}
+        {/* Inject Schema if available */}
+        {schema && (
+          <script type="application/ld+json">{JSON.stringify(schema)}</script>
+        )}
+        {blogData?.canonical && (
+          <link rel="canonical" href={blogData.canonical} />
+        )}
+      </Helmet>
 
       <section className="main-body">
         <div className="main-con">

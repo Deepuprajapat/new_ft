@@ -54,7 +54,7 @@ const ThankYouPage = () => {
               <div className="col-md-7">
                 <img
                   style={{ width: "550px" }}
-                  src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/a88e788f-a24a-498c-b72d-0e9913e3b300/public"
+                  src='././images/thankYou.png'
                   loading="lazy"
                   alt="Thank You"
                   className="img-fluid"
@@ -62,7 +62,7 @@ const ThankYouPage = () => {
               </div>
               <div className="col-md-5">
                 <p style={{ fontSize: "70px" }} className="h1 text-center">
-                  Thank you for contacting usc
+                  Thank you for contacting us
                 </p>
                 <hr />
                 <p

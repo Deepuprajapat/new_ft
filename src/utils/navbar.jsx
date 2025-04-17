@@ -6,6 +6,7 @@ const navItems = [
       label: 'About Us',
       dropdown: [
         { label: 'Overview', path: '/about' },
+        { label: 'Mango Insights', path: '/mango-insights' },
         { label: 'Our Videos', path: '/video' },
         { label: 'FAQ', path: '/faq' },
         
@@ -16,11 +17,12 @@ const navItems = [
       dropdown: [
         { label: 'All Projects', path: '/allProjects' },
         { label: 'Featured Properties', path: '/featuredProperties' },
-        { label: 'Properties', path: '/allProperties' },
+       
+        // { label: 'Properties', path: '/allProperties' },
         
       ],
     },
-    { label: 'Mango Insights', path: '/mango-insights' },
+    { label: 'All Properties', path: '/allProperties' },
     { label: 'Compare Projects',path: '/compare'},
     { label: 'Career', path: '/career' },
     { label: 'Contact Us', path: '/contact' },

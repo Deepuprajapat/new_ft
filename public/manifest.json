@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "IM-Logo-192.png",
+      "src": "IM-Icon-01.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "IM-Logo-512.png",
+      "src": "IM-Icon-02.png",
       "type": "image/png",
       "sizes": "512x512"
     }

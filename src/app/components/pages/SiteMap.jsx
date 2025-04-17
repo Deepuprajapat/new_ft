@@ -86,7 +86,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://www.investmango.com/allProperties"
+                      href="https://www.investmango.com/featuredProperties"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -97,7 +97,7 @@ const SiteMap = () => {
 
                 <h2 style={{ color: "black" }}>Other Links</h2>
                 <ul style={{ listStyle: "none" }}>
-                  <li>
+                  {/* <li>
                     <a
                       href="https://www.investmango.com/residential-projects-in-sector-150-noida.php"
                       target="_blank"
@@ -105,10 +105,10 @@ const SiteMap = () => {
                     >
                       Residential Projects in Sector 150 Noida
                     </a>
-                  </li>
+                  </li> */}
                   <li>
                     <a
-                      href="https://www.investmango.com/new-residential-projects-in-noida.php"
+                      href="https://www.investmango.com/allProjects?new-residential-projects-in-noida"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -117,14 +117,14 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://www.investmango.com/new-projects-in-noida-extension.php"
+                      href="https://www.investmango.com/allProjects?new-projects-in-noida-extension"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       New Projects in Noida Extension
                     </a>
                   </li>
-                  <li>
+                  {/* <li>
                     <a
                       href="https://www.investmango.com/3-bhk-flats-in-noida-extension-ready-to-move.php"
                       target="_blank"
@@ -132,10 +132,10 @@ const SiteMap = () => {
                     >
                       3Bhk Flat in Noida Extension Ready to Move
                     </a>
-                  </li>
+                  </li> */}
                   <li>
                     <a
-                      href="https://www.investmango.com/godrej-projects-in-noida.php"
+                      href="https://www.investmango.com/allProjects?godrej-projects-in-noida"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -144,7 +144,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://www.investmango.com/ace-projects-in-noida.php"
+                      href="https://www.investmango.com/allProjects?ace-projects-in-noida"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -153,7 +153,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://www.investmango.com/ats-projects-in-noida.php"
+                      href="https://www.investmango.com/allProjects?ats-projects-in-noida"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -162,7 +162,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://www.investmango.com/best-residential-projects-in-siddharth-vihar-ghaziabad.php"
+                      href="https://www.investmango.com/allProjects?residential-projects-in-siddharth-vihar"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -171,7 +171,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://www.investmango.com/2-bhk-flat-in-noida-extension-ready-to-move.php"
+                      href="https://www.investmango.com/allProjects?2bhk-flats-in-noida-extension"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -180,7 +180,7 @@ const SiteMap = () => {
                   </li>
                   <li>
                     <a
-                      href="https://www.investmango.com/best-residential-projects-in-greater-noida-west.php"
+                      href="https://www.investmango.com/allProjects?residential-projects-in-greater-noida-west"
                       target="_blank"
                       rel="noopener noreferrer"
                     >

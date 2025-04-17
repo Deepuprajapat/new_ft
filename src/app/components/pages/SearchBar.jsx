@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect, useRef  } from "react";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { getAllProject, getAllLocalities } from "../../apis/api";
@@ -12,6 +12,8 @@ const SearchBar = () => {
   const [localities, setLocalities] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false); // Track if suggestions should be shown
   const navigate = useNavigate();
+  // const searchRef = useRef(null); // Ref for search input
+
 
   // Fetch localities when the component mounts
   React.useEffect(() => {
@@ -21,6 +23,17 @@ const SearchBar = () => {
     };
     fetchLocalities();
   }, []);
+
+  // useEffect(() => {
+  //   function handleClickOutside(event) {
+  //     if (searchRef.current && !searchRef.current.contains(event.target)) {
+  //       setShowSuggestions(false);
+  //     }
+  //   }
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
+  
 
   // Handle Location Change
   const handleLocationChange = (e) => {
@@ -34,12 +47,19 @@ const SearchBar = () => {
     debouncedSearch(value);
   };
 
+  // Close suggestions on ESC key
+const handleKeyDown = (e) => {
+  if (e.key === "Escape") {
+    setShowSuggestions(false);
+  }
+};
+
   const debouncedSearch = debounce(async (query) => {
     if (query.trim() === "") {
       setProjectSuggestions([]);
       return;
     }
-
+    console.log("Query", query);
     const response = await getAllProject({ name: query });
     setProjectSuggestions(response.content || []);
     setShowSuggestions(true); // Show suggestions when data is fetched
@@ -57,6 +77,7 @@ const SearchBar = () => {
 
     // Include the search query in the URL
     if (searchQuery) {
+      console.log("Search Query", searchQuery);
       const matchedProject = projectSuggestions.find(
         (project) => project.name.toLowerCase() === searchQuery.toLowerCase()
       );
@@ -71,6 +92,7 @@ const SearchBar = () => {
 
     // Include the location in the URL
     if (location) {
+      console.log("Location", location);
       const selectedCity = localities.find(
         (city) => city.id === parseInt(location)
       );
@@ -133,6 +155,7 @@ const SearchBar = () => {
         </div>
         <div className="form-group">
           <input
+          //  ref={searchRef} // Attach ref to input
             className="form-control"
             type="text"
             name="search"
@@ -141,6 +164,7 @@ const SearchBar = () => {
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => setShowSuggestions(true)} // Show suggestions on focus
+            onKeyDown={handleKeyDown} // Detect Escape key
           />
           {showSuggestions && searchQuery && (
             <ul className="suggestions-list">

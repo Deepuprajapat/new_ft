@@ -128,59 +128,58 @@
 /* Center the Swiper navigation buttons below the cards */
 .swiper-container {
   position: relative;
-  padding-bottom: 50px; /* Add space for navigation buttons */
+  padding-bottom: 50px; /* Space for navigation */
 }
+
+/* Custom Navigation Buttons (Visible Only on Desktop) */
 .swiper-button-prev,
 .swiper-button-next {
   position: absolute;
-  bottom: 10px;
-  top: auto;
-  width: 59px;
-  height: 60px;
-  background: #2067D1;
-  color: #fff;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 45px;
+  height: 45px;
+  background: white; /* Default: White background */
+  color: black; /* Default: Black arrow */
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
+  
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+  /* Adding Soft Shadow */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
-.swiper-button-prev {
-  left: 45%;
-  z-index: 10 !important;
-}
-.swiper-button-next {
-  right: 45%;
-  z-index: 10 !important;
-}
-/* Optional: Add hover effect */
+
+/* Hover Effect */
 .swiper-button-prev:hover,
 .swiper-button-next:hover {
-  background: #0056B3; /* Darker shade on hover */
+  background: #2067D1; /* Blue background on hover */
+  color: white; /* White arrow on hover */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Stronger shadow */
 }
-@media (max-width: 850px) {
-  .swiper-button-prev {
-    left: 30%; /* Adjust based on your needs */
-    z-index: 10 !important;
-  }
 
+
+/* Button Positions */
+.swiper-button-prev {
+  left: 15px;
+}
+
+.swiper-button-next {
+  right: 15px;
+}
+
+/* Hide Navigation Buttons on Tablets & Mobile */
+@media (max-width: 1024px) {
+  .swiper-button-prev,
   .swiper-button-next {
-    right: 30%; /* Adjust based on your needs */
-    z-index: 10 !important;
+    display: none !important;
   }
 }
 
-/* Mobile devices */
-@media (max-width: 480px) {
-  .swiper-button-prev {
-    left: 33%; /* Adjust based on your needs */
-  }
-
-  .swiper-button-next {
-    right: 33%; /* Adjust based on your needs */
-  }
-}
-
-.swiper-button-next, .swiper-button-prev {
-  z-index: 10 !important;
+.swiper-button-prev::after, 
+.swiper-button-next::after {
+    display: none;
 }

@@ -39,6 +39,7 @@
   margin-top: 20px;
 }
 
+
 .hidden {
   display: none;
 }
@@ -60,9 +61,6 @@
   margin-bottom: 10px;
 }
 
-
-
-
 .testimonial .client-slide .checked {
   color: #ffd700;
 }
@@ -71,8 +69,10 @@
   font-size: 1rem;
   line-height: 1.5;
   margin: 10px 0;
-  max-height: 80px; 
-  overflow: hidden;
+  /* max-height: 80px;  */
+  min-height: 100px; /* Ensures enough space */
+  max-height: none; /* Allow full height dynamically */
+  overflow: visible;
 }
 
 .testimonial .client-slide .read-more {
@@ -133,8 +133,6 @@
   gap: 20px; 
   scroll-behavior: smooth; 
 }
-
-
 
 .project-card:hover {
   transform: translateY(-5px);

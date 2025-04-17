@@ -1,0 +1,64 @@
+.custom-prev, .custom-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    cursor: pointer;
+    font-size: 24px;
+    color: #000; /* Arrow color */
+    background: transparent; /* Fully transparent background */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+}
+
+/* Position adjustments */
+.custom-prev {
+    left: -10px; /* Adjust as needed */
+}
+
+.custom-next {
+    right: -10px; /* Adjust as needed */
+}
+
+/* Hover Effect */
+.custom-prev:hover, .custom-next:hover {
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.4); /* Stronger shadow on hover */
+    color: white; /* Slightly darker arrow */
+}
+
+.swiper-button-prev::after, 
+.swiper-button-next::after {
+    display: none;
+}
+  
+  /* Make buttons responsive */
+  @media (max-width: 768px) {
+    .custom-prev, .custom-next {
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+    }
+  
+    .custom-prev {
+      left: 5px;
+    }
+  
+    .custom-next {
+      right: 5px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .custom-prev, .custom-next {
+      width: 25px;
+      height: 25px;
+      font-size: 16px;
+    }
+  }
+  

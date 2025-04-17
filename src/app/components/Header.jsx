@@ -4,7 +4,7 @@ import "../components/styles/css/header.css";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { getAllProject, getAllCityForMobile } from "../apis/api";
-import logo from "../assets/img/logo.jpg";
+import logo from "../assets/img/Untitled-1.png";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Container, Navbar } from "react-bootstrap";

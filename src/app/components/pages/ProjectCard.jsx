@@ -46,7 +46,7 @@ const ProjectCard = ({ project }) => {
       </a>
       <p className="project-card-location">
         <i className="fas fa-map-marker-alt"></i>{" "}
-        {`${project.locality.name} ${project.locality.city.name}`}
+        {project.shortAddress}
       </p>
       <p className="project-card-details">
         <span>

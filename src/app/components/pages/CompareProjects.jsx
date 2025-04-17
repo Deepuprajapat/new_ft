@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getAllProject } from "../../apis/api";
 import { Helmet } from "react-helmet";
 import jsPDF from "jspdf"; // Import jsPDF
 import "jspdf-autotable";
-import { IconButton, Menu, MenuItem, ListItemText } from "@mui/material";
-import ShareIcon from "@mui/icons-material/Share";
+import {
+  Autocomplete,
+  TextField,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemText,
+  
+} from "@mui/material";
+import  ShareIcon from "@mui/icons-material/Share";
+import ListIcon from '@mui/icons-material/List';
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import LeadFormModal from "./LeadFormModal";
+
+
 
 const CompareProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -18,6 +30,7 @@ const CompareProjects = () => {
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openForm, setOpenForm] = useState(false);
+  const navigate = useNavigate();
 
   const handleOpenForm = () => {
     setOpenForm(true);
@@ -35,7 +48,8 @@ const CompareProjects = () => {
     fetchProjects();
   }, []);
 
-  const handleSelect = (index, value) => {
+  const handleSelect = (index, value,event) => {
+    // console.log(value,'bbbbbbbbbbbbb')
     const updatedSelection = [...selectedProjects];
     updatedSelection[index] = value;
     setSelectedProjects(updatedSelection);
@@ -67,15 +81,40 @@ const CompareProjects = () => {
 
   const handleCompare = () => {
     const selected = selectedProjects.filter((projectId) => projectId !== "");
+    // console.log(selected,'aaaaaaaaaaaaa')
     if (selected.length < 2) {
       alert("Please select at least 2 projects to compare.");
     } else {
+      console.log(projects,'projects')
+      // console.log(  projects.filter((project) =>
+      //   selected.includes(project.id.toString())))
       const selectedData = projects.filter((project) =>
-        selected.includes(project.id.toString())
+        // selected.includes(project.id.toString())
+      selected.map(String).includes(String(project.id)) 
       );
+      console.log(selectedData,'selectedData')
       setComparedProjects(selectedData);
     }
   };
+
+  // const handleCompare = () => {
+  //   const selected = selectedProjects.filter((projectId) => projectId !== "");
+  //   console.log(selected, "aaaaaaaaaaaaa");
+  
+  //   if (selected.length < 2) {
+  //     alert("Please select at least 2 projects to compare.");
+  //   } else {
+  //     console.log(projects, "projects");
+  
+  //     // Ensure type consistency when filtering
+  //     const selectedData = projects.filter((project) =>
+  //       selected.map(String).includes(String(project.id)) // Convert both to string
+  //     );
+  
+  //     console.log(selectedData, "selectedData");
+  //     setComparedProjects(selectedData);
+  //   }
+  // };
 
   const handleShareClick = (platform) => {
     const url = encodeURIComponent(window.location.href);
@@ -114,11 +153,12 @@ const CompareProjects = () => {
         const image = project.images?.[0]?.imageUrl;
         return image ? (
           <img
-            src={image}
-            alt={project.name}
-            loading="lazy"
-            style={{ width: "300px", height: "300px", borderRadius: "10px" }}
-          />
+          src={image}
+          alt={project.name}
+          loading="lazy"
+          style={{ width: "300px", height: "300px", borderRadius: "10px", cursor: "pointer" }}
+          onClick={() => window.open(`/${project.url}`, "_blank")}
+        />
         ) : (
           "No Image Available"
         );
@@ -412,56 +452,76 @@ const CompareProjects = () => {
         <p>Home / Compare Projects</p>
 
         <div className="d-flex flex-wrap justify-content-center mb-4">
-          {/* City Dropdown */}
-          <select
-            className="custom-select form-select mx-2"
-            style={{ width: window.innerWidth <= 768 ? "100%" : "200px" }}
-            value={selectedCity}
-            onChange={(e) => handleCitySelect(e.target.value)}
-          >
-            <option value="">Select City</option>
-            {cities.map((city, index) => (
-              <option key={index} value={city}>
-                {city.charAt(0).toUpperCase() + city.slice(1).toLowerCase()}
-              </option>
-            ))}
-          </select>
-          {/* Project Dropdowns */}
+          <span>
+            <i
+              class="fa-solid fa-location-dot"
+              style={{
+                color: "#d0cccc",
+                fontSize: "24px",
+                alignItems: "center",
+                padding: "7px",
+              }}
+            ></i>
+          </span>
+          <Autocomplete
+            options={cities}
+            getOptionLabel={(option) =>
+              option.charAt(0).toUpperCase() + option.slice(1).toLowerCase()
+            }
+            onChange={(event, value) => handleCitySelect(value)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Select City"
+                variant="outlined"
+                size="small"
+              />
+            )}
+            sx={{
+              width: window.innerWidth <= 768 ? "100%" : "75%",
+              margin: "0 8px",
+            }}
+          />
+        </div>
+        <div className="d-flex flex-wrap justify-content-center mb-4" style={{gap: '10px'}}>
           {[0, 1, 2].map((index) => (
-            <select
+            <div
               key={index}
-              className="custom-select form-select mx-2"
-              style={{ width: window.innerWidth <= 768 ? "100%" : "200px" }}
-              value={selectedProjects[index]}
-              onChange={(e) => handleSelect(index, e.target.value)}
+              // className="mx-2"
+              style={{ width: window.innerWidth <= 768 ? "100%" : "320px" ,display:'flex',alignItems:'center'}}
             >
-              <option value="">Select</option>
-              {filteredProjects
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((project) => {
-                  const formattedName = project.name
-                    .toLowerCase()
-                    .split(" ")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ");
-                  return (
-                    <option key={project.id} value={project.id}>
-                      {formattedName}
-                    </option>
-                  );
-                })}
-            </select>
+             <ListIcon />
+              <Autocomplete
+                options={filteredProjects}
+                getOptionLabel={(option) => option.name}
+                style= {{width:'100%',marginLeft:'10px'}}
+                onChange={(event, value) =>
+                  handleSelect(index, value ? value.id : "",event)
+                
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Search Project"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+              />
+            </div>
           ))}
 
-          <button
+        
+        </div>
+        <div className="d-flex flex-wrap justify-content-center mb-4">
+        <button
             className="btn mx-2"
             onClick={handleCompare}
-            // onClick={() => console.log("Compare clicked", selectedProjects)}
             style={{
               backgroundColor: "#2067d1",
               borderColor: "#2067d1",
               color: "#fff",
-              width: window.innerWidth <= 768 ? "100%" : "auto",
+              width: window.innerWidth <= 768 ? "100%" : "72%",
             }}
           >
             Compare Now
@@ -498,7 +558,6 @@ const CompareProjects = () => {
             />
           </div>
         </div>
-
         {comparedProjects.length > 0 && (
           <div className="table-responsive">
             <table className="table table-bordered" style={{ width: "100%" }}>

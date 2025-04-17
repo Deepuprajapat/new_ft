@@ -85,6 +85,8 @@ export const getAllDeveloper = async () => {
     return { content: [] };
   }
 };
+
+
 export const getAllAmenitiesWithCategory = async () => {
   try {
     const res = await axios.get(`${BASE_URL}/amenity/get/all`, {
@@ -125,6 +127,7 @@ export const getAllProject = async (filters = {}) => {
     localityId,
     name,
     type,
+    configurations
   } = filters;
 
   try {
@@ -141,7 +144,9 @@ export const getAllProject = async (filters = {}) => {
       ...(localityId && { localityId }),
       ...(name && { name }),
       ...(type && { type: type.toUpperCase() }),
+      ...(configurations && { configurations }), 
     };
+
     const res = await axios.get(`${BASE_URL}/project/get/all`, { params });
     return res.data;
   } catch (error) {

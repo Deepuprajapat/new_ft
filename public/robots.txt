@@ -1,3 +1,7 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /img/
+Disallow: /property-for-sale.php
+Disallow: /cgi-bin/
+Disallow: /*.php$
+
+Sitemap: https://www.investmango.com/sitemap.xml

@@ -57,6 +57,8 @@ const ProjectDetails = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isNavFixed, setIsNavFixed] = useState(false);
   const [navInitialPosition, setNavInitialPosition] = useState(null);
+  const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
+
   const navigate = useNavigate();
 
   // Store initial nav position on mount
@@ -75,8 +77,30 @@ const ProjectDetails = () => {
           const data = await getAllProjectsByUrlName(urlName, navigate);
           if (data) {
             setProjectData(data);
+            // console.log(data,"gfghjhhfgdfh");
             setDeveloperId(data.developerId); // Update developer ID
             setProjectId(data.id); // Update developer ID
+            // Extract and parse schema JSON
+            // Extract and parse multiple schema JSONs
+            if (Array.isArray(data.schema) && data.schema.length > 0) {
+              const parsedSchemas = data.schema
+                .map((schemaStr) => {
+                  try {
+                    const scriptContent = schemaStr
+                      .replace(/<script[^>]*>/, "") // Remove opening <script> tag
+                      .replace(/<\/script>/, "") // Remove closing </script> tag
+                      .trim();
+
+                    return JSON.parse(scriptContent);
+                  } catch (error) {
+                    console.error("Error parsing schema JSON:", error);
+                    return null; // Skip invalid schema
+                  }
+                })
+                .filter(Boolean); // Remove null values if parsing fails
+
+              setSchemas(parsedSchemas);
+            }
           }
         } catch (error) {
           console.error("Error fetching project data:", error);
@@ -89,15 +113,28 @@ const ProjectDetails = () => {
   useEffect(() => {
     if (projectData) {
       const fetchAllProject = async () => {
-        const data = await getAllProject(projectData?.locality?.city?.id);
+        try {
+          const data = await getAllProject(projectData?.locality?.city?.id);
 
-        if (data) {
-          setAllSimilarProjects(data?.content);
+          if (data?.content) {
+            // Filter projects based on locality ID
+            const filteredProjects = data.content.filter(
+              (project) =>
+                project?.locality?.city?.id === projectData?.locality?.city?.id
+            );
+
+            // Limit the projects to max 15
+            setAllSimilarProjects(filteredProjects.slice(0, 15));
+          }
+        } catch (error) {
+          console.error("Error fetching similar projects:", error);
         }
       };
+
       fetchAllProject();
     }
   }, [projectData]);
+
   // Fetch developer details when DeveloperId changes
   useEffect(() => {
     const fetchDeveloper = async () => {
@@ -413,11 +450,24 @@ const ProjectDetails = () => {
   };
   const closePopup = () => {
     setShowPopup(false);
+    setShowBrochurePopup(false);
   };
 
   const [showBrochurePopup, setShowBrochurePopup] = useState(false);
   const closeBrochurePopup = () => setShowBrochurePopup(false);
   const handleDownloadBrochuree = () => setShowBrochurePopup(true);
+
+  const [isMobileView, setIsMobileView] = useState(false); // To track if mobile/tablet view
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 768); // Assuming 768px is your mobile/tablet breakpoint
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener("resize", handleResize); // Add resize listener
+
+    return () => window.removeEventListener("resize", handleResize); // Clean up listener
+  }, []);
 
   const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
   // const [modalType, setModalType] = useState("");
@@ -479,6 +529,37 @@ const ProjectDetails = () => {
     }
   }, [projectData, setShortAddress]);
 
+  const defaultFaqs = [
+    {
+      question: "Why choose Invest Mango?",
+      answer:
+        "Invest Mango works as one team with a common purpose to provide best-in-class services, thoroughly understands the changing needs of its clients. We are client-centric as client is the focal point of Invest Mango. We provide advice and recommendations that are in the client’s best interest. We strive to understand the client’s requirement by entering into his shoes and offer advice which have far reaching impact. A happy client is what makes us happy and we are proud to serve our client’s.",
+    },
+    {
+      question: "How much is the total size of {{projectData.name}}?",
+      answer: "{{projectData.area}}.",
+    },
+    {
+      question: "What is the project location?",
+      answer: "{{projectData.shortAddress}}.",
+    },
+  ];
+
+  const injectProjectData = (template, data) => {
+    return template
+      .replace(/{{projectData\.name}}/g, data?.name || "")
+      .replace(/{{projectData\.shortAddress}}/g, data?.shortAddress || "")
+      .replace(/{{projectData\.area}}/g, data?.area || "");
+  };
+
+  const displayedFaqs =
+    Array.isArray(sortedFaqs) && sortedFaqs.length > 0
+      ? sortedFaqs
+      : defaultFaqs.map((faq) => ({
+          question: injectProjectData(faq.question, projectData),
+          answer: injectProjectData(faq.answer, projectData),
+        }));
+
   return (
     <>
       {projectData && (
@@ -497,13 +578,12 @@ const ProjectDetails = () => {
             }
           />
           <link rel="canonical" href={window.location.href} />
-          {projectData.schema &&
-            projectData.schema.map((schemaItem, index) => (
-              <script
-                key={index}
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaItem) }}
-              />
+          {/* Inject Multiple Schema Scripts */}
+          {schemas.length > 0 &&
+            schemas.map((schema, index) => (
+              <script key={index} type="application/ld+json">
+                {JSON.stringify(schema)}
+              </script>
             ))}
         </Helmet>
       )}
@@ -724,6 +804,7 @@ const ProjectDetails = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       const element = document.querySelector(`#${item}`);
+                      if (!element) return; // ✅ Prevent error if element doesn't exist
                       const headerOffset = 100;
                       const elementPosition =
                         element.getBoundingClientRect().top;
@@ -1238,7 +1319,7 @@ const ProjectDetails = () => {
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
                 <div className="p-0 pb-2">
-                  <h4
+                  <h2
                     className="mb-3 py-2 fw-bold text-white ps-3"
                     style={{
                       fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -1247,7 +1328,7 @@ const ProjectDetails = () => {
                     }}
                   >
                     Project Details
-                  </h4>
+                  </h2>
                   <div className="px-3">
                     <p
                       className="mb-2 mb-md-4"
@@ -1473,7 +1554,9 @@ const ProjectDetails = () => {
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.possessionDate === "Coming, Soon"
+                              {projectData?.possessionDate
+                                ?.toLowerCase()
+                                .includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.possessionDate
                                 ? new Date(
@@ -1489,80 +1572,82 @@ const ProjectDetails = () => {
                           </div>
                         </div>
                       </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faBuilding}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
+                      {projectData?.totalTowers && (
+                        <div className="col-6 col-md-4 mt-2 mt-md-4">
+                          <div className="d-flex align-items-center flex-column flex-md-row">
+                            <FontAwesomeIcon
+                              icon={faBuilding}
+                              className="mb-2 mb-md-0 me-md-3"
                               style={{
-                                color: "#000",
                                 fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
+                                  window.innerWidth <= 768 ? "14px" : "20px",
+                                color: "#2067d1",
                               }}
-                            >
-                              Total Towers
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {projectData?.totalTowers || "5"} Towers
-                            </p>
+                            />
+                            <div className="text-center text-md-start">
+                              <small
+                                style={{
+                                  color: "#000",
+                                  fontSize:
+                                    window.innerWidth <= 768 ? "11px" : "15px",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                Total Towers
+                              </small>
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder"
+                                style={{
+                                  color: "#000",
+                                  fontSize:
+                                    window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                {projectData?.totalTowers || ""} Towers
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faBars}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
+                      )}
+                      {projectData?.totalFloor && (
+                        <div className="col-6 col-md-4 mt-2 mt-md-4">
+                          <div className="d-flex align-items-center flex-column flex-md-row">
+                            <FontAwesomeIcon
+                              icon={faBars}
+                              className="mb-2 mb-md-0 me-md-3"
                               style={{
-                                color: "#000",
                                 fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
+                                  window.innerWidth <= 768 ? "14px" : "20px",
+                                color: "#2067d1",
                               }}
-                            >
-                              Total Floors
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {projectData?.totalFloor} Floors
-                            </p>
+                            />
+                            <div className="text-center text-md-start">
+                              <small
+                                style={{
+                                  color: "#000",
+                                  fontSize:
+                                    window.innerWidth <= 768 ? "11px" : "15px",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                Total Floors
+                              </small>
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder"
+                                style={{
+                                  color: "#000",
+                                  fontSize:
+                                    window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                {projectData?.totalFloor} Floors
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
 
                       <div className="col-6 col-md-4 mt-2 mt-md-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
@@ -1737,7 +1822,7 @@ const ProjectDetails = () => {
                   style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
                 >
                   <div className="bg-white rounded-3 mb-4 p-4 pb-0">
-                    <h4
+                    <p
                       className="mb-3 py-2 fw-bold text-white ps-3"
                       style={{
                         fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -1746,7 +1831,7 @@ const ProjectDetails = () => {
                       }}
                     >
                       Connect to Our Expert
-                    </h4>
+                    </p>
                     {!otpSent && !otpVerified && (
                       <form onSubmit={(e) => e.preventDefault()}>
                         <div className="mb-3">
@@ -1959,7 +2044,7 @@ const ProjectDetails = () => {
                 <div className="">
                   <div className="">
                     <div className="">
-                      <h4
+                      <h2
                         className="mb-0  py-2 fw-bold text-white ps-3"
                         style={{
                           fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -1968,7 +2053,7 @@ const ProjectDetails = () => {
                         }}
                       >
                         Why to choose {projectData?.name}?
-                      </h4>
+                      </h2>
                       <div
                         className="px-3"
                         style={{
@@ -2063,7 +2148,7 @@ const ProjectDetails = () => {
                                     <div className="d-flex align-items-start">
                                       <img
                                         className="me-2"
-                                        src="https://www.investmango.com/img/icon/interior-icon4.svg"
+                                        src="/images/usp-icon.svg"
                                         loading="lazy"
                                         style={{
                                           height:
@@ -2141,7 +2226,10 @@ const ProjectDetails = () => {
                               />
                               <div className="col-12 mt-2">
                                 <a
-                                  href="tel:911234567890"
+                                  href={`tel:+91${
+                                    projectData?.locality?.city
+                                      ?.phoneNumber?.[0] || "8595189189"
+                                  }`}
                                   className="btn w-100 py-1"
                                   style={{
                                     backgroundColor: "#fff",
@@ -2176,7 +2264,7 @@ const ProjectDetails = () => {
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
                 <div className="p-0 pb-2">
-                  <h4
+                  <h2
                     className="mb-3 py-2 fw-bold text-white ps-3"
                     style={{
                       fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -2185,7 +2273,7 @@ const ProjectDetails = () => {
                     }}
                   >
                     Know About {projectData?.name}
-                  </h4>
+                  </h2>
                   <div className="px-3">
                     <div
                       className="position-relative overflow-hidden"
@@ -2253,7 +2341,12 @@ const ProjectDetails = () => {
                             transition: "background-color 0.3s ease",
                           }}
                           id="download-btn2"
-                          onClick={handleDownloadBrochure} // Trigger for brochure popup
+                          onClick={
+                            isMobileView
+                              ? handleDownloadBrochuree
+                              : handleDownloadBrochure
+                          } // Use the correct handler based on screen size
+                          // onClick={handleDownloadBrochure} // Trigger for brochure popup
                           onMouseOver={(e) =>
                             (e.target.style.backgroundColor = "#e6f0fc")
                           }
@@ -2301,7 +2394,7 @@ const ProjectDetails = () => {
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
                 <div className="p-0 pb-2">
-                  <h4
+                  <h2
                     className="mb-3 py-2 fw-bold text-white ps-3"
                     style={{
                       fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -2310,7 +2403,7 @@ const ProjectDetails = () => {
                     }}
                   >
                     {projectData?.name} Floor Plan
-                  </h4>
+                  </h2>
                   <div className="px-3">
                     <p
                       className="mb-3"
@@ -2399,7 +2492,7 @@ const ProjectDetails = () => {
                           slidesToSlide: 1,
                         },
                       }}
-                      infinite={true}
+                      infinite={false}
                       containerClass="carousel-container"
                       itemClass="carousel-item-padding-40-px"
                       style={{ width: "60%", margin: "0 auto" }}
@@ -2414,9 +2507,9 @@ const ProjectDetails = () => {
 
                         // Sort based on numeric BHK values (e.g., 2 BHK, 3 BHK, etc.)
                         const sortedPlans = filtered.sort((a, b) => {
-                          const numA = parseFloat(a.projectConfigurationName); // Extract number
-                          const numB = parseFloat(b.projectConfigurationName);
-                          return numA - numB;
+                          const sizeA = parseFloat(a.size);
+                          const sizeB = parseFloat(b.size);
+                          return sizeA - sizeB;
                         });
 
                         return sortedPlans.map((plan, index) => (
@@ -2515,7 +2608,10 @@ const ProjectDetails = () => {
                                 </div>
                                 <div className="d-flex flex-column gap-2 align-items-center">
                                   <a
-                                    href="tel:+911234567890"
+                                    href={`tel:+91${
+                                      projectData?.locality?.city
+                                        ?.phoneNumber?.[0] || "8595189189"
+                                    }`}
                                     className="btn btn-primary w-100"
                                     style={{
                                       fontSize:
@@ -2652,7 +2748,7 @@ const ProjectDetails = () => {
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
                 <div className="p-0 pb-2">
-                  <h4
+                  <h2
                     className="mb-3 py-2 fw-bold text-white ps-3"
                     style={{
                       fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -2661,7 +2757,7 @@ const ProjectDetails = () => {
                     }}
                   >
                     {projectData?.name} Price List
-                  </h4>
+                  </h2>
                   <div className="px-3">
                     <p
                       className="mb-3"
@@ -2833,20 +2929,21 @@ const ProjectDetails = () => {
                   }`}
                   style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
-                  {projectData?.locality?.city?.phoneNumber?.[0] ||
-                    "8595-189-189"}
+                  {`+91-${
+                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                    "8595-189-189"
+                  }`}
                 </a>
               </div>
               {/* Payment Plan */}
-              {(projectData?.paymentPara ||
-                projectData?.paymentPlans?.length > 0) && (
+              {projectData?.paymentPlans?.length > 0 && (
                 <div
                   className="mb-4"
                   id="payment_plan"
                   style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
                 >
                   <div className="p-0 pb-2">
-                    <h4
+                    <h2
                       className="mb-3 py-2 fw-bold text-white ps-3"
                       style={{
                         fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -2855,7 +2952,7 @@ const ProjectDetails = () => {
                       }}
                     >
                       {projectData?.name} Payment Plan
-                    </h4>
+                    </h2>
                     <div className="p-3">
                       <p
                         className="mb-3"
@@ -2873,7 +2970,7 @@ const ProjectDetails = () => {
                             }}
                             dangerouslySetInnerHTML={{
                               __html: DOMPurify.sanitize(
-                                projectData.paymentPara
+                                projectData?.paymentPara
                               ),
                             }}
                           />
@@ -2884,7 +2981,7 @@ const ProjectDetails = () => {
                           <tbody>
                             {projectData?.paymentPlans &&
                               [...projectData?.paymentPlans]
-                                .reverse()
+                                .sort((a, b) => a.id - b.id) // Sort by id in ascending order
                                 .map((plan, index) => (
                                   <tr key={index}>
                                     <td
@@ -2899,7 +2996,7 @@ const ProjectDetails = () => {
                                             : "8px",
                                       }}
                                     >
-                                      {plan.planName}
+                                      {plan?.planName}
                                     </td>
                                     <td
                                       style={{
@@ -2913,7 +3010,7 @@ const ProjectDetails = () => {
                                             : "8px",
                                       }}
                                     >
-                                      {plan.details}
+                                      {plan?.details}
                                     </td>
                                   </tr>
                                 ))}
@@ -2924,6 +3021,7 @@ const ProjectDetails = () => {
                   </div>
                 </div>
               )}
+              {/* )} */}
               {/* Amenities */}
               <div
                 className="mb-4"
@@ -2931,7 +3029,7 @@ const ProjectDetails = () => {
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
                 <div className="p-0 pb-2">
-                  <h4
+                  <h2
                     className="mb-3 py-2 fw-bold text-white ps-3"
                     style={{
                       fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -2940,7 +3038,7 @@ const ProjectDetails = () => {
                     }}
                   >
                     {projectData?.name} Amenities
-                  </h4>
+                  </h2>
                   <div className="px-3">
                     {projectData?.amenitiesPara && (
                       <p
@@ -3018,7 +3116,7 @@ const ProjectDetails = () => {
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
                 <div className="p-0 pb-2">
-                  <h4
+                  <h2
                     className="mb-3 py-2 fw-bold text-white ps-3"
                     style={{
                       fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -3027,7 +3125,7 @@ const ProjectDetails = () => {
                     }}
                   >
                     Video Presentation of {projectData && projectData?.name}
-                  </h4>
+                  </h2>
                   <div className="px-3">
                     {projectData?.videoPara && (
                       <p
@@ -3073,7 +3171,7 @@ const ProjectDetails = () => {
                         <div
                           style={{
                             width: "100%",
-                            height: "150px",
+                            height: "160px",
                             backgroundImage:
                               "url('/images/investmango-youtube-banner.webp')",
                             backgroundSize: "cover",
@@ -3440,7 +3538,7 @@ const ProjectDetails = () => {
                 id="developer"
               >
                 <div className="p-0 pb-2">
-                  <h4
+                  <h2
                     className="mb-3 py-2 fw-bold text-white ps-3"
                     style={{
                       fontSize: window.innerWidth <= 768 ? "16px" : "18px",
@@ -3449,7 +3547,7 @@ const ProjectDetails = () => {
                     }}
                   >
                     About {developerDetails?.name}
-                  </h4>
+                  </h2>
                   <div className="row px-3">
                     <div className="col-12">
                       <div className="d-flex align-items-center px-3">
@@ -3568,7 +3666,12 @@ const ProjectDetails = () => {
                             fontWeight: 700,
                           }}
                           id="BookBtn3"
-                          onClick={handleDownloadBrochure}
+                          onClick={
+                            isMobileView
+                              ? handleDownloadBrochuree
+                              : handleDownloadBrochure
+                          } // Use the correct handler based on screen size
+                          // onClick={handleDownloadBrochure}
                         >
                           Click Here
                         </span>
@@ -3595,7 +3698,7 @@ const ProjectDetails = () => {
                     Frequently Asked Questions (FAQs)
                   </h4>
                   <div className="px-3">
-                    {sortedFaqs?.map((faq, index) => (
+                    {displayedFaqs?.map((faq, index) => (
                       <div key={index} className="mb-3">
                         <div
                           className="d-flex justify-content-between align-items-center p-2"
@@ -3614,7 +3717,10 @@ const ProjectDetails = () => {
                             )
                           }
                         >
-                          <span className="fw-bold">{faq.text}</span>{" "}
+                          <span className="fw-bold">
+                            {faq.text || faq.question}
+                          </span>
+
                           {/* Display cleaned question */}
                           <span>{expandedIndex === index ? "−" : "+"}</span>
                         </div>
@@ -3631,9 +3737,7 @@ const ProjectDetails = () => {
                           >
                             <div
                               dangerouslySetInnerHTML={{
-                                __html: DOMPurify.sanitize(
-                                  faq.answer || "<p>Not Available.</p>"
-                                ),
+                                __html: DOMPurify.sanitize(faq?.answer),
                               }}
                             />
                           </div>

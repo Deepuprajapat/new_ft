@@ -1,6 +1,3 @@
-
-
-
 $(function () {
     var overlay = $('<div id="overlay"></div>')
     var popup = $('.popupp');
