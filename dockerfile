@@ -5,6 +5,9 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json ./
+COPY .env ./
+
+# Install dependencies
 RUN npm install
 
 # Copy rest of the app
