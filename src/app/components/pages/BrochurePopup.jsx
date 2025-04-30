@@ -97,6 +97,17 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
       const response = await verifyOTP(formData.usermobile, otp);
 
       if (response.message === "OTP Validated Successfully") {
+        let brochureUrl = brochure?.startsWith("http")
+          ? brochure
+          : `${BASE_BROCHURE_URL}/${brochure}`;
+      
+        // Open brochure or generate PDF BEFORE Swal
+        if (brochure) {
+          window.open(brochureUrl, "_blank");
+        } else {
+          generateComingSoonPDF(projectName);
+        }
+      
         Swal.fire({
           icon: "success",
           title: "Success!",
@@ -105,23 +116,11 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
           allowOutsideClick: false,
         }).then(() => {
           window.location.reload();
-          // Redirect first
-          // navigate("/thankYou");
-
-          // Parallel PDF download
-          if (brochure) {
-            let brochureUrl = brochure.startsWith("http")
-              ? brochure
-              : `${BASE_BROCHURE_URL}/${brochure}`;
-
-            window.open(brochureUrl, "_blank"); // Open brochure in new tab
-          } else {
-            generateComingSoonPDF(projectName);
-          }
         });
-
+      
         onClose();
-      } else {
+      }
+       else {
         Swal.fire({
           icon: "error",
           title: "Invalid OTP",

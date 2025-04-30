@@ -290,6 +290,12 @@ const ProjectDetails = () => {
 
   // Simulate sending OTP API
   const sendOtp = async () => {
+    if (!formData.username || formData.username.trim() === "") {
+      setError("Please enter your name.");
+      return;
+    }
+
+
     if (!formData.usermobile || formData.usermobile.length !== 10) {
       setError("Please enter a valid 10-digit phone number.");
       return;
@@ -552,14 +558,23 @@ const ProjectDetails = () => {
       .replace(/{{projectData\.area}}/g, data?.area || "");
   };
 
+  const isValidFaq = (faq) =>
+    faq?.question?.trim() !== "" || faq?.answer?.trim() !== "";
+  
   const displayedFaqs =
-    Array.isArray(sortedFaqs) && sortedFaqs.length > 0
+    Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
       ? sortedFaqs
       : defaultFaqs.map((faq) => ({
           question: injectProjectData(faq.question, projectData),
           answer: injectProjectData(faq.answer, projectData),
         }));
 
+
+        const validPaymentPlans = projectData?.paymentPlans?.filter(
+          (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
+        );
+
+        
   return (
     <>
       {projectData && (
@@ -570,7 +585,7 @@ const ProjectDetails = () => {
             content={projectData.metaDesciption || "Default Description"}
           />
           <meta
-            name="metaKeywords"
+            name="keywords"
             content={
               projectData.metaKeywords
                 ?.filter((k) => k.trim() !== "")
@@ -2936,7 +2951,8 @@ const ProjectDetails = () => {
                 </a>
               </div>
               {/* Payment Plan */}
-              {projectData?.paymentPlans?.length > 0 && (
+              
+              {validPaymentPlans?.length > 0 && (
                 <div
                   className="mb-4"
                   id="payment_plan"
