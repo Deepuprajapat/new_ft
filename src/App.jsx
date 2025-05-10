@@ -23,9 +23,8 @@ import CompareProjects from "./app/components/pages/CompareProjects";
 import NotFound from "./app/components/pages/NotFound";
 import ThankYouPage from "./app/components/ThankYouPage";
 import FeaturedProperties from "./app/components/pages/FeaturedProperties";
-
-
-// import PropertyForSale from "./app/components/pages/PropertyForSale";
+import Privacy from "./app/components/pages/Privacy";
+import TermAndCondition from "./app/components/pages/TermAndCondition";
 
 
 const router = createBrowserRouter([
@@ -53,7 +52,10 @@ const router = createBrowserRouter([
       { path: "/featuredProperties", element: <FeaturedProperties /> },
       { path: "/thankYou", element: <ThankYouPage /> },
       { path: "*", element: <NotFound /> }, // Not Found route
-      { path: "/404", element: <NotFound /> }
+      { path: "/404", element: <NotFound /> },
+      { path: "/privacy-policy", element: <Privacy /> },
+      { path: "/terms-and-conditions", element: <TermAndCondition /> },
+
  
     ],
   },

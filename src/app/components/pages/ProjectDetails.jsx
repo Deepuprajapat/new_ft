@@ -817,7 +817,7 @@ const ProjectDetails = () => {
                         activeSection === item ? "underline" : "none",
                     }}
                     onClick={(e) => {
-                      e.preventDefault();
+                      // e.preventDefault();
                       const element = document.querySelector(`#${item}`);
                       if (!element) return; // ✅ Prevent error if element doesn't exist
                       const headerOffset = 100;
@@ -928,7 +928,7 @@ const ProjectDetails = () => {
                         color: activeSection === item ? "#2067d1" : "#ffffff",
                       }}
                       onClick={(e) => {
-                        e.preventDefault();
+                        // e.preventDefault();
                         const element = document.querySelector(`#${item}`);
                         const headerOffset = 100;
                         const elementPosition =
