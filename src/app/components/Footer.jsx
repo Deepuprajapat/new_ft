@@ -371,6 +371,12 @@ const Footer = ({ shortAddress }) => {
                   <li>
                     <Link to="/sitemap">Sitemap</Link>
                   </li>
+                  <li>
+                    <Link to="/privacy-policy">Privacy Policy</Link>
+                  </li>
+                  <li>
+                    <Link to="/terms-and-conditions">Terms & Conditions</Link>
+                  </li>
                 </ul>
               </div>
 
