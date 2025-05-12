@@ -450,6 +450,29 @@ const ProjectDetails = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [navInitialPosition]);
 
+
+  useEffect(() => {
+    const scrollToHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const target = document.querySelector(hash);
+        if (target) {
+          const headerOffset = 100;
+          const elementPosition = target.getBoundingClientRect().top;
+          const offsetPosition =
+            elementPosition + window.pageYOffset - headerOffset;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+          });
+        }
+      }
+    };
+  
+    // Delay scrolling slightly to allow DOM to render
+    setTimeout(scrollToHash, 300);
+  }, []);
+
   const [showPopup, setShowPopup] = useState(false);
   const handleDownloadBrochure = () => {
     setShowPopup(true);
