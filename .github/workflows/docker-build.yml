@@ -31,7 +31,7 @@ jobs:
         run: |
           docker build -t ghcr.io/${{ env.REPO_LOWER }}:${{ env.SHORT_SHA }} .
 
-      - name: List docker images
+      - name: List all docker images
         run: docker images
 
       - name: Push Docker Images
