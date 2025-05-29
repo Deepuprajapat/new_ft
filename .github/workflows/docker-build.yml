@@ -1,23 +1,40 @@
-name: Build and Push Docker Image
+name: Build and Push Docker Images
 
 on:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Build & push Docker image
-        uses: mr-smithers-excellent/docker-build-push@v6
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log in to GHCR
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
         with:
-          image: invest/frontend
-          tags: ${{ github.sha }}, latest
-          registry: registry.virtualintelligence.co.in
-          dockerfile: dockerfile
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Set up commit hash and lowercase repo
+        id: vars
+        run: |
+          echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
+          echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Build Docker Images
+        run: |
+          docker build -t ghcr.io/${{ env.REPO_LOWER }}:${{ env.SHORT_SHA }} .
+
+      - name: List docker images
+        run: docker images
+
+      - name: Push Docker Images
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker push ghcr.io/${{ env.REPO_LOWER }}:${{ env.SHORT_SHA }}
