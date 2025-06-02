@@ -26,6 +26,8 @@ import {
   faCity,
   faHouseUser,
   faKey,
+  faSave,
+  faEdit
 } from "@fortawesome/free-solid-svg-icons";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -34,6 +36,23 @@ import DOMPurify from "dompurify";
 import Swal from "sweetalert2";
 import Header from "../Header";
 
+// Import modular sections
+import ProjectGallery from "./ProjectDetailsParts/ProjectGallery";
+import NavigationSection from "./ProjectDetailsParts/NavigationSection";
+import WhyChooseSection from "./ProjectDetailsParts/WhyChooseSection";
+import KnowAboutSection from "./ProjectDetailsParts/KnowAboutSection";
+import FloorPlanSection from "./ProjectDetailsParts/FloorPlanSection";
+import PriceListSection from "./ProjectDetailsParts/PriceListSection";
+import PaymentPlanSection from "./ProjectDetailsParts/PaymentPlanSection";
+import AmenitiesSection from "./ProjectDetailsParts/AmenitiesSection";
+import VideoPresentationSection from "./ProjectDetailsParts/VideoPresentationSection";
+import LocationMapSection from "./ProjectDetailsParts/LocationMapSection";
+import SitePlanSection from "./ProjectDetailsParts/SitePlanSection";
+import AboutDeveloperSection from "./ProjectDetailsParts/AboutDeveloperSection";
+import FaqSection from "./ProjectDetailsParts/FAQSection";
+import SimilarProjectsSection from "./ProjectDetailsParts/SimilarProjectsSection";
+import ConnectExpertSection from "./ProjectDetailsParts/ConnectExpertSection";
+import ProjectHeaderSection from "./ProjectDetailsParts/ProjectHeaderSection";
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
 // const FALLBACK_Floor_IMAGE = "/images/coming_soon_floor.jpg";
@@ -59,7 +78,224 @@ const ProjectDetails = () => {
   const [navInitialPosition, setNavInitialPosition] = useState(null);
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
 
+
+const [isPriceEditing, setIsPriceEditing] = useState(false);
+const [priceListPara, setPriceListPara] = useState("");
+const [floorplans, setFloorplans] = useState([]);
+
   const navigate = useNavigate();
+
+  const [isAboutEditing, setIsAboutEditing] = useState(false);
+const [aboutHtml, setAboutHtml] = useState(projectData?.about || "");
+
+//anushaka
+const [isEditing, setIsEditing] = useState(false);
+const [AddProjectButton, setAddProjectButton] = useState(false);
+// State variables pament
+const [isPaymentEditing, setIsPaymentEditing] = useState(false);
+const [paymentPara, setPaymentPara] = useState(projectData?.paymentPara || '');
+const [paymentPlans, setPaymentPlans] = useState(projectData?.paymentPlans || []);
+
+
+
+// State variables  amenthis
+const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
+const [amenitiesPara, setAmenitiesPara] = useState(projectData?.amenitiesPara || '');
+const [editableAmenities, setEditableAmenities] = useState([]);
+
+// State variables  youtube
+const [isVideoEditing, setIsVideoEditing] = useState(false);
+const [videoPara, setVideoPara] = useState(projectData?.videoPara || '');
+const [editableVideos, setEditableVideos] = useState([]);
+
+
+// ...existing code... location map
+
+const [isLocationEditing, setIsLocationEditing] = useState(false);
+const [locationMapHtml, setLocationMapHtml] = useState(projectData?.locationMap || "");
+const [locationUrl, setLocationUrl] = useState(projectData?.locationUrl || "");
+
+//  state variable for site plan
+const [isSitePlanEditing, setIsSitePlanEditing] = useState(false);
+const [siteplanParaHtml, setSiteplanParaHtml] = useState(projectData?.siteplanPara || "");
+const [siteplanImgUrl, setSiteplanImgUrl] = useState(projectData?.siteplanImg || "");
+//state variabe for ace group
+const [isDeveloperEditing, setIsDeveloperEditing] = useState(false);
+const [developerForm, setDeveloperForm] = useState({
+  logo: developerDetails?.logo || "",
+  altLogo: developerDetails?.altLogo || "",
+  establishedYear: developerDetails?.establishedYear || "",
+  totalProjects: developerDetails?.totalProjects || "",
+  about: developerDetails?.about || "",
+});
+
+
+//anushaka
+const handleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+  const handleSave = () => {
+    setIsEditing(false);
+    // Here you would typically save the data to your backend
+    console.log('Saving project data:', projectData);
+  };
+
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
+    if (dateStr.toLowerCase().includes("coming")) return "Coming Soon";
+    try {
+      const date = new Date(isNaN(dateStr) ? dateStr : Number(dateStr));
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+  const getSizeRange = () => {
+    if (!projectData?.floorplans || projectData.floorplans.length === 0) {
+      return "Size not available";
+    }
+    const sizes = projectData.floorplans.map(fp => fp.size);
+    const minSize = Math.min(...sizes);
+    const maxSize = Math.max(...sizes);
+    return `${minSize} - ${maxSize} Sq. Ft.`;
+  };
+  const handleInputChange = (field, value) => {
+    setProjectData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+
+
+const handleArrayInputChange = (field, value) => {
+    const arrayValue = value.split(',').map(item => item.trim());
+    setProjectData(prev => ({
+      ...prev,
+      [field]: arrayValue
+    }));
+  };
+// ace group
+useEffect(() => {
+  setDeveloperForm({
+    logo: developerDetails?.logo || "",
+    altLogo: developerDetails?.altLogo || "",
+    establishedYear: developerDetails?.establishedYear || "",
+    totalProjects: developerDetails?.totalProjects || "",
+    about: developerDetails?.about || "",
+  });
+}, [developerDetails]);
+
+//  site plan popup
+useEffect(() => {
+  setSiteplanParaHtml(projectData?.siteplanPara || "");
+  setSiteplanImgUrl(projectData?.siteplanImg || "");
+}, [projectData]);
+
+
+// Keep state in sync with projectData location map and URL
+useEffect(() => {
+  setLocationMapHtml(projectData?.locationMap || "");
+  setLocationUrl(projectData?.locationUrl || "");
+}, [projectData]);
+
+
+// Initialize editable amenities when editing starts
+useEffect(() => {
+  if (isAmenitiesEditing && projectData?.amenities) {
+    setEditableAmenities(JSON.parse(JSON.stringify(processAmenities())));
+  }
+}, [isAmenitiesEditing]);
+
+// Functions
+const processEditableAmenities = () => {
+  return editableAmenities;
+};
+
+const updateCategoryName = (categoryIndex, newName) => {
+  const updated = [...editableAmenities];
+  updated[categoryIndex].name = newName;
+  setEditableAmenities(updated);
+};
+
+const updateAmenity = (categoryIndex, amenityIndex, field, value) => {
+  const updated = [...editableAmenities];
+  updated[categoryIndex].assets[amenityIndex][field] = value;
+  setEditableAmenities(updated);
+};
+
+const removeAmenity = (categoryIndex, amenityIndex) => {
+  const updated = [...editableAmenities];
+  updated[categoryIndex].assets.splice(amenityIndex, 1);
+  setEditableAmenities(updated);
+};
+
+const addNewAmenity = (categoryIndex) => {
+  const updated = [...editableAmenities];
+  updated[categoryIndex].assets.push({
+    name: 'New Amenity',
+    icon: '/images/default-icon.svg'
+  });
+  setEditableAmenities(updated);
+};
+
+const removeCategoryAmenities = (categoryIndex) => {
+  const updated = editableAmenities.filter((_, index) => index !== categoryIndex);
+  setEditableAmenities(updated);
+};
+
+const addNewCategory = () => {
+  const newCategory = {
+    name: 'New Category',
+    assets: [
+      {
+        name: 'Sample Amenity',
+        icon: '/images/default-icon.svg'
+      }
+    ]
+  };
+  setEditableAmenities([...editableAmenities, newCategory]);
+};
+
+const saveAmenitiesChanges = () => {
+  // Save logic here - update projectData or call API
+  // You'll need to convert editableAmenities back to your original format
+  setIsAmenitiesEditing(false);
+};
+// Functions
+const updatePaymentPlan = (index, field, value) => {
+  const updated = [...paymentPlans];
+  updated[index] = { ...updated[index], [field]: value };
+  setPaymentPlans(updated);
+};
+
+const removePaymentPlan = (index) => {
+  const updated = paymentPlans.filter((_, i) => i !== index);
+  setPaymentPlans(updated);
+};
+
+const addNewPaymentPlan = () => {
+  const newPlan = {
+    id: Math.max(...paymentPlans.map(p => p.id), 0) + 1,
+    planName: 'New Plan',
+    details: 'Plan details...'
+  };
+  setPaymentPlans([...paymentPlans, newPlan]);
+};
+
+const savePaymentChanges = () => {
+  // Save logic here - update projectData or call API
+  setIsPaymentEditing(false);
+};
+
+// Update aboutHtml when projectData changes
+useEffect(() => {
+  setAboutHtml(projectData?.about || "");
+}, [projectData]);
 
   // Store initial nav position on mount
   useEffect(() => {
@@ -168,6 +404,80 @@ const ProjectDetails = () => {
     fetchReraInfo();
   }, [projectId]);
 
+
+  // Update your existing useEffect
+useEffect(() => {
+  setAboutHtml(projectData?.about || "");
+  setPriceListPara(projectData?.priceListPara || "");
+  setFloorplans(projectData?.floorplans ? [...projectData.floorplans] : []);
+}, [projectData]);
+
+// Add these functions
+const savePriceChanges = () => {
+  setProjectData(prev => ({
+    ...prev,
+    priceListPara: priceListPara,
+    floorplans: floorplans
+  }));
+  setIsPriceEditing(false);
+};
+
+
+
+
+
+// Initialize editable videos when editing starts
+useEffect(() => {
+  if (isVideoEditing) {
+    const videos = projectData?.videos || [''];
+    // Ensure at least one empty field for new video
+    const videosWithEmpty = videos.length === 0 ? [''] : [...videos];
+    setEditableVideos(videosWithEmpty);
+  }
+}, [isVideoEditing, projectData?.videos]);
+
+// Functions
+const updateVideoUrl = (index, value) => {
+  const updated = [...editableVideos];
+  updated[index] = value;
+  setEditableVideos(updated);
+};
+
+const removeVideo = (index) => {
+  const updated = editableVideos.filter((_, i) => i !== index);
+  // Ensure at least one empty field remains
+  if (updated.length === 0) {
+    updated.push('');
+  }
+  setEditableVideos(updated);
+};
+
+const addNewVideo = () => {
+  setEditableVideos([...editableVideos, '']);
+};
+
+const saveVideoChanges = () => {
+  // Filter out empty video URLs before saving
+  const validVideos = editableVideos.filter(url => url.trim() !== '');
+  
+  // Save logic here - update projectData or call API
+  // projectData.videos = validVideos;
+  // projectData.videoPara = videoPara;
+  
+  setIsVideoEditing(false);
+};
+
+// Helper function to extract YouTube video ID from various URL formats
+const extractYouTubeId = (url) => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : url;
+};
+const updateFloorplan = (index, field, value) => {
+  setFloorplans(prev => prev.map((item, i) => 
+    i === index ? { ...item, [field]: field === 'size' ? parseInt(value) || 0 : value } : item
+  ));
+};
   const formatPrice = (price) => {
     if (!price) return "Prices On Request";
 
@@ -226,22 +536,16 @@ const ProjectDetails = () => {
     return Object.values(groupedAmenities);
   };
 
-  const getLeastPriceOfFloorPlan = (floorPlan) => {
-    if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
-      return 0;
-    }
-
-    // Filter out prices that are exactly 1.5
-    const validFloorPlans = floorPlan.filter((plan) => plan.price !== 1.5);
-
-    if (validFloorPlans.length === 0) return 0; // If all prices were 1.5, return 0
-
-    const sortedFloorPlan = [...validFloorPlans].sort(
-      (a, b) => a.price - b.price
-    );
-    return sortedFloorPlan[0].price;
-  };
-
+  function getLeastPriceOfFloorPlan(floorPlan) {
+  if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
+    return 0;
+  }
+  // Filter out prices that are exactly 1.5
+  const validFloorPlans = floorPlan.filter((plan) => plan.price !== 1.5);
+  if (validFloorPlans.length === 0) return 0;
+  const sortedFloorPlan = [...validFloorPlans].sort((a, b) => a.price - b.price);
+  return sortedFloorPlan[0].price;
+}
   const getHighestPriceOfFloorPlan = (floorPlan) => {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
       return 0;
@@ -999,346 +1303,21 @@ const ProjectDetails = () => {
         </div>
 
         {/* Section 1 */}
-        <section
-          className="container-fluid"
-          style={{
-            width: window.innerWidth <= 768 ? "90%" : "95%",
-            margin: "0 auto",
-          }}
-        >
-          <div>
-            <div className="d-flex flex-column flex-md-row justify-content-between">
-              {/* Left Section */}
-              <div className="col-12 col-md-6 p-0 p-md-0">
-                {/* Upper Section */}
-                <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start mb-2 mt-2 mt-md-3">
-                  <div
-                    className="mb-2 mb-md-0 me-md-3 text-center text-md-start"
-                    style={{
-                      maxWidth: "90px",
-                      border: "1px solid grey",
-                      height: "66px",
-                    }}
-                  >
-                    <img
-                      src={projectData?.projectLogo || "defaultLogo.jpg"}
-                      alt={projectData?.projectLogo || "Project Logo"}
-                      loading="lazy"
-                      className="img-fluid"
-                      style={{
-                        maxWidth: "80px",
-                        height: "64px",
-                      }}
-                    />
-                  </div>
-                  <div className="text-center text-md-start">
-                    <h1
-                      className="h3 mb-0 text-center text-md-start"
-                      style={{ fontSize: "20px" }}
-                    >
-                      {projectData?.name || "Project Name"}
-                    </h1>
-                    <p className="mb-0" style={{ fontSize: "11px" }}>
-                      {projectData?.shortAddress || "Project Address"}
-                    </p>
-                    <span style={{ fontSize: "13px" }}>
-                      By{" "}
-                      <a
-                        href={projectData?.developerLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {projectData?.developerName || "Developer Name"}
-                      </a>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Lower Section - Buttons */}
-                <div className="d-flex flex-wrap justify-content-center justify-content-md-start position-relative">
-                  {/* RERA Badge */}
-                  <span
-                    className="badge bg-primary"
-                    style={{
-                      padding: "6px 10px",
-                      fontSize: "12px",
-                      marginRight: "5px",
-                      marginBottom: "5px",
-                      borderRadius: "4px",
-                      backgroundColor: "#2067d1",
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={() => setShowReraDetails(true)}
-                    // onMouseLeave={() => setShowReraDetails(false)}
-                  >
-                    Rera
-                  </span>
-
-                  {/* RERA Details Popup */}
-                  {showReraDetails && (
-                    <div
-                      onMouseEnter={() => setIsReraDetailHovered(true)}
-                      onMouseLeave={() => {
-                        setIsReraDetailHovered(false);
-                        setShowReraDetails(false);
-                      }}
-                      style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
-                        zIndex: 1000,
-                        backgroundColor: "white",
-                        padding: "15px",
-                        boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-                        borderRadius: "6px",
-                        minWidth: "350px",
-                        maxWidth: "90vw",
-                        overflowX: "auto",
-                      }}
-                    >
-                      <div className="d-flex justify-content-between align-items-center mb-0">
-                        <h6
-                          className="m-0"
-                          style={{ fontWeight: 700, fontSize: "14px" }}
-                        >
-                          RERA Details
-                        </h6>
-                        <i
-                          className="fa fa-close"
-                          style={{ fontSize: "15px", cursor: "pointer" }}
-                          onClick={() => {
-                            setShowReraDetails(false);
-                            setIsReraDetailHovered(false);
-                          }}
-                        />
-                      </div>
-
-                      <div className="table-responsive">
-                        <span style={{ fontSize: "10px", color: "black" }}>
-                          Website Link
-                          <a
-                            href={projectData?.reraLink || "N/A"}
-                            target="_blank"
-                          >
-                            {" "}
-                            {projectData?.reraLink || "N/A"}
-                          </a>
-                        </span>
-                        <table className="w-100">
-                          <thead>
-                            <tr>
-                              <th
-                                style={{
-                                  width: "40%",
-                                  textAlign: "left",
-                                  fontSize: "12px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                  padding: "8px",
-                                }}
-                              >
-                                Phase
-                              </th>
-                              <th
-                                style={{
-                                  width: "30%",
-                                  textAlign: "left",
-                                  fontSize: "12px",
-                                  padding: "8px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                Status
-                              </th>
-                              <th
-                                style={{
-                                  width: "30%",
-                                  textAlign: "left",
-                                  fontSize: "12px",
-                                  padding: "8px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                RERA Number
-                              </th>
-                              <th
-                                style={{
-                                  width: "30%",
-                                  textAlign: "left",
-                                  fontSize: "12px",
-                                  padding: "8px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                RERA QR
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {reraDetails.length > 0 ? (
-                              reraDetails.map((item, index) => (
-                                <tr key={index}>
-                                  <td
-                                    style={{
-                                      fontSize: "12px",
-                                      padding: "10px",
-                                      fontWeight: "500",
-                                    }}
-                                  >
-                                    {item.phase?.join(", ") || "-"}
-                                  </td>
-                                  <td
-                                    style={{
-                                      fontSize: "12px",
-                                      padding: "10px",
-                                    }}
-                                  >
-                                    {item.status || "-"}
-                                  </td>
-                                  <td
-                                    style={{
-                                      fontSize: "12px",
-                                      padding: "10px",
-                                      fontWeight: "600",
-                                    }}
-                                  >
-                                    {item.reraNumber || "-"}
-                                  </td>
-                                  <td
-                                    style={{
-                                      fontSize: "12px",
-                                      padding: "10px",
-                                      fontWeight: "600",
-                                    }}
-                                  >
-                                    {item.qrImages?.length > 0 ? (
-                                      <img
-                                        src={item.qrImages || "-"}
-                                        alt="qrImage"
-                                        style={{
-                                          height: "200",
-                                          width: "200%",
-                                          objectFit: "cover",
-                                        }}
-                                      />
-                                    ) : (
-                                      <span>N/A</span>
-                                    )}
-                                  </td>
-                                </tr>
-                              ))
-                            ) : (
-                              <tr>
-                                <td
-                                  colSpan="3"
-                                  style={{
-                                    textAlign: "center",
-                                    padding: "10px",
-                                    fontSize: "12px",
-                                    fontWeight: "500",
-                                    color: "gray",
-                                  }}
-                                >
-                                  No RERA data available
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Additional Badges */}
-                  <span
-                    className="badge text-dark"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#f0f0f0",
-                      fontWeight: "300",
-                    }}
-                  >
-                    No Brokerage
-                  </span>
-                  <span
-                    className="badge text-dark"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#f0f0f0",
-                      fontWeight: "300",
-                    }}
-                  >
-                    Floor Plans Available
-                  </span>
-                  <span
-                    className="badge text-dark"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#f0f0f0",
-                      fontWeight: "300",
-                    }}
-                  >
-                    Top Amenities
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Section */}
-              <div
-                className="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-2 mt-md-2 p-0 p-md-0"
-                style={{ boxShadow: "none", border: "none" }}
-              >
-                <p
-                  className="mb-1 fw-bold text-black text-center text-md-end mt-2 mt-md-4"
-                  style={{ fontSize: "16px" }}
-                >
-                  Project Price
-                </p>
-                <h2
-                  className="h2 mb-0 fw-bold text-center text-md-end"
-                  style={{ fontSize: "25px", fontWeight: "800" }}
-                >
-                  ₹{" "}
-                  {formatPrice(
-                    getLeastPriceOfFloorPlan(
-                      projectData?.floorplans?.filter((plan) => plan.price > 1)
-                    )
-                  )}{" "}
-                  - ₹{" "}
-                  {formatPrice(
-                    getHighestPriceOfFloorPlan(projectData?.floorplans)
-                  )}
-                </h2>
-              </div>
-            </div>
-          </div>
-          <div className="">
-            <hr />
-          </div>
-        </section>
+    <ProjectHeaderSection
+  projectData={projectData}
+  reraDetails={reraDetails}
+  showReraDetails={showReraDetails}
+  setShowReraDetails={setShowReraDetails}
+  setIsReraDetailHovered={setIsReraDetailHovered}
+  isReraDetailHovered={isReraDetailHovered}
+  formatPrice={formatPrice}
+  getLeastPriceOfFloorPlan={getLeastPriceOfFloorPlan}
+  getHighestPriceOfFloorPlan={getHighestPriceOfFloorPlan}
+  isEditing={isEditing}
+  handleEdit={handleEdit  }
+  handleSave={handleSave}
+  handleInputChange={handleInputChange}
+/>
 
         {/* Section 2 */}
         <section
@@ -1351,401 +1330,458 @@ const ProjectDetails = () => {
           <div className="row">
             <section className="col-md-8">
               {/* Project Details */}
-              <div
+           <div
                 className="mb-4"
                 id="overview"
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
                 <div className="p-0 pb-2">
-                  <h2
-                    className="mb-3 py-2 fw-bold text-white ps-3"
+                  <div
+                    className="mb-3 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
                     style={{
                       fontSize: window.innerWidth <= 768 ? "16px" : "18px",
                       backgroundColor: "#2067d1",
                       borderRadius: "4px 4px 0 0",
                     }}
                   >
-                    Project Details
-                  </h2>
+                   <span>Project Details</span>
+  <span style={{ cursor: "pointer", marginRight: "12px" }}>
+    {isEditing ? (
+      <button
+        className="btn btn-success btn-sm"
+        style={{ backgroundColor: "white" ,color: "#2067d1"}}
+        onClick={handleSave}
+      >
+        Save
+      </button>
+    ) : (
+      <span
+        onClick={handleEdit}
+        style={{
+          cursor: "pointer",
+          display: "inline-flex",
+          alignItems: "center",
+        }}
+      >
+        <img
+          src="/images/edit-icon.svg"
+          alt="Edit"
+          fill="true"
+          style={{ width: "18px", height: "18px" }}
+        />
+      </span>
+    )}
+  </span>
+                  </div>
+
                   <div className="px-3">
-                    <p
-                      className="mb-2 mb-md-4"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                      }}
-                    >
-                      {projectData?.overviewPara && (
+                    <div className="mb-2 mb-md-4" style={{ fontSize: window.innerWidth <= 768 ? "12px" : "16px" }}>
+                      {isEditing ? (
+                        <textarea
+                          className="form-control"
+                          value={AddProjectButton ? '' : (projectData?.overviewPara || '')}
+                          onChange={(e) => handleInputChange('overviewPara', e.target.value)}
+                          rows="3"
+                          placeholder="Project description..."
+                        />
+                      ) : (
                         <div
                           className="project-description"
                           dangerouslySetInnerHTML={{
-                            __html: projectData.overviewPara,
+              __html: AddProjectButton ? 'Enter project description...' : (projectData?.overviewPara || ''),
                           }}
                         />
                       )}
-                    </p>
+                    </div>
 
                     <div className="row g-3 mb-0 mb-md-4">
+                      {/* Project Area */}
                       <div className="col-6 col-md-4 mt-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
                           <FontAwesomeIcon
                             icon={faExpandArrowsAlt}
                             className="mb-2 mb-md-0 me-md-3"
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
+                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                               color: "#2067d1",
                             }}
                           />
-                          <div className="text-center text-md-start">
+                          <div className="text-center text-md-start w-100">
                             <small
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
+                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                 fontWeight: "600",
                               }}
                             >
                               Project Area
                             </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                                fontWeight:
-                                  window.innerWidth <= 768 ? "400" : "800",
-                              }}
-                            >
-                              {projectData?.area}
-                            </p>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                className="form-control form-control-sm mt-1"
+                                value={AddProjectButton ? '' : (projectData?.area || '')}
+                                onChange={(e) => handleInputChange('area', e.target.value)}
+                              />
+                            ) : (
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder"
+                                style={{
+                                  color: "#000",
+                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                  fontWeight: window.innerWidth <= 768 ? "400" : "800",
+                                }}
+                              >
+                                {AddProjectButton ? '-- --' : projectData?.area}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
 
+                      {/* Sizes */}
                       <div className="col-6 col-md-4 mt-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
                           <FontAwesomeIcon
                             icon={faRulerCombined}
                             className="mb-2 mb-md-0 me-md-3"
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
+                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                               color: "#2067d1",
                             }}
                           />
-                          <div className="text-center text-md-start">
+                          <div className="text-center text-md-start w-100">
                             <small
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
+                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                 fontWeight: "600",
                               }}
                             >
                               Sizes
                             </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                                fontWeight:
-                                  window.innerWidth <= 768 ? "400" : "800",
-                              }}
-                            >
-                              {projectData?.floorplans &&
-                              projectData.floorplans.length > 0
-                                ? `${Math.min(
-                                    ...projectData.floorplans.map(
-                                      (fp) => fp.size
-                                    )
-                                  )} - ${Math.max(
-                                    ...projectData.floorplans.map(
-                                      (fp) => fp.size
-                                    )
-                                  )} Sq. Ft.`
-                                : "Size not available"}
-                            </p>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                className="form-control form-control-sm mt-1"
+                                 value={AddProjectButton ? '' : (projectData?.floorplans?.map(fp => fp.size).join(', ') || '')}
+                                onChange={(e) => {
+                                  const sizes = e.target.value.split(',').map(s => ({ size: parseInt(s.trim()) || 0 }));
+                                  setProjectData(prev => ({ ...prev, floorplans: sizes }));
+                                }}
+                                placeholder="850, 1200, 1650, 2100"
+                              />
+                            ) : (
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder"
+                                style={{
+                                  color: "#000",
+                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                  fontWeight: window.innerWidth <= 768 ? "400" : "800",
+                                }}
+                              >
+                                 {AddProjectButton ? '-- --' : getSizeRange()}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
 
+                      {/* Project Units */}
                       <div className="col-6 col-md-4 mt-2 mt-md-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
                           <FontAwesomeIcon
                             icon={faBuilding}
                             className="mb-2 mb-md-0 me-md-3"
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
+                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                               color: "#2067d1",
                             }}
                           />
-                          <div className="text-center text-md-start">
+                          <div className="text-center text-md-start w-100">
                             <small
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
+                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                 fontWeight: "600",
                               }}
                             >
                               Project Units
                             </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {projectData?.units}
-                            </p>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                className="form-control form-control-sm mt-1"
+                                value={AddProjectButton ? '' : (projectData?.units || '')}
+                                onChange={(e) => handleInputChange('units', e.target.value)}
+                              />
+                            ) : (
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder"
+                                style={{
+                                  color: "#000",
+                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                }}
+                              >
+                               {AddProjectButton ? '-- --' : projectData?.units}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
 
+                      {/* Launch Date */}
                       <div className="col-6 col-md-4 mt-2 mt-md-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
                           <FontAwesomeIcon
                             icon={faCalendarAlt}
                             className="mb-2 mb-md-0 me-md-3"
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
+                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                               color: "#2067d1",
                             }}
                           />
-                          <div className="text-center text-md-start">
+                          <div className="text-center text-md-start w-100">
                             <small
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
+                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                 fontWeight: "600",
                               }}
                             >
                               Launch Date
                             </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {projectData?.launchDate
-                                ?.toLowerCase()
-                                .includes("coming")
-                                ? "Coming Soon"
-                                : projectData?.launchDate
-                                ? new Date(
-                                    isNaN(projectData.launchDate)
-                                      ? projectData.launchDate
-                                      : Number(projectData.launchDate)
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "long",
-                                  })
-                                : "-"}
-                            </p>
+                            {isEditing ? (
+                              <input
+                                type="date"
+                                className="form-control form-control-sm mt-1"
+                                alue={AddProjectButton ? '' : (projectData?.launchDate || '')}
+                                onChange={(e) => handleInputChange('launchDate', e.target.value)}
+                              />
+                            ) : (
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder"
+                                style={{
+                                  color: "#000",
+                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                {AddProjectButton ? '-- --' : formatDate(projectData?.launchDate)}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
 
+                      {/* Possession Date */}
                       <div className="col-6 col-md-4 mt-2 mt-md-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
                           <FontAwesomeIcon
                             icon={faGavel}
                             className="mb-2 mb-md-0 me-md-3"
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
+                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                               color: "#2067d1",
                             }}
                           />
-                          <div className="text-center text-md-start">
+                          <div className="text-center text-md-start w-100">
                             <small
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
+                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                 fontWeight: "600",
                               }}
                             >
                               Possession Date
                             </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {projectData?.possessionDate
-                                ?.toLowerCase()
-                                .includes("coming")
-                                ? "Coming Soon"
-                                : projectData?.possessionDate
-                                ? new Date(
-                                    isNaN(projectData.possessionDate)
-                                      ? projectData.possessionDate
-                                      : Number(projectData.possessionDate)
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "long",
-                                  })
-                                : "-"}
-                            </p>
+                            {isEditing ? (
+                              <input
+                                type="date"
+                                className="form-control form-control-sm mt-1"
+                                value={AddProjectButton ? '' : (projectData?.possessionDate || '')}
+                                onChange={(e) => handleInputChange('possessionDate', e.target.value)}
+                              />
+                            ) : (
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder"
+                                style={{
+                                  color: "#000",
+                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                 {AddProjectButton ? '-- --' : formatDate(projectData?.possessionDate)}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
-                      {projectData?.totalTowers && (
+
+                      {/* Total Towers */}
+                        {((projectData?.totalTowers && !AddProjectButton) || isEditing) && (
                         <div className="col-6 col-md-4 mt-2 mt-md-4">
                           <div className="d-flex align-items-center flex-column flex-md-row">
                             <FontAwesomeIcon
                               icon={faBuilding}
                               className="mb-2 mb-md-0 me-md-3"
                               style={{
-                                fontSize:
-                                  window.innerWidth <= 768 ? "14px" : "20px",
+                                fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                                 color: "#2067d1",
                               }}
                             />
-                            <div className="text-center text-md-start">
+                            <div className="text-center text-md-start w-100">
                               <small
                                 style={{
                                   color: "#000",
-                                  fontSize:
-                                    window.innerWidth <= 768 ? "11px" : "15px",
+                                  fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                   fontWeight: "600",
                                 }}
                               >
                                 Total Towers
                               </small>
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder"
-                                style={{
-                                  color: "#000",
-                                  fontSize:
-                                    window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                }}
-                              >
-                                {projectData?.totalTowers || ""} Towers
-                              </p>
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  className="form-control form-control-sm mt-1"
+                                  value={AddProjectButton ? '' : (projectData?.totalTowers || '')}
+                                  onChange={(e) => handleInputChange('totalTowers', e.target.value)}
+                                />
+                              ) : (
+                                <p
+                                  className="mb-0 fw-normal fw-md-bolder"
+                                  style={{
+                                    color: "#000",
+                                    fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                    marginTop: "2px",
+                                  }}
+                                >
+                                  {AddProjectButton ? '-- --' : `${projectData?.totalTowers || ""} Towers`}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
                       )}
-                      {projectData?.totalFloor && (
+
+                      {/* Total Floors */}
+                       {((projectData?.totalFloor && !AddProjectButton) || isEditing) && (
                         <div className="col-6 col-md-4 mt-2 mt-md-4">
                           <div className="d-flex align-items-center flex-column flex-md-row">
                             <FontAwesomeIcon
                               icon={faBars}
                               className="mb-2 mb-md-0 me-md-3"
                               style={{
-                                fontSize:
-                                  window.innerWidth <= 768 ? "14px" : "20px",
+                                fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                                 color: "#2067d1",
                               }}
                             />
-                            <div className="text-center text-md-start">
+                            <div className="text-center text-md-start w-100">
                               <small
                                 style={{
                                   color: "#000",
-                                  fontSize:
-                                    window.innerWidth <= 768 ? "11px" : "15px",
+                                  fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                   fontWeight: "600",
                                 }}
                               >
                                 Total Floors
                               </small>
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder"
-                                style={{
-                                  color: "#000",
-                                  fontSize:
-                                    window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                }}
-                              >
-                                {projectData?.totalFloor} Floors
-                              </p>
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  className="form-control form-control-sm mt-1"
+                                   value={AddProjectButton ? '' : (projectData?.totalFloor || '')}
+                                  onChange={(e) => handleInputChange('totalFloor', e.target.value)}
+                                />
+                              ) : (
+                                <p
+                                  className="mb-0 fw-normal fw-md-bolder"
+                                  style={{
+                                    color: "#000",
+                                    fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                    marginTop: "2px",
+                                  }}
+                                >
+                                   {AddProjectButton ? '-- --' : `${projectData?.totalFloor} Floors`}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
                       )}
 
+                      {/* Project Status */}
                       <div className="col-6 col-md-4 mt-2 mt-md-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
                           <FontAwesomeIcon
                             icon={faFlag}
                             className="mb-2 mb-md-0 me-md-3"
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
+                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                               color: "#2067d1",
                             }}
                           />
-                          <div className="text-center text-md-start">
+                          <div className="text-center text-md-start w-100">
                             <small
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
+                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                 fontWeight: "600",
                               }}
                             >
                               Project Status
                             </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {projectData?.status
-                                ?.toLowerCase() // Convert to lowercase
-                                ?.replace(/_/g, " ") // Replace underscores with spaces
-                                ?.replace(/\b\w/g, (char) =>
-                                  char.toUpperCase()
-                                )}
-                            </p>
+                            {isEditing ? (
+                              <select
+                                className="form-control form-control-sm mt-1"
+                                 style={{ paddingTop: "6px", paddingBottom: "6px" }}
+                                value={AddProjectButton ? '' : (projectData?.status || '')}
+                                onChange={(e) => handleInputChange('status', e.target.value)}
+                              >
+                                <option value="">Select Status</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="under_construction">Under Construction</option>
+                                <option value="ready_to_move">Ready To Move</option>
+                                <option value="completed">Completed</option>
+                              </select>
+                            ) : (
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder"
+                                style={{
+                                  color: "#000",
+                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                {AddProjectButton ? '-- --' : (projectData?.status
+                    ?.toLowerCase()
+                    ?.replace(/_/g, " ")
+                    ?.replace(/\b\w/g, (char) => char.toUpperCase()))}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
 
+                      {/* Property Type */}
                       <div className="col-6 col-md-4 mt-2 mt-md-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
                           <FontAwesomeIcon
                             icon={faCity}
                             className="mb-2 mb-md-0 me-md-3"
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
+                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                               color: "#2067d1",
                             }}
                           />
-                          <div className="text-center text-md-start">
+                          <div className="text-center text-md-start w-100">
                             <small
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
+                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                 fontWeight: "600",
                               }}
                             >
@@ -1755,97 +1791,112 @@ const ProjectDetails = () => {
                               className="mb-0 fw-normal fw-md-bolder"
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
+                                fontSize: window.innerWidth <= 768 ? "12px" : "13px",
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.configurationsType?.propertyType &&
-                                projectData.configurationsType.propertyType
-                                  .toLowerCase()
-                                  .replace(/^\w/, (c) => c.toUpperCase())}
+                             {AddProjectButton 
+                  ? '-- --' 
+                  : (projectData?.configurationsType?.propertyType &&
+                      projectData.configurationsType.propertyType
+                        .toLowerCase()
+                        .replace(/^\w/, (c) => c.toUpperCase()))}
                             </p>
                           </div>
                         </div>
                       </div>
 
+                      {/* Configurations */}
                       <div className="col-6 col-md-4 mt-2 mt-md-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
                           <FontAwesomeIcon
                             icon={faHouseUser}
                             className="mb-2 mb-md-0 me-md-3"
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
+                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                               color: "#2067d1",
                             }}
                           />
-                          <div className="text-center text-md-start">
+                          <div className="text-center text-md-start w-100">
                             <small
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
+                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                 fontWeight: "600",
                               }}
                             >
                               Configurations
                             </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder text-break"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {projectData?.configurations
-                                ?.map((item) => item.toUpperCase()) // Ensure consistent casing
-                                ?.filter(
-                                  (value, index, self) =>
-                                    self.indexOf(value) === index
-                                ) // Remove duplicates
-                                ?.sort((a, b) => parseFloat(a) - parseFloat(b)) // Sort numerically based on the number
-                                ?.join(", ")}
-                            </p>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                className="form-control form-control-sm mt-1"
+                                value={AddProjectButton ? '' : (projectData?.configurations?.join(', ') || '')}
+                                onChange={(e) => handleArrayInputChange('configurations', e.target.value)}
+                                placeholder="1BHK, 2BHK, 3BHK, 4BHK"
+                              />
+                            ) : (
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder text-break"
+                                style={{
+                                  color: "#000",
+                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                {AddProjectButton 
+                    ? '-- --' 
+                    : (projectData?.configurations
+                        ?.map((item) => item.toUpperCase())
+                        ?.filter((value, index, self) => self.indexOf(value) === index)
+                        ?.sort((a, b) => parseFloat(a) - parseFloat(b))
+                        ?.join(", "))}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
 
+                      {/* RERA Number */}
                       <div className="col-6 col-md-4 mt-2 mt-md-4">
                         <div className="d-flex align-items-center flex-column flex-md-row">
                           <FontAwesomeIcon
                             icon={faKey}
                             className="mb-2 mb-md-0 me-md-3"
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
+                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                               color: "#2067d1",
                             }}
                           />
-                          <div className="text-center text-md-start">
+                          <div className="text-center text-md-start w-100">
                             <small
                               style={{
                                 color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
+                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                                 fontWeight: "600",
                               }}
                             >
                               RERA Number
                             </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {projectData?.rera}
-                            </p>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                className="form-control form-control-sm mt-1"
+                                value={AddProjectButton ? '' : (projectData?.rera || '')}
+                                onChange={(e) => handleInputChange('rera', e.target.value)}
+                              />
+                            ) : (
+                              <p
+                                className="mb-0 fw-normal fw-md-bolder"
+                                style={{
+                                  color: "#000",
+                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                {AddProjectButton ? '-- --' : projectData?.rera}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1853,6 +1904,7 @@ const ProjectDetails = () => {
                   </div>
                 </div>
               </div>
+
               {/* connect to out expert for mobile view*/}
               {window.innerWidth <= 768 && (
                 <div
@@ -2082,16 +2134,39 @@ const ProjectDetails = () => {
                 <div className="">
                   <div className="">
                     <div className="">
-                      <h2
-                        className="mb-0  py-2 fw-bold text-white ps-3"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                          backgroundColor: "#2067d1",
-                          borderRadius: "4px 4px 0 0",
-                        }}
-                      >
-                        Why to choose {projectData?.name}?
-                      </h2>
+                     <h2
+  className="mb-0 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
+  style={{
+    fontSize: window.innerWidth <= 768 ? "16px" : "18px",
+    backgroundColor: "#2067d1",
+    borderRadius: "4px 4px 0 0",
+  }}
+>
+  <span>Why to choose {projectData?.name}?</span>
+  <span style={{ cursor: "pointer", marginRight: "12px" }}>
+    {isEditing ? (
+     <span>
+  <button
+    className="btn btn-success btn-sm"
+  style={{ backgroundColor: "#000", borderColor: "#000" }}
+    onClick={() => setIsEditing(false)} // Replace with your save handler if needed
+  >
+    Save
+  </button>
+  </span>
+    ) : (
+   <span onClick={() => setIsEditing(true)} style={{ cursor: "pointer", display: "inline-flex", alignItems: "center" }}>
+  <img
+  
+    src="/images/edit-icon.svg" 
+    alt="Edit"
+    fill="true"
+    style={{ width: "18px", height: "18px" }}
+  />
+</span>
+    )}
+  </span>
+</h2>
                       <div
                         className="px-3"
                         style={{
@@ -2173,52 +2248,52 @@ const ProjectDetails = () => {
                           </div>
 
                           <div className="col-md-6">
-                            <div
-                              className="row g-4"
-                              style={{
-                                marginTop:
-                                  window.innerWidth <= 768 ? "5px" : "0",
-                              }}
-                            >
-                              {projectData?.usps &&
-                                projectData?.usps?.map((usp, idx) => (
-                                  <div className="col-6" key={idx}>
-                                    <div className="d-flex align-items-start">
-                                      <img
-                                        className="me-2"
-                                        src="/images/usp-icon.svg"
-                                        loading="lazy"
-                                        style={{
-                                          height:
-                                            window.innerWidth <= 768
-                                              ? "24px"
-                                              : "30px",
-                                          marginTop:
-                                            window.innerWidth <= 768
-                                              ? "2px"
-                                              : "0",
-                                        }}
-                                        fetchpriority="high"
-                                        alt={`USP Icon ${idx + 1}`}
-                                      />
-                                      <span
-                                        style={{
-                                          fontSize:
-                                            window.innerWidth <= 768
-                                              ? "10px"
-                                              : "14px",
-                                          lineHeight:
-                                            window.innerWidth <= 768
-                                              ? "1.2"
-                                              : "normal",
-                                        }}
-                                      >
-                                        {usp}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                            </div>
+                            <div className="row g-4" style={{ marginTop: window.innerWidth <= 768 ? "5px" : "0" }}>
+  {projectData?.usps?.map((usp, idx) => (
+    <div className="col-6" key={idx}>
+      <div className="d-flex align-items-start">
+        <img
+          className="me-2"
+          src="/images/usp-icon.svg"
+          loading="lazy"
+          style={{
+            height: window.innerWidth <= 768 ? "24px" : "30px",
+            marginTop: window.innerWidth <= 768 ? "2px" : "0",
+          }}
+          fetchpriority="high"
+          alt={`USP Icon ${idx + 1}`}
+        />
+
+        {isEditing ? (
+          <input
+            type="text"
+            className="form-control form-control-sm"
+            value={usp}
+            onChange={(e) => {
+              const updatedUSPs = [...projectData.usps];
+              updatedUSPs[idx] = e.target.value;
+              setProjectData({ ...projectData, usps: updatedUSPs });
+            }}
+            style={{
+              fontSize: window.innerWidth <= 768 ? "10px" : "14px",
+              lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",
+            }}
+          />
+        ) : (
+          <span
+            style={{
+              fontSize: window.innerWidth <= 768 ? "10px" : "14px",
+              lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",
+            }}
+          >
+            {usp}
+          </span>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
+
                             <div
                               className="row mt-4"
                               style={{
@@ -2296,656 +2371,25 @@ const ProjectDetails = () => {
                 </div>
               </div>
               {/* Know About */}
-              <div
-                className="mb-4"
-                id="about"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h2
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    Know About {projectData?.name}
-                  </h2>
-                  <div className="px-3">
-                    <div
-                      className="position-relative overflow-hidden"
-                      style={{
-                        maxHeight: showFullDescription ? "none" : "100px",
-                      }}
-                    >
-                      <div
-                        className={
-                          !showFullDescription
-                            ? "position-absolute w-100 h-100"
-                            : ""
-                        }
-                        style={{
-                          background: !showFullDescription
-                            ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)"
-                            : "none",
-                          top: 0,
-                          left: 0,
-                        }}
-                      ></div>
-                      <div
-                        className="mb-3"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "15px", // Adjust font size for smaller screens
-                          fontFamily: "'Roboto', sans-serif", // Use imported Google font here
-                          lineHeight: "1.5", // Improve readability with line-height adjustment
-                          letterSpacing: "0.5px", // Slight letter spacing for better clarity
-                        }}
-                      >
-                        {projectData?.about && (
-                          <div
-                            className="project-description"
-                            dangerouslySetInnerHTML={{
-                              __html: projectData.about,
-                            }}
-                          />
-                        )}
-                      </div>
-
-                      <p
-                        className="mb-3"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                        }}
-                      >
-                        {/* <span className="text-primary fw-bold">
-                          Coming Soon
-                        </span> */}
-                      </p>
-                      <p
-                        className="mb-3"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                        }}
-                      >
-                        Click on the{" "}
-                        <span
-                          className="fw-bold"
-                          style={{
-                            cursor: "pointer",
-                            color: "#2067d1",
-                            padding: "2px 6px",
-                            borderRadius: "4px",
-                            transition: "background-color 0.3s ease",
-                          }}
-                          id="download-btn2"
-                          onClick={
-                            isMobileView
-                              ? handleDownloadBrochuree
-                              : handleDownloadBrochure
-                          } // Use the correct handler based on screen size
-                          // onClick={handleDownloadBrochure} // Trigger for brochure popup
-                          onMouseOver={(e) =>
-                            (e.target.style.backgroundColor = "#e6f0fc")
-                          }
-                          onMouseOut={(e) =>
-                            (e.target.style.backgroundColor = "transparent")
-                          }
-                        >
-                          "Download"
-                        </span>
-                        button to download{" "}
-                        <span className="fw-bold">
-                          {projectData?.name} brochure
-                        </span>
-                        .
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-link text-decoration-none p-0 mt-2"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setShowFullDescription(!showFullDescription);
-                      }}
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                        color: "black", // Default color is black
-                        display: "block", // Makes the button a block element
-                        margin: "0 auto", // Centers the button horizontally
-                        textAlign: "center", // Center-aligns text inside the button
-                        cursor: "pointer", // Changes cursor on hover
-                        padding: "0", // Removes any default padding
-                      }}
-                      onMouseEnter={(e) => (e.target.style.color = "#2067d1")} // Changes color on hover
-                      onMouseLeave={(e) => (e.target.style.color = "black")} // Resets color after hover
-                    >
-                      {showFullDescription ? "Show Less" : "Read More"}
-                    </button>
-                  </div>
-                </div>
-              </div>
+  <KnowAboutSection
+                  projectData={projectData}
+                  showFullDescription={showFullDescription}
+                  setShowFullDescription={setShowFullDescription}
+                  isMobileView={isMobileView}
+                  handleDownloadBrochure={handleDownloadBrochure}
+                  handleDownloadBrochuree={handleDownloadBrochuree}
+                />
               {/* Floor Plan */}
-              <div
-                className="mb-4"
-                id="floor"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h2
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    {projectData?.name} Floor Plan
-                  </h2>
-                  <div className="px-3">
-                    <p
-                      className="mb-3"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                      }}
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(projectData?.floorPara),
-                      }}
-                    >
-                      {/* {projectData?.floorPara} */}
-                    </p>
-                    <div className="d-flex gap-2 mb-3">
-                      <button
-                        onClick={() => setActiveFilter("all")}
-                        className={`btn ${
-                          activeFilter === "all" ? "btn-primary" : ""
-                        }`}
-                        style={{
-                          border: "2px solid #000",
-                          borderRadius: "15px",
-                          padding:
-                            window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
-                          fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-                          fontWeight: "600",
-                          backgroundColor:
-                            activeFilter === "all" ? "rgb(32, 103, 209)" : "",
-                        }}
-                      >
-                        All
-                      </button>
-                      {projectData?.configurations
-                        ?.slice()
-                        .sort((a, b) => {
-                          const numA = parseFloat(a) || 0; // Extract numeric part
-                          const numB = parseFloat(b) || 0;
-                          return numA - numB; // Sort in ascending order
-                        })
-                        .map((config, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setActiveFilter(config)}
-                            className={`btn ${
-                              activeFilter === config ? "btn-primary" : ""
-                            }`}
-                            style={{
-                              border: "2px solid #000",
-                              borderRadius: "15px",
-                              padding:
-                                window.innerWidth <= 768
-                                  ? "2px 5px"
-                                  : "5px 15px",
-                              fontSize:
-                                window.innerWidth <= 768 ? "10px" : "14px",
-                              fontWeight: "600",
-                              backgroundColor:
-                                activeFilter === config
-                                  ? "rgb(32, 103, 209)"
-                                  : "",
-                            }}
-                          >
-                            {config}
-                          </button>
-                        ))}
-                    </div>
-                    <Carousel
-                      responsive={{
-                        superLargeDesktop: {
-                          breakpoint: { max: 4000, min: 3000 },
-                          items: 3,
-                          slidesToSlide: 1,
-                        },
-                        desktop: {
-                          breakpoint: { max: 3000, min: 1024 },
-                          items: 2,
-                          slidesToSlide: 1,
-                        },
-                        tablet: {
-                          breakpoint: { max: 1024, min: 464 },
-                          items: 1,
-                          slidesToSlide: 1,
-                        },
-                        mobile: {
-                          breakpoint: { max: 464, min: 0 },
-                          items: 1,
-                          slidesToSlide: 1,
-                        },
-                      }}
-                      infinite={false}
-                      containerClass="carousel-container"
-                      itemClass="carousel-item-padding-40-px"
-                      style={{ width: "60%", margin: "0 auto" }}
-                    >
-                      {(() => {
-                        const filteredPlans = projectData?.floorplans || [];
-                        const filtered = filteredPlans.filter(
-                          (plan) =>
-                            activeFilter === "all" ||
-                            plan.projectConfigurationName === activeFilter
-                        );
-
-                        // Sort based on numeric BHK values (e.g., 2 BHK, 3 BHK, etc.)
-                        const sortedPlans = filtered.sort((a, b) => {
-                          const sizeA = parseFloat(a.size);
-                          const sizeB = parseFloat(b.size);
-                          return sizeA - sizeB;
-                        });
-
-                        return sortedPlans.map((plan, index) => (
-                          <div
-                            key={index}
-                            className="px-2 d-flex justify-content-center"
-                          >
-                            <div
-                              className="card border-0"
-                              style={{
-                                width: "80%",
-                                maxWidth:
-                                  window.innerWidth <= 768 ? "80%" : "auto",
-                              }}
-                            >
-                              <div className="card-body p-3">
-                                <p
-                                  className="mb-3"
-                                  style={{
-                                    fontSize:
-                                      window.innerWidth <= 768
-                                        ? "14px"
-                                        : "16px",
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  {plan.title}
-                                </p>
-                                <img
-                                  src={
-                                    plan.imageUrl &&
-                                    plan.imageUrl !== BASE_URL &&
-                                    plan.imageUrl !== ""
-                                      ? plan.imageUrl
-                                      : "/images/Floor.png" // Fallback image in other cases
-                                  }
-                                  alt={`${plan.type} Floor Plan`}
-                                  loading="lazy"
-                                  className="img-fluid mb-3"
-                                  style={{ width: "100%" }}
-                                  onClick={() =>
-                                    handleImageClick(plan.imageUrl)
-                                  } // Add click handler to open the popup
-                                />
-                                <div className="row mb-3">
-                                  <div className="col-6">
-                                    <small
-                                      className="text-muted"
-                                      style={{
-                                        fontSize:
-                                          window.innerWidth <= 768
-                                            ? "11px"
-                                            : "12px",
-                                      }}
-                                    >
-                                      Builtup Area
-                                    </small>
-                                    <p
-                                      className="mb-0"
-                                      style={{
-                                        fontSize:
-                                          window.innerWidth <= 768
-                                            ? "13px"
-                                            : "14px",
-                                        fontWeight: "600",
-                                      }}
-                                    >
-                                      {plan.size} sq.ft
-                                    </p>
-                                  </div>
-                                  <div className="col-6">
-                                    <small
-                                      className="text-muted"
-                                      style={{
-                                        fontSize:
-                                          window.innerWidth <= 768
-                                            ? "11px"
-                                            : "12px",
-                                      }}
-                                    >
-                                      Price
-                                    </small>
-                                    <p
-                                      className="mb-0"
-                                      style={{
-                                        fontSize:
-                                          window.innerWidth <= 768
-                                            ? "13px"
-                                            : "14px",
-                                        fontWeight: "600",
-                                      }}
-                                    >
-                                      {formatPrice(plan.price)}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="d-flex flex-column gap-2 align-items-center">
-                                  <a
-                                    href={`tel:+91${
-                                      projectData?.locality?.city
-                                        ?.phoneNumber?.[0] || "8595189189"
-                                    }`}
-                                    className="btn btn-primary w-100"
-                                    style={{
-                                      fontSize:
-                                        window.innerWidth <= 768
-                                          ? "12px"
-                                          : "14px",
-                                      backgroundColor: "rgb(32, 103, 209)",
-                                    }}
-                                  >
-                                    Talk to our Expert
-                                  </a>
-                                  <button
-                                    onClick={handleDownloadFloorPlan}
-                                    className="btn btn-outline-primary w-100"
-                                    style={{
-                                      fontSize:
-                                        window.innerWidth <= 768
-                                          ? "12px"
-                                          : "14px",
-                                      margin: "0px",
-                                    }}
-                                  >
-                                    Download Floor Plan
-                                  </button>
-
-                                  {/* Floor Plan Dialog Popup */}
-
-                                  <BrochurePopupDialog
-                                    open={showFloorPlanPopup}
-                                    onClose={closeFloorPlanPopup}
-                                    projectName={
-                                      projectData?.name || "Invest Mango"
-                                    }
-                                    brochure={projectData?.brochure}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ));
-                      })()}
-                    </Carousel>
-                    {/* Image Popup Modal */}
-                    {showImagePopup && (
-                      <div
-                        className="image-popup-modal"
-                        style={{
-                          position: "fixed",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          backgroundColor: "rgba(0, 0, 0, 0.7)",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          zIndex: 1000,
-                        }}
-                      >
-                        <div
-                          className="image-popup-content"
-                          style={{
-                            position: "relative",
-                            maxWidth: "50%",
-                            // maxHeight: '40%',
-                          }}
-                        >
-                          <img
-                            src={
-                              selectedImage &&
-                              selectedImage !== BASE_URL &&
-                              selectedImage !== ""
-                                ? selectedImage
-                                : "/images/Floor.png" // Fallback image when no image is available
-                            }
-                            alt="Floor Plan"
-                            loading="lazy"
-                            style={{
-                              width: "100%",
-                              height: "auto",
-                              borderRadius: "8px",
-                            }}
-                          />
-                          <button
-                            onClick={closeImagePopup}
-                            style={{
-                              position: "absolute",
-                              top: "10px",
-                              right: "10px",
-                              // backgroundColor: "rgba(0, 0, 0, 0.5)",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "50%",
-                              padding: "10px",
-                              cursor: "pointer",
-                              fontSize: "20px",
-                            }}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    <style>
-                      {`
-              .carousel-container {
-                  position: relative;
-              }
-              .react-multiple-carousel__arrow {
-                  background-color: #2067d1;
-                  height: 35px;
-                  width: 35px;
-                  min-width: 35px;
-                  min-height: 35px;
-                  border-radius: 50%;
-                  padding-right: 15px;
-                  padding-left: 15px;
-              }
-              .react-multiple-carousel__arrow--left {
-                  left: -10px;
-              }
-              .react-multiple-carousel__arrow--right {
-                  right: -10px;
-              }
-            `}
-                    </style>
-                  </div>
-                </div>
-              </div>
+               <FloorPlanSection
+                  projectData={projectData}
+                  activeFilter={activeFilter}
+                  setActiveFilter={setActiveFilter}
+                  formatPrice={formatPrice}
+                />
               {/* Price List */}
-              <div
-                className="mb-4"
-                id="price"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h2
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    {projectData?.name} Price List
-                  </h2>
-                  <div className="px-3">
-                    <p
-                      className="mb-3"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                      }}
-                    >
-                      {/* {projectData?.priceListPara} */}
-                      <div className="px-3">
-                        <p
-                          className="mb-3"
-                          style={{
-                            fontSize:
-                              window.innerWidth <= 768 ? "12px" : "16px",
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(
-                              projectData?.priceListPara
-                            ),
-                          }}
-                        />
-                      </div>
-                    </p>
-                    <div
-                      style={{
-                        // overflowX: "auto",
-                        // maxHeight: "400px",
-                        // overflowY: "auto",
-                        width: "100%",
-                        overflowX: "auto", // Horizontal scroll if needed
-                        overflowY: "hidden", // No vertical scroll
-                      }}
-                    >
-                      <table
-                        className="table table-striped"
-                        style={{
-                          minWidth: window.innerWidth <= 768 ? "100%" : "auto",
-                        }}
-                      >
-                        <thead>
-                          <tr>
-                            <th
-                              scope="col"
-                              style={{
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "14px",
-                                padding:
-                                  window.innerWidth <= 768 ? "8px 4px" : "8px",
-                                fontWeight: "bold",
-                                position: "sticky",
-                                top: 0,
-                                backgroundColor: "#fff",
-                                zIndex: 1,
-                              }}
-                            >
-                              Configuration
-                            </th>
-                            <th
-                              scope="col"
-                              style={{
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "14px",
-                                padding:
-                                  window.innerWidth <= 768 ? "8px 4px" : "8px",
-                                fontWeight: "bold",
-                                position: "sticky",
-                                top: 0,
-                                backgroundColor: "#fff",
-                                zIndex: 1,
-                              }}
-                            >
-                              Size
-                            </th>
-                            <th
-                              scope="col"
-                              style={{
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "14px",
-                                padding:
-                                  window.innerWidth <= 768 ? "8px 4px" : "8px",
-                                fontWeight: "bold",
-                                position: "sticky",
-                                top: 0,
-                                backgroundColor: "#fff",
-                                zIndex: 1,
-                              }}
-                            >
-                              Price
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {projectData?.floorplans &&
-                            projectData.floorplans
-                              .slice() // Create a copy to avoid mutating the original array
-                              .sort((a, b) => a.size - b.size) // Sort in ascending order based on size
-                              .map((plan, index) => (
-                                <tr key={index}>
-                                  <td
-                                    style={{
-                                      fontSize:
-                                        window.innerWidth <= 768
-                                          ? "11px"
-                                          : "14px",
-                                      padding:
-                                        window.innerWidth <= 768
-                                          ? "8px 4px"
-                                          : "8px",
-                                    }}
-                                  >
-                                    {plan.title}
-                                  </td>
-                                  <td
-                                    style={{
-                                      fontSize:
-                                        window.innerWidth <= 768
-                                          ? "11px"
-                                          : "14px",
-                                      padding:
-                                        window.innerWidth <= 768
-                                          ? "8px 4px"
-                                          : "8px",
-                                    }}
-                                  >
-                                    {plan.size} sq ft
-                                  </td>
-                                  <td
-                                    style={{
-                                      fontSize:
-                                        window.innerWidth <= 768
-                                          ? "11px"
-                                          : "14px",
-                                      padding:
-                                        window.innerWidth <= 768
-                                          ? "8px 4px"
-                                          : "8px",
-                                    }}
-                                  >
-                                    {!plan.isSoldOut
-                                      ? formatPrice(plan.price)
-                                      : "Sold Out"}
-                                  </td>
-                                </tr>
-                              ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
+ <PriceListSection projectData={projectData} formatPrice={formatPrice} 
+ />
+
               {/* Get Free Consultation */}
               <div
                 className="py-3 px-3 mb-4"
@@ -2974,264 +2418,18 @@ const ProjectDetails = () => {
                 </a>
               </div>
               {/* Payment Plan */}
-              
-              {validPaymentPlans?.length > 0 && (
-                <div
-                  className="mb-4"
-                  id="payment_plan"
-                  style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-                >
-                  <div className="p-0 pb-2">
-                    <h2
-                      className="mb-3 py-2 fw-bold text-white ps-3"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                        backgroundColor: "#2067d1",
-                        borderRadius: "4px 4px 0 0",
-                      }}
-                    >
-                      {projectData?.name} Payment Plan
-                    </h2>
-                    <div className="p-3">
-                      <p
-                        className="mb-3"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                        }}
-                      >
-                        {/* {projectData?.paymentPara} */}
-                        {projectData?.paymentPara && (
-                          <p
-                            className="mb-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "12px" : "16px",
-                            }}
-                            dangerouslySetInnerHTML={{
-                              __html: DOMPurify.sanitize(
-                                projectData?.paymentPara
-                              ),
-                            }}
-                          />
-                        )}
-                      </p>
-                      <div className="table-responsive">
-                        <table className="table table-striped">
-                          <tbody>
-                            {projectData?.paymentPlans &&
-                              [...projectData?.paymentPlans]
-                                .sort((a, b) => a.id - b.id) // Sort by id in ascending order
-                                .map((plan, index) => (
-                                  <tr key={index}>
-                                    <td
-                                      style={{
-                                        fontSize:
-                                          window.innerWidth <= 768
-                                            ? "11px"
-                                            : "14px",
-                                        padding:
-                                          window.innerWidth <= 768
-                                            ? "8px 4px"
-                                            : "8px",
-                                      }}
-                                    >
-                                      {plan?.planName}
-                                    </td>
-                                    <td
-                                      style={{
-                                        fontSize:
-                                          window.innerWidth <= 768
-                                            ? "11px"
-                                            : "14px",
-                                        padding:
-                                          window.innerWidth <= 768
-                                            ? "8px 4px"
-                                            : "8px",
-                                      }}
-                                    >
-                                      {plan?.details}
-                                    </td>
-                                  </tr>
-                                ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+<PaymentPlanSection 
+  projectData={projectData} 
+  validPaymentPlans={validPaymentPlans} 
+  paymentPara={paymentPara}
+  setPaymentPara={setPaymentPara}
+/>
+            
               {/* )} */}
-              {/* Amenities */}
-              <div
-                className="mb-4"
-                id="amenities"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h2
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    {projectData?.name} Amenities
-                  </h2>
-                  <div className="px-3">
-                    {projectData?.amenitiesPara && (
-                      <p
-                        className="mb-3"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                        }}
-                        dangerouslySetInnerHTML={{
-                          __html: projectData.amenitiesPara,
-                        }}
-                      />
-                    )}
-
-                    <div
-                      className="inner-item"
-                      style={{
-                        height: "400px",
-                        overflowY: "auto",
-                        overflowX: "hidden",
-                      }}
-                    >
-                      {processAmenities().map((category, categoryIndex) => (
-                        <div key={categoryIndex}>
-                          <p
-                            className="fw-bolder mb-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "16px",
-                              color: "#2067d1",
-                              fontWeight: "1000",
-                            }}
-                          >
-                            {category.name.charAt(0).toUpperCase() +
-                              category.name.slice(1)}
-                          </p>
-                          <div className="row g-4 mb-5">
-                            {category.assets.map((amenity, index) => (
-                              <div key={index} className="col-6 col-md-3">
-                                <div
-                                  className="d-flex align-items-center"
-                                  style={{
-                                    fontSize:
-                                      window.innerWidth <= 768
-                                        ? "11px"
-                                        : "14px",
-                                    marginBottom: "16px",
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  <img
-                                    src={amenity.icon}
-                                    alt={amenity.name}
-                                    loading="lazy"
-                                    style={{
-                                      width: "35px",
-                                      height: "35px",
-                                      marginRight: "16px",
-                                    }}
-                                  />
-                                  {amenity.name}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* video presentation */}
-              <div
-                className="mb-4"
-                id="video"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h2
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    Video Presentation of {projectData && projectData?.name}
-                  </h2>
-                  <div className="px-3">
-                    {projectData?.videoPara && (
-                      <p
-                        className="mb-3 mb-md-5"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                        }}
-                        dangerouslySetInnerHTML={{
-                          __html: projectData.videoPara,
-                        }}
-                      />
-                    )}
-
-                    <div className="d-flex flex-column">
-                      {projectData?.videos &&
-                      projectData.videos.length > 0 &&
-                      projectData.videos.some(
-                        (videoUrl) => videoUrl.trim() !== ""
-                      ) ? (
-                        projectData.videos.map(
-                          (videoUrl, index) =>
-                            videoUrl.trim() !== "" && ( // Ignore empty strings
-                              <div
-                                key={index}
-                                className="ratio ratio-16x9 mb-3"
-                              >
-                                <iframe
-                                  src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                                  title={`${
-                                    projectData?.name
-                                  } Video Presentation ${index + 1}`}
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                  allowFullScreen
-                                  style={{
-                                    border: "none",
-                                    borderRadius: "8px",
-                                  }}
-                                ></iframe>
-                              </div>
-                            )
-                        )
-                      ) : (
-                        <div
-                          style={{
-                            width: "100%",
-                            height: "160px",
-                            backgroundImage:
-                              "url('/images/investmango-youtube-banner.webp')",
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            borderRadius: "8px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#fff",
-                            fontSize: "20px",
-                            fontWeight: "bold",
-                            textAlign: "center",
-                            backgroundColor: "#f0f0f0",
-                          }}
-                        ></div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+             {/* Amenities */}
+ <AmenitiesSection projectData={projectData} />
+             {/* video presentation */}
+ <VideoPresentationSection projectData={projectData} />
               {/* Location Advantage */}
               {/* <div
                 className="mb-4"
@@ -3273,1057 +2471,58 @@ const ProjectDetails = () => {
                 </div>
               </div> */}
               {/* Location Map */}
-              <div className="bg-white rounded-3 mb-4" id="location">
-                <h2
-                  className="mb-4"
-                  style={{
-                    fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                    color: "#000000",
-                    fontWeight: "bold",
-                    textAlign: "left",
-                    backgroundColor: "#2067d1",
-                    padding: "8px 12px",
-                    borderRadius: "4px",
-                    color: "#ffffff",
-                  }}
-                >
-                  {projectData?.name} Location Map
-                </h2>
-                <div className="row">
-                  <div className="col-12">
-                    <div
-                      className="mb-4 px-3"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                      }}
-                    >
-                      {projectData?.locationMap && (
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: projectData.locationMap,
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div className="position-relative">
-                      <div
-                        style={{
-                          position: "absolute",
-                          width: "80%",
-                          height: "100%",
-                          background: "#f22a2a00",
-                          zIndex: 1,
-                        }}
-                      ></div>
-                      <iframe
-                        title="Location"
-                        src={projectData?.locationUrl}
-                        width="100%"
-                        height="300"
-                        style={{ border: 0 }}
-                        allowFullScreen=""
-                        loading="lazy"
-                      ></iframe>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <LocationMapSection projectData={projectData} />
               {/* Site Plan */}
-              <div className="bg-white rounded-3 mb-4" id="siteplan">
-                <h2
-                  className="mb-4"
-                  style={{
-                    fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                    color: "#ffffff",
-                    fontWeight: "bold",
-                    textAlign: "left",
-                    backgroundColor: "#2067d1",
-                    padding: "8px 12px",
-                    borderRadius: "4px",
-                  }}
-                >
-                  {projectData?.name} Site Plan
-                </h2>
-                <div className="row">
-                  <div className="col-12">
-                    <p
-                      className="mb-4 px-3"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                      }}
-                    >
-                      {projectData?.siteplanPara && (
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: projectData.siteplanPara,
-                          }}
-                        />
-                      )}
-                    </p>
-
-                    <div className="position-relative px-3">
-                      <div
-                        className="position-relative"
-                        style={{
-                          overflow: "hidden",
-                          height: window.innerWidth <= 768 ? "200px" : "400px",
-                        }}
-                      >
-                        <div
-                          id="image-container"
-                          style={{
-                            position: "relative",
-                            width: "100%",
-                            height: "100%",
-                            overflow: "hidden",
-                          }}
-                        >
-                          <img
-                            className="img-fluid"
-                            id="zoom-image"
-                            alt={`${projectData?.name} Site Plan`}
-                            src={imageSrc}
-                            loading="lazy"
-                            fetchpriority="high"
-                            style={{
-                              transform: "scale(1) translate(0px, 0px)",
-                              transition: "transform 0.3s ease-in-out",
-                              position: "absolute",
-                              maxWidth: "100%",
-                              cursor: "grab",
-                            }}
-                            onClick={openModal} // Open modal on image click
-                            onMouseDown={(e) => {
-                              const img = e.target;
-                              img.style.cursor = "grabbing";
-                              let lastX = e.clientX;
-                              let lastY = e.clientY;
-
-                              const onMouseMove = (moveEvent) => {
-                                const deltaX = moveEvent.clientX - lastX;
-                                const deltaY = moveEvent.clientY - lastY;
-                                lastX = moveEvent.clientX;
-                                lastY = moveEvent.clientY;
-
-                                const transform = img.style.transform;
-                                const scale = parseFloat(
-                                  transform.match(/scale\((.*?)\)/)[1]
-                                );
-                                const [translateX, translateY] = transform
-                                  .match(/translate\((.*?), (.*?)\)/)
-                                  ?.slice(1)
-                                  .map(parseFloat) || [0, 0];
-
-                                // Only allow movement if zoomed in
-                                if (scale > 1) {
-                                  img.style.transform = `scale(${scale}) translate(${
-                                    translateX + deltaX
-                                  }px, ${translateY + deltaY}px)`;
-                                }
-                              };
-
-                              const onMouseUp = () => {
-                                img.style.cursor = "grab";
-                                document.removeEventListener(
-                                  "mousemove",
-                                  onMouseMove
-                                );
-                                document.removeEventListener(
-                                  "mouseup",
-                                  onMouseUp
-                                );
-                              };
-
-                              document.addEventListener(
-                                "mousemove",
-                                onMouseMove
-                              );
-                              document.addEventListener("mouseup", onMouseUp);
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="position-absolute top-0 end-0">
-                        <button
-                          className="d-block border-0 mb-1"
-                          id="zoom-in"
-                          aria-label="Zoom In"
-                          style={{
-                            background: "#dddd",
-                            width: "40px",
-                            height: "40px",
-                            cursor: "pointer",
-                            color: "#000",
-                          }}
-                          onClick={() => {
-                            const img = document.getElementById("zoom-image");
-                            const currentScale = parseFloat(
-                              img.style.transform.match(/scale\((.*?)\)/)[1]
-                            );
-                            const [translateX, translateY] = img.style.transform
-                              .match(/translate\((.*?), (.*?)\)/)
-                              ?.slice(1)
-                              .map(parseFloat) || [0, 0];
-                            img.style.transform = `scale(${Math.min(
-                              3,
-                              currentScale * 1.2
-                            )}) translate(${translateX}px, ${translateY}px)`;
-                          }}
-                        >
-                          +
-                        </button>
-                        <button
-                          className="d-block border-0"
-                          id="zoom-out"
-                          aria-label="Zoom Out"
-                          style={{
-                            background: "#dddd",
-                            width: "40px",
-                            height: "40px",
-                            cursor: "pointer",
-                            color: "#000",
-                          }}
-                          onClick={() => {
-                            const img = document.getElementById("zoom-image");
-                            const currentScale = parseFloat(
-                              img.style.transform.match(/scale\((.*?)\)/)[1]
-                            );
-                            const [translateX, translateY] = img.style.transform
-                              .match(/translate\((.*?), (.*?)\)/)
-                              ?.slice(1)
-                              .map(parseFloat) || [0, 0];
-                            img.style.transform = `scale(${Math.max(
-                              1,
-                              currentScale / 1.2
-                            )}) translate(${translateX}px, ${translateY}px)`;
-                          }}
-                        >
-                          -
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Modal for displaying the image in full view */}
-                {isModalOpen && (
-                  <div
-                    className="modal d-block"
-                    id="siteplan-modal"
-                    style={{
-                      display: "block",
-                      position: "fixed",
-                      top: "0",
-                      left: "0",
-                      right: "0",
-                      bottom: "0",
-                      backgroundColor: "rgba(0,0,0,0.7)",
-                      zIndex: "1000",
-                      overflow: "auto",
-                      paddingTop: "60px",
-                    }}
-                    onClick={closeModal} // Close modal when clicking outside the image
-                  >
-                    <div
-                      className="modal-content"
-                      style={{
-                        margin: "auto",
-                        padding: "20px",
-                        backgroundColor: "#fff",
-                        maxWidth: "60%",
-                      }}
-                      onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside it
-                    >
-                      <img
-                        src={
-                          imageSrc
-                          // projectData?.siteplanImg
-                          //   ? projectData.siteplanImg === BASE_URL
-                          //     ? FALLBACK_IMAGE
-                          //     : projectData.siteplanImg
-                          //   : FALLBACK_IMAGE
-                        }
-                        alt={`${projectData?.name} Site Plan`}
-                        loading="lazy"
-                        style={{
-                          width: "100%",
-                          height: "auto",
-                        }}
-                      />
-                      <button
-                        className="btn btn-close"
-                        style={{
-                          position: "absolute",
-                          top: "10px",
-                          right: "10px",
-                          backgroundColor: "#000",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: "70%",
-                          padding: "10px 10px",
-                        }}
-                        onClick={closeModal} // Close modal on button click
-                      >
-                        X
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+          <SitePlanSection projectData={projectData} imageSrc={imageSrc} />
               {/* about group */}
-              <div
-                className="mb-4"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-                id="developer"
-              >
-                <div className="p-0 pb-2">
-                  <h2
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    About {developerDetails?.name}
-                  </h2>
-                  <div className="row px-3">
-                    <div className="col-12">
-                      <div className="d-flex align-items-center px-3">
-                        <img
-                          src={developerDetails?.logo}
-                          className="img-fluid me-3"
-                          alt={developerDetails?.altLogo}
-                          loading="lazy"
-                          style={{ maxWidth: "90px", border: "1px solid grey" }}
-                          fetchpriority="high"
-                        />
-                        <p
-                          className="mb-0"
-                          style={{
-                            fontSize:
-                              window.innerWidth <= 768 ? "12px" : "14px",
-                          }}
-                        >
-                          ESTABLISHED IN -{" "}
-                          <b>{developerDetails?.establishedYear}</b>
-                          <br />
-                          TOTAL PROJECTS -{" "}
-                          <b>{developerDetails?.totalProjects}+</b>
-                        </p>
-                      </div>
-
-                      <div
-                        className="mb-4"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                        }}
-                      >
-                        {developerDetails?.about && (
-                          <>
-                            <div
-                              className="project-description"
-                              dangerouslySetInnerHTML={{
-                                __html:
-                                  expandedIndex === "about"
-                                    ? developerDetails.about
-                                        .replace(
-                                          /<ul>/g,
-                                          '<ul style="padding-left: 20px; margin-top: 10px;">'
-                                        )
-                                        .replace(
-                                          /<li>/g,
-                                          '<li style="font-size: 1em; color: #666;">'
-                                        ) // Adds inline styles to <li>
-                                    : developerDetails.about.substring(0, 150) +
-                                      "...",
-                              }}
-                            />
-                            <button
-                              onClick={() =>
-                                setExpandedIndex(
-                                  expandedIndex === "about" ? null : "about"
-                                )
-                              }
-                              className="btn btn-link p-0 read-more-btn"
-                              style={{
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "14px",
-                                color: "#2067d1", // Set the text color
-                                textDecoration: "none", // Remove underline
-                                fontWeight: "bold", // Make the text bold
-                                transition: "color 0.3s ease", // Smooth color transition on hover
-                              }}
-                            >
-                              {expandedIndex === "about"
-                                ? "Show Less"
-                                : "Read More"}
-                            </button>
-                          </>
-                        )}
-                      </div>
-                      <h4
-                        className="fw-bold mb-3"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "14px" : "18px",
-                        }}
-                      >
-                        Contact Details
-                      </h4>
-
-                      <p
-                        className="mb-0"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                        }}
-                      >
-                        <b>{projectData?.name}</b>
-                        <br />
-                        <b>Address:</b> {projectData?.address}
-                        <br />
-                        <b>Phone:</b>{" "}
-                        <a
-                          href={`tel:+91${
-                            projectData?.locality?.city?.phoneNumber?.[0] ||
-                            "8595189189"
-                          }`}
-                          style={{
-                            textDecoration: "none",
-                            color: "#2067d1",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {projectData?.locality?.city?.phoneNumber?.[0] ||
-                            "8595-189-189"}
-                        </a>
-                        <br />
-                        <b>Book Your Site Visit</b>{" "}
-                        <span
-                          style={{
-                            cursor: "pointer",
-                            color: "#2067d1",
-                            fontWeight: 700,
-                          }}
-                          id="BookBtn3"
-                          onClick={
-                            isMobileView
-                              ? handleDownloadBrochuree
-                              : handleDownloadBrochure
-                          } // Use the correct handler based on screen size
-                          // onClick={handleDownloadBrochure}
-                        >
-                          Click Here
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <AboutDeveloperSection
+                  developerDetails={developerDetails}
+                  expandedIndex={expandedIndex}
+                  setExpandedIndex={setExpandedIndex}
+                  projectData={projectData}
+                  isMobileView={isMobileView}
+                  handleDownloadBrochuree={handleDownloadBrochuree}
+                  handleDownloadBrochure={handleDownloadBrochure}
+                />
               {/* Frequently Asked Questions */}
-              <div
-                className="mb-4"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-                id="FAQs"
-              >
-                <div className="p-0 pb-2">
-                  <h4
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    Frequently Asked Questions (FAQs)
-                  </h4>
-                  <div className="px-3">
-                    {displayedFaqs?.map((faq, index) => (
-                      <div key={index} className="mb-3">
-                        <div
-                          className="d-flex justify-content-between align-items-center p-2"
-                          style={{
-                            backgroundColor:
-                              expandedIndex === index ? "#f8f9fa" : "white",
-                            cursor: "pointer",
-                            border: "1px solid #dee2e6",
-                            borderRadius: "4px",
-                            fontSize:
-                              window.innerWidth <= 768 ? "12px" : "13px",
-                          }}
-                          onClick={() =>
-                            setExpandedIndex(
-                              expandedIndex === index ? null : index
-                            )
-                          }
-                        >
-                          <span className="fw-bold">
-                            {faq.text || faq.question}
-                          </span>
-
-                          {/* Display cleaned question */}
-                          <span>{expandedIndex === index ? "−" : "+"}</span>
-                        </div>
-                        {expandedIndex === index && (
-                          <div
-                            className="p-3"
-                            style={{
-                              border: "1px solid #dee2e6",
-                              borderTop: "none",
-                              borderRadius: "0 0 4px 4px",
-                              fontSize:
-                                window.innerWidth <= 768 ? "12px" : "13px",
-                            }}
-                          >
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html: DOMPurify.sanitize(faq?.answer),
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <FaqSection
+                  displayedFaqs={displayedFaqs}
+                  expandedIndex={expandedIndex}
+                  setExpandedIndex={setExpandedIndex}
+                />
               {/* Similar Projects */}
-              <div
-                className="mb-4"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-                id="similar_projects"
-              >
-                <div className="p-0 pb-2">
-                  <h4
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    Similar Projects
-                  </h4>
-                  <div className="row">
-                    <div className="col-md-12">
-                      <div style={{ position: "relative" }}>
-                        <Carousel
-                          containerClass="carousel-container"
-                          itemClass="carousel-item-padding-40-px"
-                          style={{ width: "100%", margin: "0 auto" }}
-                          focusOnSelect={false}
-                          responsive={{
-                            desktop: {
-                              breakpoint: { max: 3000, min: 1024 },
-                              items: 4,
-                              slidesToSlide: 1,
-                            },
-                            tablet: {
-                              breakpoint: { max: 1024, min: 464 },
-                              items: 2,
-                              slidesToSlide: 1,
-                            },
-                            mobile: {
-                              breakpoint: { max: 464, min: 0 },
-                              items: 1,
-                              slidesToSlide: 1,
-                            },
-                          }}
-                        >
-                          {allSimilarProjects &&
-                          allSimilarProjects.length > 0 ? (
-                            allSimilarProjects.map((project, index) => (
-                              <div key={index} className="px-2">
-                                <div className="similar_projects_item">
-                                  <div style={{ color: "#000" }}>
-                                    <a
-                                      href={project?.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      style={{
-                                        color: "#000",
-                                        textDecoration: "none",
-                                      }}
-                                    >
-                                      <img
-                                        src={project?.images[0]?.imageUrl}
-                                        alt={project?.name}
-                                        loading="lazy"
-                                        style={{
-                                          height: "150px",
-                                          width: "100%",
-                                          objectFit: "cover",
-                                          borderRadius: "10px",
-                                        }}
-                                      />
-                                      <p
-                                        style={{
-                                          color: "#2067d1",
-                                          fontWeight: 600,
-                                          margin: "10px 0",
-                                          fontSize:
-                                            window.innerWidth <= 768
-                                              ? "14px"
-                                              : "16px",
-                                          lineHeight: "20px",
-                                          minHeight: "45px",
-                                        }}
-                                      >
-                                        {project.name}
-                                      </p>
-                                    </a>
-                                    <div className="project-details">
-                                      <p
-                                        className="mb-1"
-                                        style={{
-                                          fontSize:
-                                            window.innerWidth <= 768
-                                              ? "12px"
-                                              : "13px",
-                                          color: "#000",
-                                        }}
-                                      >
-                                        <i
-                                          className="fas fa-map-marker-alt me-2"
-                                          style={{ color: "#2067d1" }}
-                                        ></i>
-                                        {project?.shortAddress}
-                                      </p>
-                                      {project?.area && (
-                                        <p
-                                          className="mb-1"
-                                          style={{
-                                            fontSize:
-                                              window.innerWidth <= 768
-                                                ? "12px"
-                                                : "13px",
-                                            color: "#000", // Dark color for "Size Info"
-                                          }}
-                                        >
-                                          <i
-                                            className="fa fa-bed me-2"
-                                            style={{ color: "#2067d1" }}
-                                          ></i>
-                                          Size Info:{" "}
-                                          {project?.configurations &&
-                                          project.configurations.length > 0
-                                            ? `${
-                                                Math.min(
-                                                  ...project.configurations.map(
-                                                    (config) => parseInt(config)
-                                                  )
-                                                ) + "BHK"
-                                              }`
-                                            : ""}
-                                        </p>
-                                      )}
-                                      {project?.floorplans && (
-                                        <p
-                                          className="mb-1"
-                                          style={{
-                                            fontSize:
-                                              window.innerWidth <= 768
-                                                ? "12px"
-                                                : "13px",
-                                            color: "#000",
-                                          }}
-                                        >
-                                          Starting ₹
-                                          {/* <i className="fas fa-rupee-sign" style={{ color: "#2067d1" }}></i> */}
-                                          <b>
-                                            {formatPrice(
-                                              getLeastPriceOfFloorPlan(
-                                                project?.floorplans
-                                              )
-                                            )}
-                                          </b>
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div>No similar projects available</div>
-                          )}
-                        </Carousel>
-                        <style>
-                          {`
-                                    .carousel-container {
-                                        position: relative;
-                                    }
-                                    .react-multiple-carousel__arrow {
-                                        background-color: #2067d1;
-                                        height: 35px;
-                                        width: 35px;
-                                        min-width: 35px;
-                                        min-height: 35px;
-                                        border-radius: 50%;
-                                        padding-right: 15px;
-                                        padding-left: 15px;
-                                    }
-                                    @media (max-width: 768px) {
-                                        .react-multiple-carousel__arrow {
-                                            height: 25px;
-                                            width: 25px;
-                                            min-width: 25px;
-                                            min-height: 25px;
-                                            padding-right: 10px;
-                                            padding-left: 10px;
-                                        }
-                                    }
-                                    .react-multiple-carousel__arrow--left {
-                                        left: -10px;
-                                    }
-                                    .react-multiple-carousel__arrow--right {
-                                        right: -10px;
-                                    }
-                                    .react-multi-carousel-item  carousel-item-padding-40-px{
-                                        padding: 0px 20px;
-                                    }
-                                    `}
-                        </style>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
+       <SimilarProjectsSection
+  allSimilarProjects={allSimilarProjects}
+  formatPrice={formatPrice}
+  getLeastPriceOfFloorPlan={getLeastPriceOfFloorPlan}
+/>
+              </section>
 
             <section className="col-md-4 mb-4">
               {/*Connect to Our Expert */}
-              {window.innerWidth > 768 && (
-                <div
-                  className="position-sticky"
-                  style={{
-                    top: "20px",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  <div className="bg-white rounded-3 mb-4 p-4 pb-0">
-                    <h4 className="mb-4 text-center">Connect to Our Expert</h4>
-
-                    {/* Form for sending OTP */}
-                    {!otpSent && !otpVerified && (
-                      <form onSubmit={(e) => e.preventDefault()}>
-                        <div className="mb-3">
-                          <input
-                            name="username"
-                            className="form-control"
-                            type="text"
-                            placeholder="Name"
-                            value={formData.username}
-                            onChange={handleChange}
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <input
-                            name="useremail"
-                            className="form-control"
-                            type="email"
-                            placeholder="Email"
-                            value={formData.useremail}
-                            onChange={handleChange}
-                          />
-                        </div>
-
-                        <div className="mb-3">
-                          <select
-                            name="userType"
-                            className="form-select"
-                            // style={{ maxWidth: "100px" }}
-                            value={formData.userType} // Ensure this is in your state
-                            onChange={handleChange}
-                          >
-                            <option value="">Select Role</option>
-                            <option value="Associate">Associate</option>
-                            <option value="Builder">Builder</option>
-                            <option value="Broker">Broker</option>
-                            <option value="Seller">Seller</option>
-                            <option value="Buyer">Buyer</option>
-                          </select>
-                        </div>
-
-                        <div className="mb-3">
-                          <div className="input-group">
-                            <select
-                              name="dial_code"
-                              className="form-select"
-                              style={{ maxWidth: "100px" }}
-                              // value={formData.dial_code}
-                              onChange={handleChange}
-                            >
-                              <option value="91">+91</option>
-                              <option value="61">+61</option>
-                              <option value="852">+852</option>
-                              <option value="968">+968</option>
-                              <option value="974">+974</option>
-                              <option value="65">+65</option>
-                              <option value="971">+971</option>
-                              <option value="44">+44</option>
-                              <option value="1">+1</option>
-                              <option value="27">+27</option>
-                              <option value="60">+60</option>
-                              <option value="64">+64</option>
-                              <option value="66">+66</option>
-                              <option value="966">+966</option>
-                              <option value="31">+31</option>
-                              <option value="973">+973</option>
-                              <option value="54">+54</option>
-                              <option value="43">+43</option>
-                              <option value="880">+880</option>
-                              <option value="32">+32</option>
-                              <option value="55">+55</option>
-                              <option value="86">+86</option>
-                              <option value="385">+385</option>
-                              <option value="42">+42</option>
-                              <option value="45">+45</option>
-                              <option value="1809">+1809</option>
-                              <option value="20">+20</option>
-                              <option value="358">+358</option>
-                              <option value="679">+679</option>
-                              <option value="33">+33</option>
-                              <option value="49">+49</option>
-                              <option value="30">+30</option>
-                              <option value="592">+592</option>
-                              <option value="36">+36</option>
-                              <option value="62">+62</option>
-                              <option value="353">+353</option>
-                              <option value="972">+972</option>
-                              <option value="39">+39</option>
-                              <option value="81">+81</option>
-                              <option value="962">+962</option>
-                              <option value="82">+82</option>
-                              <option value="965">+965</option>
-                              <option value="853">+853</option>
-                              <option value="52">+52</option>
-                              <option value="212">+212</option>
-                              <option value="47">+47</option>
-                              <option value="48">+48</option>
-                              <option value="351">+351</option>
-                              <option value="40">+40</option>
-                              <option value="7">+7</option>
-                              <option value="34">+34</option>
-                              <option value="46">+46</option>
-                              <option value="41">+41</option>
-                              <option value="1868">+1868</option>
-                              <option value="216">+216</option>
-                              <option value="90">+90</option>
-                              <option value="84">+84</option>
-                              <option value="91">+91</option>
-                              <option value="61">+61</option>
-                              <option value="852">+852</option>
-                              <option value="968">+968</option>
-                              <option value="974">+974</option>
-                              <option value="65">+65</option>
-                              <option value="971">+971</option>
-                              <option value="44">+44</option>
-                              <option value="1">+1</option>
-                              <option value="27">+27</option>
-                              <option value="60">+60</option>
-                              <option value="64">+64</option>
-                              <option value="66">+66</option>
-                              <option value="966">+966</option>
-                              <option value="31">+31</option>
-                              <option value="973">+973</option>
-                              <option value="54">+54</option>
-                              <option value="43">+43</option>
-                              <option value="880">+880</option>
-                              <option value="32">+32</option>
-                              <option value="55">+55</option>
-                              <option value="86">+86</option>
-                              <option value="385">+385</option>
-                              <option value="42">+42</option>
-                              <option value="45">+45</option>
-                              <option value="1809">+1809</option>
-                              <option value="20">+20</option>
-                              <option value="358">+358</option>
-                              <option value="679">+679</option>
-                              <option value="33">+33</option>
-                              <option value="49">+49</option>
-                              <option value="30">+30</option>
-                              <option value="592">+592</option>
-                              <option value="36">+36</option>
-                              <option value="62">+62</option>
-                              <option value="353">+353</option>
-                              <option value="972">+972</option>
-                              <option value="39">+39</option>
-                              <option value="81">+81</option>
-                              <option value="962">+962</option>
-                              <option value="82">+82</option>
-                              <option value="965">+965</option>
-                              <option value="853">+853</option>
-                              <option value="52">+52</option>
-                              <option value="212">+212</option>
-                              <option value="47">+47</option>
-                              <option value="48">+48</option>
-                              <option value="351">+351</option>
-                              <option value="40">+40</option>
-                              <option value="7">+7</option>
-                              <option value="34">+34</option>
-                              <option value="46">+46</option>
-                              <option value="41">+41</option>
-                              <option value="1868">+1868</option>
-                              <option value="216">+216</option>
-                              <option value="90">+90</option>
-                              <option value="84">+84</option>
-                            </select>
-                            <input
-                              name="usermobile"
-                              className="form-control"
-                              type="tel"
-                              maxLength="10"
-                              placeholder="Phone"
-                              value={formData.usermobile}
-                              onChange={handleChange}
-                            />
-                          </div>
-                        </div>
-                        <div className="mb-3">
-                          <label className="form-label fw-bold">
-                            I am interested in
-                          </label>
-                          <select
-                            className="form-select"
-                            name="intersted_in"
-                            value={formData.intersted_in}
-                            onChange={handleChange}
-                          >
-                            <option value="">Select</option>
-
-                            {projectData?.configurations
-                              ?.slice()
-                              .sort((a, b) => {
-                                const numA = parseFloat(a) || 0; // Extract numeric part
-                                const numB = parseFloat(b) || 0;
-
-                                return numA - numB; // Sort numerically
-                              })
-                              .map((config, index) => (
-                                <option key={index} value={config}>
-                                  {config}
-                                </option>
-                              ))}
-                          </select>
-                        </div>
-
-                        <div className="mb-3">
-                          <textarea
-                            name="usermsg"
-                            className="form-control"
-                            placeholder="Message"
-                            rows="3"
-                            value={formData.usermsg}
-                            onChange={handleChange}
-                            style={{ resize: "none", overflowY: "auto" }}
-                          ></textarea>
-                        </div>
-                        {error && (
-                          <div className="alert alert-danger">{error}</div>
-                        )}
-                        <div className="text-center d-flex justify-content-center">
-                          <button
-                            type="button"
-                            className="btn btn-primary w-100"
-                            style={{ backgroundColor: "#2067d1" }}
-                            onClick={sendOtp}
-                          >
-                            Get a Call back
-                          </button>
-                        </div>
-                      </form>
-                    )}
-
-                    {/* Form for OTP verification */}
-                    {otpSent && !otpVerified && (
-                      <div>
-                        <div className="alert alert-success">
-                          <span className="fw-bold">
-                            OTP sent to your {formData.usermobile}{" "}
-                            <a
-                              href="#"
-                              onClick={() => setOtpSent(false)}
-                              className="text-decoration-none"
-                            >
-                              Edit
-                            </a>
-                          </span>
-                        </div>
-                        <div className="mb-3">
-                          <input
-                            name="enterotp"
-                            className="form-control"
-                            type="text"
-                            placeholder="Enter OTP"
-                            value={otp}
-                            onChange={handleOtpChange}
-                          />
-                        </div>
-                        {error && (
-                          <div className="alert alert-danger">{error}</div>
-                        )}
-                        <div className="d-flex justify-content-between">
-                          <button
-                            className="btn btn-primary"
-                            onClick={resendOtp}
-                            disabled={timer > 0}
-                          >
-                            Resend {timer > 0 && `(${timer}s)`}
-                          </button>
-                          <button
-                            className="btn btn-primary"
-                            onClick={() => {
-                              if (!otp || otp.trim() === "") {
-                                setError("Please enter OTP");
-                                return;
-                              }
-                              verifyOtp();
-                            }}
-                          >
-                            Verify OTP
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* After OTP is verified */}
-                    {otpVerified && (
-                      <form onSubmit={sendOtp}>
-                        <div className="alert alert-success">
-                          OTP verified! We will connect with you shortly.
-                        </div>
-                        <button type="submit" className="btn btn-primary w-100">
-                          Submit
-                        </button>
-                      </form>
-                    )}
-                  </div>
-                  <div
-                    className=" rounded-3 p-3 pt-3 text-center d-flex justify-content-center"
-                    style={{
-                      backgroundColor: "#2067d1",
-                      backgroundSize: "160px",
-                    }}
-                  >
-                    <button
-                      className="btn bg-white w-100"
-                      style={{ fontSize: "16px", color: "#2067d1" }}
-                      onClick={handleDownloadBrochure}
-                    >
-                      <i className="fas fa-download me-2"></i>
-                      DOWNLOAD BROCHURE
-                    </button>
-
-                    {/* Dialog Popup Trigger */}
-                    <BrochurePopupDialog
-                      open={showPopup}
-                      onClose={closePopup}
-                      projectName={projectData?.name || "Invest Mango"}
-                      brochure={projectData?.brochure}
-                    />
-                  </div>
-                </div>
-              )}
+           
+                {window.innerWidth > 768 && (
+                  <ConnectExpertSection
+                    formData={formData}
+                    handleChange={handleChange}
+                    otpSent={otpSent}
+                    otpVerified={otpVerified}
+                    error={error}
+                    sendOtp={sendOtp}
+                    handleOtpChange={handleOtpChange}
+                    otp={otp}
+                    resendOtp={resendOtp}
+                    timer={timer}
+                    verifyOtp={verifyOtp}
+                    setOtpSent={setOtpSent}
+                    showPopup={showPopup}
+                    handleDownloadBrochure={handleDownloadBrochure}
+                    closePopup={closePopup}
+                    BrochurePopupDialog={BrochurePopupDialog}
+                    projectData={projectData}
+                  />
+                )}
+           
             </section>
           </div>
         </section>
