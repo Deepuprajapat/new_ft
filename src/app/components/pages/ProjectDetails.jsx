@@ -22,8 +22,6 @@ import Header from "../Header";
 
 // Import modular sections
 import ProjectGallery from "./ProjectDetailsParts/ProjectGallery";
-import NavigationSection from "./ProjectDetailsParts/NavigationSection";
-import AddProjectForm from "./ProjectDetailsParts/AddProject/AddProject";
 import WhyChooseSection from "./ProjectDetailsParts/WhyChooseSection";
 import KnowAboutSection from "./ProjectDetailsParts/KnowAboutSection";
 import FloorPlanSection from "./ProjectDetailsParts/FloorPlanSection";
@@ -33,6 +31,7 @@ import AmenitiesSection from "./ProjectDetailsParts/AmenitiesSection";
 import VideoPresentationSection from "./ProjectDetailsParts/VideoPresentationSection";
 import LocationMapSection from "./ProjectDetailsParts/LocationMapSection";
 import SitePlanSection from "./ProjectDetailsParts/SitePlanSection";
+
 
 import FaqSection from "./ProjectDetailsParts/FAQSection";
 import SimilarProjectsSection from "./ProjectDetailsParts/SimilarProjectsSection";
@@ -784,18 +783,8 @@ const ProjectDetails = () => {
   const [showImagePopup, setShowImagePopup] = useState(false); // State for image popup
   const [selectedImage, setSelectedImage] = useState(""); // State to hold selected image URL
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImage(imageUrl);
-    setShowImagePopup(true); // Open the popup with the clicked image
-  };
 
-  const closeImagePopup = () => {
-    setShowImagePopup(false);
-    setSelectedImage(""); // Clear selected image
-  };
-
-     // Function to handle image upload
-
+  
   // Function to clean and extract numbers for sorting
   const cleanQuestion = (question) => {
     const match = question.match(/^(\d+)[.\s\t]+(.*)/); // Extracts number and question
