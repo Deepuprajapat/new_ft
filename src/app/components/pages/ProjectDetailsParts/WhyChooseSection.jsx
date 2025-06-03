@@ -4,7 +4,8 @@ import PopupDialog from "../CommanPopup"; // Adjust the path if needed
 const WhyChooseSection = ({
   projectData,
   isEditing,
-  setIsEditing,
+  handleEdit,
+  handleSave,
   setProjectData,
   handleSitePopup,
   showSitePopup,
@@ -27,34 +28,34 @@ const WhyChooseSection = ({
             }}
           >
             <span>Why to choose {projectData?.name}?</span>
-            <span style={{ cursor: "pointer", marginRight: "12px" }}>
-              {isEditing ? (
-                <span onClick={() => setIsEditing(false)}>
-                  <img
-                    src="/images/update.svg"
-                    alt="Edit"
-                    fill="true"
-                    style={{ width: "22px", height: "22px" }}
-                  />
-                </span>
-              ) : (
-                <span
-                  onClick={() => setIsEditing(true)}
-                  style={{
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <img
-                    src="/images/edit-icon.svg"
-                    alt="Edit"
-                    fill="true"
-                    style={{ width: "18px", height: "18px" }}
-                  />
-                </span>
-              )}
-            </span>
+           <span style={{ cursor: "pointer", marginRight: "12px" }}>
+  {isEditing ? (
+    <>
+     <button
+  className="btn btn-success btn-sm"
+  style={{ backgroundColor: "white",  color: "#2067d1",fontWeight: "bold", }}
+  onClick={handleSave}
+>
+  Save
+</button>
+ {/* <button
+          className="btn btn-secondary btn-sm"
+          style={{ color: "white", fontWeight: "bold" ,backgroundColor: "#6c757d"}}
+          onClick={handleCancel}
+        >
+          Cancel
+        </button> */}
+        </>
+            ) : (
+              <img
+                src="/images/edit-icon.svg"
+                alt="Edit"
+                style={{ width: "18px", height: "18px" }}
+                onClick={handleEdit}
+              />
+            )}
+          </span>
+
           </h2>
           <div
             className="px-3"

@@ -8,6 +8,9 @@ const KnowAboutSection = ({
   setAboutHtml,
   showFullDescription,
   setShowFullDescription,
+  isMobileView,
+  handleDownloadBrochure,
+  handleDownloadBrochuree,
 }) => (
   <div
     className="mb-4"
@@ -26,12 +29,18 @@ const KnowAboutSection = ({
         Know About {projectData?.name}
         <span style={{ cursor: "pointer", marginRight: "12px" }}>
           {isAboutEditing ? (
-            <img
-              src="/images/update.svg"
-              alt="Save"
-              style={{ width: "22px", height: "22px" }}
+            <button
+              className="btn btn-success btn-sm"
+              style={{
+                backgroundColor: "white",
+                color: "#2067d1",
+                border: "1px solid #2067d1",
+                fontWeight: "bold"
+              }}
               onClick={() => setIsAboutEditing(false)}
-            />
+            >
+              Save
+            </button>
           ) : (
             <img
               src="/images/edit-icon.svg"
@@ -43,6 +52,11 @@ const KnowAboutSection = ({
         </span>
       </h2>
       <div className="px-3">
+        {isAboutEditing && (
+          <div style={{ fontSize: "12px", color: "#2067d1", marginBottom: "4px" }}>
+            You can use formatting tags (e.g., &lt;b&gt;, &lt;i&gt;, &lt;ul&gt;, &lt;li&gt;).
+          </div>
+        )}
         <div
           className="position-relative overflow-hidden"
           style={{
@@ -83,6 +97,46 @@ const KnowAboutSection = ({
             dangerouslySetInnerHTML={{ __html: aboutHtml }}
           />
         </div>
+        {/* Download Brochure Link */}
+        {!isAboutEditing && (
+          <p
+            className="mb-3"
+            style={{
+              fontSize: window.innerWidth <= 768 ? "12px" : "16px",
+            }}
+          >
+            Click on the{" "}
+            <span
+              className="fw-bold"
+              style={{
+                cursor: "pointer",
+                color: "#2067d1",
+                padding: "2px 6px",
+                borderRadius: "4px",
+                transition: "background-color 0.3s ease",
+              }}
+              id="download-btn2"
+              onClick={
+                isMobileView
+                  ? handleDownloadBrochuree
+                  : handleDownloadBrochure
+              }
+              onMouseOver={e =>
+                (e.target.style.backgroundColor = "#e6f0fc")
+              }
+              onMouseOut={e =>
+                (e.target.style.backgroundColor = "transparent")
+              }
+            >
+              Download
+            </span>{" "}
+            button to download{" "}
+            <span className="fw-bold">
+              {projectData?.name} brochure
+            </span>
+            .
+          </p>
+        )}
         <button
           type="button"
           className="btn btn-link text-decoration-none p-0 mt-2"

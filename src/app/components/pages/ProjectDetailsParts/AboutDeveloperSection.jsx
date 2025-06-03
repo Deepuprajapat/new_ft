@@ -39,6 +39,16 @@ const AboutDeveloperSection = ({
     // Optionally: call a prop function to update parent state or API
     // onSave(developerForm);
   };
+const handleCancel = () => {
+  setDeveloperForm({
+    logo: developerDetails?.logo || "",
+    altLogo: developerDetails?.altLogo || "",
+    establishedYear: developerDetails?.establishedYear || "",
+    totalProjects: developerDetails?.totalProjects || "",
+    about: developerDetails?.about || "",
+  });
+  setIsDeveloperEditing(false);
+};
 
   return (
     <div className="mb-4" style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }} id="developer">
@@ -52,6 +62,7 @@ const AboutDeveloperSection = ({
           About {developerDetails?.name}
           <span style={{ cursor: "pointer", marginLeft: "12px" }}>
             {isDeveloperEditing ? (
+              <>
               <button
                 className="btn btn-success btn-sm"
                 style={{ backgroundColor: "#000", borderColor: "#000", marginRight: "19px" }}
@@ -59,6 +70,14 @@ const AboutDeveloperSection = ({
               >
                 Save
               </button>
+               <button
+          className="btn btn-secondary btn-sm"
+          style={{ color: "white", fontWeight: "bold" ,backgroundColor: "#6c757d"}}
+          onClick={handleCancel}
+        >
+          Cancel
+        </button>
+        </>
             ) : (
               <img src="/images/edit-icon.svg" alt="Edit" style={{ width: "18px", height: "18px" ,marginRight: "19px"}}
                 onClick={() => setIsDeveloperEditing(true)} />

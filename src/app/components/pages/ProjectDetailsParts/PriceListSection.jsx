@@ -27,23 +27,31 @@ const PriceListSection = ({
         }}
       >
         {projectData?.name} Price List
-        <span style={{ cursor: "pointer", marginRight: "12px" }}>
-          {isPriceEditing ? (
-            <img
-              src="/images/update.svg"
-              alt="Save"
-              style={{ width: "22px", height: "22px" }}
-              onClick={savePriceChanges}
-            />
-          ) : (
-            <img
-              src="/images/edit-icon.svg"
-              alt="Edit"
-              style={{ width: "18px", height: "18px" }}
-              onClick={() => setIsPriceEditing(true)}
-            />
-          )}
-        </span>
+       <span style={{ cursor: "pointer", marginRight: "12px" }}>
+  {isPriceEditing ? (
+    <button
+      className="btn btn-success btn-sm"
+      style={{
+        backgroundColor: "white",
+        color: "#2067d1",
+        border: "1px solid #2067d1",
+        fontWeight: "bold",
+        padding: "2px 10px",
+        fontSize: "14px",
+      }}
+      onClick={savePriceChanges}
+    >
+      Save
+    </button>
+  ) : (
+    <img
+      src="/images/edit-icon.svg"
+      alt="Edit"
+      style={{ width: "18px", height: "18px" }}
+      onClick={() => setIsPriceEditing(true)}
+    />
+  )}
+</span>
       </h2>
       <div className="px-3">
         <div className="px-3">

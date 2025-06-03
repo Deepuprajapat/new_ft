@@ -2,46 +2,46 @@ import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 
 const AmenitiesSection = ({
-  projectData,
+  amenities = [],
+  amenitiesPara = "",
+  name = "",
   onSave, // Optional: callback to save changes to parent or API
 }) => {
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
-  const [amenitiesPara, setAmenitiesPara] = useState(projectData?.amenitiesPara || "");
   const [editableAmenities, setEditableAmenities] = useState([]);
+  const [editableAmenitiesPara, setEditableAmenitiesPara] = useState(amenitiesPara);
 
-  // Process amenities to match the format of amenities.json
-  const processAmenities = () => {
-    if (!projectData?.projectAmenities) return [];
-    const groupedAmenities = projectData.projectAmenities.reduce(
-      (acc, amenity) => {
-        const category = amenity.category.toLowerCase();
-        if (!acc[category]) {
-          acc[category] = {
-            name: category,
-            assets: [],
-          };
-        }
-        acc[category].assets.push({
-          name: amenity.name
-            .split("_")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" "),
-          icon: amenity.url,
-        });
-        return acc;
-      },
-      {}
-    );
-    return Object.values(groupedAmenities);
+  // Group amenities by category if not already grouped
+  const groupAmenities = (amenitiesList) => {
+    if (!amenitiesList || !Array.isArray(amenitiesList)) return [];
+    if (amenitiesList.length && amenitiesList[0].assets) return amenitiesList; // Already grouped
+    const grouped = amenitiesList.reduce((acc, amenity) => {
+      const category = (amenity.category || "Other").toLowerCase();
+      if (!acc[category]) {
+        acc[category] = {
+          name: category,
+          assets: [],
+        };
+      }
+      acc[category].assets.push({
+        name: amenity.name
+          .split("_")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" "),
+        icon: amenity.url,
+      });
+      return acc;
+    }, {});
+    return Object.values(grouped);
   };
 
   // Initialize editable amenities when editing starts
   useEffect(() => {
     if (isAmenitiesEditing) {
-      setEditableAmenities(JSON.parse(JSON.stringify(processAmenities())));
-      setAmenitiesPara(projectData?.amenitiesPara || "");
+      setEditableAmenities(JSON.parse(JSON.stringify(groupAmenities(amenities))));
+      setEditableAmenitiesPara(amenitiesPara);
     }
-  // eslint-disable-next-line
+    // eslint-disable-next-line
   }, [isAmenitiesEditing]);
 
   // Editable amenities functions
@@ -94,9 +94,11 @@ const AmenitiesSection = ({
 
   const saveAmenitiesChanges = () => {
     setIsAmenitiesEditing(false);
-    // Optionally call onSave(editableAmenities, amenitiesPara) here
-    if (onSave) onSave(editableAmenities, amenitiesPara);
+    if (onSave) onSave(editableAmenities, editableAmenitiesPara);
   };
+
+  // Use grouped amenities for display
+  const groupedAmenities = groupAmenities(amenities);
 
   return (
     <div
@@ -113,16 +115,16 @@ const AmenitiesSection = ({
             borderRadius: "4px 4px 0 0",
           }}
         >
-          {projectData?.name} Amenities
+          {name} Amenities
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isAmenitiesEditing ? (
-            <button
-  className="btn btn-success btn-sm"
-  style={{ backgroundColor: "white",  color: "black" }}
-  onClick={saveAmenitiesChanges}
->
-  Save
-</button>
+              <button
+                className="btn btn-success btn-sm"
+                style={{ backgroundColor: "white", color: "black" }}
+                onClick={saveAmenitiesChanges}
+              >
+                Save
+              </button>
             ) : (
               <img
                 src="/images/edit-icon.svg"
@@ -147,10 +149,10 @@ const AmenitiesSection = ({
             }}
             contentEditable={isAmenitiesEditing}
             suppressContentEditableWarning={true}
-            onInput={(e) => setAmenitiesPara(e.currentTarget.innerHTML)}
+            onInput={(e) => setEditableAmenitiesPara(e.currentTarget.innerHTML)}
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(
-                isAmenitiesEditing ? amenitiesPara : projectData?.amenitiesPara
+                isAmenitiesEditing ? editableAmenitiesPara : amenitiesPara
               ),
             }}
           />
@@ -164,7 +166,7 @@ const AmenitiesSection = ({
           >
             {(isAmenitiesEditing
               ? processEditableAmenities()
-              : processAmenities()
+              : groupedAmenities
             ).map((category, categoryIndex) => (
               <div key={categoryIndex}>
                 <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>

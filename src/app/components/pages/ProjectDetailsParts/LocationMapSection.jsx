@@ -25,12 +25,17 @@ const LocationMapSection = ({
       {projectData?.name} Location Map
       <span style={{ cursor: "pointer", marginLeft: "12px" }}>
         {isLocationEditing ? (
-          <img
-            src="/images/update.svg"
-            alt="Save"
-            style={{ width: "22px", height: "22px" }}
-            onClick={() => setIsLocationEditing(false)}
-          />
+         <button
+      className="btn btn-success btn-sm"
+      style={{ backgroundColor: "white", color: "#2067d1", border: "1px solid #2067d1" ,fontWeight: "bold"}}
+      onClick={() => {
+        // Call your save handler here, e.g.:
+        // onSave(locationMapHtml, locationUrl);
+        setIsLocationEditing(false);
+      }}
+    >
+      Save
+    </button> 
         ) : (
           <img
             src="/images/edit-icon.svg"

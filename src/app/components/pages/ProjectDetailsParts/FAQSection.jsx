@@ -77,13 +77,14 @@ const FaqSection = ({
       <>
         <button
           className="btn btn-success btn-sm"
-          style={{ backgroundColor: "#000", borderColor: "#000", marginRight: "10px" }}
+          style={{ backgroundColor: "white", marginRight: "10px" ,color: "#2067d1", fontWeight: "bold"}}
           onClick={handleSave}
         >
           Save
         </button>
         <button
           className="btn btn-secondary btn-sm"
+          style={{ color: "white", fontWeight: "bold" ,backgroundColor: "#6c757d"}}
           onClick={handleCancel}
         >
           Cancel

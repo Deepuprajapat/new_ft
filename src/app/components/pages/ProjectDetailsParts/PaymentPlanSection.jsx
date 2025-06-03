@@ -2,7 +2,7 @@ import React from "react";
 import DOMPurify from "dompurify";
 
 const PaymentPlanSection = ({
-projectData,
+  projectData,
   isPaymentEditing,
   setIsPaymentEditing,
   paymentPara,
@@ -17,7 +17,8 @@ projectData,
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   );
 
-  if (!validPaymentPlans?.length) return null;
+  // Only hide if not editing AND no plans at all
+  if (!isPaymentEditing && !validPaymentPlans?.length) return null;
 
   return (
     <div
@@ -37,13 +38,20 @@ projectData,
           {projectData?.name} Payment Plan
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isPaymentEditing ? (
-             <button
-  className="btn btn-success btn-sm"
-  style={{  borderColor: "#000" }}
-  onClick={savePaymentChanges}
->
-  Save
-</button>
+              <button
+                className="btn btn-success btn-sm"
+                style={{
+                  backgroundColor: "white",
+                  color: "#2067d1",
+                  border: "1px solid #2067d1",
+                  fontWeight: "bold",
+                  padding: "2px 10px",
+                  fontSize: "14px",
+                }}
+                onClick={savePaymentChanges}
+              >
+                Save
+              </button>
             ) : (
               <img
                 src="/images/edit-icon.svg"
@@ -127,92 +135,89 @@ projectData,
                 </tr>
               </thead>
               <tbody>
-                {validPaymentPlans
-                  .slice()
-                  .sort((a, b) => a.id - b.id)
-                  .map((plan, index) => (
-                    <tr key={index}>
-                      <td
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "11px" : "14px",
-                          padding: window.innerWidth <= 768 ? "8px 4px" : "8px",
-                        }}
-                      >
-                        {isPaymentEditing ? (
-                          <input
-                            type="text"
-                            value={plan.planName}
-                            onChange={(e) =>
-                              updatePaymentPlan(index, "planName", e.target.value)
-                            }
-                            style={{
-                              border: "1px solid #ddd",
-                              borderRadius: "4px",
-                              padding: "4px 8px",
-                              fontSize:
-                                window.innerWidth <= 768 ? "11px" : "14px",
-                              width: "100%",
-                              background: "#f8faff",
-                            }}
-                          />
-                        ) : (
-                          plan?.planName
-                        )}
-                      </td>
-                      <td
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "11px" : "14px",
-                          padding: window.innerWidth <= 768 ? "8px 4px" : "8px",
-                        }}
-                      >
-                        {isPaymentEditing ? (
-                          <textarea
-                            value={plan.details}
-                            onChange={(e) =>
-                              updatePaymentPlan(index, "details", e.target.value)
-                            }
-                            style={{
-                              border: "1px solid #ddd",
-                              borderRadius: "4px",
-                              padding: "4px 8px",
-                              fontSize:
-                                window.innerWidth <= 768 ? "11px" : "14px",
-                              width: "100%",
-                              background: "#f8faff",
-                              minHeight: "60px",
-                              resize: "vertical",
-                            }}
-                          />
-                        ) : (
-                          plan?.details
-                        )}
-                      </td>
-                      {isPaymentEditing && (
-                        <td
+                {(validPaymentPlans?.length > 0 ? validPaymentPlans : isPaymentEditing ? paymentPlans : []).map((plan, index) => (
+                  <tr key={index}>
+                    <td
+                      style={{
+                        fontSize: window.innerWidth <= 768 ? "11px" : "14px",
+                        padding: window.innerWidth <= 768 ? "8px 4px" : "8px",
+                      }}
+                    >
+                      {isPaymentEditing ? (
+                        <input
+                          type="text"
+                          value={plan.planName}
+                          onChange={(e) =>
+                            updatePaymentPlan(index, "planName", e.target.value)
+                          }
                           style={{
-                            fontSize: window.innerWidth <= 768 ? "11px" : "14px",
-                            padding: window.innerWidth <= 768 ? "8px 4px" : "8px",
-                            textAlign: "center",
+                            border: "1px solid #ddd",
+                            borderRadius: "4px",
+                            padding: "4px 8px",
+                            fontSize:
+                              window.innerWidth <= 768 ? "11px" : "14px",
+                            width: "100%",
+                            background: "#f8faff",
+                          }}
+                        />
+                      ) : (
+                        plan?.planName
+                      )}
+                    </td>
+                    <td
+                      style={{
+                        fontSize: window.innerWidth <= 768 ? "11px" : "14px",
+                        padding: window.innerWidth <= 768 ? "8px 4px" : "8px",
+                      }}
+                    >
+                      {isPaymentEditing ? (
+                        <textarea
+                          value={plan.details}
+                          onChange={(e) =>
+                            updatePaymentPlan(index, "details", e.target.value)
+                          }
+                          style={{
+                            border: "1px solid #ddd",
+                            borderRadius: "4px",
+                            padding: "4px 8px",
+                            fontSize:
+                              window.innerWidth <= 768 ? "11px" : "14px",
+                            width: "100%",
+                            background: "#f8faff",
+                            minHeight: "60px",
+                            resize: "vertical",
+                          }}
+                        />
+                      ) : (
+                        plan?.details
+                      )}
+                    </td>
+                    {isPaymentEditing && (
+                      <td
+                        style={{
+                          fontSize: window.innerWidth <= 768 ? "11px" : "14px",
+                          padding: window.innerWidth <= 768 ? "8px 4px" : "8px",
+                          textAlign: "center",
+                        }}
+                      >
+                        <button
+                          onClick={() => removePaymentPlan(index)}
+                          style={{
+                            border: "none",
+                            background: "#dc3545",
+                            color: "white",
+                            borderRadius: "4px",
+                            padding: "4px 8px",
+                            fontSize: "12px",
+                            cursor: "pointer",
                           }}
                         >
-                          <button
-                            onClick={() => removePaymentPlan(index)}
-                            style={{
-                              border: "none",
-                              background: "#dc3545",
-                              color: "white",
-                              borderRadius: "4px",
-                              padding: "4px 8px",
-                              fontSize: "12px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      )}
-                    </tr>
-                  ))}
+                          Remove
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
               </tbody>
             </table>
             {isPaymentEditing && (

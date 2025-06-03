@@ -53,6 +53,7 @@ import FaqSection from "./ProjectDetailsParts/FAQSection";
 import SimilarProjectsSection from "./ProjectDetailsParts/SimilarProjectsSection";
 import ConnectExpertSection from "./ProjectDetailsParts/ConnectExpertSection";
 import ProjectHeaderSection from "./ProjectDetailsParts/ProjectHeaderSection";
+import MetaFormSection from "./ProjectDetailsParts/MetaForm";
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
 // const FALLBACK_Floor_IMAGE = "/images/coming_soon_floor.jpg";
@@ -79,13 +80,21 @@ const ProjectDetails = () => {
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
 
 
+// price list
 const [isPriceEditing, setIsPriceEditing] = useState(false);
-const [priceListPara, setPriceListPara] = useState("");
-const [floorplans, setFloorplans] = useState([]);
+const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
+const [floorplans, setFloorplans] = useState(projectData?.floorplans || []);
+
+const updateFloorplan = (index, key, value) => {
+  setFloorplans(prev =>
+    prev.map((plan, i) => i === index ? { ...plan, [key]: value } : plan)
+  );
+};
+
 
   const navigate = useNavigate();
 
-  const [isAboutEditing, setIsAboutEditing] = useState(false);
+ const [isAboutEditing, setIsAboutEditing] = useState(false);
 const [aboutHtml, setAboutHtml] = useState(projectData?.about || "");
 
 //anushaka
@@ -96,7 +105,8 @@ const [isPaymentEditing, setIsPaymentEditing] = useState(false);
 const [paymentPara, setPaymentPara] = useState(projectData?.paymentPara || '');
 const [paymentPlans, setPaymentPlans] = useState(projectData?.paymentPlans || []);
 
-
+//project header
+const [isHeaderEditing, setIsHeaderEditing] = useState(false);
 
 // State variables  amenthis
 const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
@@ -170,7 +180,8 @@ const handleEdit = () => {
     }));
   };
 
-
+//whychoose section
+const [isWhyChooseEditing, setIsWhyChooseEditing] = useState(false);
 
 const handleArrayInputChange = (field, value) => {
     const arrayValue = value.split(',').map(item => item.trim());
@@ -279,12 +290,10 @@ const removePaymentPlan = (index) => {
 };
 
 const addNewPaymentPlan = () => {
-  const newPlan = {
-    id: Math.max(...paymentPlans.map(p => p.id), 0) + 1,
-    planName: 'New Plan',
-    details: 'Plan details...'
-  };
-  setPaymentPlans([...paymentPlans, newPlan]);
+  setPaymentPlans(prev => [
+    ...prev,
+    { planName: "", details: "" }
+  ]);
 };
 
 const savePaymentChanges = () => {
@@ -473,11 +482,7 @@ const extractYouTubeId = (url) => {
   const match = url.match(regExp);
   return (match && match[2].length === 11) ? match[2] : url;
 };
-const updateFloorplan = (index, field, value) => {
-  setFloorplans(prev => prev.map((item, i) => 
-    i === index ? { ...item, [field]: field === 'size' ? parseInt(value) || 0 : value } : item
-  ));
-};
+
   const formatPrice = (price) => {
     if (!price) return "Prices On Request";
 
@@ -1301,8 +1306,10 @@ const updateFloorplan = (index, field, value) => {
             </div>
           </div>
         </div>
-
+   {/* meta form */}
+<MetaFormSection />
         {/* Section 1 */}
+      
     <ProjectHeaderSection
   projectData={projectData}
   reraDetails={reraDetails}
@@ -1313,9 +1320,9 @@ const updateFloorplan = (index, field, value) => {
   formatPrice={formatPrice}
   getLeastPriceOfFloorPlan={getLeastPriceOfFloorPlan}
   getHighestPriceOfFloorPlan={getHighestPriceOfFloorPlan}
-  isEditing={isEditing}
-  handleEdit={handleEdit  }
-  handleSave={handleSave}
+  isEditing={isHeaderEditing}
+  handleEdit={() => setIsHeaderEditing(true)}
+  handleSave={() => setIsHeaderEditing(false)}
   handleInputChange={handleInputChange}
 />
 
@@ -1349,7 +1356,7 @@ const updateFloorplan = (index, field, value) => {
     {isEditing ? (
       <button
         className="btn btn-success btn-sm"
-        style={{ backgroundColor: "white" ,color: "#2067d1"}}
+        style={{ backgroundColor: "white" ,color: "#2067d1",fontWeight:'bold'}}
         onClick={handleSave}
       >
         Save
@@ -2106,7 +2113,7 @@ const updateFloorplan = (index, field, value) => {
                   </div>
 
                   <div className="bg-white rounded-3 p-3 pt-0 text-center d-flex justify-content-center">
-                    <button
+                     <button
                       className="btn btn-primary w-100"
                       style={{ fontSize: "16px", backgroundColor: "#2067d1" }}
                       onClick={handleDownloadBrochuree}
@@ -2126,259 +2133,31 @@ const updateFloorplan = (index, field, value) => {
                 </div>
               )}
               {/* Why to choose */}
-              <div
-                className="mb-4"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-                id="why-choose"
-              >
-                <div className="">
-                  <div className="">
-                    <div className="">
-                     <h2
-  className="mb-0 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
-  style={{
-    fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-    backgroundColor: "#2067d1",
-    borderRadius: "4px 4px 0 0",
-  }}
->
-  <span>Why to choose {projectData?.name}?</span>
-  <span style={{ cursor: "pointer", marginRight: "12px" }}>
-    {isEditing ? (
-     <span>
-  <button
-    className="btn btn-success btn-sm"
-  style={{ backgroundColor: "#000", borderColor: "#000" }}
-    onClick={() => setIsEditing(false)} // Replace with your save handler if needed
-  >
-    Save
-  </button>
-  </span>
-    ) : (
-   <span onClick={() => setIsEditing(true)} style={{ cursor: "pointer", display: "inline-flex", alignItems: "center" }}>
-  <img
-  
-    src="/images/edit-icon.svg" 
-    alt="Edit"
-    fill="true"
-    style={{ width: "18px", height: "18px" }}
-  />
-</span>
-    )}
-  </span>
-</h2>
-                      <div
-                        className="px-3"
-                        style={{
-                          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                          borderRadius: "4px",
-                          padding: "20px",
-                        }}
-                      >
-                        <div className="row">
-                          <div className="col-md-6">
-                            <div className="row g-1">
-                              {/* First row with single image */}
-                              {projectData?.images &&
-                                projectData?.images[0] && (
-                                  <div className="col-12 mb-1">
-                                    {/* <a
-                                      href={projectData?.images[0].imageUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="d-block"
-                                    > */}
-                                    <img
-                                      alt={
-                                        projectData?.images[0].caption ||
-                                        "Project Image 1"
-                                      }
-                                      src={projectData?.images[0].imageUrl}
-                                      loading="lazy"
-                                      className="img-fluid rounded w-100"
-                                      style={{
-                                        height:
-                                          window.innerWidth <= 768
-                                            ? "200px"
-                                            : "185px",
-                                        objectFit: "cover",
-                                        borderRadius: "16px",
-                                      }}
-                                      fetchpriority="high"
-                                    />
-                                    {/* </a> */}
-                                  </div>
-                                )}
-
-                              {/* Second row with two images */}
-                              <div className="col-12">
-                                <div className="row g-2">
-                                  {projectData?.images &&
-                                    projectData?.images
-                                      ?.slice(1, 3)
-                                      .map((image, index) => (
-                                        <div className="col-6" key={index + 1}>
-                                          <a
-                                            href={image.imageUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="d-block"
-                                          >
-                                            <img
-                                              alt={
-                                                image.caption ||
-                                                `Project Image ${index + 2}`
-                                              }
-                                              src={image.imageUrl}
-                                              loading="lazy"
-                                              className="img-fluid rounded w-100"
-                                              style={{
-                                                height: "150px",
-                                                objectFit: "cover",
-                                                borderRadius: "16px",
-                                              }}
-                                              fetchpriority="high"
-                                            />
-                                          </a>
-                                        </div>
-                                      ))}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="col-md-6">
-                            <div className="row g-4" style={{ marginTop: window.innerWidth <= 768 ? "5px" : "0" }}>
-  {projectData?.usps?.map((usp, idx) => (
-    <div className="col-6" key={idx}>
-      <div className="d-flex align-items-start">
-        <img
-          className="me-2"
-          src="/images/usp-icon.svg"
-          loading="lazy"
-          style={{
-            height: window.innerWidth <= 768 ? "24px" : "30px",
-            marginTop: window.innerWidth <= 768 ? "2px" : "0",
-          }}
-          fetchpriority="high"
-          alt={`USP Icon ${idx + 1}`}
-        />
-
-        {isEditing ? (
-          <input
-            type="text"
-            className="form-control form-control-sm"
-            value={usp}
-            onChange={(e) => {
-              const updatedUSPs = [...projectData.usps];
-              updatedUSPs[idx] = e.target.value;
-              setProjectData({ ...projectData, usps: updatedUSPs });
-            }}
-            style={{
-              fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-              lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",
-            }}
-          />
-        ) : (
-          <span
-            style={{
-              fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-              lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",
-            }}
-          >
-            {usp}
-          </span>
-        )}
-      </div>
-    </div>
-  ))}
-</div>
-
-                            <div
-                              className="row mt-4"
-                              style={{
-                                position:
-                                  window.innerWidth <= 768
-                                    ? "static"
-                                    : "relative",
-                                bottom: window.innerWidth <= 768 ? "auto" : 0,
-                                left: 0,
-                                right: 0,
-                                margin: "0 12px",
-                              }}
-                            >
-                              <div className="col-12">
-                                <a
-                                  // href="#form_side"
-                                  className="btn w-100 py-1"
-                                  style={{
-                                    backgroundColor: "#2067d1",
-                                    color: "#fff",
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = "#1854b0";
-                                    e.target.style.transition =
-                                      "background-color 0.3s";
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = "#2067d1";
-                                  }}
-                                  onClick={handleSitePopup} // Trigger popup on button click
-                                >
-                                  Book Your Site Visit
-                                </a>
-                              </div>
-
-                              {/* Floor Plan Dialog Popup */}
-                              <PopupDialog
-                                open={showSitePopup} // Use state to control visibility
-                                onClose={closeSitePopup} // Close popup when necessary
-                                projectName={
-                                  projectData?.name || "Invest Mango"
-                                } // Set project name or default
-                              />
-                              <div className="col-12 mt-2">
-                                <a
-                                  href={`tel:+91${
-                                    projectData?.locality?.city
-                                      ?.phoneNumber?.[0] || "8595189189"
-                                  }`}
-                                  className="btn w-100 py-1"
-                                  style={{
-                                    backgroundColor: "#fff",
-                                    color: "#000",
-                                    border: "1px solid #000",
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = "#2067d1";
-                                    e.target.style.color = "#fff";
-                                    e.target.style.transition = "all 0.3s";
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = "#fff";
-                                    e.target.style.color = "#000";
-                                  }}
-                                >
-                                  Connect to Our Expert
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+<WhyChooseSection
+  projectData={projectData}
+  isEditing={isWhyChooseEditing}
+  handleEdit={() => setIsWhyChooseEditing(true)}
+  handleSave={() => setIsWhyChooseEditing(false)}
+  setProjectData={setProjectData}
+  handleSitePopup={handleSitePopup}
+  showSitePopup={showSitePopup}
+  closeSitePopup={closeSitePopup}
+/>
               {/* Know About */}
-  <KnowAboutSection
-                  projectData={projectData}
-                  showFullDescription={showFullDescription}
-                  setShowFullDescription={setShowFullDescription}
-                  isMobileView={isMobileView}
-                  handleDownloadBrochure={handleDownloadBrochure}
-                  handleDownloadBrochuree={handleDownloadBrochuree}
-                />
+  {projectData && (
+<KnowAboutSection
+  projectData={projectData}
+  isAboutEditing={isAboutEditing}
+  setIsAboutEditing={setIsAboutEditing}
+  aboutHtml={aboutHtml}
+  setAboutHtml={setAboutHtml}
+  showFullDescription={showFullDescription}
+  setShowFullDescription={setShowFullDescription}
+  isMobileView={isMobileView}
+  handleDownloadBrochure={handleDownloadBrochure}
+  handleDownloadBrochuree={handleDownloadBrochuree}
+/>
+)}
               {/* Floor Plan */}
                <FloorPlanSection
                   projectData={projectData}
@@ -2387,8 +2166,17 @@ const updateFloorplan = (index, field, value) => {
                   formatPrice={formatPrice}
                 />
               {/* Price List */}
- <PriceListSection projectData={projectData} formatPrice={formatPrice} 
- />
+<PriceListSection
+  projectData={projectData}
+  isPriceEditing={isPriceEditing}
+  setIsPriceEditing={setIsPriceEditing}
+  priceListPara={priceListPara}
+  setPriceListPara={setPriceListPara}
+  floorplans={floorplans}
+  updateFloorplan={updateFloorplan}
+  savePriceChanges={savePriceChanges}
+  formatPrice={formatPrice}
+/>
 
               {/* Get Free Consultation */}
               <div
@@ -2418,18 +2206,40 @@ const updateFloorplan = (index, field, value) => {
                 </a>
               </div>
               {/* Payment Plan */}
-<PaymentPlanSection 
-  projectData={projectData} 
-  validPaymentPlans={validPaymentPlans} 
+<PaymentPlanSection
+  projectData={projectData}
+  isPaymentEditing={isPaymentEditing}
+  setIsPaymentEditing={setIsPaymentEditing}
   paymentPara={paymentPara}
   setPaymentPara={setPaymentPara}
+  paymentPlans={paymentPlans}
+  updatePaymentPlan={updatePaymentPlan}
+  removePaymentPlan={removePaymentPlan}
+  addNewPaymentPlan={addNewPaymentPlan}
+  savePaymentChanges={savePaymentChanges}
 />
             
               {/* )} */}
              {/* Amenities */}
- <AmenitiesSection projectData={projectData} />
+<AmenitiesSection
+  amenities={projectData?.projectAmenities || []}
+  amenitiesPara={projectData?.amenitiesPara || ""}
+  name={projectData?.name || ""}
+  // onSave={yourSaveHandler} // optional
+/>
              {/* video presentation */}
- <VideoPresentationSection projectData={projectData} />
+ <VideoPresentationSection
+  projectData={projectData}
+  isVideoEditing={isVideoEditing}
+  setIsVideoEditing={setIsVideoEditing}
+  videoPara={videoPara}
+  setVideoPara={setVideoPara}
+  editableVideos={editableVideos}
+  updateVideoUrl={updateVideoUrl}
+  removeVideo={removeVideo}
+  addNewVideo={addNewVideo}
+  saveVideoChanges={saveVideoChanges}
+/>
               {/* Location Advantage */}
               {/* <div
                 className="mb-4"
@@ -2471,24 +2281,33 @@ const updateFloorplan = (index, field, value) => {
                 </div>
               </div> */}
               {/* Location Map */}
-        <LocationMapSection projectData={projectData} />
-              {/* Site Plan */}
-          <SitePlanSection projectData={projectData} imageSrc={imageSrc} />
-              {/* about group */}
-              <AboutDeveloperSection
-                  developerDetails={developerDetails}
-                  expandedIndex={expandedIndex}
-                  setExpandedIndex={setExpandedIndex}
-                  projectData={projectData}
-                  isMobileView={isMobileView}
-                  handleDownloadBrochuree={handleDownloadBrochuree}
-                  handleDownloadBrochure={handleDownloadBrochure}
-                />
+       <LocationMapSection
+  projectData={projectData}
+  isLocationEditing={isLocationEditing}
+  setIsLocationEditing={setIsLocationEditing}
+  locationMapHtml={locationMapHtml}
+  setLocationMapHtml={setLocationMapHtml}
+  locationUrl={locationUrl}
+  setLocationUrl={setLocationUrl}
+/>
+  <SitePlanSection
+  projectData={projectData}
+  imageSrc={imageSrc}
+  isSitePlanEditing={isSitePlanEditing}
+  setIsSitePlanEditing={setIsSitePlanEditing}
+  siteplanParaHtml={siteplanParaHtml}
+  setSiteplanParaHtml={setSiteplanParaHtml}
+  siteplanImgUrl={siteplanImgUrl}
+  setSiteplanImgUrl={setSiteplanImgUrl}
+  isModalOpen={isModalOpen}
+  openModal={openModal}
+  closeModal={closeModal}
+/>
               {/* Frequently Asked Questions */}
               <FaqSection
                   displayedFaqs={displayedFaqs}
                   expandedIndex={expandedIndex}
-                  setExpandedIndex={setExpandedIndex}
+                 
                 />
               {/* Similar Projects */}
        <SimilarProjectsSection

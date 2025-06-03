@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Carousel from "react-multi-carousel";
 import BrochurePopupDialog from "../BrochurePopup";
 import DOMPurify from "dompurify";
@@ -17,117 +17,204 @@ const FloorPlanSection = ({
   handleDownloadFloorPlan,
   showFloorPlanPopup,
   closeFloorPlanPopup,
-}) => (
-  <div
-    className="mb-4"
-    id="floor"
-    style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-  >
-    <div className="p-0 pb-2">
-      <h2
-        className="mb-3 py-2 fw-bold text-white ps-3"
-        style={{
-          fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-          backgroundColor: "#2067d1",
-          borderRadius: "4px 4px 0 0",
-        }}
-      >
-        {projectData?.name} Floor Plan
-      </h2>
-      <div className="px-3">
-        <p
-          className="mb-3"
-          style={{
-            fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-          }}
-          dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(projectData?.floorPara),
-          }}
-        />
-        <div className="d-flex gap-2 mb-3">
-          <button
-            onClick={() => setActiveFilter("all")}
-            className={`btn ${activeFilter === "all" ? "btn-primary" : ""}`}
-            style={{
-              border: "2px solid #000",
-              borderRadius: "15px",
-              padding: window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
-              fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-              fontWeight: "600",
-              backgroundColor:
-                activeFilter === "all" ? "rgb(32, 103, 209)" : "",
-            }}
-          >
-            All
-          </button>
-          {projectData?.configurations
-            ?.slice()
-            .sort((a, b) => {
-              const numA = parseFloat(a) || 0;
-              const numB = parseFloat(b) || 0;
-              return numA - numB;
-            })
-            .map((config, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveFilter(config)}
-                className={`btn ${activeFilter === config ? "btn-primary" : ""}`}
-                style={{
-                  border: "2px solid #000",
-                  borderRadius: "15px",
-                  padding: window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
-                  fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-                  fontWeight: "600",
-                  backgroundColor:
-                    activeFilter === config ? "rgb(32, 103, 209)" : "",
-                }}
-              >
-                {config}
-              </button>
-            ))}
-        </div>
-        <Carousel
-          responsive={{
-            superLargeDesktop: {
-              breakpoint: { max: 4000, min: 3000 },
-              items: 3,
-              slidesToSlide: 1,
-            },
-            desktop: {
-              breakpoint: { max: 3000, min: 1024 },
-              items: 2,
-              slidesToSlide: 1,
-            },
-            tablet: {
-              breakpoint: { max: 1024, min: 464 },
-              items: 1,
-              slidesToSlide: 1,
-            },
-            mobile: {
-              breakpoint: { max: 464, min: 0 },
-              items: 1,
-              slidesToSlide: 1,
-            },
-          }}
-          infinite={false}
-          containerClass="carousel-container"
-          itemClass="carousel-item-padding-40-px"
-          style={{ width: "60%", margin: "0 auto" }}
-        >
-          {(() => {
-            const filteredPlans = projectData?.floorplans || [];
-            const filtered = filteredPlans.filter(
-              (plan) =>
-                activeFilter === "all" ||
-                plan.projectConfigurationName === activeFilter
-            );
-            const sortedPlans = filtered.sort((a, b) => {
-              const sizeA = parseFloat(a.size);
-              const sizeB = parseFloat(b.size);
-              return sizeA - sizeB;
-            });
+  onSave, // optional: callback to save changes
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableFloorPara, setEditableFloorPara] = useState(projectData?.floorPara || "");
+  const [editableFloorplans, setEditableFloorplans] = useState([]);
+  const [removeIndex, setRemoveIndex] = useState(null); // For confirmation popup
 
-            return sortedPlans.map((plan, index) => (
+  useEffect(() => {
+    setEditableFloorPara(projectData?.floorPara || "");
+    setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
+  }, [projectData]);
+
+  const handleFloorPlanChange = (index, field, value) => {
+    const updated = [...editableFloorplans];
+    updated[index][field] = value;
+    setEditableFloorplans(updated);
+  };
+
+  const handleAddFloorPlan = () => {
+    setEditableFloorplans([
+      ...editableFloorplans,
+      {
+        title: "",
+        imageUrl: "",
+        size: "",
+        price: "",
+        projectConfigurationName: "",
+        type: "",
+      },
+    ]);
+  };
+
+  const handleRemoveFloorPlan = (index) => {
+    const updated = [...editableFloorplans];
+    updated.splice(index, 1);
+    setEditableFloorplans(updated);
+    setRemoveIndex(null); // Close popup after removal
+  };
+  const handleSave = () => {
+    setIsEditing(false);
+    if (onSave) {
+      onSave({
+        floorPara: editableFloorPara,
+        floorplans: editableFloorplans,
+      });
+    }
+  };
+
+  // Filtering logic
+  const filteredPlans = isEditing ? editableFloorplans : (projectData?.floorplans || []);
+  const filtered = filteredPlans.filter(
+    (plan) =>
+      activeFilter === "all" ||
+      plan.projectConfigurationName === activeFilter
+  );
+  const sortedPlans = filtered.sort((a, b) => {
+    const sizeA = parseFloat(a.size);
+    const sizeB = parseFloat(b.size);
+    return sizeA - sizeB;
+  });
+
+  return (
+    <div
+      className="mb-4"
+      id="floor"
+      style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
+    >
+      <div className="p-0 pb-2">
+        <h2
+          className="mb-3 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
+          style={{
+            fontSize: window.innerWidth <= 768 ? "16px" : "18px",
+            backgroundColor: "#2067d1",
+            borderRadius: "4px 4px 0 0",
+          }}
+        >
+          {projectData?.name} Floor Plan
+         <span style={{ cursor: "pointer", marginRight: "12px" }}>
+  {isEditing ? (
+    <button
+      className="btn btn-success btn-sm"
+      style={{ backgroundColor: "white", color: "#2067d1", fontWeight: "bold" }}
+      onClick={handleSave}
+    >
+      Save
+    </button>
+  ) : (
+    <img
+      src="/images/edit-icon.svg"
+      alt="Edit"
+      style={{ width: "18px", height: "18px" }}
+      onClick={() => setIsEditing(true)}
+    />
+  )}
+</span>
+        </h2>
+        <div className="px-3">
+          <div className="mb-3">
+            {isEditing ? (
+              <textarea
+                className="form-control"
+                value={editableFloorPara}
+                onChange={e => setEditableFloorPara(e.target.value)}
+                rows={3}
+                style={{ fontSize: window.innerWidth <= 768 ? "12px" : "16px" }}
+              />
+            ) : (
+              <p
+                style={{
+                  fontSize: window.innerWidth <= 768 ? "12px" : "16px",
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(projectData?.floorPara),
+                }}
+              />
+            )}
+          </div>
+          {isEditing && (
+            <button
+              className="btn btn-outline-primary mb-3"
+              type="button"
+              onClick={handleAddFloorPlan}
+              style={{ fontWeight: 600, borderRadius: "20px" }}
+            >
+              + Add Floor Plan
+            </button>
+          )}
+          <div className="d-flex gap-2 mb-3">
+            <button
+              onClick={() => setActiveFilter("all")}
+              className={`btn ${activeFilter === "all" ? "btn-primary" : ""}`}
+              style={{
+                border: "2px solid #000",
+                borderRadius: "15px",
+                padding: window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
+                fontSize: window.innerWidth <= 768 ? "10px" : "14px",
+                fontWeight: "600",
+                backgroundColor:
+                  activeFilter === "all" ? "rgb(32, 103, 209)" : "",
+              }}
+            >
+              All
+            </button>
+            {projectData?.configurations
+              ?.slice()
+              .sort((a, b) => {
+                const numA = parseFloat(a) || 0;
+                const numB = parseFloat(b) || 0;
+                return numA - numB;
+              })
+              .map((config, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveFilter(config)}
+                  className={`btn ${activeFilter === config ? "btn-primary" : ""}`}
+                  style={{
+                    border: "2px solid #000",
+                    borderRadius: "15px",
+                    padding: window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
+                    fontSize: window.innerWidth <= 768 ? "10px" : "14px",
+                    fontWeight: "600",
+                    backgroundColor:
+                      activeFilter === config ? "rgb(32, 103, 209)" : "",
+                  }}
+                >
+                  {config}
+                </button>
+              ))}
+          </div>
+          <Carousel
+            responsive={{
+              superLargeDesktop: {
+                breakpoint: { max: 4000, min: 3000 },
+                items: 3,
+                slidesToSlide: 1,
+              },
+              desktop: {
+                breakpoint: { max: 3000, min: 1024 },
+                items: 2,
+                slidesToSlide: 1,
+              },
+              tablet: {
+                breakpoint: { max: 1024, min: 464 },
+                items: 1,
+                slidesToSlide: 1,
+              },
+              mobile: {
+                breakpoint: { max: 464, min: 0 },
+                items: 1,
+                slidesToSlide: 1,
+              },
+            }}
+            infinite={false}
+            containerClass="carousel-container"
+            itemClass="carousel-item-padding-40-px"
+            style={{ width: "60%", margin: "0 auto" }}
+          >
+            {sortedPlans.map((plan, index) => (
               <div key={index} className="px-2 d-flex justify-content-center">
                 <div
                   className="card border-0"
@@ -137,69 +224,170 @@ const FloorPlanSection = ({
                   }}
                 >
                   <div className="card-body p-3">
-                    <p
-                      className="mb-3"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {plan.title}
-                    </p>
-                    <img
-                      src={
-                        plan.imageUrl &&
-                        plan.imageUrl !== BASE_URL &&
-                        plan.imageUrl !== ""
-                          ? plan.imageUrl
-                          : "/images/Floor.png"
-                      }
-                      alt={`${plan.type} Floor Plan`}
-                      loading="lazy"
-                      className="img-fluid mb-3"
-                      style={{ width: "100%" }}
-                      onClick={() => handleImageClick(plan.imageUrl)}
-                    />
-                    <div className="row mb-3">
-                      <div className="col-6">
-                        <small
-                          className="text-muted"
-                          style={{
-                            fontSize: window.innerWidth <= 768 ? "11px" : "12px",
-                          }}
+                    {isEditing ? (
+                      <>
+                        <input
+                          className="form-control mb-2"
+                          type="text"
+                          value={plan.title}
+                          onChange={e => handleFloorPlanChange(index, "title", e.target.value)}
+                          placeholder="Title"
+                        />
+                        <input
+                          className="form-control mb-2"
+                          type="text"
+                          value={plan.imageUrl}
+                          onChange={e => handleFloorPlanChange(index, "imageUrl", e.target.value)}
+                          placeholder="Image URL"
+                        />
+                        <input
+                          className="form-control mb-2"
+                          type="text"
+                          value={plan.size}
+                          onChange={e => handleFloorPlanChange(index, "size", e.target.value)}
+                          placeholder="Size (sq.ft)"
+                        />
+                        <input
+                          className="form-control mb-2"
+                          type="text"
+                          value={plan.price}
+                          onChange={e => handleFloorPlanChange(index, "price", e.target.value)}
+                          placeholder="Price"
+                        />
+                        <input
+                          className="form-control mb-2"
+                          type="text"
+                          value={plan.projectConfigurationName}
+                          onChange={e => handleFloorPlanChange(index, "projectConfigurationName", e.target.value)}
+                          placeholder="Configuration Name"
+                        />
+                        <input
+                          className="form-control mb-2"
+                          type="text"
+                          value={plan.type}
+                          onChange={e => handleFloorPlanChange(index, "type", e.target.value)}
+                          placeholder="Type"
+                        />
+                        <button
+                          className="btn btn-danger btn-sm"
+                          type="button"
+                          onClick={() => setRemoveIndex(index)}
+                          style={{ marginTop: "5px" }}
                         >
-                          Builtup Area
-                        </small>
+                          Remove
+                        </button>
+                        {/* Confirmation Popup */}
+                        {removeIndex === index && (
+                          <div
+                            style={{
+                              position: "fixed",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background: "rgba(0,0,0,0.4)",
+                              zIndex: 2000,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <div
+                              style={{
+                                background: "#fff",
+                                padding: "24px 32px",
+                                borderRadius: "8px",
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                                minWidth: "300px",
+                                textAlign: "center",
+                              }}
+                            >
+                              <p style={{ marginBottom: "18px", fontWeight: 500 }}>
+                                Are you sure you want to remove this floor plan?
+                              </p>
+                              <button
+                                className="btn btn-danger me-2"
+                                onClick={() => handleRemoveFloorPlan(index)}
+                              >
+                                OK
+                              </button>
+                              <button
+                                className="btn btn-secondary"
+                                onClick={() => setRemoveIndex(null)}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <>
                         <p
-                          className="mb-0"
+                          className="mb-3"
                           style={{
-                            fontSize: window.innerWidth <= 768 ? "13px" : "14px",
+                            fontSize: window.innerWidth <= 768 ? "14px" : "16px",
                             fontWeight: "600",
                           }}
                         >
-                          {plan.size} sq.ft
+                          {plan.title}
                         </p>
-                      </div>
-                      <div className="col-6">
-                        <small
-                          className="text-muted"
-                          style={{
-                            fontSize: window.innerWidth <= 768 ? "11px" : "12px",
-                          }}
-                        >
-                          Price
-                        </small>
-                        <p
-                          className="mb-0"
-                          style={{
-                            fontSize: window.innerWidth <= 768 ? "13px" : "14px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          {formatPrice(plan.price)}
-                        </p>
-                      </div>
-                    </div>
+                        <img
+                          src={
+                            plan.imageUrl &&
+                            plan.imageUrl !== BASE_URL &&
+                            plan.imageUrl !== ""
+                              ? plan.imageUrl
+                              : "/images/Floor.png"
+                          }
+                          alt={`${plan.type} Floor Plan`}
+                          loading="lazy"
+                          className="img-fluid mb-3"
+                          style={{ width: "100%" }}
+                          onClick={() => handleImageClick(plan.imageUrl)}
+                        />
+                        <div className="row mb-3">
+                          <div className="col-6">
+                            <small
+                              className="text-muted"
+                              style={{
+                                fontSize: window.innerWidth <= 768 ? "11px" : "12px",
+                              }}
+                            >
+                              Builtup Area
+                            </small>
+                            <p
+                              className="mb-0"
+                              style={{
+                                fontSize: window.innerWidth <= 768 ? "13px" : "14px",
+                                fontWeight: "600",
+                              }}
+                            >
+                              {plan.size} sq.ft
+                            </p>
+                          </div>
+                          <div className="col-6">
+                            <small
+                              className="text-muted"
+                              style={{
+                                fontSize: window.innerWidth <= 768 ? "11px" : "12px",
+                              }}
+                            >
+                              Price
+                            </small>
+                            <p
+                              className="mb-0"
+                              style={{
+                                fontSize: window.innerWidth <= 768 ? "13px" : "14px",
+                                fontWeight: "600",
+                              }}
+                            >
+                              {formatPrice(plan.price)}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                     <div className="d-flex flex-column gap-2 align-items-center">
                       <a
                         href={`tel:+91${
@@ -234,94 +422,94 @@ const FloorPlanSection = ({
                   </div>
                 </div>
               </div>
-            ));
-          })()}
-        </Carousel>
-        {/* Image Popup Modal */}
-        {showImagePopup && (
-          <div
-            className="image-popup-modal"
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
+            ))}
+          </Carousel>
+          {/* Image Popup Modal */}
+          {showImagePopup && (
             <div
-              className="image-popup-content"
+              className="image-popup-modal"
               style={{
-                position: "relative",
-                maxWidth: "50%",
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.7)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 1000,
               }}
             >
-              <img
-                src={
-                  selectedImage &&
-                  selectedImage !== BASE_URL &&
-                  selectedImage !== ""
-                    ? selectedImage
-                    : "/images/Floor.png"
-                }
-                alt="Floor Plan"
-                loading="lazy"
+              <div
+                className="image-popup-content"
                 style={{
-                  width: "100%",
-                  height: "auto",
-                  borderRadius: "8px",
-                }}
-              />
-              <button
-                onClick={closeImagePopup}
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "50%",
-                  padding: "10px",
-                  cursor: "pointer",
-                  fontSize: "20px",
+                  position: "relative",
+                  maxWidth: "50%",
                 }}
               >
-                ×
-              </button>
+                <img
+                  src={
+                    selectedImage &&
+                    selectedImage !== BASE_URL &&
+                    selectedImage !== ""
+                      ? selectedImage
+                      : "/images/Floor.png"
+                  }
+                  alt="Floor Plan"
+                  loading="lazy"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    borderRadius: "8px",
+                  }}
+                />
+                <button
+                  onClick={closeImagePopup}
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "50%",
+                    padding: "10px",
+                    cursor: "pointer",
+                    fontSize: "20px",
+                  }}
+                >
+                  ×
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-        <style>
-          {`
-            .carousel-container {
-                position: relative;
-            }
-            .react-multiple-carousel__arrow {
-                background-color: #2067d1;
-                height: 35px;
-                width: 35px;
-                min-width: 35px;
-                min-height: 35px;
-                border-radius: 50%;
-                padding-right: 15px;
-                padding-left: 15px;
-            }
-            .react-multiple-carousel__arrow--left {
-                left: -10px;
-            }
-            .react-multiple-carousel__arrow--right {
-                right: -10px;
-            }
-          `}
-        </style>
+          )}
+          <style>
+            {`
+              .carousel-container {
+                  position: relative;
+              }
+              .react-multiple-carousel__arrow {
+                  background-color: #2067d1;
+                  height: 35px;
+                  width: 35px;
+                  min-width: 35px;
+                  min-height: 35px;
+                  border-radius: 50%;
+                  padding-right: 15px;
+                  padding-left: 15px;
+              }
+              .react-multiple-carousel__arrow--left {
+                  left: -10px;
+              }
+              .react-multiple-carousel__arrow--right {
+                  right: -10px;
+              }
+            `}
+          </style>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default FloorPlanSection;

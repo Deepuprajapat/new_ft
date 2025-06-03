@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 const ProjectHeaderSection = ({
   projectData,
@@ -14,8 +14,35 @@ const ProjectHeaderSection = ({
   handleEdit,
   handleSave,
   handleInputChange,
-}) =>{
+}) => {
   const fileInputRef = useRef(null);
+
+  // Local state for prices
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+
+  // Initialize local state when entering edit mode or when projectData changes
+  useEffect(() => {
+    if (isEditing) {
+      setMinPrice(
+        projectData?.minPrice ??
+        getLeastPriceOfFloorPlan(projectData?.floorplans?.filter(plan => plan.price > 1)) ??
+        ""
+      );
+      setMaxPrice(
+        projectData?.maxPrice ??
+        getHighestPriceOfFloorPlan(projectData?.floorplans) ??
+        ""
+      );
+    }
+  }, [isEditing, projectData, getLeastPriceOfFloorPlan, getHighestPriceOfFloorPlan]);
+
+  // Handle Save: update parent state for prices, then call handleSave
+ const handleSaveAll = () => {
+  handleInputChange("minPrice", minPrice);
+  handleInputChange("maxPrice", maxPrice);
+  handleSave();
+};
 
   // Handle image upload and preview
   const handleImageChange = (e) => {
@@ -81,7 +108,7 @@ const ProjectHeaderSection = ({
   }}
 >
   <img
-    src="/images/editpan.png"
+    src="/images/editlogo.png"
     alt="Edit"
     style={{ width: "16px", height: "16px" }}
   />
@@ -96,70 +123,35 @@ const ProjectHeaderSection = ({
                   </>
                 )}
               </div>
-              <div className="text-center text-md-start d-flex align-items-center">
-                {isEditing ? (
-                  <>
-                    <div className="input-group" style={{ maxWidth: 350 }}>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm"
-                        value={projectData?.name || ""}
-                        onChange={e => handleInputChange("name", e.target.value)}
-                        placeholder="Project Name"
-                        style={{ fontSize: "18px", fontWeight: 600 }}
-                      />
-                      <button
-                        className="btn btn-primary btn-sm"
-                        style={{ backgroundColor: "#2067d1", borderColor: "#2067d1" }}
-                        onClick={handleSave}
-                        type="button"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <h1
-                    className="h3 mb-0 text-center text-md-start d-flex align-items-center"
-                    style={{ fontSize: "20px" }}
-                  >
-                    {projectData?.name || "Project Name"}
-                    <span style={{ marginLeft: 10 }}>
-                      <button
-                        className="btn btn-light btn-sm"
-                        onClick={handleEdit}
-                        style={{ border: "1px solid #2067d1", marginLeft: 8 ,backgroundColor: "#2067d1"}}
-                      >
-                        <img
-                          src="/images/edit-icon.svg"
-                          alt="Edit"
-                          style={{ width: "18px", height: "18px" }}
-                        />
-                      </button>
-                    </span>
-                  </h1>
-                )}
-              </div>
-            </div>
-        
-<div className="text-center text-md-start" style={{ marginTop: 8 }}>
+            <div className="text-center text-md-start w-100">
   {isEditing ? (
-    <input
-      type="text"
-      className="form-control form-control-sm mb-1"
-      value={projectData?.shortAddress || ""}
-      onChange={e => handleInputChange("shortAddress", e.target.value)}
-      placeholder="Project Address"
-      style={{ fontSize: "12px", maxWidth: 350 }}
-    />
-  ) : (
-    <p className="mb-0" style={{ fontSize: "11px" }}>
-      {projectData?.shortAddress || "Project Address"}
-    </p>
-  )}
-  <span style={{ fontSize: "13px" }}>
-    By{" "}
-    {isEditing ? (
+    <>
+      <div className="input-group mb-2" style={{ maxWidth: 350 }}>
+        <input
+          type="text"
+          className="form-control form-control-sm"
+          value={projectData?.name || ""}
+          onChange={e => handleInputChange("name", e.target.value)}
+          placeholder="Project Name"
+          style={{ fontSize: "18px", fontWeight: 600 }}
+        />
+        <button
+          className="btn btn-primary btn-sm"
+          style={{ backgroundColor: "#2067d1", borderColor: "#2067d1" }}
+          onClick={handleSaveAll}
+          type="button"
+        >
+          Save
+        </button>
+      </div>
+      <input
+        type="text"
+        className="form-control form-control-sm mb-2"
+        value={projectData?.shortAddress || ""}
+        onChange={e => handleInputChange("shortAddress", e.target.value)}
+        placeholder="Project Address"
+        style={{ fontSize: "12px", maxWidth: 350 }}
+      />
       <input
         type="text"
         className="form-control form-control-sm d-inline w-auto"
@@ -168,17 +160,46 @@ const ProjectHeaderSection = ({
         placeholder="Developer Name"
         style={{ fontSize: "13px", display: "inline-block", maxWidth: 200 }}
       />
-    ) : (
-      <a
-        href={projectData?.developerLink}
-        target="_blank"
-        rel="noopener noreferrer"
+    </>
+  ) : (
+    <>
+      <h1
+        className="h3 mb-0 text-center text-md-start"
+        style={{ fontSize: "20px" }}
       >
-        {projectData?.developerName || "Developer Name"}
-      </a>
-    )}
-  </span>
+        {projectData?.name || "Project Name"}
+        <span style={{ marginLeft: 10 }}>
+          <button
+            className="btn btn-light btn-sm"
+            onClick={handleEdit}
+            style={{ border: "1px solid #2067d1", marginLeft: 8, backgroundColor: "#2067d1" }}
+          >
+            <img
+              src="/images/edit-icon.svg"
+              alt="Edit"
+              style={{ width: "18px", height: "18px" }}
+            />
+          </button>
+        </span>
+      </h1>
+      <p className="mb-0 mt-2" style={{ fontSize: "11px" }}>
+        {projectData?.shortAddress || "Project Address"}
+      </p>
+      <span style={{ fontSize: "13px" }}>
+        By{" "}
+        <a
+          href={projectData?.developerLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {projectData?.developerName || "Developer Name"}
+        </a>
+      </span>
+    </>
+  )}
 </div>
+            </div>
+        
 
           {/* Lower Section - Buttons */}
           <div className="d-flex flex-wrap justify-content-center justify-content-md-start position-relative mt-2">
@@ -472,71 +493,67 @@ const ProjectHeaderSection = ({
           </div>
         </div>
 
-        {/* Right Section */}
-<div
-  className="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-2 mt-md-2 p-0 p-md-0"
-  style={{ boxShadow: "none", border: "none" }}
->
-  <p
-    className="mb-1 fw-bold text-black text-center text-md-end mt-2 mt-md-4"
-    style={{ fontSize: "16px" }}
-  >
-    Project Price
-  </p>
-  {isEditing ? (
-    <div className="d-flex align-items-center">
-      <span style={{ fontSize: "22px", fontWeight: 700, marginRight: 4 }}>₹</span>
-      <input
-        type="number"
-        className="form-control form-control-sm"
-        style={{ width: 100, fontSize: "18px", fontWeight: 600, marginRight: 8 }}
-        value={projectData?.minPrice ?? getLeastPriceOfFloorPlan(projectData?.floorplans?.filter(plan => plan.price > 1))}
-        onChange={e => handleInputChange("minPrice", e.target.value)}
-        placeholder="Min Price"
-      />
-      <span style={{ fontSize: "18px", fontWeight: 700, margin: "0 8px" }}>-</span>
-      <span style={{ fontSize: "22px", fontWeight: 700, marginRight: 4 }}>₹</span>
-      <input
-        type="number"
-        className="form-control form-control-sm"
-        style={{ width: 100, fontSize: "18px", fontWeight: 600, marginRight: 8 }}
-        value={projectData?.maxPrice ?? getHighestPriceOfFloorPlan(projectData?.floorplans)}
-        onChange={e => handleInputChange("maxPrice", e.target.value)}
-        placeholder="Max Price"
-      />
-      <button
-        className="btn btn-primary btn-sm"
-        style={{ backgroundColor: "#2067d1", borderColor: "#2067d1" }}
-        onClick={handleSave}
-        type="button"
-      >
-        Save
-      </button>
-    </div>
-  ) : (
-    <h2
-      className="h2 mb-0 fw-bold text-center text-md-end"
-      style={{ fontSize: "25px", fontWeight: "800" }}
-    >
-      ₹{" "}
-      {formatPrice(
-        projectData?.minPrice ??
-        getLeastPriceOfFloorPlan(projectData?.floorplans?.filter(plan => plan.price > 1))
-      )}{" "}
-      - ₹{" "}
-      {formatPrice(
-        projectData?.maxPrice ??
-        getHighestPriceOfFloorPlan(projectData?.floorplans)
-      )}
-    </h2>
-  )}
+         {/* Right Section */}
+          <div
+            className="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-2 mt-md-2 p-0 p-md-0"
+            style={{ boxShadow: "none", border: "none" }}
+          >
+            <p
+              className="mb-1 fw-bold text-black text-center text-md-end mt-2 mt-md-4"
+              style={{ fontSize: "16px" }}
+            >
+              Project Price
+            </p>
+            {isEditing ? (
+           <div className="d-flex align-items-center">
+  <span style={{ fontSize: "22px", fontWeight: 700, marginRight: 4 }}>₹</span>
+  <input
+    type="number"
+    className="form-control form-control-sm"
+    style={{ width: 180, fontSize: "18px", fontWeight: 600, marginRight: 8 }}
+    value={minPrice}
+    onChange={e => setMinPrice(e.target.value)}
+    placeholder="Min Price"
+  />
+  <span style={{ fontSize: "18px", fontWeight: 700, margin: "0 8px" }}>-</span>
+  <span style={{ fontSize: "22px", fontWeight: 700, marginRight: 4 }}>₹</span>
+  <input
+    type="number"
+    className="form-control form-control-sm"
+    style={{ width: 180, fontSize: "18px", fontWeight: 600, marginRight: 8 }}
+    value={maxPrice}
+    onChange={e => setMaxPrice(e.target.value)}
+    placeholder="Max Price"
+  />
+  {/* No Save button here */}
 </div>
+            ) : (
+              <h2
+                className="h2 mb-0 fw-bold text-center text-md-end"
+                style={{ fontSize: "25px", fontWeight: "800" }}
+              >
+                ₹{" "}
+                {formatPrice(
+                  projectData?.minPrice ??
+                  getLeastPriceOfFloorPlan(projectData?.floorplans?.filter(plan => plan.price > 1))
+                )}{" "}
+                - ₹{" "}
+                {formatPrice(
+                  projectData?.maxPrice ??
+                  getHighestPriceOfFloorPlan(projectData?.floorplans)
+                )}
+              </h2>
+            )}
+          </div>
+        </div>
+        {/* Save button for all edits (only one button, left section) */}
+      
       </div>
-    </div>
-    <div className="">
-      <hr />
-    </div>
-  </section>
-);
-}
+      <div className="">
+        <hr />
+      </div>
+    </section>
+  );
+};
+
 export default ProjectHeaderSection;

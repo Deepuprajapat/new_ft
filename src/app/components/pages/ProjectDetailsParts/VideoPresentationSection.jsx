@@ -30,21 +30,29 @@ const VideoPresentationSection = ({
         Video Presentation of {projectData?.name}
         <span style={{ cursor: "pointer", marginRight: "12px" }}>
           {isVideoEditing ? (
-            <img
-              src="/images/update.svg"
-              alt="Save"
-              style={{ width: "22px", height: "22px" }}
-              onClick={saveVideoChanges}
-            />
-          ) : (
-            <img
-              src="/images/edit-icon.svg"
-              alt="Edit"
-              style={{ width: "18px", height: "18px" }}
-              onClick={() => setIsVideoEditing(true)}
-            />
-          )}
-        </span>
+           <button
+                className="btn btn-success btn-sm"
+                style={{
+                  backgroundColor: "white",
+                  color: "#2067d1",
+                  border: "1px solid #2067d1",
+                  fontWeight: "bold",
+                  padding: "2px 10px",
+                  fontSize: "14px",
+                }}
+                onClick={saveVideoChanges}
+              >
+                Save
+              </button>
+            ) : (
+              <img
+                src="/images/edit-icon.svg"
+                alt="Edit"
+                style={{ width: "18px", height: "18px" }}
+                onClick={() => setIsVideoEditing(true)}
+              />
+            )}
+          </span>
       </h2>
       <div className="px-3">
         <div
