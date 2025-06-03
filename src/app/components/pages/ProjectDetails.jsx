@@ -33,7 +33,7 @@ import AmenitiesSection from "./ProjectDetailsParts/AmenitiesSection";
 import VideoPresentationSection from "./ProjectDetailsParts/VideoPresentationSection";
 import LocationMapSection from "./ProjectDetailsParts/LocationMapSection";
 import SitePlanSection from "./ProjectDetailsParts/SitePlanSection";
-import AboutDeveloperSection from "./ProjectDetailsParts/AboutDeveloperSection";
+
 import FaqSection from "./ProjectDetailsParts/FAQSection";
 import SimilarProjectsSection from "./ProjectDetailsParts/SimilarProjectsSection";
 import ConnectExpertSection from "./ProjectDetailsParts/ConnectExpertSection";
