@@ -17,7 +17,7 @@ function MetaFormSection() {
   const deleteKeyword = (index) => {
     setMetaKeywords(metaKeywords.filter((_, i) => i !== index));
   };
- useEffect(() => {
+  useEffect(() => {
     if (showMetaForm) {
       document.body.style.overflow = "hidden";
     } else {
@@ -29,12 +29,12 @@ function MetaFormSection() {
   }, [showMetaForm]);
 
   return (
-     <section
+    <section
       className="container-fluid"
       style={{
         width: window.innerWidth <= 768 ? "90%" : "95%",
         margin: "0 auto",
-        
+
       }}
     >
       <button
@@ -128,37 +128,37 @@ function MetaFormSection() {
                   {metaDescription.length}/160
                 </div>
               </div>
-            <div className="mb-3">
-  <label className="form-label" style={{ fontWeight: 500 }}>
-    Meta Keywords
-  </label>
-  <div className="mb-3">
-  
-  <div
-    style={{
-      maxHeight: 110,
-      overflowY: "auto",
-      borderRadius: 8,
-      border: "1px solid #dee2e6",
-    }}
-  >
-    <textarea
-      className="form-control border-0"
-      rows={3}
-      value={keywordInput}
-      onChange={e => setKeywordInput(e.target.value)}
-      placeholder="Add keywords (comma separated)"
-      style={{ resize: "none", fontSize: 15, background: "transparent" }}
-      maxLength={160}
-    ></textarea>
-  </div>
-  <div className="form-text text-end" style={{ fontSize: 12 }}>
-    {keywordInput.split(",").filter(k => k.trim()).length} keywords
-  </div>
-</div>
-  
+              <div className="mb-3">
+                <label className="form-label" style={{ fontWeight: 500 }}>
+                  Meta Keywords
+                </label>
+                <div className="mb-3">
 
-</div>
+                  <div
+                    style={{
+                      maxHeight: 110,
+                      overflowY: "auto",
+                      borderRadius: 8,
+                      border: "1px solid #dee2e6",
+                    }}
+                  >
+                    <textarea
+                      className="form-control border-0"
+                      rows={3}
+                      value={keywordInput}
+                      onChange={e => setKeywordInput(e.target.value)}
+                      placeholder="Add keywords (comma separated)"
+                      style={{ resize: "none", fontSize: 15, background: "transparent" }}
+                      maxLength={160}
+                    ></textarea>
+                  </div>
+                  <div className="form-text text-end" style={{ fontSize: 12 }}>
+                    {keywordInput.split(",").filter(k => k.trim()).length} keywords
+                  </div>
+                </div>
+
+
+              </div>
               <div className="mb-3">
                 <label className="form-label" style={{ fontWeight: 500 }}>
                   Schema

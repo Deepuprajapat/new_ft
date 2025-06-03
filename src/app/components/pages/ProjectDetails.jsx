@@ -27,7 +27,8 @@ import {
   faHouseUser,
   faKey,
   faSave,
-  faEdit
+  faEdit,
+  faCamera
 } from "@fortawesome/free-solid-svg-icons";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -53,6 +54,7 @@ import FaqSection from "./ProjectDetailsParts/FAQSection";
 import SimilarProjectsSection from "./ProjectDetailsParts/SimilarProjectsSection";
 import ConnectExpertSection from "./ProjectDetailsParts/ConnectExpertSection";
 import ProjectHeaderSection from "./ProjectDetailsParts/ProjectHeaderSection";
+import ProjectDetailsSection from "./ProjectDetailsParts/ProjectDetailsSection";
 import MetaFormSection from "./ProjectDetailsParts/MetaForm";
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
@@ -78,70 +80,73 @@ const ProjectDetails = () => {
   const [isNavFixed, setIsNavFixed] = useState(false);
   const [navInitialPosition, setNavInitialPosition] = useState(null);
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
+  const [hoveredImageIndex, setHoveredImageIndex] = useState(null);
+  const [isGalleryEditing, setIsGalleryEditing] = useState(false);
 
 
-// price list
-const [isPriceEditing, setIsPriceEditing] = useState(false);
-const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
-const [floorplans, setFloorplans] = useState(projectData?.floorplans || []);
 
-const updateFloorplan = (index, key, value) => {
-  setFloorplans(prev =>
-    prev.map((plan, i) => i === index ? { ...plan, [key]: value } : plan)
-  );
-};
+  // price list
+  const [isPriceEditing, setIsPriceEditing] = useState(false);
+  const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
+  const [floorplans, setFloorplans] = useState(projectData?.floorplans || []);
+
+  const updateFloorplan = (index, key, value) => {
+    setFloorplans(prev =>
+      prev.map((plan, i) => i === index ? { ...plan, [key]: value } : plan)
+    );
+  };
 
 
   const navigate = useNavigate();
 
- const [isAboutEditing, setIsAboutEditing] = useState(false);
-const [aboutHtml, setAboutHtml] = useState(projectData?.about || "");
+  const [isAboutEditing, setIsAboutEditing] = useState(false);
+  const [aboutHtml, setAboutHtml] = useState(projectData?.about || "");
 
-//anushaka
-const [isEditing, setIsEditing] = useState(false);
-const [AddProjectButton, setAddProjectButton] = useState(false);
-// State variables pament
-const [isPaymentEditing, setIsPaymentEditing] = useState(false);
-const [paymentPara, setPaymentPara] = useState(projectData?.paymentPara || '');
-const [paymentPlans, setPaymentPlans] = useState(projectData?.paymentPlans || []);
+  //anushaka
+  const [isEditing, setIsEditing] = useState(false);
+  const [AddProjectButton, setAddProjectButton] = useState(false);
+  // State variables pament
+  const [isPaymentEditing, setIsPaymentEditing] = useState(false);
+  const [paymentPara, setPaymentPara] = useState(projectData?.paymentPara || '');
+  const [paymentPlans, setPaymentPlans] = useState(projectData?.paymentPlans || []);
 
-//project header
-const [isHeaderEditing, setIsHeaderEditing] = useState(false);
+  //project header
+  const [isHeaderEditing, setIsHeaderEditing] = useState(false);
 
-// State variables  amenthis
-const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
-const [amenitiesPara, setAmenitiesPara] = useState(projectData?.amenitiesPara || '');
-const [editableAmenities, setEditableAmenities] = useState([]);
+  // State variables  amenthis
+  const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
+  const [amenitiesPara, setAmenitiesPara] = useState(projectData?.amenitiesPara || '');
+  const [editableAmenities, setEditableAmenities] = useState([]);
 
-// State variables  youtube
-const [isVideoEditing, setIsVideoEditing] = useState(false);
-const [videoPara, setVideoPara] = useState(projectData?.videoPara || '');
-const [editableVideos, setEditableVideos] = useState([]);
-
-
-// ...existing code... location map
-
-const [isLocationEditing, setIsLocationEditing] = useState(false);
-const [locationMapHtml, setLocationMapHtml] = useState(projectData?.locationMap || "");
-const [locationUrl, setLocationUrl] = useState(projectData?.locationUrl || "");
-
-//  state variable for site plan
-const [isSitePlanEditing, setIsSitePlanEditing] = useState(false);
-const [siteplanParaHtml, setSiteplanParaHtml] = useState(projectData?.siteplanPara || "");
-const [siteplanImgUrl, setSiteplanImgUrl] = useState(projectData?.siteplanImg || "");
-//state variabe for ace group
-const [isDeveloperEditing, setIsDeveloperEditing] = useState(false);
-const [developerForm, setDeveloperForm] = useState({
-  logo: developerDetails?.logo || "",
-  altLogo: developerDetails?.altLogo || "",
-  establishedYear: developerDetails?.establishedYear || "",
-  totalProjects: developerDetails?.totalProjects || "",
-  about: developerDetails?.about || "",
-});
+  // State variables  youtube
+  const [isVideoEditing, setIsVideoEditing] = useState(false);
+  const [videoPara, setVideoPara] = useState(projectData?.videoPara || '');
+  const [editableVideos, setEditableVideos] = useState([]);
 
 
-//anushaka
-const handleEdit = () => {
+  // ...existing code... location map
+
+  const [isLocationEditing, setIsLocationEditing] = useState(false);
+  const [locationMapHtml, setLocationMapHtml] = useState(projectData?.locationMap || "");
+  const [locationUrl, setLocationUrl] = useState(projectData?.locationUrl || "");
+
+  //  state variable for site plan
+  const [isSitePlanEditing, setIsSitePlanEditing] = useState(false);
+  const [siteplanParaHtml, setSiteplanParaHtml] = useState(projectData?.siteplanPara || "");
+  const [siteplanImgUrl, setSiteplanImgUrl] = useState(projectData?.siteplanImg || "");
+  //state variabe for ace group
+  const [isDeveloperEditing, setIsDeveloperEditing] = useState(false);
+  const [developerForm, setDeveloperForm] = useState({
+    logo: developerDetails?.logo || "",
+    altLogo: developerDetails?.altLogo || "",
+    establishedYear: developerDetails?.establishedYear || "",
+    totalProjects: developerDetails?.totalProjects || "",
+    about: developerDetails?.about || "",
+  });
+
+
+  //anushaka
+  const handleEdit = () => {
     setIsEditing(!isEditing);
   };
   const handleSave = () => {
@@ -151,28 +156,7 @@ const handleEdit = () => {
   };
 
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "-";
-    if (dateStr.toLowerCase().includes("coming")) return "Coming Soon";
-    try {
-      const date = new Date(isNaN(dateStr) ? dateStr : Number(dateStr));
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-      });
-    } catch {
-      return dateStr;
-    }
-  };
-  const getSizeRange = () => {
-    if (!projectData?.floorplans || projectData.floorplans.length === 0) {
-      return "Size not available";
-    }
-    const sizes = projectData.floorplans.map(fp => fp.size);
-    const minSize = Math.min(...sizes);
-    const maxSize = Math.max(...sizes);
-    return `${minSize} - ${maxSize} Sq. Ft.`;
-  };
+
   const handleInputChange = (field, value) => {
     setProjectData(prev => ({
       ...prev,
@@ -180,131 +164,131 @@ const handleEdit = () => {
     }));
   };
 
-//whychoose section
-const [isWhyChooseEditing, setIsWhyChooseEditing] = useState(false);
+  //whychoose section
+  const [isWhyChooseEditing, setIsWhyChooseEditing] = useState(false);
 
-const handleArrayInputChange = (field, value) => {
+  const handleArrayInputChange = (field, value) => {
     const arrayValue = value.split(',').map(item => item.trim());
     setProjectData(prev => ({
       ...prev,
       [field]: arrayValue
     }));
   };
-// ace group
-useEffect(() => {
-  setDeveloperForm({
-    logo: developerDetails?.logo || "",
-    altLogo: developerDetails?.altLogo || "",
-    establishedYear: developerDetails?.establishedYear || "",
-    totalProjects: developerDetails?.totalProjects || "",
-    about: developerDetails?.about || "",
-  });
-}, [developerDetails]);
+  // ace group
+  useEffect(() => {
+    setDeveloperForm({
+      logo: developerDetails?.logo || "",
+      altLogo: developerDetails?.altLogo || "",
+      establishedYear: developerDetails?.establishedYear || "",
+      totalProjects: developerDetails?.totalProjects || "",
+      about: developerDetails?.about || "",
+    });
+  }, [developerDetails]);
 
-//  site plan popup
-useEffect(() => {
-  setSiteplanParaHtml(projectData?.siteplanPara || "");
-  setSiteplanImgUrl(projectData?.siteplanImg || "");
-}, [projectData]);
-
-
-// Keep state in sync with projectData location map and URL
-useEffect(() => {
-  setLocationMapHtml(projectData?.locationMap || "");
-  setLocationUrl(projectData?.locationUrl || "");
-}, [projectData]);
+  //  site plan popup
+  useEffect(() => {
+    setSiteplanParaHtml(projectData?.siteplanPara || "");
+    setSiteplanImgUrl(projectData?.siteplanImg || "");
+  }, [projectData]);
 
 
-// Initialize editable amenities when editing starts
-useEffect(() => {
-  if (isAmenitiesEditing && projectData?.amenities) {
-    setEditableAmenities(JSON.parse(JSON.stringify(processAmenities())));
-  }
-}, [isAmenitiesEditing]);
+  // Keep state in sync with projectData location map and URL
+  useEffect(() => {
+    setLocationMapHtml(projectData?.locationMap || "");
+    setLocationUrl(projectData?.locationUrl || "");
+  }, [projectData]);
 
-// Functions
-const processEditableAmenities = () => {
-  return editableAmenities;
-};
 
-const updateCategoryName = (categoryIndex, newName) => {
-  const updated = [...editableAmenities];
-  updated[categoryIndex].name = newName;
-  setEditableAmenities(updated);
-};
+  // Initialize editable amenities when editing starts
+  useEffect(() => {
+    if (isAmenitiesEditing && projectData?.amenities) {
+      setEditableAmenities(JSON.parse(JSON.stringify(processAmenities())));
+    }
+  }, [isAmenitiesEditing]);
 
-const updateAmenity = (categoryIndex, amenityIndex, field, value) => {
-  const updated = [...editableAmenities];
-  updated[categoryIndex].assets[amenityIndex][field] = value;
-  setEditableAmenities(updated);
-};
-
-const removeAmenity = (categoryIndex, amenityIndex) => {
-  const updated = [...editableAmenities];
-  updated[categoryIndex].assets.splice(amenityIndex, 1);
-  setEditableAmenities(updated);
-};
-
-const addNewAmenity = (categoryIndex) => {
-  const updated = [...editableAmenities];
-  updated[categoryIndex].assets.push({
-    name: 'New Amenity',
-    icon: '/images/default-icon.svg'
-  });
-  setEditableAmenities(updated);
-};
-
-const removeCategoryAmenities = (categoryIndex) => {
-  const updated = editableAmenities.filter((_, index) => index !== categoryIndex);
-  setEditableAmenities(updated);
-};
-
-const addNewCategory = () => {
-  const newCategory = {
-    name: 'New Category',
-    assets: [
-      {
-        name: 'Sample Amenity',
-        icon: '/images/default-icon.svg'
-      }
-    ]
+  // Functions
+  const processEditableAmenities = () => {
+    return editableAmenities;
   };
-  setEditableAmenities([...editableAmenities, newCategory]);
-};
 
-const saveAmenitiesChanges = () => {
-  // Save logic here - update projectData or call API
-  // You'll need to convert editableAmenities back to your original format
-  setIsAmenitiesEditing(false);
-};
-// Functions
-const updatePaymentPlan = (index, field, value) => {
-  const updated = [...paymentPlans];
-  updated[index] = { ...updated[index], [field]: value };
-  setPaymentPlans(updated);
-};
+  const updateCategoryName = (categoryIndex, newName) => {
+    const updated = [...editableAmenities];
+    updated[categoryIndex].name = newName;
+    setEditableAmenities(updated);
+  };
 
-const removePaymentPlan = (index) => {
-  const updated = paymentPlans.filter((_, i) => i !== index);
-  setPaymentPlans(updated);
-};
+  const updateAmenity = (categoryIndex, amenityIndex, field, value) => {
+    const updated = [...editableAmenities];
+    updated[categoryIndex].assets[amenityIndex][field] = value;
+    setEditableAmenities(updated);
+  };
 
-const addNewPaymentPlan = () => {
-  setPaymentPlans(prev => [
-    ...prev,
-    { planName: "", details: "" }
-  ]);
-};
+  const removeAmenity = (categoryIndex, amenityIndex) => {
+    const updated = [...editableAmenities];
+    updated[categoryIndex].assets.splice(amenityIndex, 1);
+    setEditableAmenities(updated);
+  };
 
-const savePaymentChanges = () => {
-  // Save logic here - update projectData or call API
-  setIsPaymentEditing(false);
-};
+  const addNewAmenity = (categoryIndex) => {
+    const updated = [...editableAmenities];
+    updated[categoryIndex].assets.push({
+      name: 'New Amenity',
+      icon: '/images/default-icon.svg'
+    });
+    setEditableAmenities(updated);
+  };
 
-// Update aboutHtml when projectData changes
-useEffect(() => {
-  setAboutHtml(projectData?.about || "");
-}, [projectData]);
+  const removeCategoryAmenities = (categoryIndex) => {
+    const updated = editableAmenities.filter((_, index) => index !== categoryIndex);
+    setEditableAmenities(updated);
+  };
+
+  const addNewCategory = () => {
+    const newCategory = {
+      name: 'New Category',
+      assets: [
+        {
+          name: 'Sample Amenity',
+          icon: '/images/default-icon.svg'
+        }
+      ]
+    };
+    setEditableAmenities([...editableAmenities, newCategory]);
+  };
+
+  const saveAmenitiesChanges = () => {
+    // Save logic here - update projectData or call API
+    // You'll need to convert editableAmenities back to your original format
+    setIsAmenitiesEditing(false);
+  };
+  // Functions
+  const updatePaymentPlan = (index, field, value) => {
+    const updated = [...paymentPlans];
+    updated[index] = { ...updated[index], [field]: value };
+    setPaymentPlans(updated);
+  };
+
+  const removePaymentPlan = (index) => {
+    const updated = paymentPlans.filter((_, i) => i !== index);
+    setPaymentPlans(updated);
+  };
+
+  const addNewPaymentPlan = () => {
+    setPaymentPlans(prev => [
+      ...prev,
+      { planName: "", details: "" }
+    ]);
+  };
+
+  const savePaymentChanges = () => {
+    // Save logic here - update projectData or call API
+    setIsPaymentEditing(false);
+  };
+
+  // Update aboutHtml when projectData changes
+  useEffect(() => {
+    setAboutHtml(projectData?.about || "");
+  }, [projectData]);
 
   // Store initial nav position on mount
   useEffect(() => {
@@ -415,73 +399,73 @@ useEffect(() => {
 
 
   // Update your existing useEffect
-useEffect(() => {
-  setAboutHtml(projectData?.about || "");
-  setPriceListPara(projectData?.priceListPara || "");
-  setFloorplans(projectData?.floorplans ? [...projectData.floorplans] : []);
-}, [projectData]);
+  useEffect(() => {
+    setAboutHtml(projectData?.about || "");
+    setPriceListPara(projectData?.priceListPara || "");
+    setFloorplans(projectData?.floorplans ? [...projectData.floorplans] : []);
+  }, [projectData]);
 
-// Add these functions
-const savePriceChanges = () => {
-  setProjectData(prev => ({
-    ...prev,
-    priceListPara: priceListPara,
-    floorplans: floorplans
-  }));
-  setIsPriceEditing(false);
-};
-
-
+  // Add these functions
+  const savePriceChanges = () => {
+    setProjectData(prev => ({
+      ...prev,
+      priceListPara: priceListPara,
+      floorplans: floorplans
+    }));
+    setIsPriceEditing(false);
+  };
 
 
 
-// Initialize editable videos when editing starts
-useEffect(() => {
-  if (isVideoEditing) {
-    const videos = projectData?.videos || [''];
-    // Ensure at least one empty field for new video
-    const videosWithEmpty = videos.length === 0 ? [''] : [...videos];
-    setEditableVideos(videosWithEmpty);
-  }
-}, [isVideoEditing, projectData?.videos]);
 
-// Functions
-const updateVideoUrl = (index, value) => {
-  const updated = [...editableVideos];
-  updated[index] = value;
-  setEditableVideos(updated);
-};
 
-const removeVideo = (index) => {
-  const updated = editableVideos.filter((_, i) => i !== index);
-  // Ensure at least one empty field remains
-  if (updated.length === 0) {
-    updated.push('');
-  }
-  setEditableVideos(updated);
-};
+  // Initialize editable videos when editing starts
+  useEffect(() => {
+    if (isVideoEditing) {
+      const videos = projectData?.videos || [''];
+      // Ensure at least one empty field for new video
+      const videosWithEmpty = videos.length === 0 ? [''] : [...videos];
+      setEditableVideos(videosWithEmpty);
+    }
+  }, [isVideoEditing, projectData?.videos]);
 
-const addNewVideo = () => {
-  setEditableVideos([...editableVideos, '']);
-};
+  // Functions
+  const updateVideoUrl = (index, value) => {
+    const updated = [...editableVideos];
+    updated[index] = value;
+    setEditableVideos(updated);
+  };
 
-const saveVideoChanges = () => {
-  // Filter out empty video URLs before saving
-  const validVideos = editableVideos.filter(url => url.trim() !== '');
-  
-  // Save logic here - update projectData or call API
-  // projectData.videos = validVideos;
-  // projectData.videoPara = videoPara;
-  
-  setIsVideoEditing(false);
-};
+  const removeVideo = (index) => {
+    const updated = editableVideos.filter((_, i) => i !== index);
+    // Ensure at least one empty field remains
+    if (updated.length === 0) {
+      updated.push('');
+    }
+    setEditableVideos(updated);
+  };
 
-// Helper function to extract YouTube video ID from various URL formats
-const extractYouTubeId = (url) => {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : url;
-};
+  const addNewVideo = () => {
+    setEditableVideos([...editableVideos, '']);
+  };
+
+  const saveVideoChanges = () => {
+    // Filter out empty video URLs before saving
+    const validVideos = editableVideos.filter(url => url.trim() !== '');
+
+    // Save logic here - update projectData or call API
+    // projectData.videos = validVideos;
+    // projectData.videoPara = videoPara;
+
+    setIsVideoEditing(false);
+  };
+
+  // Helper function to extract YouTube video ID from various URL formats
+  const extractYouTubeId = (url) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : url;
+  };
 
   const formatPrice = (price) => {
     if (!price) return "Prices On Request";
@@ -542,15 +526,15 @@ const extractYouTubeId = (url) => {
   };
 
   function getLeastPriceOfFloorPlan(floorPlan) {
-  if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
-    return 0;
+    if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
+      return 0;
+    }
+    // Filter out prices that are exactly 1.5
+    const validFloorPlans = floorPlan.filter((plan) => plan.price !== 1.5);
+    if (validFloorPlans.length === 0) return 0;
+    const sortedFloorPlan = [...validFloorPlans].sort((a, b) => a.price - b.price);
+    return sortedFloorPlan[0].price;
   }
-  // Filter out prices that are exactly 1.5
-  const validFloorPlans = floorPlan.filter((plan) => plan.price !== 1.5);
-  if (validFloorPlans.length === 0) return 0;
-  const sortedFloorPlan = [...validFloorPlans].sort((a, b) => a.price - b.price);
-  return sortedFloorPlan[0].price;
-}
   const getHighestPriceOfFloorPlan = (floorPlan) => {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
       return 0;
@@ -777,7 +761,7 @@ const extractYouTubeId = (url) => {
         }
       }
     };
-  
+
     // Delay scrolling slightly to allow DOM to render
     setTimeout(scrollToHash, 300);
   }, []);
@@ -840,6 +824,27 @@ const extractYouTubeId = (url) => {
     setSelectedImage(""); // Clear selected image
   };
 
+     // Function to handle image upload
+  const handleImageUpload = (index, event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const newImages = [...projectData.images];
+        newImages[index] = {
+          ...newImages[index],
+          imageUrl: e.target.result,
+          caption: file.name,
+        };
+        setProjectData({
+          ...projectData,
+          images: newImages,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Function to clean and extract numbers for sorting
   const cleanQuestion = (question) => {
     const match = question.match(/^(\d+)[.\s\t]+(.*)/); // Extracts number and question
@@ -871,7 +876,7 @@ const extractYouTubeId = (url) => {
     {
       question: "Why choose Invest Mango?",
       answer:
-        "Invest Mango works as one team with a common purpose to provide best-in-class services, thoroughly understands the changing needs of its clients. We are client-centric as client is the focal point of Invest Mango. We provide advice and recommendations that are in the client’s best interest. We strive to understand the client’s requirement by entering into his shoes and offer advice which have far reaching impact. A happy client is what makes us happy and we are proud to serve our client’s.",
+        "Invest Mango works as one team with a common purpose to provide best-in-class services, thoroughly understands the changing needs of its clients. We are client-centric as client is the focal point of Invest Mango. We provide advice and recommendations that are in the client's best interest. We strive to understand the client's requirement by entering into his shoes and offer advice which have far reaching impact. A happy client is what makes us happy and we are proud to serve our client's.",
     },
     {
       question: "How much is the total size of {{projectData.name}}?",
@@ -892,21 +897,21 @@ const extractYouTubeId = (url) => {
 
   const isValidFaq = (faq) =>
     faq?.question?.trim() !== "" || faq?.answer?.trim() !== "";
-  
+
   const displayedFaqs =
     Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
       ? sortedFaqs
       : defaultFaqs.map((faq) => ({
-          question: injectProjectData(faq.question, projectData),
-          answer: injectProjectData(faq.answer, projectData),
-        }));
+        question: injectProjectData(faq.question, projectData),
+        answer: injectProjectData(faq.answer, projectData),
+      }));
 
 
-        const validPaymentPlans = projectData?.paymentPlans?.filter(
-          (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
-        );
+  const validPaymentPlans = projectData?.paymentPlans?.filter(
+    (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
+  );
 
-        
+
   return (
     <>
       {projectData && (
@@ -949,55 +954,91 @@ const extractYouTubeId = (url) => {
         <div className="container-fluid p-0 mb-0 w-100">
           {/* Gallery Section */}
           <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
-            {projectData &&
-              projectData.images &&
-              projectData.images.length > 0 && (
-                <>
-                  {/* Main Image - Full width on mobile, half width on desktop */}
-                  <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
-                    {projectData?.images[0] && (
-                      <div
-                        className="h-100 d-flex align-items-center justify-content-center"
-                        style={{
-                          minHeight: "184px",
-                          maxHeight: "700px",
-                          padding: ".5px",
-                        }}
-                      >
-                        <a
-                          href={projectData?.images[0]?.imageUrl}
-                          data-toggle="lightbox"
-                          data-gallery="gallery"
-                          className="d-flex align-items-center justify-content-center w-100 h-100"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setShowFullScreen(true);
-                            setCurrentImageIndex(0);
-                          }}
+                {projectData && projectData.images && projectData.images.length > 0 && (
+                  <>
+                    {/* Main Image - Left Side */}
+                    <div className="col-12 col-md-6 p-0 pe-0 pe-md-1">
+                      {projectData?.images[0] && (
+                        <div
+                          className="position-relative"
+                          style={{ height: "540px" }}
+                          onMouseEnter={() => setHoveredImageIndex(0)}
+                          onMouseLeave={() => setHoveredImageIndex(null)}
                         >
-                          <img
-                            alt={projectData?.images[0]?.caption || "Image"}
-                            src={projectData?.images[0]?.imageUrl}
-                            loading="lazy"
-                            className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
-                            style={{ objectFit: "cover", cursor: "pointer" }}
-                            fetchpriority="high"
-                          />
-                        </a>
-                      </div>
-                    )}
-                  </div>
+                          <a
+                            href={projectData?.images[0]?.imageUrl}
+                            data-toggle="lightbox"
+                            data-gallery="gallery"
+                            className="d-block h-100"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setShowFullScreen(true);
+                              setCurrentImageIndex(0);
+                            }}
+                          >
+                            <img
+                              alt={projectData?.images[0]?.caption || "Image"}
+                              src={projectData?.images[0]?.imageUrl}
+                              loading="lazy"
+                              className="w-100 h-100"
+                              style={{ 
+                                objectFit: "cover", 
+                                cursor: "pointer",
+                                filter: hoveredImageIndex === 0 ? "blur(5px)" : "none",
+                                transition: "filter 0.3s ease"
+                              }}
+                              fetchpriority="high"
+                            />
+                          </a>
+                          {hoveredImageIndex === 0 && (
+                            <div 
+                              className="position-absolute d-flex align-items-center justify-content-center"
+                              style={{
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                backgroundColor: 'rgba(0,0,0,0.5)',
+                                borderRadius: '50%',
+                                padding: '15px',
+                                cursor: 'pointer',
+                                zIndex: 2
+                              }}
+                            >
+                              <label htmlFor={`image-upload-0`} style={{ margin: 0, cursor: 'pointer' }}>
+                                <FontAwesomeIcon 
+                                  icon={faCamera} 
+                                  style={{ 
+                                    color: 'white', 
+                                    fontSize: '25px',
+                                    transition: 'transform 0.3s ease',
+                                    transform: 'scale(1.2)'
+                                  }}
+                                />
+                              </label>
+                              <input
+                                type="file"
+                                id={`image-upload-0`}
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                onChange={(e) => handleImageUpload(0, e)}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
-                  {/* Additional Images Grid */}
-                  <div className="col-12 col-md-6 p-0">
-                    <div className="row g-0 h-100">
-                      {[1, 2, 3, 4].map(
-                        (index) =>
+                    {/* Grid Images - Right Side */}
+                    <div className="col-12 col-md-6 p-0">
+                      <div className="row g-0">
+                        {[1, 2, 3, 4].map((index) =>
                           projectData?.images[index] && (
                             <div
                               key={index}
-                              className="col-3 col-md-6"
-                              style={{ height: "270px" }}
+                              className="col-6"
+                              style={{ height: "270px", padding: "0 0 0.5px 0.5px" }}
+                              onMouseEnter={() => setHoveredImageIndex(index)}
+                              onMouseLeave={() => setHoveredImageIndex(null)}
                             >
                               <a
                                 href={projectData?.images[index]?.imageUrl}
@@ -1011,29 +1052,61 @@ const extractYouTubeId = (url) => {
                                 }}
                               >
                                 <img
-                                  alt={
-                                    projectData?.images[index]?.caption ||
-                                    "Image"
-                                  }
+                                  alt={projectData?.images[index]?.caption || "Image"}
                                   src={projectData?.images[index]?.imageUrl}
                                   loading="lazy"
-                                  className="w-100 h-100 rounded-0"
+                                  className="w-100 h-100"
                                   style={{
                                     objectFit: "cover",
                                     cursor: "pointer",
-                                    padding: ".5px",
+                                    filter: hoveredImageIndex === index ? "blur(4px)" : "none",
+                                    transition: "filter 0.3s ease"
                                   }}
                                   fetchpriority="high"
                                 />
                               </a>
+                              {hoveredImageIndex === index && (
+                                <div 
+                                  className="position-absolute d-flex align-items-center justify-content-center"
+                                  style={{
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    backgroundColor: 'rgba(0,0,0,0.5)',
+                                    borderRadius: '50%',
+                                    padding: '15px',
+                                    cursor: 'pointer',
+                                    zIndex: 2
+                                  }}
+                                >
+                                  <label htmlFor={`image-upload-${index}`} style={{ margin: 0, cursor: 'pointer' }}>
+                                    <FontAwesomeIcon 
+                                      icon={faCamera} 
+                                      style={{ 
+                                        color: 'white', 
+                                        fontSize: '25px',
+                                        transition: 'transform 0.3s ease',
+                                        transform: 'scale(1.2)'
+                                      }}
+                                    />
+                                  </label>
+                                  <input
+                                    type="file"
+                                    id={`image-upload-${index}`}
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => handleImageUpload(index, e)}
+                                  />
+                                </div>
+                              )}
                             </div>
                           )
-                      )}
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
-          </div>
+                  </>
+                )}
+              </div>
 
           {/* Fullscreen Image Modal */}
           {showFullScreen && projectData?.images && (
@@ -1140,9 +1213,8 @@ const extractYouTubeId = (url) => {
                 <li key={item} className="mx-1">
                   <a
                     href={`#${item}`}
-                    className={`text-white text-decoration-none ${
-                      activeSection === item ? "fw-bold" : ""
-                    }`}
+                    className={`text-white text-decoration-none ${activeSection === item ? "fw-bold" : ""
+                      }`}
                     style={{
                       fontWeight: activeSection === item ? "bold" : "400",
                       textDecoration:
@@ -1306,877 +1378,86 @@ const extractYouTubeId = (url) => {
             </div>
           </div>
         </div>
-   {/* meta form */}
-<MetaFormSection />
+        {/* meta form */}
+        <MetaFormSection />
         {/* Section 1 */}
-      
-    <ProjectHeaderSection
-  projectData={projectData}
-  reraDetails={reraDetails}
-  showReraDetails={showReraDetails}
-  setShowReraDetails={setShowReraDetails}
-  setIsReraDetailHovered={setIsReraDetailHovered}
-  isReraDetailHovered={isReraDetailHovered}
-  formatPrice={formatPrice}
-  getLeastPriceOfFloorPlan={getLeastPriceOfFloorPlan}
-  getHighestPriceOfFloorPlan={getHighestPriceOfFloorPlan}
-  isEditing={isHeaderEditing}
-  handleEdit={() => setIsHeaderEditing(true)}
-  handleSave={() => setIsHeaderEditing(false)}
-  handleInputChange={handleInputChange}
-/>
 
-        {/* Section 2 */}
-        <section
-          className="container-fluid "
-          style={{
-            width: window.innerWidth <= 768 ? "90%" : "95%",
-            margin: "0 auto",
-          }}
-        >
+        <ProjectHeaderSection
+          projectData={projectData}
+          reraDetails={reraDetails}
+          showReraDetails={showReraDetails}
+          setShowReraDetails={setShowReraDetails}
+          setIsReraDetailHovered={setIsReraDetailHovered}
+          isReraDetailHovered={isReraDetailHovered}
+          formatPrice={formatPrice}
+          getLeastPriceOfFloorPlan={getLeastPriceOfFloorPlan}
+          getHighestPriceOfFloorPlan={getHighestPriceOfFloorPlan}
+          isEditing={isHeaderEditing}
+          handleEdit={() => setIsHeaderEditing(true)}
+          handleSave={() => setIsHeaderEditing(false)}
+          handleInputChange={handleInputChange}
+        />
+
+        {/* Project Details */}
+        <section className="container-fluid" style={{ width: window.innerWidth <= 768 ? "90%" : "95%", margin: "0 auto" }}>
           <div className="row">
             <section className="col-md-8">
-              {/* Project Details */}
-           <div
-                className="mb-4"
-                id="overview"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <div
-                    className="mb-3 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                   <span>Project Details</span>
-  <span style={{ cursor: "pointer", marginRight: "12px" }}>
-    {isEditing ? (
-      <button
-        className="btn btn-success btn-sm"
-        style={{ backgroundColor: "white" ,color: "#2067d1",fontWeight:'bold'}}
-        onClick={handleSave}
-      >
-        Save
-      </button>
-    ) : (
-      <span
-        onClick={handleEdit}
-        style={{
-          cursor: "pointer",
-          display: "inline-flex",
-          alignItems: "center",
-        }}
-      >
-        <img
-          src="/images/edit-icon.svg"
-          alt="Edit"
-          fill="true"
-          style={{ width: "18px", height: "18px" }}
-        />
-      </span>
-    )}
-  </span>
-                  </div>
+              <ProjectDetailsSection 
+                projectData={projectData}
+                isEditing={isEditing}
+                handleEdit={handleEdit}
+                handleSave={handleSave}
+                handleInputChange={handleInputChange}
+                handleArrayInputChange={handleArrayInputChange}
+                AddProjectButton={AddProjectButton}
+                formatPrice={formatPrice}
+              />
 
-                  <div className="px-3">
-                    <div className="mb-2 mb-md-4" style={{ fontSize: window.innerWidth <= 768 ? "12px" : "16px" }}>
-                      {isEditing ? (
-                        <textarea
-                          className="form-control"
-                          value={AddProjectButton ? '' : (projectData?.overviewPara || '')}
-                          onChange={(e) => handleInputChange('overviewPara', e.target.value)}
-                          rows="3"
-                          placeholder="Project description..."
-                        />
-                      ) : (
-                        <div
-                          className="project-description"
-                          dangerouslySetInnerHTML={{
-              __html: AddProjectButton ? 'Enter project description...' : (projectData?.overviewPara || ''),
-                          }}
-                        />
-                      )}
-                    </div>
-
-                    <div className="row g-3 mb-0 mb-md-4">
-                      {/* Project Area */}
-                      <div className="col-6 col-md-4 mt-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faExpandArrowsAlt}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start w-100">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Project Area
-                            </small>
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                className="form-control form-control-sm mt-1"
-                                value={AddProjectButton ? '' : (projectData?.area || '')}
-                                onChange={(e) => handleInputChange('area', e.target.value)}
-                              />
-                            ) : (
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder"
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                  fontWeight: window.innerWidth <= 768 ? "400" : "800",
-                                }}
-                              >
-                                {AddProjectButton ? '-- --' : projectData?.area}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Sizes */}
-                      <div className="col-6 col-md-4 mt-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faRulerCombined}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start w-100">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Sizes
-                            </small>
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                className="form-control form-control-sm mt-1"
-                                 value={AddProjectButton ? '' : (projectData?.floorplans?.map(fp => fp.size).join(', ') || '')}
-                                onChange={(e) => {
-                                  const sizes = e.target.value.split(',').map(s => ({ size: parseInt(s.trim()) || 0 }));
-                                  setProjectData(prev => ({ ...prev, floorplans: sizes }));
-                                }}
-                                placeholder="850, 1200, 1650, 2100"
-                              />
-                            ) : (
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder"
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                  fontWeight: window.innerWidth <= 768 ? "400" : "800",
-                                }}
-                              >
-                                 {AddProjectButton ? '-- --' : getSizeRange()}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Project Units */}
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faBuilding}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start w-100">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Project Units
-                            </small>
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                className="form-control form-control-sm mt-1"
-                                value={AddProjectButton ? '' : (projectData?.units || '')}
-                                onChange={(e) => handleInputChange('units', e.target.value)}
-                              />
-                            ) : (
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder"
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                }}
-                              >
-                               {AddProjectButton ? '-- --' : projectData?.units}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Launch Date */}
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faCalendarAlt}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start w-100">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Launch Date
-                            </small>
-                            {isEditing ? (
-                              <input
-                                type="date"
-                                className="form-control form-control-sm mt-1"
-                                alue={AddProjectButton ? '' : (projectData?.launchDate || '')}
-                                onChange={(e) => handleInputChange('launchDate', e.target.value)}
-                              />
-                            ) : (
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder"
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                }}
-                              >
-                                {AddProjectButton ? '-- --' : formatDate(projectData?.launchDate)}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Possession Date */}
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faGavel}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start w-100">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Possession Date
-                            </small>
-                            {isEditing ? (
-                              <input
-                                type="date"
-                                className="form-control form-control-sm mt-1"
-                                value={AddProjectButton ? '' : (projectData?.possessionDate || '')}
-                                onChange={(e) => handleInputChange('possessionDate', e.target.value)}
-                              />
-                            ) : (
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder"
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                }}
-                              >
-                                 {AddProjectButton ? '-- --' : formatDate(projectData?.possessionDate)}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Total Towers */}
-                        {((projectData?.totalTowers && !AddProjectButton) || isEditing) && (
-                        <div className="col-6 col-md-4 mt-2 mt-md-4">
-                          <div className="d-flex align-items-center flex-column flex-md-row">
-                            <FontAwesomeIcon
-                              icon={faBuilding}
-                              className="mb-2 mb-md-0 me-md-3"
-                              style={{
-                                fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                                color: "#2067d1",
-                              }}
-                            />
-                            <div className="text-center text-md-start w-100">
-                              <small
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                  fontWeight: "600",
-                                }}
-                              >
-                                Total Towers
-                              </small>
-                              {isEditing ? (
-                                <input
-                                  type="text"
-                                  className="form-control form-control-sm mt-1"
-                                  value={AddProjectButton ? '' : (projectData?.totalTowers || '')}
-                                  onChange={(e) => handleInputChange('totalTowers', e.target.value)}
-                                />
-                              ) : (
-                                <p
-                                  className="mb-0 fw-normal fw-md-bolder"
-                                  style={{
-                                    color: "#000",
-                                    fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                    marginTop: "2px",
-                                  }}
-                                >
-                                  {AddProjectButton ? '-- --' : `${projectData?.totalTowers || ""} Towers`}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Total Floors */}
-                       {((projectData?.totalFloor && !AddProjectButton) || isEditing) && (
-                        <div className="col-6 col-md-4 mt-2 mt-md-4">
-                          <div className="d-flex align-items-center flex-column flex-md-row">
-                            <FontAwesomeIcon
-                              icon={faBars}
-                              className="mb-2 mb-md-0 me-md-3"
-                              style={{
-                                fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                                color: "#2067d1",
-                              }}
-                            />
-                            <div className="text-center text-md-start w-100">
-                              <small
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                  fontWeight: "600",
-                                }}
-                              >
-                                Total Floors
-                              </small>
-                              {isEditing ? (
-                                <input
-                                  type="text"
-                                  className="form-control form-control-sm mt-1"
-                                   value={AddProjectButton ? '' : (projectData?.totalFloor || '')}
-                                  onChange={(e) => handleInputChange('totalFloor', e.target.value)}
-                                />
-                              ) : (
-                                <p
-                                  className="mb-0 fw-normal fw-md-bolder"
-                                  style={{
-                                    color: "#000",
-                                    fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                    marginTop: "2px",
-                                  }}
-                                >
-                                   {AddProjectButton ? '-- --' : `${projectData?.totalFloor} Floors`}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Project Status */}
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faFlag}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start w-100">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Project Status
-                            </small>
-                            {isEditing ? (
-                              <select
-                                className="form-control form-control-sm mt-1"
-                                 style={{ paddingTop: "6px", paddingBottom: "6px" }}
-                                value={AddProjectButton ? '' : (projectData?.status || '')}
-                                onChange={(e) => handleInputChange('status', e.target.value)}
-                              >
-                                <option value="">Select Status</option>
-                                <option value="upcoming">Upcoming</option>
-                                <option value="under_construction">Under Construction</option>
-                                <option value="ready_to_move">Ready To Move</option>
-                                <option value="completed">Completed</option>
-                              </select>
-                            ) : (
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder"
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                }}
-                              >
-                                {AddProjectButton ? '-- --' : (projectData?.status
-                    ?.toLowerCase()
-                    ?.replace(/_/g, " ")
-                    ?.replace(/\b\w/g, (char) => char.toUpperCase()))}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Property Type */}
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faCity}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start w-100">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Property Type
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                             {AddProjectButton 
-                  ? '-- --' 
-                  : (projectData?.configurationsType?.propertyType &&
-                      projectData.configurationsType.propertyType
-                        .toLowerCase()
-                        .replace(/^\w/, (c) => c.toUpperCase()))}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Configurations */}
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faHouseUser}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start w-100">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Configurations
-                            </small>
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                className="form-control form-control-sm mt-1"
-                                value={AddProjectButton ? '' : (projectData?.configurations?.join(', ') || '')}
-                                onChange={(e) => handleArrayInputChange('configurations', e.target.value)}
-                                placeholder="1BHK, 2BHK, 3BHK, 4BHK"
-                              />
-                            ) : (
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder text-break"
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                }}
-                              >
-                                {AddProjectButton 
-                    ? '-- --' 
-                    : (projectData?.configurations
-                        ?.map((item) => item.toUpperCase())
-                        ?.filter((value, index, self) => self.indexOf(value) === index)
-                        ?.sort((a, b) => parseFloat(a) - parseFloat(b))
-                        ?.join(", "))}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* RERA Number */}
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faKey}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start w-100">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              RERA Number
-                            </small>
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                className="form-control form-control-sm mt-1"
-                                value={AddProjectButton ? '' : (projectData?.rera || '')}
-                                onChange={(e) => handleInputChange('rera', e.target.value)}
-                              />
-                            ) : (
-                              <p
-                                className="mb-0 fw-normal fw-md-bolder"
-                                style={{
-                                  color: "#000",
-                                  fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                                  marginTop: "2px",
-                                }}
-                              >
-                                {AddProjectButton ? '-- --' : projectData?.rera}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* connect to out expert for mobile view*/}
-              {window.innerWidth <= 768 && (
-                <div
-                  className="position-sticky mb-4"
-                  style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-                >
-                  <div className="bg-white rounded-3 mb-4 p-4 pb-0">
-                    <p
-                      className="mb-3 py-2 fw-bold text-white ps-3"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                        backgroundColor: "#2067d1",
-                        borderRadius: "4px 4px 0 0",
-                      }}
-                    >
-                      Connect to Our Expert
-                    </p>
-                    {!otpSent && !otpVerified && (
-                      <form onSubmit={(e) => e.preventDefault()}>
-                        <div className="mb-3">
-                          <input
-                            name="username"
-                            className="form-control"
-                            type="text"
-                            placeholder="Name"
-                            value={formData.username}
-                            onChange={handleChange}
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <input
-                            name="useremail"
-                            className="form-control"
-                            type="email"
-                            placeholder="Email"
-                            value={formData.useremail}
-                            onChange={handleChange}
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <select
-                            name="userType"
-                            className="form-select"
-                            // style={{ maxWidth: "150px" }}
-                            value={formData.userType} // Ensure this is in your state
-                            onChange={handleChange}
-                          >
-                            <option value="">Select Role</option>
-                            <option value="Associate">Associate</option>
-                            <option value="Builder">Builder</option>
-                            <option value="Broker">Broker</option>
-                            <option value="Seller">Seller</option>
-                            <option value="Buyer">Buyer</option>
-                          </select>
-                        </div>
-
-                        <div className="mb-3">
-                          <div className="input-group">
-                            <select
-                              name="dial_code"
-                              className="form-select"
-                              style={{ maxWidth: "100px" }}
-                              // value={formData.dial_code}
-                              onChange={handleChange}
-                            >
-                              <option value="91">+91</option>
-                              <option value="61">+61</option>
-                              <option value="852">+852</option>
-                              <option value="1">+1</option>
-                            </select>
-                            <input
-                              name="usermobile"
-                              className="form-control"
-                              type="tel"
-                              maxLength="10"
-                              placeholder="Phone"
-                              value={formData.usermobile}
-                              onChange={handleChange}
-                            />
-                          </div>
-                        </div>
-                        <div className="mb-3">
-                          <label className="form-label fw-bold">
-                            I am interested in
-                          </label>
-                          <select
-                            className="form-select"
-                            name="intersted_in"
-                            value={formData.intersted_in}
-                            onChange={handleChange}
-                          >
-                            <option value="">Select</option>
-                            {projectData?.configurations
-                              ?.slice()
-                              .sort((a, b) => {
-                                const numA = parseFloat(a) || 0; // Extract numeric part
-                                const numB = parseFloat(b) || 0;
-
-                                return numA - numB; // Sort numerically
-                              })
-                              .map((config, index) => (
-                                <option key={index} value={config}>
-                                  {config}
-                                </option>
-                              ))}
-                          </select>
-                        </div>
-                        <div className="mb-3">
-                          <textarea
-                            name="usermsg"
-                            className="form-control"
-                            placeholder="Message"
-                            rows="3"
-                            value={formData.usermsg}
-                            onChange={handleChange}
-                            style={{
-                              resize: "vertical", // Only allows vertical resizing
-                              width: "100%", // Ensures it fills the container's width
-                            }}
-                          ></textarea>
-                        </div>
-                        {error && (
-                          <div className="alert alert-danger">{error}</div>
-                        )}
-                        <div className="text-center d-flex justify-content-center">
-                          <button
-                            type="button"
-                            className="btn btn-primary w-100"
-                            style={{ backgroundColor: "#2067d1" }}
-                            onClick={sendOtp}
-                          >
-                            Get a Call back
-                          </button>
-                        </div>
-                      </form>
-                    )}
-
-                    {otpSent && !otpVerified && (
-                      <div>
-                        <div className="alert alert-success">
-                          <span className="fw-bold">
-                            OTP sent to your mobile number{" "}
-                            <a
-                              href="#"
-                              onClick={() => setOtpSent(false)}
-                              className="text-decoration-none"
-                            >
-                              Edit
-                            </a>
-                          </span>
-                        </div>
-                        <div className="mb-3">
-                          <input
-                            name="enterotp"
-                            className="form-control"
-                            type="text"
-                            placeholder="Enter OTP"
-                            value={otp}
-                            onChange={handleOtpChange}
-                          />
-                        </div>
-                        {error && (
-                          <div className="alert alert-danger">{error}</div>
-                        )}
-                        <div className="d-flex justify-content-between">
-                          <button
-                            className="btn btn-primary"
-                            onClick={resendOtp}
-                            disabled={timer > 0}
-                          >
-                            Resend {timer > 0 && `(${timer}s)`}
-                          </button>
-                          <button
-                            className="btn btn-primary"
-                            onClick={() => {
-                              if (!otp || otp.trim() === "") {
-                                setError("Please enter OTP");
-                                return;
-                              }
-                              verifyOtp();
-                            }}
-                          >
-                            Verify OTP
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {otpVerified && (
-                      <form onSubmit={sendOtp}>
-                        <div className="alert alert-success">
-                          OTP verified! We will connect with you shortly.
-                        </div>
-                        <button type="submit" className="btn btn-primary w-100">
-                          Submit
-                        </button>
-                      </form>
-                    )}
-                  </div>
-
-                  <div className="bg-white rounded-3 p-3 pt-0 text-center d-flex justify-content-center">
-                     <button
-                      className="btn btn-primary w-100"
-                      style={{ fontSize: "16px", backgroundColor: "#2067d1" }}
-                      onClick={handleDownloadBrochuree}
-                    >
-                      <i className="fas fa-download me-2"></i>
-                      DOWNLOAD BROCHURE
-                    </button>
-
-                    {/* Dialog Popup Trigger */}
-                    <BrochurePopupDialog
-                      open={showBrochurePopup}
-                      onClose={closeBrochurePopup}
-                      projectName={projectData?.name || "Invest Mango"}
-                      brochure={projectData?.brochure}
-                    />
-                  </div>
-                </div>
-              )}
               {/* Why to choose */}
-<WhyChooseSection
-  projectData={projectData}
-  isEditing={isWhyChooseEditing}
-  handleEdit={() => setIsWhyChooseEditing(true)}
-  handleSave={() => setIsWhyChooseEditing(false)}
-  setProjectData={setProjectData}
-  handleSitePopup={handleSitePopup}
-  showSitePopup={showSitePopup}
-  closeSitePopup={closeSitePopup}
-/>
+              <WhyChooseSection
+                projectData={projectData}
+                isEditing={isWhyChooseEditing}
+                handleEdit={() => setIsWhyChooseEditing(true)}
+                handleSave={() => setIsWhyChooseEditing(false)}
+                setProjectData={setProjectData}
+                handleSitePopup={handleSitePopup}
+                showSitePopup={showSitePopup}
+                closeSitePopup={closeSitePopup}
+              />
               {/* Know About */}
-  {projectData && (
-<KnowAboutSection
-  projectData={projectData}
-  isAboutEditing={isAboutEditing}
-  setIsAboutEditing={setIsAboutEditing}
-  aboutHtml={aboutHtml}
-  setAboutHtml={setAboutHtml}
-  showFullDescription={showFullDescription}
-  setShowFullDescription={setShowFullDescription}
-  isMobileView={isMobileView}
-  handleDownloadBrochure={handleDownloadBrochure}
-  handleDownloadBrochuree={handleDownloadBrochuree}
-/>
-)}
-              {/* Floor Plan */}
-               <FloorPlanSection
+              {projectData && (
+                <KnowAboutSection
                   projectData={projectData}
-                  activeFilter={activeFilter}
-                  setActiveFilter={setActiveFilter}
-                  formatPrice={formatPrice}
+                  isAboutEditing={isAboutEditing}
+                  setIsAboutEditing={setIsAboutEditing}
+                  aboutHtml={aboutHtml}
+                  setAboutHtml={setAboutHtml}
+                  showFullDescription={showFullDescription}
+                  setShowFullDescription={setShowFullDescription}
+                  isMobileView={isMobileView}
+                  handleDownloadBrochure={handleDownloadBrochure}
+                  handleDownloadBrochuree={handleDownloadBrochuree}
                 />
+              )}
+              {/* Floor Plan */}
+              <FloorPlanSection
+                projectData={projectData}
+                activeFilter={activeFilter}
+                setActiveFilter={setActiveFilter}
+                formatPrice={formatPrice}
+              />
               {/* Price List */}
-<PriceListSection
-  projectData={projectData}
-  isPriceEditing={isPriceEditing}
-  setIsPriceEditing={setIsPriceEditing}
-  priceListPara={priceListPara}
-  setPriceListPara={setPriceListPara}
-  floorplans={floorplans}
-  updateFloorplan={updateFloorplan}
-  savePriceChanges={savePriceChanges}
-  formatPrice={formatPrice}
-/>
+              <PriceListSection
+                projectData={projectData}
+                isPriceEditing={isPriceEditing}
+                setIsPriceEditing={setIsPriceEditing}
+                priceListPara={priceListPara}
+                setPriceListPara={setPriceListPara}
+                floorplans={floorplans}
+                updateFloorplan={updateFloorplan}
+                savePriceChanges={savePriceChanges}
+                formatPrice={formatPrice}
+              />
 
               {/* Get Free Consultation */}
               <div
@@ -2193,53 +1474,51 @@ const extractYouTubeId = (url) => {
               >
                 Get Free Consultation for this property. Call us at:{" "}
                 <a
-                  href={`tel:+91${
-                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                  href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595189189"
-                  }`}
+                    }`}
                   style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
-                  {`+91-${
-                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                  {`+91-${projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595-189-189"
-                  }`}
+                    }`}
                 </a>
               </div>
               {/* Payment Plan */}
-<PaymentPlanSection
-  projectData={projectData}
-  isPaymentEditing={isPaymentEditing}
-  setIsPaymentEditing={setIsPaymentEditing}
-  paymentPara={paymentPara}
-  setPaymentPara={setPaymentPara}
-  paymentPlans={paymentPlans}
-  updatePaymentPlan={updatePaymentPlan}
-  removePaymentPlan={removePaymentPlan}
-  addNewPaymentPlan={addNewPaymentPlan}
-  savePaymentChanges={savePaymentChanges}
-/>
-            
+              <PaymentPlanSection
+                projectData={projectData}
+                isPaymentEditing={isPaymentEditing}
+                setIsPaymentEditing={setIsPaymentEditing}
+                paymentPara={paymentPara}
+                setPaymentPara={setPaymentPara}
+                paymentPlans={paymentPlans}
+                updatePaymentPlan={updatePaymentPlan}
+                removePaymentPlan={removePaymentPlan}
+                addNewPaymentPlan={addNewPaymentPlan}
+                savePaymentChanges={savePaymentChanges}
+              />
+
               {/* )} */}
-             {/* Amenities */}
-<AmenitiesSection
-  amenities={projectData?.projectAmenities || []}
-  amenitiesPara={projectData?.amenitiesPara || ""}
-  name={projectData?.name || ""}
-  // onSave={yourSaveHandler} // optional
-/>
-             {/* video presentation */}
- <VideoPresentationSection
-  projectData={projectData}
-  isVideoEditing={isVideoEditing}
-  setIsVideoEditing={setIsVideoEditing}
-  videoPara={videoPara}
-  setVideoPara={setVideoPara}
-  editableVideos={editableVideos}
-  updateVideoUrl={updateVideoUrl}
-  removeVideo={removeVideo}
-  addNewVideo={addNewVideo}
-  saveVideoChanges={saveVideoChanges}
-/>
+              {/* Amenities */}
+              <AmenitiesSection
+                amenities={projectData?.projectAmenities || []}
+                amenitiesPara={projectData?.amenitiesPara || ""}
+                name={projectData?.name || ""}
+              // onSave={yourSaveHandler} // optional
+              />
+              {/* video presentation */}
+              <VideoPresentationSection
+                projectData={projectData}
+                isVideoEditing={isVideoEditing}
+                setIsVideoEditing={setIsVideoEditing}
+                videoPara={videoPara}
+                setVideoPara={setVideoPara}
+                editableVideos={editableVideos}
+                updateVideoUrl={updateVideoUrl}
+                removeVideo={removeVideo}
+                addNewVideo={addNewVideo}
+                saveVideoChanges={saveVideoChanges}
+              />
               {/* Location Advantage */}
               {/* <div
                 className="mb-4"
@@ -2281,67 +1560,67 @@ const extractYouTubeId = (url) => {
                 </div>
               </div> */}
               {/* Location Map */}
-       <LocationMapSection
-  projectData={projectData}
-  isLocationEditing={isLocationEditing}
-  setIsLocationEditing={setIsLocationEditing}
-  locationMapHtml={locationMapHtml}
-  setLocationMapHtml={setLocationMapHtml}
-  locationUrl={locationUrl}
-  setLocationUrl={setLocationUrl}
-/>
-  <SitePlanSection
-  projectData={projectData}
-  imageSrc={imageSrc}
-  isSitePlanEditing={isSitePlanEditing}
-  setIsSitePlanEditing={setIsSitePlanEditing}
-  siteplanParaHtml={siteplanParaHtml}
-  setSiteplanParaHtml={setSiteplanParaHtml}
-  siteplanImgUrl={siteplanImgUrl}
-  setSiteplanImgUrl={setSiteplanImgUrl}
-  isModalOpen={isModalOpen}
-  openModal={openModal}
-  closeModal={closeModal}
-/>
+              <LocationMapSection
+                projectData={projectData}
+                isLocationEditing={isLocationEditing}
+                setIsLocationEditing={setIsLocationEditing}
+                locationMapHtml={locationMapHtml}
+                setLocationMapHtml={setLocationMapHtml}
+                locationUrl={locationUrl}
+                setLocationUrl={setLocationUrl}
+              />
+              <SitePlanSection
+                projectData={projectData}
+                imageSrc={imageSrc}
+                isSitePlanEditing={isSitePlanEditing}
+                setIsSitePlanEditing={setIsSitePlanEditing}
+                siteplanParaHtml={siteplanParaHtml}
+                setSiteplanParaHtml={setSiteplanParaHtml}
+                siteplanImgUrl={siteplanImgUrl}
+                setSiteplanImgUrl={setSiteplanImgUrl}
+                isModalOpen={isModalOpen}
+                openModal={openModal}
+                closeModal={closeModal}
+              />
               {/* Frequently Asked Questions */}
               <FaqSection
-                  displayedFaqs={displayedFaqs}
-                  expandedIndex={expandedIndex}
-                 
-                />
+                displayedFaqs={displayedFaqs}
+                expandedIndex={expandedIndex}
+
+              />
               {/* Similar Projects */}
-       <SimilarProjectsSection
-  allSimilarProjects={allSimilarProjects}
-  formatPrice={formatPrice}
-  getLeastPriceOfFloorPlan={getLeastPriceOfFloorPlan}
-/>
-              </section>
+              <SimilarProjectsSection
+                allSimilarProjects={allSimilarProjects}
+                formatPrice={formatPrice}
+                getLeastPriceOfFloorPlan={getLeastPriceOfFloorPlan}
+              />
+            </section>
 
             <section className="col-md-4 mb-4">
               {/*Connect to Our Expert */}
-           
-                {window.innerWidth > 768 && (
-                  <ConnectExpertSection
-                    formData={formData}
-                    handleChange={handleChange}
-                    otpSent={otpSent}
-                    otpVerified={otpVerified}
-                    error={error}
-                    sendOtp={sendOtp}
-                    handleOtpChange={handleOtpChange}
-                    otp={otp}
-                    resendOtp={resendOtp}
-                    timer={timer}
-                    verifyOtp={verifyOtp}
-                    setOtpSent={setOtpSent}
-                    showPopup={showPopup}
-                    handleDownloadBrochure={handleDownloadBrochure}
-                    closePopup={closePopup}
-                    BrochurePopupDialog={BrochurePopupDialog}
-                    projectData={projectData}
-                  />
-                )}
-           
+
+              {window.innerWidth > 768 && (
+                <ConnectExpertSection
+                  formData={formData}
+                  handleChange={handleChange}
+                  otpSent={otpSent}
+                  otpVerified={otpVerified}
+                  error={error}
+                  sendOtp={sendOtp}
+                  handleOtpChange={handleOtpChange}
+                  otp={otp}
+                  resendOtp={resendOtp}
+                  timer={timer}
+                  verifyOtp={verifyOtp}
+                  setOtpSent={setOtpSent}
+                  showPopup={showPopup}
+                  handleDownloadBrochure={handleDownloadBrochure}
+                  closePopup={closePopup}
+                  BrochurePopupDialog={BrochurePopupDialog}
+                  projectData={projectData}
+                />
+              )}
+
             </section>
           </div>
         </section>
