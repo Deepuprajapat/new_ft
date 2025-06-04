@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Carousel from "react-multi-carousel";
 import BrochurePopupDialog from "../BrochurePopup";
 import DOMPurify from "dompurify";
@@ -17,52 +17,103 @@ const FloorPlanSection = ({
   handleDownloadFloorPlan,
   showFloorPlanPopup,
   closeFloorPlanPopup,
-  onSave, // optional: callback to save changes
+  fetchFloorPlansFromApi,
+  saveFloorPlansToApi,
+  removeFloorPlanFromApi,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableFloorPara, setEditableFloorPara] = useState(projectData?.floorPara || "");
   const [editableFloorplans, setEditableFloorplans] = useState([]);
-  const [removeIndex, setRemoveIndex] = useState(null); // For confirmation popup
+  const [removeIndex, setRemoveIndex] = useState(null);
+
+  // For file input refs
+  const fileInputRefs = useRef([]);
 
   useEffect(() => {
-    setEditableFloorPara(projectData?.floorPara || "");
-    setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
-  }, [projectData]);
+    if (!isEditing && fetchFloorPlansFromApi) {
+      fetchFloorPlansFromApi().then((data) => {
+        setEditableFloorplans(data?.floorplans || []);
+        setEditableFloorPara(data?.floorPara || "");
+      });
+    } else {
+      setEditableFloorPara(projectData?.floorPara || "");
+      setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
+    }
+    // eslint-disable-next-line
+  }, [projectData, isEditing]);
 
   const handleFloorPlanChange = (index, field, value) => {
     const updated = [...editableFloorplans];
-    updated[index][field] = value;
+    // Only allow integer for size and price fields
+    if (field === "size" || field === "price") {
+      let intValue = value.replace(/[^0-9]/g, "");
+      if (intValue.length > 1 && intValue.startsWith("0")) {
+        intValue = intValue.replace(/^0+/, "");
+      }
+      updated[index][field] = intValue;
+    } else {
+      updated[index][field] = value;
+    }
     setEditableFloorplans(updated);
   };
 
   const handleAddFloorPlan = () => {
     setEditableFloorplans([
-      ...editableFloorplans,
       {
         title: "",
-        imageUrl: "",
+        imageUrl: "/images/Floor.png",
         size: "",
         price: "",
         projectConfigurationName: "",
         type: "",
       },
+      ...editableFloorplans,
     ]);
   };
 
-  const handleRemoveFloorPlan = (index) => {
+  const handleRemoveFloorPlan = async (index) => {
+    const planToRemove = editableFloorplans[index];
+    if (removeFloorPlanFromApi && planToRemove.id) {
+      await removeFloorPlanFromApi(planToRemove.id);
+    }
     const updated = [...editableFloorplans];
     updated.splice(index, 1);
     setEditableFloorplans(updated);
-    setRemoveIndex(null); // Close popup after removal
+    setRemoveIndex(null);
   };
-  const handleSave = () => {
+
+  const handleSave = async () => {
     setIsEditing(false);
-    if (onSave) {
-      onSave({
+    if (saveFloorPlansToApi) {
+      await saveFloorPlansToApi({
         floorPara: editableFloorPara,
         floorplans: editableFloorplans,
       });
     }
+  };
+
+  const handleCancel = async () => {
+    setIsEditing(false);
+    if (fetchFloorPlansFromApi) {
+      const data = await fetchFloorPlansFromApi();
+      setEditableFloorplans(data?.floorplans || []);
+      setEditableFloorPara(data?.floorPara || "");
+    } else {
+      setEditableFloorPara(projectData?.floorPara || "");
+      setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
+    }
+  };
+
+  // Handle image upload for a floor plan
+  const handleImageUpload = (index, file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const updated = [...editableFloorplans];
+      updated[index].imageUrl = e.target.result; // base64 string
+      setEditableFloorplans(updated);
+    };
+    reader.readAsDataURL(file);
   };
 
   // Filtering logic
@@ -94,37 +145,33 @@ const FloorPlanSection = ({
           }}
         >
           {projectData?.name} Floor Plan
-         <span style={{ cursor: "pointer", marginRight: "12px" }}>
-  {isEditing ? (
-     <>
-    <button
-      className="btn btn-success btn-sm"
-      style={{ backgroundColor: "white", color: "#2067d1", fontWeight: "bold" }}
-      onClick={handleSave}
-    >
-      Save
-    </button>
-   
-     <button
-      className="btn btn-secondary btn-sm"
-      style={{ color: "white", fontWeight: "bold" }}
-      onClick={() => {
-        setIsEditing(false);
-        // Optionally reset form fields here if needed
-      }}
-    >
-      Cancel
-    </button>
-    </>
-  ) : (
-    <img
-      src="/images/edit-icon.svg"
-      alt="Edit"
-      style={{ width: "18px", height: "18px" }}
-      onClick={() => setIsEditing(true)}
-    />
-  )}
-</span>
+          <span style={{ cursor: "pointer", marginRight: "12px" }}>
+            {isEditing ? (
+              <>
+                <button
+                  className="btn btn-success btn-sm"
+                  style={{ backgroundColor: "white", color: "#2067d1", fontWeight: "bold" }}
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  style={{ color: "white", fontWeight: "bold", marginLeft: 8 }}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <img
+                src="/images/edit-icon.svg"
+                alt="Edit"
+                style={{ width: "18px", height: "18px" }}
+                onClick={() => setIsEditing(true)}
+              />
+            )}
+          </span>
         </h2>
         <div className="px-3">
           <div className="mb-3">
@@ -246,13 +293,53 @@ const FloorPlanSection = ({
                           onChange={e => handleFloorPlanChange(index, "title", e.target.value)}
                           placeholder="Title"
                         />
-                        <input
-                          className="form-control mb-2"
-                          type="text"
-                          value={plan.imageUrl}
-                          onChange={e => handleFloorPlanChange(index, "imageUrl", e.target.value)}
-                          placeholder="Image URL"
-                        />
+                        <div className="mb-2">
+                          <label style={{ fontSize: "13px", fontWeight: 500, display: "block" }}>
+                            Floor Plan Image
+                          </label>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <img
+                              src={
+                                plan.imageUrl
+                                  ? plan.imageUrl
+                                  : "/images/Floor.png"
+                              }
+                              alt="Floor Plan"
+                              style={{
+                                width: "60px",
+                                height: "60px",
+                                objectFit: "cover",
+                                borderRadius: "8px",
+                                border: "1px solid #ddd",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => fileInputRefs.current[index]?.click()}
+                            />
+                            <input
+                              type="file"
+                              accept="image/*"
+                              ref={el => (fileInputRefs.current[index] = el)}
+                              style={{ display: "none" }}
+                              onChange={e => {
+                                const file = e.target.files[0];
+                                handleImageUpload(index, file);
+                              }}
+                            />
+                            <button
+                              className="btn btn-outline-secondary btn-sm"
+                              type="button"
+                              onClick={() => fileInputRefs.current[index]?.click()}
+                            >
+                              Upload
+                            </button>
+                          </div>
+                        </div>
                         <input
                           className="form-control mb-2"
                           type="text"

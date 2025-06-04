@@ -80,6 +80,23 @@ const ProjectHeaderSection = ({
     }
   };
 
+  // Dummy data for now
+  const cities = [
+    { id: 1, name: "Noida" },
+    { id: 2, name: "Gurgaon" },
+    { id: 3, name: "Greater Noida" },
+  ];
+
+  const localities = {
+    1: ["Sector 150", "Sector 76", "Sector 137"],
+    2: ["DLF Phase 1", "Sohna Road", "Golf Course Road"],
+    3: ["Pari Chowk", "Omega 1", "Alpha 2"],
+  };
+
+  // Add these states inside your component
+  const [selectedCity, setSelectedCity] = useState(cities[0].id);
+  const [selectedLocality, setSelectedLocality] = useState(localities[cities[0].id][0]);
+
   return (
     <section
       className="container-fluid"
@@ -167,18 +184,64 @@ const ProjectHeaderSection = ({
                       >
                         Save
                       </button>
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold" }}
+                        type="button"
+                        onClick={() => {
+                          // Reset local state for city/locality and prices
+                          setSelectedCity(cities[0].id);
+                          setSelectedLocality(localities[cities[0].id][0]);
+                          setMinPrice(
+                            projectData?.minPrice ??
+                            getLeastPriceOfFloorPlan(projectData?.floorplans?.filter(plan => plan.price > 1)) ??
+                            ""
+                          );
+                          setMaxPrice(
+                            projectData?.maxPrice ??
+                            getHighestPriceOfFloorPlan(projectData?.floorplans) ??
+                            ""
+                          );
+                          setIsEditing(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    <div className="d-flex gap-2 mb-2">
+                      <select
+                        className="form-select form-select-sm"
+                        style={{ maxWidth: 150 }}
+                        value={selectedCity}
+                        onChange={e => {
+                          const cityId = Number(e.target.value);
+                          setSelectedCity(cityId);
+                          setSelectedLocality(localities[cityId][0]);
+                          handleInputChange("city", cities.find(c => c.id === cityId).name);
+                          handleInputChange("locality", localities[cityId][0]);
+                        }}
+                      >
+                        {cities.map(city => (
+                          <option key={city.id} value={city.id}>{city.name}</option>
+                        ))}
+                      </select>
+                      <select
+                        className="form-select form-select-sm"
+                        style={{ maxWidth: 180 }}
+                        value={selectedLocality}
+                        onChange={e => {
+                          setSelectedLocality(e.target.value);
+                          handleInputChange("locality", e.target.value);
+                        }}
+                      >
+                        {(localities[selectedCity] || []).map(loc => (
+                          <option key={loc} value={loc}>{loc}</option>
+                        ))}
+                      </select>
                     </div>
                     <input
                       type="text"
                       className="form-control form-control-sm mb-2"
-                      value={projectData?.shortAddress || ""}
-                      onChange={e => handleInputChange("shortAddress", e.target.value)}
-                      placeholder="Project Address"
-                      style={{ fontSize: "12px", maxWidth: 350 }}
-                    />
-                    <input
-                      type="text"
-                      className="form-control form-control-sm d-inline w-auto"
                       value={projectData?.developerName || ""}
                       onChange={e => handleInputChange("developerName", e.target.value)}
                       placeholder="Developer Name"

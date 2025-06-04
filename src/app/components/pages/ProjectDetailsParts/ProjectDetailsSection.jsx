@@ -66,13 +66,25 @@ const ProjectDetailsSection = ({
           <span>Project Details</span>
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isEditing ? (
-              <button
-                className="btn btn-success btn-sm"
-                style={{ backgroundColor: "white", color: "#2067d1", fontWeight: 'bold' }}
-                onClick={handleSave}
-              >
-                Save
-              </button>
+              <>
+                <button
+                  className="btn btn-success btn-sm"
+                  style={{ backgroundColor: "white", color: "#2067d1", fontWeight: 'bold' }}
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold" }}
+                  onClick={() => {
+                    // Reset logic here if needed, or just exit edit mode
+                    if (typeof handleEdit === "function") handleEdit(false); // or call a cancel handler if you have one
+                  }}
+                >
+                  Cancel
+                </button>
+              </>
             ) : (
               <span
                 onClick={handleEdit}
@@ -626,4 +638,4 @@ const ProjectDetailsSection = ({
   );
 };
 
-export default ProjectDetailsSection; 
+export default ProjectDetailsSection;

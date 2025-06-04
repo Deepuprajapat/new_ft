@@ -1,48 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
-
-// Example predefined amenities per category
-const PREDEFINED_AMENITIES = {
-  interior: [
-    { name: "Modular Kitchen", icon: "/icons/kitchen.svg" },
-    { name: "Wardrobes", icon: "/icons/wardrobe.svg" },
-    { name: "False Ceiling", icon: "/icons/ceiling.svg" },
-  ],
-  exterior: [
-    { name: "Swimming Pool", icon: "/icons/pool.svg" },
-    { name: "Garden", icon: "/icons/garden.svg" },
-    { name: "Play Area", icon: "/icons/playarea.svg" },
-  ],
-  security: [
-    { name: "CCTV", icon: "/icons/cctv.svg" },
-    { name: "Gated Security", icon: "/icons/gate.svg" },
-    { name: "Fire Alarm", icon: "/icons/fire.svg" },
-  ],
-  other: [
-    { name: "Power Backup", icon: "/icons/power.svg" },
-    { name: "Lift", icon: "/icons/lift.svg" },
-  ],
-};
 
 const AmenitiesSection = ({
   amenities = [],
   amenitiesPara = "",
   name = "",
-  onSave,
+  onSave, // Optional: callback to save changes to parent or API
 }) => {
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [editableAmenities, setEditableAmenities] = useState([]);
   const [editableAmenitiesPara, setEditableAmenitiesPara] = useState(amenitiesPara);
-  const [showAddCategory, setShowAddCategory] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryAmenities, setNewCategoryAmenities] = useState("");
-  const [newCategoryIcon, setNewCategoryIcon] = useState("");
-  const fileInputRefs = useRef({});
 
   // Group amenities by category if not already grouped
   const groupAmenities = (amenitiesList) => {
     if (!amenitiesList || !Array.isArray(amenitiesList)) return [];
-    if (amenitiesList.length && amenitiesList[0].assets) return amenitiesList;
+    if (amenitiesList.length && amenitiesList[0].assets) return amenitiesList; // Already grouped
     const grouped = amenitiesList.reduce((acc, amenity) => {
       const category = (amenity.category || "Other").toLowerCase();
       if (!acc[category]) {
@@ -52,7 +24,10 @@ const AmenitiesSection = ({
         };
       }
       acc[category].assets.push({
-        name: amenity.name,
+        name: amenity.name
+          .split("_")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" "),
         icon: amenity.url,
       });
       return acc;
@@ -69,85 +44,131 @@ const AmenitiesSection = ({
     // eslint-disable-next-line
   }, [isAmenitiesEditing]);
 
-  // Add amenity from dropdown
-  const handleAddAmenity = (categoryIndex, amenity) => {
+  // Editable amenities functions
+  const processEditableAmenities = () => editableAmenities;
+
+  const updateCategoryName = (categoryIndex, newName) => {
     const updated = [...editableAmenities];
-    // Prevent duplicates
-    if (!updated[categoryIndex].assets.some(a => a.name === amenity.name)) {
-      updated[categoryIndex].assets.push({ ...amenity });
-      setEditableAmenities(updated);
-    }
+    updated[categoryIndex].name = newName;
+    setEditableAmenities(updated);
   };
 
-  // Remove amenity
+  const updateAmenity = (categoryIndex, amenityIndex, field, value) => {
+    const updated = [...editableAmenities];
+    updated[categoryIndex].assets[amenityIndex][field] = value;
+    setEditableAmenities(updated);
+  };
+
   const removeAmenity = (categoryIndex, amenityIndex) => {
     const updated = [...editableAmenities];
     updated[categoryIndex].assets.splice(amenityIndex, 1);
     setEditableAmenities(updated);
   };
 
-  // Change amenity icon
-  const handleIconChange = (categoryIndex, amenityIndex, file) => {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const updated = [...editableAmenities];
-      updated[categoryIndex].assets[amenityIndex].icon = ev.target.result;
-      setEditableAmenities(updated);
-    };
-    reader.readAsDataURL(file);
+  const addNewAmenity = (categoryIndex) => {
+    const updated = [...editableAmenities];
+    updated[categoryIndex].assets.push({
+      name: "New Amenity",
+      icon: "/images/default-icon.svg",
+    });
+    setEditableAmenities(updated);
   };
 
-  // Save
+  const removeCategoryAmenities = (categoryIndex) => {
+    const updated = editableAmenities.filter((_, index) => index !== categoryIndex);
+    setEditableAmenities(updated);
+  };
+
+  const addNewCategory = () => {
+    const newCategory = {
+      name: "New Category",
+      assets: [
+        {
+          name: "Sample Amenity",
+          icon: "/images/default-icon.svg",
+        },
+      ],
+    };
+    setEditableAmenities([...editableAmenities, newCategory]);
+  };
+
   const saveAmenitiesChanges = () => {
     setIsAmenitiesEditing(false);
     if (onSave) onSave(editableAmenities, editableAmenitiesPara);
   };
 
-  // Cancel
-  const handleCancel = () => {
-    setIsAmenitiesEditing(false);
-    setEditableAmenities(groupAmenities(amenities));
-    setEditableAmenitiesPara(amenitiesPara);
+  // Use grouped amenities for display
+  const groupedAmenities = groupAmenities(amenities);
+
+  // Dummy data for dropdowns (replace with API data as needed)
+  const ALL_CATEGORIES = [
+    "Club House",
+    "Swimming Pool",
+    "Gym",
+    "Security",
+    "Parking",
+    "Garden",
+    "Other",
+  ];
+
+  const ALL_AMENITIES = {
+    "Club House": [
+      { name: "Banquet Hall", icon: "/images/banquet.svg" },
+      { name: "Indoor Games", icon: "/images/indoor-games.svg" },
+    ],
+    "Swimming Pool": [
+      { name: "Kids Pool", icon: "/images/kids-pool.svg" },
+      { name: "Lap Pool", icon: "/images/lap-pool.svg" },
+    ],
+    "Gym": [
+      { name: "Cardio Zone", icon: "/images/cardio.svg" },
+      { name: "Weight Training", icon: "/images/weights.svg" },
+    ],
+    // ...add more as needed
   };
 
-  // Add this function inside your AmenitiesSection component
-  const handleAddCategory = () => {
-    if (
-      newCategoryName &&
-      !editableAmenities.some(
-        (cat) => cat.name.toLowerCase() === newCategoryName.toLowerCase()
-      )
-    ) {
-      let assets = [];
-      if (newCategoryAmenities) {
-        assets = newCategoryAmenities.split(",").map((item) => {
-          const name = item.trim();
-          const lowerCat = newCategoryName.toLowerCase();
-          const predefined = PREDEFINED_AMENITIES[lowerCat]?.find(a => a.name.toLowerCase() === name.toLowerCase());
-          return {
-            name,
-            icon: predefined ? predefined.icon : "/icons/default.svg"
-          };
-        });
-      }
-      setEditableAmenities([
-        ...editableAmenities,
-        {
-          name: newCategoryName.toLowerCase(),
-          assets,
-          icon: newCategoryIcon || "/icons/default.svg"
-        }
-      ]);
-      setShowAddCategory(false);
-      setNewCategoryName("");
-      setNewCategoryAmenities("");
-      setNewCategoryIcon("");
+  // Add these states at the top of your component:
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedAmenity, setSelectedAmenity] = useState("");
+
+  // Helpers for dropdowns
+  const addedCategories = editableAmenities.map((cat) => cat.name);
+  const availableCategories = ALL_CATEGORIES;
+  const addedAmenities = (catName) => {
+    const cat = editableAmenities.find((c) => c.name === catName);
+    return cat ? cat.assets.map((a) => a.name) : [];
+  };
+  const availableAmenities = selectedCategory
+    ? (ALL_AMENITIES[selectedCategory] || []).map((amenity) => ({
+        ...amenity,
+        alreadyAdded: addedAmenities(selectedCategory).includes(amenity.name),
+      }))
+    : [];
+
+  // Add this function in your component:
+  const handleAddAmenity = () => {
+    if (!selectedCategory || !selectedAmenity) return;
+    const amenityObj = (ALL_AMENITIES[selectedCategory] || []).find(a => a.name === selectedAmenity);
+    let updated = [...editableAmenities];
+    let catIndex = updated.findIndex(c => c.name === selectedCategory);
+    if (catIndex === -1) {
+      updated.push({ name: selectedCategory, assets: [amenityObj] });
+    } else {
+      updated[catIndex].assets.push(amenityObj);
     }
+    setEditableAmenities(updated);
+    setSelectedAmenity("");
   };
-
-  // --- UI: Your original design preserved below ---
+ const handleCancel = () => {
+  setIsAmenitiesEditing(false);
+  // Optionally reset editableAmenities and editableAmenitiesPara to original values if needed
+};
   return (
-    <div className="mb-4" id="amenities" style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
+    <div
+      className="mb-4"
+      id="amenities"
+      style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
+    >
       <div className="p-0 pb-2">
         <h2
           className="mb-3 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
@@ -161,21 +182,25 @@ const AmenitiesSection = ({
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isAmenitiesEditing ? (
               <>
-                <button
-                  className="btn btn-success btn-sm"
-                  style={{ backgroundColor: "white", color: "black" }}
-                  onClick={saveAmenitiesChanges}
-                >
-                  Save
-                </button>
-                <button
+              <button
+                className="btn btn-success btn-sm"
+                style={{ backgroundColor: "white", color: "black" }}
+                onClick={saveAmenitiesChanges}
+              >
+                Save
+              </button>
+              <button
                   className="btn btn-secondary btn-sm"
-                  style={{ color: "white", fontWeight: "bold" }}
+                  style={{
+                    color: "white",
+                    fontWeight: "bold",
+                    backgroundColor: "#6c757d",
+                  }}
                   onClick={handleCancel}
                 >
                   Cancel
                 </button>
-              </>
+                </>
             ) : (
               <img
                 src="/images/edit-icon.svg"
@@ -207,211 +232,224 @@ const AmenitiesSection = ({
               ),
             }}
           />
-          <div className="inner-item" style={{ minHeight: "200px", maxHeight: "400px", overflowY: "auto", overflowX: "hidden" }}>
-            {(isAmenitiesEditing ? editableAmenities : groupAmenities(amenities)).map(
-              (category, categoryIndex) => (
-                <div key={categoryIndex} style={{ marginBottom: 24 }}>
-                  <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-                    <span
-                      className="fw-bolder"
+          <div
+            className="inner-item"
+            style={{
+              height: "400px",
+              overflowY: "auto",
+              overflowX: "hidden",
+            }}
+          >
+            {(isAmenitiesEditing
+              ? processEditableAmenities()
+              : groupedAmenities
+            ).map((category, categoryIndex) => (
+              <div key={categoryIndex}>
+                <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
+                  {isAmenitiesEditing ? (
+                    <>
+                      <input
+                        type="text"
+                        value={category.name}
+                        onChange={(e) => updateCategoryName(categoryIndex, e.target.value)}
+                        style={{
+                          border: "1px solid #ddd",
+                          borderRadius: "4px",
+                          padding: "6px 12px",
+                          fontSize: window.innerWidth <= 768 ? "14px" : "16px",
+                          fontWeight: "bold",
+                          color: "#2067d1",
+                          background: "#f8faff",
+                          marginRight: "8px",
+                        }}
+                      />
+                      <button
+                        onClick={() => removeCategoryAmenities(categoryIndex)}
+                        style={{
+                          border: "none",
+                          background: "#dc3545",
+                          color: "white",
+                          borderRadius: "50%",
+                          width: "24px",
+                          height: "24px",
+                          fontSize: "16px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        title="Remove Category"
+                      >
+                        ×
+                      </button>
+                    </>
+                  ) : (
+                    <p
+                      className="fw-bolder mb-3"
                       style={{
                         fontSize: window.innerWidth <= 768 ? "14px" : "16px",
                         color: "#2067d1",
                         fontWeight: "1000",
-                        marginRight: 8,
+                        margin: 0,
                       }}
                     >
                       {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
-                    </span>
-                    {/* Only show dropdown in edit mode */}
-                    {isAmenitiesEditing && (
-                      <select
-                        style={{
-                          fontSize: "13px",
-                          marginRight: 8,
-                          borderRadius: 4,
-                          border: "1px solid #2067d1",
-                          padding: "2px 8px",
-                        }}
-                        onChange={e => {
-                          const amenity = PREDEFINED_AMENITIES[category.name]?.find(
-                            a => a.name === e.target.value
-                          );
-                          if (amenity) handleAddAmenity(categoryIndex, amenity);
-                          e.target.selectedIndex = 0;
-                        }}
-                        defaultValue=""
-                      >
-                        <option value="" disabled>
-                          + Add Amenity
-                        </option>
-                        {(PREDEFINED_AMENITIES[category.name] || []).map((a, i) => (
-                          <option key={i} value={a.name}>
-                            {a.name}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {category.assets.map((amenity, amenityIndex) => (
+                    </p>
+                  )}
+                 
+                </div>
+                <div className="row g-4 mb-5">
+                  {category.assets.map((amenity, index) => (
+                    <div key={index} className="col-6 col-md-3">
                       <div
-                        key={amenityIndex}
                         className="d-flex align-items-center"
                         style={{
-                          background: "#f8faff",
-                          border: "1px solid #e0e0e0",
-                          borderRadius: "16px",
-                          padding: "4px 10px 4px 6px",
-                          marginBottom: 8,
+                          fontSize: window.innerWidth <= 768 ? "11px" : "14px",
+                          marginBottom: "16px",
+                          fontWeight: "600",
                           position: "relative",
-                          fontSize: window.innerWidth <= 768 ? "12px" : "14px",
                         }}
                       >
-                        <div
-                          style={{
-                            position: "relative",
-                            marginRight: 6,
-                            width: 28,
-                            height: 28,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <img
-                            src={amenity.icon}
-                            alt={amenity.name}
-                            style={{
-                              width: 24,
-                              height: 24,
-                              borderRadius: "50%",
-                              border: "1px solid #ddd",
-                              objectFit: "cover",
-                              cursor: isAmenitiesEditing ? "pointer" : "default",
-                              transition: "box-shadow 0.2s",
-                            }}
-                            title={isAmenitiesEditing ? "Change Icon" : amenity.name}
-                            // Only allow icon upload in edit mode
-                            onClick={() => {
-                              if (isAmenitiesEditing) {
-                                if (!fileInputRefs.current[`${categoryIndex}-${amenityIndex}`]) {
-                                  fileInputRefs.current[`${categoryIndex}-${amenityIndex}`] = document.createElement('input');
-                                  fileInputRefs.current[`${categoryIndex}-${amenityIndex}`].type = 'file';
-                                  fileInputRefs.current[`${categoryIndex}-${amenityIndex}`].accept = 'image/*';
-                                  fileInputRefs.current[`${categoryIndex}-${amenityIndex}`].style.display = 'none';
-                                  fileInputRefs.current[`${categoryIndex}-${amenityIndex}`].onchange = (e) => {
-                                    const file = e.target.files[0];
-                                    if (file) handleIconChange(categoryIndex, amenityIndex, file);
-                                  };
-                                  document.body.appendChild(fileInputRefs.current[`${categoryIndex}-${amenityIndex}`]);
-                                }
-                                fileInputRefs.current[`${categoryIndex}-${amenityIndex}`].click();
-                              }
-                            }}
-                          />
-                        </div>
-                        <span style={{ marginRight: 6 }}>{amenity.name}</span>
-                        {/* Only show remove in edit mode */}
-                        {isAmenitiesEditing && (
-                          <span
-                            style={{
-                              color: "#dc3545",
-                              fontWeight: "bold",
-                              cursor: "pointer",
-                              marginLeft: 2,
-                              fontSize: 18,
-                              lineHeight: 1,
-                            }}
-                            title="Remove"
-                            onClick={() => removeAmenity(categoryIndex, amenityIndex)}
-                          >
-                            ×
-                          </span>
+                        {isAmenitiesEditing ? (
+                          <>
+                            <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+                              <div style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
+                                <img
+                                  src={amenity.icon}
+                                  alt={amenity.name}
+                                  loading="lazy"
+                                  style={{
+                                    width: "35px",
+                                    height: "35px",
+                                    marginRight: "8px",
+                                  }}
+                                />
+                                <span>{amenity.name}</span>
+                              </div>
+                              <button
+                                onClick={() => removeAmenity(categoryIndex, index)}
+                                style={{
+                                  border: "none",
+                                  background: "#dc3545",
+                                  color: "white",
+                                  borderRadius: "50%",
+                                  width: "24px",
+                                  height: "24px",
+                                  fontSize: "16px",
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  marginLeft: "8px"
+                                }}
+                                title="Remove Amenity"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <img
+                              src={amenity.icon}
+                              alt={amenity.name}
+                              loading="lazy"
+                              style={{
+                                width: "35px",
+                                height: "35px",
+                                marginRight: "16px",
+                              }}
+                            />
+                            {amenity.name}
+                          </>
                         )}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              )
-            )}
+              </div>
+            ))}
+         
           </div>
-          {/* In your render, add this button just above the amenities list, only in edit mode: */}
-          {isAmenitiesEditing && (
-            <div className="mb-3">
-              {!showAddCategory ? (
-                <button
-                  className="btn btn-outline-primary btn-sm"
-                  type="button"
-                  onClick={() => setShowAddCategory(true)}
-                  style={{ fontSize: "13px", fontWeight: 600 }}
-                >
-                  + Add New Category
-                </button>
-              ) : (
-                <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                  <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="Category Name"
-                    value={newCategoryName}
-                    onChange={e => setNewCategoryName(e.target.value)}
-                    style={{ maxWidth: 150 }}
-                  />
-                  <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="Amenities (comma separated)"
-                    value={newCategoryAmenities}
-                    onChange={e => setNewCategoryAmenities(e.target.value)}
-                    style={{ minWidth: 220 }}
-                  />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="form-control form-control-sm"
-                    style={{ maxWidth: 180 }}
-                    onChange={e => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = ev => setNewCategoryIcon(ev.target.result);
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                  {newCategoryIcon && (
-                    <img
-                      src={newCategoryIcon}
-                      alt="Category Icon"
-                      style={{ width: 32, height: 32, borderRadius: "50%", border: "1px solid #ddd" }}
-                    />
-                  )}
-                  <button
-                    className="btn btn-success btn-sm"
-                    type="button"
-                    onClick={handleAddCategory}
-                  >
-                    Add
-                  </button>
-                  <button
-                    className="btn btn-secondary btn-sm"
-                    type="button"
-                    onClick={() => {
-                      setShowAddCategory(false);
-                      setNewCategoryName("");
-                      setNewCategoryAmenities("");
-                      setNewCategoryIcon("");
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
+      {isAmenitiesEditing && (
+        <div
+          style={{
+            borderTop: "1px solid #eee",
+            marginTop: "24px",
+            paddingTop: "16px",
+            display: "flex",
+            gap: "12px",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {/* Category Dropdown */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setSelectedAmenity("");
+            }}
+            style={{ minWidth: 150, padding: "6px" }}
+          >
+            <option value="">Select Category</option>
+            {availableCategories.map((cat, idx) => (
+              <option
+                key={cat}
+                value={cat}
+                disabled={addedCategories.includes(cat)}
+                style={
+                  addedCategories.includes(cat)
+                    ? { filter: "blur(1px)", color: "#aaa" }
+                    : {}
+                }
+              >
+                {cat}
+                {addedCategories.includes(cat) ? " (Already added)" : ""}
+              </option>
+            ))}
+          </select>
+          {/* Amenity Dropdown */}
+          <select
+            value={selectedAmenity}
+            onChange={(e) => setSelectedAmenity(e.target.value)}
+            style={{ minWidth: 150, padding: "6px" }}
+            disabled={!selectedCategory}
+          >
+            <option value="">Select Amenity</option>
+            {availableAmenities.map((amenity, idx) => (
+              <option
+                key={amenity.name}
+                value={amenity.name}
+                disabled={amenity.alreadyAdded}
+                style={
+                  amenity.alreadyAdded
+                    ? { filter: "blur(1px)", color: "#aaa" }
+                    : {}
+                }
+              >
+                {amenity.name}
+                {amenity.alreadyAdded ? " (Already added)" : ""}
+              </option>
+            ))}
+          </select>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={handleAddAmenity}
+            disabled={
+              !selectedCategory ||
+              !selectedAmenity ||
+              availableAmenities.find(
+                (a) => a.name === selectedAmenity && a.alreadyAdded
+              )
+            }
+          >
+            Add Amenity
+          </button>
+        </div>
+      )}
     </div>
   );
 };

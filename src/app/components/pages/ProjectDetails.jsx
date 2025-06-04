@@ -19,9 +19,6 @@ import { Helmet } from "react-helmet";
 import DOMPurify from "dompurify";
 import Swal from "sweetalert2";
 import Header from "../Header";
-
-// Import modular sections
-import ProjectGallery from "./ProjectDetailsParts/ProjectGallery";
 import WhyChooseSection from "./ProjectDetailsParts/WhyChooseSection";
 import KnowAboutSection from "./ProjectDetailsParts/KnowAboutSection";
 import FloorPlanSection from "./ProjectDetailsParts/FloorPlanSection";
@@ -31,8 +28,8 @@ import AmenitiesSection from "./ProjectDetailsParts/AmenitiesSection";
 import VideoPresentationSection from "./ProjectDetailsParts/VideoPresentationSection";
 import LocationMapSection from "./ProjectDetailsParts/LocationMapSection";
 import SitePlanSection from "./ProjectDetailsParts/SitePlanSection";
-import AddProject from "./ProjectDetailsParts/AddProject/AddProject";
-import FaqSection from "./ProjectDetailsParts/FAQSection";
+import FAQSection from "./ProjectDetailsParts/FAQSection";
+//import AddProjectForm from "./ProjectDetailsParts/AddProject/AddProjectForm"; // <-- add this line
 import SimilarProjectsSection from "./ProjectDetailsParts/SimilarProjectsSection";
 import ConnectExpertSection from "./ProjectDetailsParts/ConnectExpertSection";
 import ProjectHeaderSection from "./ProjectDetailsParts/ProjectHeaderSection";
@@ -41,7 +38,6 @@ import MetaFormSection from "./ProjectDetailsParts/MetaForm";
 import ProjectGallerySection from "./ProjectDetailsParts/ProjectGallerySection";
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
-// const FALLBACK_Floor_IMAGE = "/images/coming_soon_floor.jpg";
 
 const ProjectDetails = () => {
   const [activeSection, setActiveSection] = useState("overview");
@@ -52,7 +48,6 @@ const ProjectDetails = () => {
   const [developerDetails, setDeveloperDetails] = useState(null);
   const [reraDetails, setReraDetails] = useState(null);
   const { urlName } = useParams();
-  const [expandedIndex, setExpandedIndex] = useState(null); // To track which FAQ is expanded
   const [activeFilter, setActiveFilter] = useState("all");
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -62,7 +57,7 @@ const ProjectDetails = () => {
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
   const [isGalleryEditing, setIsGalleryEditing] = useState(false);
   const [addProject, setAddProject] = useState(false);
-  // price list
+
   const [isPriceEditing, setIsPriceEditing] = useState(false);
   const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
   const [floorplans, setFloorplans] = useState(projectData?.floorplans || []);
@@ -514,11 +509,6 @@ const ProjectDetails = () => {
     return sortedFloorPlan[0].price;
   };
 
-  // Function to toggle the expanded question
-  const toggleFAQ = (index) => {
-    setExpandedIndex(index === expandedIndex ? null : index);
-  };
-
   const [formData, setFormData] = useState({
     username: "",
     useremail: "",
@@ -807,41 +797,6 @@ const ProjectDetails = () => {
       setShortAddress(projectData.shortAddress); // 🔹 Update shortAddress in AppLayout
     }
   }, [projectData, setShortAddress]);
-
-  const defaultFaqs = [
-    {
-      question: "Why choose Invest Mango?",
-      answer:
-        "Invest Mango works as one team with a common purpose to provide best-in-class services, thoroughly understands the changing needs of its clients. We are client-centric as client is the focal point of Invest Mango. We provide advice and recommendations that are in the client's best interest. We strive to understand the client's requirement by entering into his shoes and offer advice which have far reaching impact. A happy client is what makes us happy and we are proud to serve our client's.",
-    },
-    {
-      question: "How much is the total size of {{projectData.name}}?",
-      answer: "{{projectData.area}}.",
-    },
-    {
-      question: "What is the project location?",
-      answer: "{{projectData.shortAddress}}.",
-    },
-  ];
-
-  const injectProjectData = (template, data) => {
-    return template
-      .replace(/{{projectData\.name}}/g, data?.name || "")
-      .replace(/{{projectData\.shortAddress}}/g, data?.shortAddress || "")
-      .replace(/{{projectData\.area}}/g, data?.area || "");
-  };
-
-  const isValidFaq = (faq) =>
-    faq?.question?.trim() !== "" || faq?.answer?.trim() !== "";
-
-  const displayedFaqs =
-    Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
-      ? sortedFaqs
-      : defaultFaqs.map((faq) => ({
-        question: injectProjectData(faq.question, projectData),
-        answer: injectProjectData(faq.answer, projectData),
-      }));
-
 
   const validPaymentPlans = projectData?.paymentPlans?.filter(
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
@@ -1222,6 +1177,8 @@ const ProjectDetails = () => {
                 handleSitePopup={handleSitePopup}
                 showSitePopup={showSitePopup}
                 closeSitePopup={closeSitePopup}
+                setIsEditing={setIsWhyChooseEditing}
+                
               />
               {/* Know About */}
               {projectData && (
@@ -1375,11 +1332,8 @@ const ProjectDetails = () => {
                 closeModal={closeModal}
               />
               {/* Frequently Asked Questions */}
-              <FaqSection
-                displayedFaqs={displayedFaqs}
-                expandedIndex={expandedIndex}
-
-              />
+        <FAQSection 
+        projectData={projectData} />
               {/* Similar Projects */}
               <SimilarProjectsSection
                 allSimilarProjects={allSimilarProjects}

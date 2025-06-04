@@ -125,7 +125,7 @@ const PriceListSection = ({
     <>
       <button
         className="btn btn-success btn-sm"
-        style={{ marginRight: 8 }}
+        style={{ marginRight: 8, backgroundColor: "white", color: "#2067d1", border: "1px solid #2067d1", fontWeight: "bold" }}
         onClick={handleSave}
       >
         Save

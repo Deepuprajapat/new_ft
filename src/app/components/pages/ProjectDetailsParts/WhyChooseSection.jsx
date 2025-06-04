@@ -10,7 +10,17 @@ const WhyChooseSection = ({
   handleSitePopup,
   showSitePopup,
   closeSitePopup,
-}) => (
+  setIsEditing, 
+}) => {
+ //const [isEditing, setIsEditing] = useState(false); // Local state
+
+ // const handleEdit = () => setIsEditing(true);
+
+  const handleCancel = () => setIsEditing(false); // Cancel just sets false
+
+
+
+return(
   <div
     className="mb-4"
     style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
@@ -28,34 +38,43 @@ const WhyChooseSection = ({
             }}
           >
             <span>Why to choose {projectData?.name}?</span>
-           <span style={{ cursor: "pointer", marginRight: "12px" }}>
-  {isEditing ? (
-    <>
-     <button
-  className="btn btn-success btn-sm"
-  style={{ backgroundColor: "white",  color: "#2067d1",fontWeight: "bold", }}
-  onClick={handleSave}
->
-  Save
-</button>
- {/* <button
-          className="btn btn-secondary btn-sm"
-          style={{ color: "white", fontWeight: "bold" ,backgroundColor: "#6c757d"}}
-          onClick={handleCancel}
-        >
-          Cancel
-        </button> */}
-        </>
-            ) : (
-              <img
-                src="/images/edit-icon.svg"
-                alt="Edit"
-                style={{ width: "18px", height: "18px" }}
-                onClick={handleEdit}
-              />
-            )}
-          </span>
+            <span style={{ cursor: "pointer", marginRight: "12px" }}>
+              {isEditing ? (
+                <>
+                  <button
+                    className="btn btn-success btn-sm"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#2067d1",
+                      fontWeight: "bold",
+                    }}
+                    onClick={handleSave}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      marginLeft: 8,
+                      backgroundColor: "#6c757d",
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                   onClick={handleCancel}
 
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <img
+                  src="/images/edit-icon.svg"
+                  alt="Edit"
+                  style={{ width: "18px", height: "18px" }}
+                  onClick={handleEdit}
+                />
+              )}
+            </span>
           </h2>
           <div
             className="px-3"
@@ -258,5 +277,5 @@ const WhyChooseSection = ({
     </div>
   </div>
 );
-
+};
 export default WhyChooseSection;

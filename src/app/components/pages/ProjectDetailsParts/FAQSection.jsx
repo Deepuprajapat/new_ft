@@ -1,18 +1,70 @@
 import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 
-const FaqSection = ({
-  displayedFaqs,
-  setDisplayedFaqs, // <-- You need to pass this from parent
-  expandedIndex,
-  setExpandedIndex,
-}) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editFaqs, setEditFaqs] = useState(displayedFaqs || []);
+const defaultFaqs = [
+  {
+    question: "Why choose Invest Mango?",
+    answer:
+      "Invest Mango works as one team with a common purpose to provide best-in-class services, thoroughly understands the changing needs of its clients. We are client-centric as client is the focal point of Invest Mango. We provide advice and recommendations that are in the client's best interest. We strive to understand the client's requirement by entering into his shoes and offer advice which have far reaching impact. A happy client is what makes us happy and we are proud to serve our client's.",
+  },
+  {
+    question: "How much is the total size of {{projectData.name}}?",
+    answer: "{{projectData.area}}.",
+  },
+  {
+    question: "What is the project location?",
+    answer: "{{projectData.shortAddress}}.",
+  },
+];
 
+function injectProjectData(template, data) {
+  return template
+    .replace(/{{projectData\.name}}/g, data?.name || "")
+    .replace(/{{projectData\.shortAddress}}/g, data?.shortAddress || "")
+    .replace(/{{projectData\.area}}/g, data?.area || "");
+}
+
+function isValidFaq(faq) {
+  return faq?.question?.trim() !== "" || faq?.answer?.trim() !== "";
+}
+
+function cleanQuestion(question) {
+  const match = question.match(/^(\d+)[.\s\t]+(.*)/);
+  return match
+    ? { number: parseInt(match[1]), text: match[2] }
+    : { number: null, text: question.trim() };
+}
+
+const FAQSection = ({ projectData }) => {
+  // State for expanded/collapsed
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  // State for editing
+  const [isEditing, setIsEditing] = useState(false);
+  // State for faqs
+  const [faqs, setFaqs] = useState([]);
+
+  // Prepare faqs on mount or when projectData changes
   useEffect(() => {
-    if (!isEditing) setEditFaqs(displayedFaqs || []);
-  }, [displayedFaqs, isEditing]);
+    let sortedFaqs = projectData?.faqs
+      ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) }))
+      ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity));
+    let initialFaqs =
+      Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
+        ? sortedFaqs
+        : defaultFaqs.map((faq) => ({
+            question: injectProjectData(faq.question, projectData),
+            answer: injectProjectData(faq.answer, projectData),
+          }));
+    setFaqs(initialFaqs);
+  }, [projectData]);
+
+  // For editing
+  const [editFaqs, setEditFaqs] = useState([]);
+  useEffect(() => {
+    if (isEditing) {
+      setEditFaqs(faqs);
+    }
+  }, [isEditing, faqs]);
 
   const handleFaqChange = (index, field, value) => {
     setEditFaqs((prev) =>
@@ -23,12 +75,12 @@ const FaqSection = ({
   };
 
   const handleSave = () => {
-    setDisplayedFaqs(editFaqs);
+    setFaqs(editFaqs);
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setEditFaqs(displayedFaqs || []);
+    setEditFaqs(faqs);
     setIsEditing(false);
   };
 
@@ -72,44 +124,53 @@ const FaqSection = ({
           >
             Frequently Asked Questions (FAQs)
           </h4>
-         <span style={{ cursor: "pointer", marginLeft: "12px" }}>
-    {isEditing ? (
-      <>
-        <button
-          className="btn btn-success btn-sm"
-          style={{ backgroundColor: "white", marginRight: "10px" ,color: "#2067d1", fontWeight: "bold"}}
-          onClick={handleSave}
-        >
-          Save
-        </button>
-        <button
-          className="btn btn-secondary btn-sm"
-          style={{ color: "white", fontWeight: "bold" ,backgroundColor: "#6c757d"}}
-          onClick={handleCancel}
-        >
-          Cancel
-        </button>
-      </>
-    ) : (
-      <span
-        onClick={() => setIsEditing(true)}
-        style={{
-          cursor: "pointer",
-          display: "inline-flex",
-          alignItems: "center",
-        }}
-      >
-        <img
-          src="/images/edit-icon.svg"
-          alt="Edit"
-          style={{ width: "18px", height: "18px" }}
-        />
-      </span>
-    )}
-  </span>
+          <span style={{ cursor: "pointer", marginLeft: "12px" }}>
+            {isEditing ? (
+              <>
+                <button
+                  className="btn btn-success btn-sm"
+                  style={{
+                    backgroundColor: "white",
+                    marginRight: "10px",
+                    color: "#2067d1",
+                    fontWeight: "bold",
+                  }}
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  style={{
+                    color: "white",
+                    fontWeight: "bold",
+                    backgroundColor: "#6c757d",
+                  }}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <span
+                onClick={() => setIsEditing(true)}
+                style={{
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src="/images/edit-icon.svg"
+                  alt="Edit"
+                  style={{ width: "18px", height: "18px" }}
+                />
+              </span>
+            )}
+          </span>
         </div>
         <div className="px-3">
-          {(isEditing ? editFaqs : displayedFaqs)?.map((faq, index) => (
+          {(isEditing ? editFaqs : faqs)?.map((faq, index) => (
             <div key={index} className="mb-3">
               <div
                 className="d-flex justify-content-between align-items-center p-2"
@@ -187,30 +248,14 @@ const FaqSection = ({
             </div>
           ))}
           {isEditing && (
-            <>
-              <div className="mb-3">
-                <button
-                  className="btn btn-success btn-sm me-2"
-                  onClick={handleSave}
-                >
-                  Save FAQs
-                </button>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-              </div>
-              <div className="mb-3 text-end">
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={handleAddFaq}
-                >
-                  <i className="fa fa-plus me-1"></i> Add FAQ
-                </button>
-              </div>
-            </>
+            <div className="mb-3 text-end">
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={handleAddFaq}
+              >
+                <i className="fa fa-plus me-1"></i> Add FAQ
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -218,4 +263,4 @@ const FaqSection = ({
   );
 };
 
-export default FaqSection;
+export default FAQSection;

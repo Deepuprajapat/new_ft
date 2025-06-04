@@ -8,7 +8,11 @@ const LocationMapSection = ({
   setLocationMapHtml,
   locationUrl,
   setLocationUrl,
-}) => (
+}) => {
+
+  const handleCancel = () => setIsLocationEditing(false);
+  
+  return(
   <div className="bg-white rounded-3 mb-4" id="location">
     <h2
       className="mb-4 d-flex justify-content-between align-items-center"
@@ -25,6 +29,7 @@ const LocationMapSection = ({
       {projectData?.name} Location Map
       <span style={{ cursor: "pointer", marginLeft: "12px" }}>
         {isLocationEditing ? (
+          <>
          <button
       className="btn btn-success btn-sm"
       style={{ backgroundColor: "white", color: "#2067d1", border: "1px solid #2067d1" ,fontWeight: "bold"}}
@@ -36,6 +41,20 @@ const LocationMapSection = ({
     >
       Save
     </button> 
+     <button
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      marginLeft: 8,
+                      backgroundColor: "#6c757d",
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                   onClick={handleCancel}
+
+                  >
+                    Cancel
+                  </button>
+                  </>
         ) : (
           <img
             src="/images/edit-icon.svg"
@@ -99,5 +118,5 @@ const LocationMapSection = ({
     </div>
   </div>
 );
-
+};
 export default LocationMapSection;

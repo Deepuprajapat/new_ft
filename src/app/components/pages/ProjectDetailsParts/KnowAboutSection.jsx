@@ -10,7 +10,7 @@ const KnowAboutSection = ({
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [aboutHtml, setAboutHtml] = useState(projectData?.about || '');
   const editableRef = useRef(null);
-
+ const handleCancel = () => setIsAboutEditing(false);
   // Update local state when projectData changes
   useEffect(() => {
     setAboutHtml(projectData?.about || '');
@@ -58,6 +58,7 @@ const KnowAboutSection = ({
           Know About {projectData?.name}
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isAboutEditing ? (
+              <>
               <button
                 className="btn btn-success btn-sm"
                 style={{
@@ -70,6 +71,20 @@ const KnowAboutSection = ({
               >
                 Save
               </button>
+                <button
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      marginLeft: 8,
+                      backgroundColor: "#6c757d",
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                   onClick={handleCancel}
+
+                  >
+                    Cancel
+                  </button>
+                  </>
             ) : (
               <img
                 src="/images/edit-icon.svg"
