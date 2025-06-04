@@ -32,7 +32,7 @@ import VideoPresentationSection from "./ProjectDetailsParts/VideoPresentationSec
 import LocationMapSection from "./ProjectDetailsParts/LocationMapSection";
 import SitePlanSection from "./ProjectDetailsParts/SitePlanSection";
 
-
+import AddProject from "./ProjectDetailsParts/AddProject/AddProject";
 import FaqSection from "./ProjectDetailsParts/FAQSection";
 import SimilarProjectsSection from "./ProjectDetailsParts/SimilarProjectsSection";
 import ConnectExpertSection from "./ProjectDetailsParts/ConnectExpertSection";
