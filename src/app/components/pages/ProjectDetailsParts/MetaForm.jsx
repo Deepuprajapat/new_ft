@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import DOMPurify from "dompurify";
+
 function MetaFormSection() {
   const [showMetaForm, setShowMetaForm] = useState(false);
   const [metaTitle, setMetaTitle] = useState("");
@@ -17,6 +19,7 @@ function MetaFormSection() {
   const deleteKeyword = (index) => {
     setMetaKeywords(metaKeywords.filter((_, i) => i !== index));
   };
+
   useEffect(() => {
     if (showMetaForm) {
       document.body.style.overflow = "hidden";
@@ -28,19 +31,23 @@ function MetaFormSection() {
     };
   }, [showMetaForm]);
 
+  const handleInputChange = (e, setter) => {
+    const value = e.target.value;
+    // Preserve HTML tags by not sanitizing on input
+    setter(value);
+  };
+
   return (
     <section
-      className="container-fluid"
-      style={{
-        width: window.innerWidth <= 768 ? "90%" : "95%",
-        margin: "0 auto",
-
-      }}
+      className=""
+      // style={{
+      //   width: window.innerWidth <= 768 ? "10%" : "15%",
+      // }}
     >
       <button
         className="btn btn-primary"
         onClick={() => setShowMetaForm(true)}
-        style={{ margin: "20px 0" }}
+        style={{ margin: "20px 0" , marginLeft: "10px"}}
       >
         Meta Data
       </button>
@@ -84,6 +91,9 @@ function MetaFormSection() {
                 style={{ fontSize: 22 }}
               ></button>
             </div>
+            <div className="alert alert-info py-2" style={{ fontSize: '0.9rem' }}>
+              <strong>Tip:</strong> You can use HTML tags (e.g., &lt;b&gt;, &lt;i&gt;, &lt;strong&gt;, &lt;em&gt;) in these fields.
+            </div>
             <form onSubmit={e => e.preventDefault()}>
               <div className="mb-3">
                 <label className="form-label" style={{ fontWeight: 500 }}>
@@ -93,8 +103,8 @@ function MetaFormSection() {
                   type="text"
                   className="form-control"
                   value={metaTitle}
-                  onChange={e => setMetaTitle(e.target.value)}
-                  placeholder="Enter meta title"
+                  onChange={(e) => handleInputChange(e, setMetaTitle)}
+                  placeholder="Enter meta title with HTML tags if needed"
                   style={{ borderRadius: 8, fontSize: 16 }}
                   maxLength={70}
                 />
@@ -118,8 +128,8 @@ function MetaFormSection() {
                     className="form-control border-0"
                     rows={3}
                     value={metaDescription}
-                    onChange={e => setMetaDescription(e.target.value)}
-                    placeholder="Enter meta description"
+                    onChange={(e) => handleInputChange(e, setMetaDescription)}
+                    placeholder="Enter meta description with HTML tags if needed"
                     style={{ resize: "none", fontSize: 15, background: "transparent" }}
                     maxLength={160}
                   ></textarea>
@@ -133,7 +143,6 @@ function MetaFormSection() {
                   Meta Keywords
                 </label>
                 <div className="mb-3">
-
                   <div
                     style={{
                       maxHeight: 110,
@@ -146,7 +155,7 @@ function MetaFormSection() {
                       className="form-control border-0"
                       rows={3}
                       value={keywordInput}
-                      onChange={e => setKeywordInput(e.target.value)}
+                      onChange={(e) => handleInputChange(e, setKeywordInput)}
                       placeholder="Add keywords (comma separated)"
                       style={{ resize: "none", fontSize: 15, background: "transparent" }}
                       maxLength={160}
@@ -156,8 +165,6 @@ function MetaFormSection() {
                     {keywordInput.split(",").filter(k => k.trim()).length} keywords
                   </div>
                 </div>
-
-
               </div>
               <div className="mb-3">
                 <label className="form-label" style={{ fontWeight: 500 }}>
@@ -175,9 +182,9 @@ function MetaFormSection() {
                     className="form-control border-0"
                     rows={3}
                     value={schema}
-                    onChange={e => setSchema(e.target.value)}
+                    onChange={(e) => handleInputChange(e, setSchema)}
                     placeholder="Paste schema JSON here"
-                    style={{ resize: "none", fontSize: 15, background: "transparent" }}
+                    style={{ resize: "none", fontSize: 15, background: "transparent", fontFamily: 'monospace' }}
                   ></textarea>
                 </div>
               </div>

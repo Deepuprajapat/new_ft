@@ -1,0 +1,142 @@
+import React, { useState, useEffect } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
+import { getAllDeveloper } from '../../../../apis/api';
+
+const AddProject = ({ show, handleClose, onSubmit }) => {
+  const [formData, setFormData] = useState({
+    projectName: '',
+    projectUrl: '',
+    projectType: '',
+    developerId: ''
+  });
+  const [developers, setDevelopers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchDevelopers();
+  }, []);
+
+  const fetchDevelopers = async () => {
+    try {
+      const response = await getAllDeveloper();
+      if (response && response.data) {
+        setDevelopers(response.data);
+      }
+    } catch (err) {
+      setError('Failed to fetch developers');
+      console.error('Error fetching developers:', err);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await onSubmit(formData);
+      handleClose();
+      setFormData({
+        projectName: '',
+        projectUrl: '',
+        projectType: '',
+        developerId: ''
+      });
+    } catch (err) {
+      setError('Failed to add project');
+      console.error('Error adding project:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Modal show={show} onHide={handleClose} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Add New Project</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            {error}
+          </div>
+        )}
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3">
+            <Form.Label>Project Name</Form.Label>
+            <Form.Control
+              type="text"
+              name="projectName"
+              value={formData.projectName}
+              onChange={handleChange}
+              placeholder="Enter project name"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Project URL</Form.Label>
+            <Form.Control
+              type="text"
+              name="projectUrl"
+              value={formData.projectUrl}
+              onChange={handleChange}
+              placeholder="Enter project URL"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Project Type</Form.Label>
+            <Form.Select
+              name="projectType"
+              value={formData.projectType}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Project Type</option>
+              <option value="RESIDENTIAL">Residential</option>
+              <option value="COMMERCIAL">Commercial</option>
+            </Form.Select>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Developer</Form.Label>
+            <Form.Select
+              name="developerId"
+              value={formData.developerId}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Developer</option>
+              {developers.map((developer) => (
+                <option key={developer.id} value={developer.id}>
+                  {developer.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+
+          <div className="d-flex justify-content-end gap-2">
+            <Button 
+              variant="primary" 
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? 'Adding...' : 'Add Project'}
+            </Button>
+          </div>
+        </Form>
+      </Modal.Body>
+    </Modal>
+  );
+};
+
+export default AddProject;   

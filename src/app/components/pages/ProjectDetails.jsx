@@ -14,23 +14,6 @@ import {
   // getLeadByPhone,
   // saveLead,
 } from "../../apis/api";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faExpandArrowsAlt,
-  faRulerCombined,
-  faBuilding,
-  faCalendarAlt,
-  faGavel,
-  faBars,
-  faFlag,
-  faCity,
-  faHouseUser,
-  faKey,
-  faSave,
-  faEdit,
-  faCamera
-} from "@fortawesome/free-solid-svg-icons";
-import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { Helmet } from "react-helmet";
 import DOMPurify from "dompurify";
@@ -40,6 +23,7 @@ import Header from "../Header";
 // Import modular sections
 import ProjectGallery from "./ProjectDetailsParts/ProjectGallery";
 import NavigationSection from "./ProjectDetailsParts/NavigationSection";
+import AddProjectForm from "./ProjectDetailsParts/AddProject/AddProject";
 import WhyChooseSection from "./ProjectDetailsParts/WhyChooseSection";
 import KnowAboutSection from "./ProjectDetailsParts/KnowAboutSection";
 import FloorPlanSection from "./ProjectDetailsParts/FloorPlanSection";
@@ -56,6 +40,7 @@ import ConnectExpertSection from "./ProjectDetailsParts/ConnectExpertSection";
 import ProjectHeaderSection from "./ProjectDetailsParts/ProjectHeaderSection";
 import ProjectDetailsSection from "./ProjectDetailsParts/ProjectDetailsSection";
 import MetaFormSection from "./ProjectDetailsParts/MetaForm";
+import ProjectGallerySection from "./ProjectDetailsParts/ProjectGallerySection";
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
 // const FALLBACK_Floor_IMAGE = "/images/coming_soon_floor.jpg";
@@ -70,9 +55,6 @@ const ProjectDetails = () => {
   const [reraDetails, setReraDetails] = useState(null);
   const { urlName } = useParams();
   const [expandedIndex, setExpandedIndex] = useState(null); // To track which FAQ is expanded
-  const [showReraDetails, setShowReraDetails] = useState(false);
-  const [isReraDetailHovered, setIsReraDetailHovered] = useState(false);
-  const [showFullDescription, setShowFullDescription] = useState(false);
   const [activeFilter, setActiveFilter] = useState("all");
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -80,8 +62,8 @@ const ProjectDetails = () => {
   const [isNavFixed, setIsNavFixed] = useState(false);
   const [navInitialPosition, setNavInitialPosition] = useState(null);
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
-  const [hoveredImageIndex, setHoveredImageIndex] = useState(null);
   const [isGalleryEditing, setIsGalleryEditing] = useState(false);
+  const [addProject, setAddProject] = useState(false);
 
 
 
@@ -99,28 +81,20 @@ const ProjectDetails = () => {
 
   const navigate = useNavigate();
 
-  const [isAboutEditing, setIsAboutEditing] = useState(false);
-  const [aboutHtml, setAboutHtml] = useState(projectData?.about || "");
+  
 
-  //anushaka
   const [isEditing, setIsEditing] = useState(false);
   const [AddProjectButton, setAddProjectButton] = useState(false);
-  // State variables pament
   const [isPaymentEditing, setIsPaymentEditing] = useState(false);
   const [paymentPara, setPaymentPara] = useState(projectData?.paymentPara || '');
   const [paymentPlans, setPaymentPlans] = useState(projectData?.paymentPlans || []);
-
-  //project header
   const [isHeaderEditing, setIsHeaderEditing] = useState(false);
-
-  // State variables  amenthis
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [amenitiesPara, setAmenitiesPara] = useState(projectData?.amenitiesPara || '');
   const [editableAmenities, setEditableAmenities] = useState([]);
 
   // State variables  youtube
   const [isVideoEditing, setIsVideoEditing] = useState(false);
-  const [videoPara, setVideoPara] = useState(projectData?.videoPara || '');
   const [editableVideos, setEditableVideos] = useState([]);
 
 
@@ -286,9 +260,7 @@ const ProjectDetails = () => {
   };
 
   // Update aboutHtml when projectData changes
-  useEffect(() => {
-    setAboutHtml(projectData?.about || "");
-  }, [projectData]);
+
 
   // Store initial nav position on mount
   useEffect(() => {
@@ -306,11 +278,8 @@ const ProjectDetails = () => {
           const data = await getAllProjectsByUrlName(urlName, navigate);
           if (data) {
             setProjectData(data);
-            // console.log(data,"gfghjhhfgdfh");
-            setDeveloperId(data.developerId); // Update developer ID
-            setProjectId(data.id); // Update developer ID
-            // Extract and parse schema JSON
-            // Extract and parse multiple schema JSONs
+            setDeveloperId(data.developerId); 
+            setProjectId(data.id); 
             if (Array.isArray(data.schema) && data.schema.length > 0) {
               const parsedSchemas = data.schema
                 .map((schemaStr) => {
@@ -400,7 +369,6 @@ const ProjectDetails = () => {
 
   // Update your existing useEffect
   useEffect(() => {
-    setAboutHtml(projectData?.about || "");
     setPriceListPara(projectData?.priceListPara || "");
     setFloorplans(projectData?.floorplans ? [...projectData.floorplans] : []);
   }, [projectData]);
@@ -767,9 +735,11 @@ const ProjectDetails = () => {
   }, []);
 
   const [showPopup, setShowPopup] = useState(false);
+
   const handleDownloadBrochure = () => {
     setShowPopup(true);
   };
+
   const closePopup = () => {
     setShowPopup(false);
     setShowBrochurePopup(false);
@@ -825,25 +795,6 @@ const ProjectDetails = () => {
   };
 
      // Function to handle image upload
-  const handleImageUpload = (index, event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const newImages = [...projectData.images];
-        newImages[index] = {
-          ...newImages[index],
-          imageUrl: e.target.result,
-          caption: file.name,
-        };
-        setProjectData({
-          ...projectData,
-          images: newImages,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   // Function to clean and extract numbers for sorting
   const cleanQuestion = (question) => {
@@ -953,160 +904,12 @@ const ProjectDetails = () => {
       <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
           {/* Gallery Section */}
-          <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
-                {projectData && projectData.images && projectData.images.length > 0 && (
-                  <>
-                    {/* Main Image - Left Side */}
-                    <div className="col-12 col-md-6 p-0 pe-0 pe-md-1">
-                      {projectData?.images[0] && (
-                        <div
-                          className="position-relative"
-                          style={{ height: "540px" }}
-                          onMouseEnter={() => setHoveredImageIndex(0)}
-                          onMouseLeave={() => setHoveredImageIndex(null)}
-                        >
-                          <a
-                            href={projectData?.images[0]?.imageUrl}
-                            data-toggle="lightbox"
-                            data-gallery="gallery"
-                            className="d-block h-100"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setShowFullScreen(true);
-                              setCurrentImageIndex(0);
-                            }}
-                          >
-                            <img
-                              alt={projectData?.images[0]?.caption || "Image"}
-                              src={projectData?.images[0]?.imageUrl}
-                              loading="lazy"
-                              className="w-100 h-100"
-                              style={{ 
-                                objectFit: "cover", 
-                                cursor: "pointer",
-                                filter: hoveredImageIndex === 0 ? "blur(5px)" : "none",
-                                transition: "filter 0.3s ease"
-                              }}
-                              fetchpriority="high"
-                            />
-                          </a>
-                          {hoveredImageIndex === 0 && (
-                            <div 
-                              className="position-absolute d-flex align-items-center justify-content-center"
-                              style={{
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                backgroundColor: 'rgba(0,0,0,0.5)',
-                                borderRadius: '50%',
-                                padding: '15px',
-                                cursor: 'pointer',
-                                zIndex: 2
-                              }}
-                            >
-                              <label htmlFor={`image-upload-0`} style={{ margin: 0, cursor: 'pointer' }}>
-                                <FontAwesomeIcon 
-                                  icon={faCamera} 
-                                  style={{ 
-                                    color: 'white', 
-                                    fontSize: '25px',
-                                    transition: 'transform 0.3s ease',
-                                    transform: 'scale(1.2)'
-                                  }}
-                                />
-                              </label>
-                              <input
-                                type="file"
-                                id={`image-upload-0`}
-                                accept="image/*"
-                                style={{ display: 'none' }}
-                                onChange={(e) => handleImageUpload(0, e)}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Grid Images - Right Side */}
-                    <div className="col-12 col-md-6 p-0">
-                      <div className="row g-0">
-                        {[1, 2, 3, 4].map((index) =>
-                          projectData?.images[index] && (
-                            <div
-                              key={index}
-                              className="col-6"
-                              style={{ height: "270px", padding: "0 0 0.5px 0.5px" }}
-                              onMouseEnter={() => setHoveredImageIndex(index)}
-                              onMouseLeave={() => setHoveredImageIndex(null)}
-                            >
-                              <a
-                                href={projectData?.images[index]?.imageUrl}
-                                data-toggle="lightbox"
-                                data-gallery="gallery"
-                                className="d-block h-100"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setShowFullScreen(true);
-                                  setCurrentImageIndex(index);
-                                }}
-                              >
-                                <img
-                                  alt={projectData?.images[index]?.caption || "Image"}
-                                  src={projectData?.images[index]?.imageUrl}
-                                  loading="lazy"
-                                  className="w-100 h-100"
-                                  style={{
-                                    objectFit: "cover",
-                                    cursor: "pointer",
-                                    filter: hoveredImageIndex === index ? "blur(4px)" : "none",
-                                    transition: "filter 0.3s ease"
-                                  }}
-                                  fetchpriority="high"
-                                />
-                              </a>
-                              {hoveredImageIndex === index && (
-                                <div 
-                                  className="position-absolute d-flex align-items-center justify-content-center"
-                                  style={{
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    backgroundColor: 'rgba(0,0,0,0.5)',
-                                    borderRadius: '50%',
-                                    padding: '15px',
-                                    cursor: 'pointer',
-                                    zIndex: 2
-                                  }}
-                                >
-                                  <label htmlFor={`image-upload-${index}`} style={{ margin: 0, cursor: 'pointer' }}>
-                                    <FontAwesomeIcon 
-                                      icon={faCamera} 
-                                      style={{ 
-                                        color: 'white', 
-                                        fontSize: '25px',
-                                        transition: 'transform 0.3s ease',
-                                        transform: 'scale(1.2)'
-                                      }}
-                                    />
-                                  </label>
-                                  <input
-                                    type="file"
-                                    id={`image-upload-${index}`}
-                                    accept="image/*"
-                                    style={{ display: 'none' }}
-                                    onChange={(e) => handleImageUpload(index, e)}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
+          <ProjectGallerySection
+            projectData={projectData}
+            setProjectData={setProjectData}
+            setShowFullScreen={setShowFullScreen}
+            setCurrentImageIndex={setCurrentImageIndex}
+          />
 
           {/* Fullscreen Image Modal */}
           {showFullScreen && projectData?.images && (
@@ -1379,16 +1182,26 @@ const ProjectDetails = () => {
           </div>
         </div>
         {/* meta form */}
+        <div className="d-flex gap-3">
         <MetaFormSection />
         {/* Section 1 */}
-
+        <button 
+          onClick={() => {
+            setAddProject(true);
+            console.log("addProject", addProject);
+          }} 
+          className="btn btn-primary"
+          style={{ margin: "20px 0" }}
+        >
+          Add Project
+        </button>
+        {addProject && (
+         <AddProjectForm show={addProject} handleClose={() => setAddProject(false)} onSubmit={() => {}}/>
+        )}
+        </div>
         <ProjectHeaderSection
           projectData={projectData}
           reraDetails={reraDetails}
-          showReraDetails={showReraDetails}
-          setShowReraDetails={setShowReraDetails}
-          setIsReraDetailHovered={setIsReraDetailHovered}
-          isReraDetailHovered={isReraDetailHovered}
           formatPrice={formatPrice}
           getLeastPriceOfFloorPlan={getLeastPriceOfFloorPlan}
           getHighestPriceOfFloorPlan={getHighestPriceOfFloorPlan}
@@ -1428,12 +1241,6 @@ const ProjectDetails = () => {
               {projectData && (
                 <KnowAboutSection
                   projectData={projectData}
-                  isAboutEditing={isAboutEditing}
-                  setIsAboutEditing={setIsAboutEditing}
-                  aboutHtml={aboutHtml}
-                  setAboutHtml={setAboutHtml}
-                  showFullDescription={showFullDescription}
-                  setShowFullDescription={setShowFullDescription}
                   isMobileView={isMobileView}
                   handleDownloadBrochure={handleDownloadBrochure}
                   handleDownloadBrochuree={handleDownloadBrochuree}
@@ -1497,6 +1304,7 @@ const ProjectDetails = () => {
                 addNewPaymentPlan={addNewPaymentPlan}
                 savePaymentChanges={savePaymentChanges}
               />
+              
 
               {/* )} */}
               {/* Amenities */}
@@ -1511,8 +1319,6 @@ const ProjectDetails = () => {
                 projectData={projectData}
                 isVideoEditing={isVideoEditing}
                 setIsVideoEditing={setIsVideoEditing}
-                videoPara={videoPara}
-                setVideoPara={setVideoPara}
                 editableVideos={editableVideos}
                 updateVideoUrl={updateVideoUrl}
                 removeVideo={removeVideo}

@@ -1,18 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import DOMPurify from "dompurify";
 
 const VideoPresentationSection = ({
   projectData,
   isVideoEditing,
   setIsVideoEditing,
-  videoPara,
-  setVideoPara,
   editableVideos,
   updateVideoUrl,
   removeVideo,
   addNewVideo,
   saveVideoChanges,
-}) => (
+}) => {
+  const [videoPara, setVideoPara] = useState(projectData?.videoPara || '');
+  return (
   <div
     className="mb-4"
     id="video"
@@ -201,6 +201,7 @@ const VideoPresentationSection = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export default VideoPresentationSection;
