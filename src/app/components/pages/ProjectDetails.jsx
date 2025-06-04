@@ -31,7 +31,6 @@ import AmenitiesSection from "./ProjectDetailsParts/AmenitiesSection";
 import VideoPresentationSection from "./ProjectDetailsParts/VideoPresentationSection";
 import LocationMapSection from "./ProjectDetailsParts/LocationMapSection";
 import SitePlanSection from "./ProjectDetailsParts/SitePlanSection";
-
 import AddProject from "./ProjectDetailsParts/AddProject/AddProject";
 import FaqSection from "./ProjectDetailsParts/FAQSection";
 import SimilarProjectsSection from "./ProjectDetailsParts/SimilarProjectsSection";
@@ -63,9 +62,6 @@ const ProjectDetails = () => {
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
   const [isGalleryEditing, setIsGalleryEditing] = useState(false);
   const [addProject, setAddProject] = useState(false);
-
-
-
   // price list
   const [isPriceEditing, setIsPriceEditing] = useState(false);
   const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
@@ -1198,6 +1194,7 @@ const ProjectDetails = () => {
           handleEdit={() => setIsHeaderEditing(true)}
           handleSave={() => setIsHeaderEditing(false)}
           handleInputChange={handleInputChange}
+          handleHeaderCancel={() => setIsHeaderEditing(false)}
         />
 
         {/* Project Details */}

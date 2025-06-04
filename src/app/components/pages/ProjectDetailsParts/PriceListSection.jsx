@@ -64,6 +64,9 @@ const PriceListSection = ({
   projectData,
   formatPrice,
 }) => {
+    // price list
+  const [isPriceEditing, setIsPriceEditing] = useState(false);
+  const [floorplans, setFloorplans] = useState(projectData?.floorplans || []);
   const [isEditing, setIsEditing] = useState(false);
   const [priceList, setPriceList] = useState(projectData?.floorplans || []);
   const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
