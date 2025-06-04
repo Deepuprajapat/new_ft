@@ -1,19 +1,57 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 
 const PaymentPlanSection = ({
   projectData,
-  isPaymentEditing,
-  setIsPaymentEditing,
-  paymentPara,
-  setPaymentPara,
-  paymentPlans,
-  updatePaymentPlan,
-  removePaymentPlan,
-  addNewPaymentPlan,
-  savePaymentChanges,
 }) => {
-  const validPaymentPlans = (isPaymentEditing ? paymentPlans : projectData?.paymentPlans)?.filter(
+  const [isPaymentEditing, setIsPaymentEditing] = useState(false);
+  const [localPaymentPlans, setLocalPaymentPlans] = useState(projectData?.paymentPlans || []);
+  const [localPaymentPara, setLocalPaymentPara] = useState(projectData?.paymentPara || "");
+
+  // Sync with projectData when not editing
+  useEffect(() => {
+    if (!isPaymentEditing) {
+      setLocalPaymentPlans(projectData?.paymentPlans || []);
+      setLocalPaymentPara(projectData?.paymentPara || "");
+    }
+  }, [projectData, isPaymentEditing]);
+
+  // Update a payment plan row
+  const updatePaymentPlan = (index, field, value) => {
+    setLocalPaymentPlans(prev =>
+      prev.map((plan, i) =>
+        i === index ? { ...plan, [field]: value } : plan
+      )
+    );
+  };
+
+  // Remove a payment plan row
+  const removePaymentPlan = (index) => {
+    setLocalPaymentPlans(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Add a new payment plan row
+  const addNewPaymentPlan = () => {
+    setLocalPaymentPlans(prev => [
+      ...prev,
+      { planName: "", details: "" }
+    ]);
+  };
+
+  // Save changes
+  const handleSave = () => {
+    setIsPaymentEditing(false);
+    // Optionally: send localPaymentPlans to API or parent here
+  };
+
+  // Cancel editing and reset changes
+  const handleCancel = () => {
+    setLocalPaymentPlans(projectData?.paymentPlans || []);
+    setLocalPaymentPara(projectData?.paymentPara || "");
+    setIsPaymentEditing(false);
+  };
+
+  const validPaymentPlans = (isPaymentEditing ? localPaymentPlans : projectData?.paymentPlans)?.filter(
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   );
 
@@ -21,37 +59,40 @@ const PaymentPlanSection = ({
   if (!isPaymentEditing && !validPaymentPlans?.length) return null;
 
   return (
-    <div
-      className="mb-4"
-      id="payment_plan"
-      style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-    >
+    <div className="mb-4" id="payment_plan" style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
       <div className="p-0 pb-2">
-        <h2
-          className="mb-3 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
-          style={{
-            fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-            backgroundColor: "#2067d1",
-            borderRadius: "4px 4px 0 0",
-          }}
-        >
+        <h2 className="mb-3 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
+            style={{
+              fontSize: window.innerWidth <= 768 ? "16px" : "18px",
+              backgroundColor: "#2067d1",
+              borderRadius: "4px 4px 0 0",
+            }}>
           {projectData?.name} Payment Plan
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isPaymentEditing ? (
-              <button
-                className="btn btn-success btn-sm"
-                style={{
-                  backgroundColor: "white",
-                  color: "#2067d1",
-                  border: "1px solid #2067d1",
-                  fontWeight: "bold",
-                  padding: "2px 10px",
-                  fontSize: "14px",
-                }}
-                onClick={savePaymentChanges}
-              >
-                Save
-              </button>
+              <>
+                <button
+                  className="btn btn-success btn-sm"
+                  style={{
+                    backgroundColor: "white",
+                    color: "#2067d1",
+                    border: "1px solid #2067d1",
+                    fontWeight: "bold",
+                    padding: "2px 10px",
+                    fontSize: "14px",
+                  }}
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  style={{ color: "white", fontWeight: "bold" }}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              </>
             ) : (
               <img
                 src="/images/edit-icon.svg"
@@ -76,10 +117,10 @@ const PaymentPlanSection = ({
             }}
             contentEditable={isPaymentEditing}
             suppressContentEditableWarning={true}
-            onInput={(e) => setPaymentPara(e.currentTarget.innerHTML)}
+            onInput={e => setLocalPaymentPara(e.currentTarget.innerHTML)}
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(
-                isPaymentEditing ? paymentPara : projectData?.paymentPara
+                isPaymentEditing ? localPaymentPara : projectData?.paymentPara
               ),
             }}
           />
@@ -135,95 +176,50 @@ const PaymentPlanSection = ({
                 </tr>
               </thead>
               <tbody>
-                {(validPaymentPlans?.length > 0 ? validPaymentPlans : isPaymentEditing ? paymentPlans : []).map((plan, index) => (
-                  <tr key={index}>
-                    <td
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "11px" : "14px",
-                        padding: window.innerWidth <= 768 ? "8px 4px" : "8px",
-                      }}
-                    >
-                      {isPaymentEditing ? (
-                        <input
-                          type="text"
-                          value={plan.planName}
-                          onChange={(e) =>
-                            updatePaymentPlan(index, "planName", e.target.value)
-                          }
-                          style={{
-                            border: "1px solid #ddd",
-                            borderRadius: "4px",
-                            padding: "4px 8px",
-                            fontSize:
-                              window.innerWidth <= 768 ? "11px" : "14px",
-                            width: "100%",
-                            background: "#f8faff",
-                          }}
-                        />
-                      ) : (
-                        plan?.planName
-                      )}
-                    </td>
-                    <td
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "11px" : "14px",
-                        padding: window.innerWidth <= 768 ? "8px 4px" : "8px",
-                      }}
-                    >
-                      {isPaymentEditing ? (
-                        <textarea
-                          value={plan.details}
-                          onChange={(e) =>
-                            updatePaymentPlan(index, "details", e.target.value)
-                          }
-                          style={{
-                            border: "1px solid #ddd",
-                            borderRadius: "4px",
-                            padding: "4px 8px",
-                            fontSize:
-                              window.innerWidth <= 768 ? "11px" : "14px",
-                            width: "100%",
-                            background: "#f8faff",
-                            minHeight: "60px",
-                            resize: "vertical",
-                          }}
-                        />
-                      ) : (
-                        plan?.details
-                      )}
-                    </td>
-                    {isPaymentEditing && (
-                      <td
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "11px" : "14px",
-                          padding: window.innerWidth <= 768 ? "8px 4px" : "8px",
-                          textAlign: "center",
-                        }}
-                      >
-                        <button
-                          onClick={() => removePaymentPlan(index)}
-                          style={{
-                            border: "none",
-                            background: "#dc3545",
-                            color: "white",
-                            borderRadius: "4px",
-                            padding: "4px 8px",
-                            fontSize: "12px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
+                {isPaymentEditing
+                  ? localPaymentPlans.map((plan, index) => (
+                      <tr key={index}>
+                        <td>
+                          <input
+                            type="text"
+                            value={plan.planName}
+                            onChange={e => updatePaymentPlan(index, "planName", e.target.value)}
+                            className="form-control"
+                          />
+                        </td>
+                        <td>
+                          <textarea
+                            value={plan.details}
+                            onChange={e => updatePaymentPlan(index, "details", e.target.value)}
+                            className="form-control"
+                            style={{ minHeight: "60px", resize: "vertical" }}
+                          />
+                        </td>
+                        <td>
+                          <button
+                            onClick={() =>
+                              setLocalPaymentPlans(prev => prev.filter((_, i) => i !== index))
+                            }
+                            className="btn btn-danger btn-sm"
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  : validPaymentPlans.map((plan, index) => (
+                      <tr key={index}>
+                        <td>{plan?.planName}</td>
+                        <td>{plan?.details}</td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
             {isPaymentEditing && (
               <div style={{ marginTop: "16px", textAlign: "center" }}>
                 <button
                   onClick={addNewPaymentPlan}
+                  className="btn btn-primary btn-sm"
                   style={{
                     border: "1px solid #2067d1",
                     background: "#f8faff",

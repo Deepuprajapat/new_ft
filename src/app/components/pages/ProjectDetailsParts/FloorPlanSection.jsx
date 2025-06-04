@@ -96,6 +96,7 @@ const FloorPlanSection = ({
           {projectData?.name} Floor Plan
          <span style={{ cursor: "pointer", marginRight: "12px" }}>
   {isEditing ? (
+     <>
     <button
       className="btn btn-success btn-sm"
       style={{ backgroundColor: "white", color: "#2067d1", fontWeight: "bold" }}
@@ -103,6 +104,18 @@ const FloorPlanSection = ({
     >
       Save
     </button>
+   
+     <button
+      className="btn btn-secondary btn-sm"
+      style={{ color: "white", fontWeight: "bold" }}
+      onClick={() => {
+        setIsEditing(false);
+        // Optionally reset form fields here if needed
+      }}
+    >
+      Cancel
+    </button>
+    </>
   ) : (
     <img
       src="/images/edit-icon.svg"
