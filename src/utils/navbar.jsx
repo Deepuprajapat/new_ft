@@ -17,6 +17,7 @@ const navItems = [
       dropdown: [
         { label: 'All Projects', path: '/allProjects' },
         { label: 'Featured Properties', path: '/featuredProperties' },
+        { label: 'Add Project', path: '/addProject' },
        
         // { label: 'Properties', path: '/allProperties' },
         

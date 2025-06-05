@@ -12,6 +12,7 @@ import navItems from "../../utils/navbar";
 import Form from "react-bootstrap/Form";
 import { FaSearch, FaPhoneAlt } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
+import AddProject from "./pages/ProjectDetailsParts/AddProject/AddProject";
 
 const Header = ({ shortAddress }) => {
   // const [matchedCity, setMatchedCity] = useState(null);
@@ -22,6 +23,7 @@ const Header = ({ shortAddress }) => {
   const [projectSuggestions, setProjectSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -137,6 +139,7 @@ const Header = ({ shortAddress }) => {
   }, [shortAddress]);
 
   return (
+
     <Navbar
       bg="light"
       expand="lg"
@@ -165,14 +168,21 @@ const Header = ({ shortAddress }) => {
                 >
                   {item.dropdown.map((subItem, subIndex) => (
                     <NavDropdown.Item
-                      href={subItem.path}
                       key={subIndex}
-                      target="_blank"
-                      style={{ paddingLeft: 2, paddingRight: 4,borderBottom:"1px solid #d4cfcf",textAlign: 'center'}}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (subItem.label === 'Add Project') {
+                          setShowAddProjectModal(true);
+                        } else {
+                          window.location.href = subItem.path;
+                        }
+                      }}
+                      style={{ paddingLeft: 2, paddingRight: 4, borderBottom:"1px solid #d4cfcf", textAlign: 'center'}}
                     >
                       {subItem.label}
                     </NavDropdown.Item>
                   ))}
+                  {showAddProjectModal && <AddProject show={showAddProjectModal} handleClose={() => setShowAddProjectModal(false)} />}
                 </NavDropdown>
               ) : (
                 <Nav.Link
