@@ -1135,9 +1135,9 @@ const ProjectDetails = () => {
         >
           Add Project
         </button> */}
-        {addProject && (
+        {/* {addProject && (
          <AddProjectForm show={addProject} handleClose={() => setAddProject(false)} onSubmit={() => {}}/>
-        )}
+        )} */}
         </div>
         <ProjectHeaderSection
           projectData={projectData}

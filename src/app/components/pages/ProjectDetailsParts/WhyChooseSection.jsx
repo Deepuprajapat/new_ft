@@ -18,7 +18,10 @@ const WhyChooseSection = ({
 
   const handleCancel = () => setIsEditing(false); // Cancel just sets false
 
-
+  // Create an array of 6 USPs, filling empty slots with empty strings
+  const displayUSPs = Array(6).fill("").map((_, index) => 
+    projectData?.usps?.[index] || ""
+  );
 
 return(
   <div
@@ -110,7 +113,16 @@ return(
 
                   {/* Second row with two images */}
                   <div className="col-12">
-                    <div className="row g-2">
+                    <div className="row g-2"> 
+                      {/* <button
+                  type="button"
+                  className="btn btn-secondary me-2"
+                  onClick={() => closeSitePopup(false)}
+                  style={{ borderRadius: 8, fontWeight: 500 }}
+                >
+                  Close
+                </button> */}
+                
                       {projectData?.images &&
                         projectData?.images
                           ?.slice(1, 3)
@@ -152,7 +164,7 @@ return(
                     marginTop: window.innerWidth <= 768 ? "5px" : "0",
                   }}
                 >
-                  {projectData?.usps?.map((usp, idx) => (
+                  {displayUSPs.map((usp, idx) => (
                     <div className="col-6" key={idx}>
                       <div className="d-flex align-items-start">
                         <img
@@ -160,10 +172,8 @@ return(
                           src="/images/usp-icon.svg"
                           loading="lazy"
                           style={{
-                            height:
-                              window.innerWidth <= 768 ? "24px" : "30px",
-                            marginTop:
-                              window.innerWidth <= 768 ? "2px" : "0",
+                            height: window.innerWidth <= 768 ? "24px" : "30px",
+                            marginTop: window.innerWidth <= 768 ? "2px" : "0",
                           }}
                           fetchpriority="high"
                           alt={`USP Icon ${idx + 1}`}
@@ -174,31 +184,29 @@ return(
                             type="text"
                             className="form-control form-control-sm"
                             value={usp}
+                            placeholder={`Enter USP ${idx + 1}`}
                             onChange={(e) => {
-                              const updatedUSPs = [...projectData.usps];
+                              const updatedUSPs = [...displayUSPs];
                               updatedUSPs[idx] = e.target.value;
                               setProjectData({
                                 ...projectData,
-                                usps: updatedUSPs,
+                                usps: updatedUSPs.filter(usp => usp !== ""), // Remove empty USPs when saving
                               });
                             }}
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "10px" : "14px",
-                              lineHeight:
-                                window.innerWidth <= 768 ? "1.2" : "normal",
+                              fontSize: window.innerWidth <= 768 ? "10px" : "14px",
+                              lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",
                             }}
                           />
                         ) : (
                           <span
                             style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "10px" : "14px",
-                              lineHeight:
-                                window.innerWidth <= 768 ? "1.2" : "normal",
+                              fontSize: window.innerWidth <= 768 ? "10px" : "14px",
+                              lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",
+                              color: usp ? "inherit" : "#6c757d",
                             }}
                           >
-                            {usp}
+                            {usp || `USP ${idx + 1}`}
                           </span>
                         )}
                       </div>
