@@ -55,6 +55,7 @@ const router = createBrowserRouter([
       { path: "/404", element: <NotFound /> },
       { path: "/privacy-policy", element: <Privacy /> },
       { path: "/terms-and-conditions", element: <TermAndCondition /> },
+      {path:"/projectDetails", element: <ProjectDetails />},
 
  
     ],

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { getAllDeveloper } from '../../../../apis/api';
+import { useNavigate } from 'react-router-dom';
 
 const AddProject = ({ show, handleClose, onSubmit }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     projectName: '',
     projectUrl: '',
@@ -41,7 +43,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await onSubmit(formData);
+      // await onSubmit(formData);
       handleClose();
       setFormData({
         projectName: '',
@@ -49,6 +51,8 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
         projectType: '',
         developerId: ''
       });
+      // Navigate to ProjectDetails
+      navigate('/ProjectDetails', { replace: true });
     } catch (err) {
       setError('Failed to add project');
       console.error('Error adding project:', err);

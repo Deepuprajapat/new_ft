@@ -1125,7 +1125,7 @@ const ProjectDetails = () => {
         <div className="d-flex gap-3">
         <MetaFormSection />
         {/* Section 1 */}
-        <button 
+        {/* <button 
           onClick={() => {
             setAddProject(true);
             console.log("addProject", addProject);
@@ -1134,7 +1134,7 @@ const ProjectDetails = () => {
           style={{ margin: "20px 0" }}
         >
           Add Project
-        </button>
+        </button> */}
         {addProject && (
          <AddProjectForm show={addProject} handleClose={() => setAddProject(false)} onSubmit={() => {}}/>
         )}
