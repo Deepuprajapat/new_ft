@@ -16,7 +16,9 @@ const ProjectHeaderSection = ({
  const [isEditing, setIsEditing] = useState(false);
   const handleEdit = () => setIsEditing(true);
   const handleSave = () => setIsEditing(false);
-
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [searchCity, setSearchCity] = useState("");
+  const [searchLocality, setSearchLocality] = useState("");
 
   function getLeastPriceOfFloorPlan(floorPlan) {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
@@ -96,6 +98,15 @@ const ProjectHeaderSection = ({
   // Add these states inside your component
   const [selectedCity, setSelectedCity] = useState(cities[0].id);
   const [selectedLocality, setSelectedLocality] = useState(localities[cities[0].id][0]);
+
+  // Filter cities and localities based on search
+  const filteredCities = cities.filter(city => 
+    city.name.toLowerCase().includes(searchCity.toLowerCase())
+  );
+
+  const filteredLocalities = (localities[selectedCity] || []).filter(locality => 
+    locality.toLowerCase().includes(searchLocality.toLowerCase())
+  );
 
   return (
     <section
@@ -189,7 +200,6 @@ const ProjectHeaderSection = ({
                         style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold" }}
                         type="button"
                         onClick={() => {
-                          // Reset local state for city/locality and prices
                           setSelectedCity(cities[0].id);
                           setSelectedLocality(localities[cities[0].id][0]);
                           setMinPrice(
@@ -209,36 +219,212 @@ const ProjectHeaderSection = ({
                       </button>
                     </div>
                     <div className="d-flex gap-2 mb-2">
-                      <select
-                        className="form-select form-select-sm"
-                        style={{ maxWidth: 150 }}
-                        value={selectedCity}
-                        onChange={e => {
-                          const cityId = Number(e.target.value);
-                          setSelectedCity(cityId);
-                          setSelectedLocality(localities[cityId][0]);
-                          handleInputChange("city", cities.find(c => c.id === cityId).name);
-                          handleInputChange("locality", localities[cityId][0]);
+                      <button
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={() => setShowLocationModal(true)}
+                        style={{ 
+                          display: "flex", 
+                          alignItems: "center", 
+                          gap: "4px",
+                          borderColor: "#2067d1",
+                          color: "#2067d1"
                         }}
                       >
-                        {cities.map(city => (
-                          <option key={city.id} value={city.id}>{city.name}</option>
-                        ))}
-                      </select>
-                      <select
-                        className="form-select form-select-sm"
-                        style={{ maxWidth: 180 }}
-                        value={selectedLocality}
-                        onChange={e => {
-                          setSelectedLocality(e.target.value);
-                          handleInputChange("locality", e.target.value);
-                        }}
-                      >
-                        {(localities[selectedCity] || []).map(loc => (
-                          <option key={loc} value={loc}>{loc}</option>
-                        ))}
-                      </select>
+                        <i className="fas fa-map-marker-alt"></i>
+                        {projectData?.locality && projectData?.city 
+                          ? `${projectData.locality}, ${projectData.city}`
+                          : "Select Location"}
+                      </button>
                     </div>
+
+                    {/* Location Selection Modal */}
+                    {showLocationModal && (
+                      <div
+                        style={{
+                          position: "fixed",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          zIndex: 1000,
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: "white",
+                            padding: "20px",
+                            borderRadius: "8px",
+                            width: "90%",
+                            maxWidth: "500px",
+                            maxHeight: "80vh",
+                            overflow: "auto",
+                          }}
+                        >
+                          <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h5 className="m-0">Select Location</h5>
+                            <button
+                              className="btn btn-sm"
+                              onClick={() => setShowLocationModal(false)}
+                              style={{ fontSize: "20px", padding: 0 }}
+                            >
+                              ×
+                            </button>
+                          </div>
+
+                          {/* City Selection */}
+                          <div className="mb-3">
+                            <label className="form-label">City</label>
+                            <div className="position-relative">
+                              <select
+                                className="form-select form-select-sm mb-2"
+                                value={selectedCity}
+                                onChange={e => {
+                                  const cityId = Number(e.target.value);
+                                  setSelectedCity(cityId);
+                                  setSelectedLocality(localities[cityId][0]);
+                                }}
+                              >
+                                <option value="">Select City</option>
+                                {cities.map(city => (
+                                  <option key={city.id} value={city.id}>{city.name}</option>
+                                ))}
+                              </select>
+                              <input
+                                type="text"
+                                className="form-control form-control-sm"
+                                placeholder="Search city..."
+                                value={searchCity}
+                                onChange={(e) => setSearchCity(e.target.value)}
+                              />
+                              {searchCity && (
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    top: "100%",
+                                    left: 0,
+                                    right: 0,
+                                    backgroundColor: "white",
+                                    border: "1px solid #dee2e6",
+                                    borderRadius: "4px",
+                                    maxHeight: "150px",
+                                    overflowY: "auto",
+                                    zIndex: 1000,
+                                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                                  }}
+                                >
+                                  {filteredCities.map((city) => (
+                                    <div
+                                      key={city.id}
+                                      className="p-2"
+                                      style={{
+                                        cursor: "pointer",
+                                        backgroundColor: selectedCity === city.id ? "#e9ecef" : "white",
+                                        borderBottom: "1px solid #dee2e6",
+                                        fontSize: "12px"
+                                      }}
+                                      onClick={() => {
+                                        setSelectedCity(city.id);
+                                        setSelectedLocality(localities[city.id][0]);
+                                        setSearchCity("");
+                                      }}
+                                    >
+                                      {city.name}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Locality Selection */}
+                          <div className="mb-3">
+                            <label className="form-label">Locality</label>
+                            <div className="position-relative">
+                              <select
+                                className="form-select form-select-sm mb-2"
+                                value={selectedLocality}
+                                onChange={e => {
+                                  setSelectedLocality(e.target.value);
+                                }}
+                              >
+                                <option value="">Select Locality</option>
+                                {(localities[selectedCity] || []).map(loc => (
+                                  <option key={loc} value={loc}>{loc}</option>
+                                ))}
+                              </select>
+                              <input
+                                type="text"
+                                className="form-control form-control-sm"
+                                placeholder="Search locality..."
+                                value={searchLocality}
+                                onChange={(e) => setSearchLocality(e.target.value)}
+                              />
+                              {searchLocality && (
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    top: "100%",
+                                    left: 0,
+                                    right: 0,
+                                    backgroundColor: "white",
+                                    border: "1px solid #dee2e6",
+                                    borderRadius: "4px",
+                                    maxHeight: "150px",
+                                    overflowY: "auto",
+                                    zIndex: 1000,
+                                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                                  }}
+                                >
+                                  {filteredLocalities.map((locality) => (
+                                    <div
+                                      key={locality}
+                                      className="p-2"
+                                      style={{
+                                        cursor: "pointer",
+                                        backgroundColor: selectedLocality === locality ? "#e9ecef" : "white",
+                                        borderBottom: "1px solid #dee2e6",
+                                        fontSize: "12px"
+                                      }}
+                                      onClick={() => {
+                                        setSelectedLocality(locality);
+                                        setSearchLocality("");
+                                      }}
+                                    >
+                                      {locality}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="d-flex justify-content-end gap-2">
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              onClick={() => setShowLocationModal(false)}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              className="btn btn-primary btn-sm"
+                              onClick={() => {
+                                handleInputChange("city", cities.find(c => c.id === selectedCity).name);
+                                handleInputChange("locality", selectedLocality);
+                                setShowLocationModal(false);
+                              }}
+                              style={{ backgroundColor: "#2067d1", borderColor: "#2067d1" }}
+                            >
+                              Apply
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     <input
                       type="text"
                       className="form-control form-control-sm mb-2"

@@ -201,20 +201,36 @@ const FAQSection = ({ projectData }) => {
                     {faq.text || faq.question}
                   </span>
                 )}
-                <span>
-                  {expandedIndex === index ? "−" : "+"}
-                  {isEditing && (
-                    <button
-                      className="btn btn-sm btn-danger ms-2"
-                      onClick={e => {
-                        e.stopPropagation();
-                        handleRemoveFaq(index);
-                      }}
-                    >
-                      <i className="fa fa-trash"></i>
-                    </button>
-                  )}
-                </span>
+             
+  <span style={{ display: "flex", alignItems: "center" }}>
+  <span
+    style={{
+      display: "inline-block",
+      transition: "transform 0.2s",
+      transform: expandedIndex === index ? "rotate(180deg)" : "rotate(0deg)",
+      fontSize: "18px",
+      marginRight: isEditing ? "8px" : 0,
+      color: "#2067d1",
+      userSelect: "none"
+    }}
+  >
+    {/* Chevron Down SVG */}
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+      <path d="M6 8l4 4 4-4" stroke="#2067d1" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  </span>
+  {isEditing && (
+    <button
+      className="btn btn-sm btn-danger ms-2"
+      onClick={e => {
+        e.stopPropagation();
+        handleRemoveFaq(index);
+      }}
+    >
+      <i className="fa fa-trash"></i>
+    </button>
+  )}
+</span>
               </div>
               {expandedIndex === index && (
                 <div
