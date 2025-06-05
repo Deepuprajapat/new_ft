@@ -1,4 +1,4 @@
-import React , {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -17,6 +17,9 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+
+// Path to your local dummy image
+const DUMMY_IMAGE_PATH = require('../../../assets/img/dummy.webp');
 
 const SortableImage = ({
   id,
@@ -42,6 +45,10 @@ const SortableImage = ({
     transition,
   };
 
+  // Use dummy image if no imageUrl is present
+  const imageUrl = imageData?.imageUrl || DUMMY_IMAGE_PATH;
+  const caption = imageData?.caption || `Image ${index + 1}`;
+
   const imageContent = (
     <div
       className={`position-relative ${isMainImage ? 'h-100' : ''}`}
@@ -50,7 +57,7 @@ const SortableImage = ({
       onMouseLeave={() => setHoveredImageIndex(null)}
     >
       <a
-        href={imageData?.imageUrl}
+        href={imageUrl}
         data-toggle="lightbox"
         data-gallery="gallery"
         className="d-block h-100"
@@ -61,8 +68,8 @@ const SortableImage = ({
         }}
       >
         <img
-          alt={imageData?.caption || "Image"}
-          src={imageData?.imageUrl}
+          alt={caption}
+          src={imageUrl}
           loading="lazy"
           className="w-100 h-100"
           style={{
@@ -135,18 +142,32 @@ const ProjectGallerySection = ({
   setCurrentImageIndex,
 }) => {
   const [hoveredImageIndex, setHoveredImageIndex] = useState(null);
+  const [localImages, setLocalImages] = useState([]);
+
+  // Initialize localImages with projectData images or empty array
+  useEffect(() => {
+    setLocalImages(projectData?.images || []);
+  }, [projectData]);
 
   const handleImageUpload = (index, event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const newImages = [...projectData.images];
+        const newImages = [...localImages];
+        
+        // Ensure the array has enough slots
+        while (newImages.length <= index) {
+          newImages.push({});
+        }
+        
         newImages[index] = {
           ...newImages[index],
           imageUrl: e.target.result,
           caption: file.name,
         };
+        
+        setLocalImages(newImages);
         setProjectData({
           ...projectData,
           images: newImages,
@@ -165,21 +186,42 @@ const ProjectGallerySection = ({
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
+    if (!active || !over || active.id === over.id) return;
 
-    if (active.id !== over.id) {
-      const oldIndex = projectData.images.findIndex(img => img.imageUrl === active.id);
-      const newIndex = projectData.images.findIndex(img => img.imageUrl === over.id);
+    try {
+      const oldIndex = localImages.findIndex((img, idx) => 
+        (img?.imageUrl || `${DUMMY_IMAGE_PATH}-${idx}`) === active.id
+      );
+      const newIndex = localImages.findIndex((img, idx) => 
+        (img?.imageUrl || `${DUMMY_IMAGE_PATH}-${idx}`) === over.id
+      );
 
-      setProjectData({
-        ...projectData,
-        images: arrayMove(projectData.images, oldIndex, newIndex)
-      });
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newImages = arrayMove([...localImages], oldIndex, newIndex);
+        setLocalImages(newImages);
+        setProjectData({
+          ...projectData,
+          images: newImages,
+        });
+      }
+    } catch (error) {
+      console.error('Error during drag and drop:', error);
     }
   };
 
-  if (!projectData?.images?.length) return null;
+  // Create array of 5 image slots (1 main + 4 grid), filling with dummy data if needed
+  const imageSlots = Array.from({ length: 5 }, (_, index) => {
+    const existingImage = localImages[index];
+    return existingImage || { 
+      imageUrl: null, 
+      caption: `Image ${index + 1}` 
+    };
+  });
 
-  const items = projectData.images.map(img => img.imageUrl);
+  // Create items array for DndContext with unique identifiers
+  const items = imageSlots.map((img, index) => 
+    img.imageUrl || `${DUMMY_IMAGE_PATH}-${index}`
+  );
 
   return (
     <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
@@ -194,39 +236,35 @@ const ProjectGallerySection = ({
         >
           <div className="d-flex flex-wrap w-100">
             {/* Main Image */}
-            {projectData.images[0] && (
-              <SortableImage
-                id={projectData.images[0].imageUrl}
-                index={0}
-                imageData={projectData.images[0]}
-                isMainImage={true}
-                handleImageUpload={handleImageUpload}
-                hoveredImageIndex={hoveredImageIndex}
-                setHoveredImageIndex={setHoveredImageIndex}
-                setShowFullScreen={setShowFullScreen}
-                setCurrentImageIndex={setCurrentImageIndex}
-              />
-            )}
+            <SortableImage
+              id={items[0]}
+              index={0}
+              imageData={imageSlots[0]}
+              isMainImage={true}
+              handleImageUpload={handleImageUpload}
+              hoveredImageIndex={hoveredImageIndex}
+              setHoveredImageIndex={setHoveredImageIndex}
+              setShowFullScreen={setShowFullScreen}
+              setCurrentImageIndex={setCurrentImageIndex}
+            />
 
             {/* Grid Images */}
             <div className="col-12 col-md-6 p-0">
               <div className="row g-0">
-                {[1, 2, 3, 4].map((index) =>
-                  projectData.images[index] ? (
-                    <SortableImage
-                      key={projectData.images[index].imageUrl}
-                      id={projectData.images[index].imageUrl}
-                      index={index}
-                      imageData={projectData.images[index]}
-                      isMainImage={false}
-                      handleImageUpload={handleImageUpload}
-                      hoveredImageIndex={hoveredImageIndex}
-                      setHoveredImageIndex={setHoveredImageIndex}
-                      setShowFullScreen={setShowFullScreen}
-                      setCurrentImageIndex={setCurrentImageIndex}
-                    />
-                  ) : null
-                )}
+                {[1, 2, 3, 4].map((index) => (
+                  <SortableImage
+                    key={items[index]}
+                    id={items[index]}
+                    index={index}
+                    imageData={imageSlots[index]}
+                    isMainImage={false}
+                    handleImageUpload={handleImageUpload}
+                    hoveredImageIndex={hoveredImageIndex}
+                    setHoveredImageIndex={setHoveredImageIndex}
+                    setShowFullScreen={setShowFullScreen}
+                    setCurrentImageIndex={setCurrentImageIndex}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -236,4 +274,4 @@ const ProjectGallerySection = ({
   );
 };
 
-export default ProjectGallerySection; 
+export default ProjectGallerySection;

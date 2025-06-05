@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUpload, faFile, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function MetaFormSection() {
   const [showMetaForm, setShowMetaForm] = useState(false);
@@ -8,6 +10,8 @@ function MetaFormSection() {
   const [metaKeywords, setMetaKeywords] = useState([]);
   const [keywordInput, setKeywordInput] = useState("");
   const [schema, setSchema] = useState("");
+  const [brochure, setBrochure] = useState(null);
+  const [brochureError, setBrochureError] = useState("");
 
   const addKeyword = () => {
     if (keywordInput.trim() && !metaKeywords.includes(keywordInput.trim())) {
@@ -18,6 +22,29 @@ function MetaFormSection() {
 
   const deleteKeyword = (index) => {
     setMetaKeywords(metaKeywords.filter((_, i) => i !== index));
+  };
+
+  const handleBrochureUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Check file type
+      if (file.type !== 'application/pdf') {
+        setBrochureError("Please upload a PDF file");
+        return;
+      }
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setBrochureError("File size should be less than 10MB");
+        return;
+      }
+      setBrochureError("");
+      setBrochure(file);
+    }
+  };
+
+  const removeBrochure = () => {
+    setBrochure(null);
+    setBrochureError("");
   };
 
   useEffect(() => {
@@ -91,9 +118,9 @@ function MetaFormSection() {
                 style={{ fontSize: 22 }}
               ></button>
             </div>
-            <div className="alert alert-info py-2" style={{ fontSize: '0.9rem' }}>
+            {/* <div className="alert alert-info py-2" style={{ fontSize: '0.9rem' }}>
               <strong>Tip:</strong> You can use HTML tags (e.g., &lt;b&gt;, &lt;i&gt;, &lt;strong&gt;, &lt;em&gt;) in these fields.
-            </div>
+            </div> */}
             <form onSubmit={e => e.preventDefault()}>
               <div className="mb-3">
                 <label className="form-label" style={{ fontWeight: 500 }}>
@@ -188,21 +215,68 @@ function MetaFormSection() {
                   ></textarea>
                 </div>
               </div>
+
+              {/* Brochure Upload Section */}
+              <div className="mb-3">
+                <label className="form-label" style={{ fontWeight: 500 }}>
+                  Project Brochure (PDF)
+                </label>
+                <div className="border rounded p-3" style={{ borderRadius: 8 }}>
+                  {brochure ? (
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="d-flex align-items-center">
+                        <FontAwesomeIcon icon={faFile} className="me-2" />
+                        <span>{brochure.name}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-link text-danger p-0"
+                        onClick={removeBrochure}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <label htmlFor="brochure-upload" style={{ cursor: 'pointer' }}>
+                        <FontAwesomeIcon icon={faUpload} className="mb-2" size="2x" />
+                        <div>Click to upload brochure</div>
+                        <div className="text-muted" style={{ fontSize: '0.8rem' }}>
+                          PDF only, max 10MB
+                        </div>
+                      </label>
+                      <input
+                        type="file"
+                        id="brochure-upload"
+                        accept=".pdf"
+                        style={{ display: 'none' }}
+                        onChange={handleBrochureUpload}
+                      />
+                    </div>
+                  )}
+                  {brochureError && (
+                    <div className="text-danger mt-2" style={{ fontSize: '0.8rem' }}>
+                      {brochureError}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="d-flex justify-content-end mt-4">
-                <button
+                {/* <button
                   type="button"
                   className="btn btn-secondary me-2"
                   onClick={() => setShowMetaForm(false)}
                   style={{ borderRadius: 8, fontWeight: 500 }}
                 >
                   Close
-                </button>
+                </button> */}
                 <button
                   type="submit"
                   className="btn btn-primary"
                   style={{ borderRadius: 8, fontWeight: 500 }}
-                  disabled
-                  title="Save functionality not implemented"
+                  disabled={!metaTitle || !metaDescription || brochureError}
+                  title={!metaTitle || !metaDescription ? "Please fill required fields" : ""}
                 >
                   Save
                 </button>
