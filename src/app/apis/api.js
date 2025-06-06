@@ -1,24 +1,12 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
 
-// let BASE_URL = process.env.REACT_APP_BASE_URL;
-// let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
-const BASE_URL="https://api.investmango.com"
-const BASE_URL1="https://api.virtualintelligence.co.in"
-
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+const BASE_URL1 = process.env.REACT_APP_SECONDARY_URL;
 
 console.log("BASE_URL", BASE_URL);
-console.log("BASE_URL1", BASE_URL1);  
+console.log("BASE_URL1", BASE_URL1);
 
-// if (process.env.REACT_APP_ENV === "production") {
-//   BASE_URL = process.env.REACT_APP_BASE_URL;
-// }
-
-// if (process.env.REACT_APP_ENV === "production") {
-//   BASE_URL1 = process.env.REACT_APP_BASE_URL1;
-// }
-// const BASE_URL1 = "https://api.virtualintelligence.co.in";
 let token = "";
 
 export const login = async (userName, password) => {
