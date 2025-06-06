@@ -4,9 +4,6 @@ import { useNavigate } from "react-router-dom";
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 const BASE_URL1 = process.env.REACT_APP_SECONDARY_URL;
 
-console.log("BASE_URL", BASE_URL);
-console.log("BASE_URL1", BASE_URL1);
-
 let token = "";
 
 export const login = async (userName, password) => {
