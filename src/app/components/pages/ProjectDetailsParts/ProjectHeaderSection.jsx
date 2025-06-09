@@ -19,6 +19,7 @@ const ProjectHeaderSection = ({
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [searchCity, setSearchCity] = useState("");
   const [searchLocality, setSearchLocality] = useState("");
+  const [logoHovered, setLogoHovered] = useState(false);
 
   function getLeastPriceOfFloorPlan(floorPlan) {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
@@ -108,6 +109,9 @@ const ProjectHeaderSection = ({
     locality.toLowerCase().includes(searchLocality.toLowerCase())
   );
 
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const [showLocalityDropdown, setShowLocalityDropdown] = useState(false);
+
   return (
     <section
       className="container-fluid"
@@ -124,12 +128,20 @@ const ProjectHeaderSection = ({
             {/* Upper Section */}
             <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start mb-2 mt-2 mt-md-3">
               <div
-                className="mb-2 mb-md-0 me-md-3 text-center text-md-start position-relative"
+                className="position-relative text-center"
                 style={{
-                  maxWidth: "90px",
+                  maxWidth: window.innerWidth <= 768 ? "60px" : "90px",
+                  height: window.innerWidth <= 768 ? "48px" : "66px",
                   border: "1px solid grey",
-                  height: "66px",
+                  background: "#fff",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  cursor: isEditing ? "pointer" : "default",
+                  marginRight: window.innerWidth <= 768 ? "12px" : "20px",
+                  marginBottom: window.innerWidth <= 768 ? "10px" : "0",
                 }}
+                onMouseEnter={() => setLogoHovered(true)}
+                onMouseLeave={() => setLogoHovered(false)}
               >
                 <img
                   src={projectData?.projectLogo || "defaultLogo.jpg"}
@@ -137,42 +149,39 @@ const ProjectHeaderSection = ({
                   loading="lazy"
                   className="img-fluid"
                   style={{
-                    maxWidth: "80px",
-                    height: "64px",
+                    maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
+                    height: window.innerWidth <= 768 ? "44px" : "64px",
                     objectFit: "contain",
+                    filter: isEditing && logoHovered ? "blur(2px)" : "none",
+                    transition: "filter 0.2s"
                   }}
+                  onClick={isEditing ? () => fileInputRef.current.click() : undefined}
                 />
+                {isEditing && logoHovered && (
+                  <div
+                    className="position-absolute d-flex align-items-center justify-content-center"
+                    style={{
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      background: "rgba(0,0,0,0.4)",
+                      zIndex: 2,
+                      cursor: "pointer"
+                    }}
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    <i className="fas fa-camera" style={{ color: "#fff", fontSize: window.innerWidth <= 768 ? "18px" : "24px" }}></i>
+                  </div>
+                )}
                 {isEditing && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current.click()}
-                      title="Edit Logo"
-                      style={{
-                        background: "none",
-                        border: "none",
-                        padding: 0,
-                        position: "absolute",
-                        top: 4,
-                        right: 4,
-                        zIndex: 2,
-                        cursor: "pointer",
-                      }}
-                    >
-                      <img
-                        src="/images/editlogo.png"
-                        alt="Edit"
-                        style={{ width: "16px", height: "16px" }}
-                      />
-                    </button>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      style={{ display: "none" }}
-                      onChange={handleImageChange}
-                    />
-                  </>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    style={{ display: "none" }}
+                    onChange={handleImageChange}
+                  />
                 )}
               </div>
               <div className="text-center text-md-start w-100">
@@ -189,15 +198,15 @@ const ProjectHeaderSection = ({
                       />
                       <button
                         className="btn btn-primary btn-sm"
-                        style={{ backgroundColor: "#2067d1", borderColor: "#2067d1" }}
+                        style={{ backgroundColor: "#2067d1", borderColor: "#2067d1" ,width: "70px"}}
                         onClick={handleSaveAll}
                         type="button"
                       >
                         Save
                       </button>
                       <button
-                        className="btn btn-secondary btn-sm"
-                        style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold" }}
+                        className="btn btn-secondary btn-sm cancel-btn"
+                        style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold" ,width: "70px"}}
                         type="button"
                         onClick={() => {
                           setSelectedCity(cities[0].id);
@@ -220,12 +229,13 @@ const ProjectHeaderSection = ({
                     </div>
                     <div className="d-flex gap-2 mb-2">
                       <button
-                        className="btn btn-outline-primary btn-sm"
+                        className="btn btn-outline-secondary btn-sm"
                         onClick={() => setShowLocationModal(true)}
                         style={{ 
                           display: "flex", 
                           alignItems: "center", 
                           gap: "4px",
+                          width:'auto',
                           borderColor: "#2067d1",
                           color: "#2067d1"
                         }}
@@ -256,167 +266,309 @@ const ProjectHeaderSection = ({
                         <div
                           style={{
                             backgroundColor: "white",
-                            padding: "20px",
-                            borderRadius: "8px",
-                            width: "90%",
+                            borderRadius: "16px",
+                            width: "95%",
                             maxWidth: "500px",
-                            maxHeight: "80vh",
-                            overflow: "auto",
+                            boxShadow: "0 8px 32px rgba(0,0,0,0.1)"
                           }}
                         >
-                          <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h5 className="m-0">Select Location</h5>
+                          {/* Header */}
+                          <div 
+                            style={{
+                              padding: "24px 28px",
+                              borderBottom: "1px solid #eee",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center"
+                            }}
+                          >
+                            <h5 className="m-0" style={{ fontSize: "20px", fontWeight: "600", color: "#1a1a1a" }}>Select Location</h5>
                             <button
-                              className="btn btn-sm"
                               onClick={() => setShowLocationModal(false)}
-                              style={{ fontSize: "20px", padding: 0 }}
+                              style={{ 
+                                background: "none",
+                                border: "none",
+                                fontSize: "24px",
+                                color: "#666",
+                                cursor: "pointer",
+                                padding: "4px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: "36px",
+                                height: "36px",
+                                borderRadius: "50%",
+                                transition: "all 0.2s"
+                              }}
+                              onMouseOver={(e) => e.target.style.backgroundColor = "#f5f5f5"}
+                              onMouseOut={(e) => e.target.style.backgroundColor = "transparent"}
                             >
                               ×
                             </button>
                           </div>
 
-                          {/* City Selection */}
-                          <div className="mb-3">
-                            <label className="form-label">City</label>
-                            <div className="position-relative">
-                              <select
-                                className="form-select form-select-sm mb-2"
-                                value={selectedCity}
-                                onChange={e => {
-                                  const cityId = Number(e.target.value);
-                                  setSelectedCity(cityId);
-                                  setSelectedLocality(localities[cityId][0]);
-                                }}
-                              >
-                                <option value="">Select City</option>
-                                {cities.map(city => (
-                                  <option key={city.id} value={city.id}>{city.name}</option>
-                                ))}
-                              </select>
-                              <input
-                                type="text"
-                                className="form-control form-control-sm"
-                                placeholder="Search city..."
-                                value={searchCity}
-                                onChange={(e) => setSearchCity(e.target.value)}
-                              />
-                              {searchCity && (
-                                <div
+                          {/* Content */}
+                          <div style={{ padding: "28px" }}>
+                            {/* City Selection */}
+                            <div className="mb-4">
+                              <label className="form-label" style={{ fontSize: "15px", fontWeight: "500", color: "#666", marginBottom: "10px" }}>City</label>
+                              <div className="position-relative">
+                                <div 
+                                  className="d-flex align-items-center"
                                   style={{
-                                    position: "absolute",
-                                    top: "100%",
-                                    left: 0,
-                                    right: 0,
-                                    backgroundColor: "white",
-                                    border: "1px solid #dee2e6",
-                                    borderRadius: "4px",
-                                    maxHeight: "150px",
-                                    overflowY: "auto",
-                                    zIndex: 1000,
-                                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                                    border: "1px solid #e0e0e0",
+                                    borderRadius: "8px",
+                                    overflow: "hidden",
+                                    transition: "all 0.2s",
+                                    backgroundColor: "#fff"
                                   }}
                                 >
-                                  {filteredCities.map((city) => (
-                                    <div
-                                      key={city.id}
-                                      className="p-2"
-                                      style={{
-                                        cursor: "pointer",
-                                        backgroundColor: selectedCity === city.id ? "#e9ecef" : "white",
-                                        borderBottom: "1px solid #dee2e6",
-                                        fontSize: "12px"
-                                      }}
-                                      onClick={() => {
-                                        setSelectedCity(city.id);
-                                        setSelectedLocality(localities[city.id][0]);
-                                        setSearchCity("");
-                                      }}
-                                    >
-                                      {city.name}
-                                    </div>
-                                  ))}
+                                  <input
+                                    type="text"
+                                    className="form-control border-0"
+                                    value={searchCity}
+                                    onChange={(e) => {
+                                      setSearchCity(e.target.value);
+                                      setShowCityDropdown(true);
+                                    }}
+                                    onFocus={() => setShowCityDropdown(true)}
+                                    placeholder="Select city"
+                                    style={{ 
+                                      padding: "14px 18px",
+                                      fontSize: "15px",
+                                      height: "auto",
+                                      boxShadow: "none"
+                                    }}
+                                  />
+                                  <button
+                                    onClick={() => setShowCityDropdown(!showCityDropdown)}
+                                    style={{
+                                      border: "none",
+                                      background: "none",
+                                      padding: "0 18px",
+                                      color: "#666",
+                                      cursor: "pointer",
+                                      height: "100%",
+                                      display: "flex",
+                                      alignItems: "center"
+                                    }}
+                                  >
+                                    <i className="fas fa-chevron-down" style={{ fontSize: "14px" }}></i>
+                                  </button>
                                 </div>
-                              )}
+                                {showCityDropdown && (
+                                  <div
+                                    style={{
+                                      position: "absolute",
+                                      top: "calc(100% + 4px)",
+                                      left: 0,
+                                      right: 0,
+                                      backgroundColor: "white",
+                                      borderRadius: "8px",
+                                      maxHeight: "250px",
+                                      overflowY: "auto",
+                                      zIndex: 1000,
+                                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                      border: "1px solid #e0e0e0"
+                                    }}
+                                  >
+                                    {filteredCities.map((city) => (
+                                      <div
+                                        key={city.id}
+                                        style={{
+                                          cursor: "pointer",
+                                          padding: "14px 18px",
+                                          fontSize: "15px",
+                                          color: "#333",
+                                          backgroundColor: selectedCity === city.id ? "#f0f7ff" : "white",
+                                          borderBottom: "1px solid #f5f5f5",
+                                          transition: "all 0.2s"
+                                        }}
+                                        onClick={() => {
+                                          setSelectedCity(city.id);
+                                          setSearchCity(city.name);
+                                          setSelectedLocality(localities[city.id]?.[0] || "");
+                                          setShowCityDropdown(false);
+                                        }}
+                                        onMouseOver={(e) => e.target.style.backgroundColor = selectedCity === city.id ? "#f0f7ff" : "#f8f9fa"}
+                                        onMouseOut={(e) => e.target.style.backgroundColor = selectedCity === city.id ? "#f0f7ff" : "white"}
+                                      >
+                                        {city.name}
+                                      </div>
+                                    ))}
+                                    {!filteredCities.some(city => city.name.toLowerCase() === searchCity.toLowerCase()) && searchCity && (
+                                      <div
+                                        style={{
+                                          cursor: "pointer",
+                                          padding: "14px 18px",
+                                          fontSize: "15px",
+                                          color: "#2067d1",
+                                          backgroundColor: "#f8f9fa",
+                                          borderTop: "1px solid #f5f5f5"
+                                        }}
+                                        onClick={() => {
+                                          const newCityId = Math.max(...cities.map(c => c.id), 0) + 1;
+                                          const newCity = { id: newCityId, name: searchCity };
+                                          cities.push(newCity);
+                                          localities[newCityId] = [];
+                                          setSelectedCity(newCityId);
+                                          setSearchCity(searchCity);
+                                          setShowCityDropdown(false);
+                                        }}
+                                      >
+                                        + Add "{searchCity}" as new city
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Locality Selection */}
+                            <div className="mb-4">
+                              <label className="form-label" style={{ fontSize: "15px", fontWeight: "500", color: "#666", marginBottom: "10px" }}>Locality</label>
+                              <div className="position-relative">
+                                <div 
+                                  className="d-flex align-items-center"
+                                  style={{
+                                    border: "1px solid #e0e0e0",
+                                    borderRadius: "8px",
+                                    overflow: "hidden",
+                                    transition: "all 0.2s",
+                                    backgroundColor: "#fff"
+                                  }}
+                                >
+                                  <input
+                                    type="text"
+                                    className="form-control border-0"
+                                    value={searchLocality}
+                                    onChange={(e) => {
+                                      setSearchLocality(e.target.value);
+                                      setShowLocalityDropdown(true);
+                                    }}
+                                    onFocus={() => setShowLocalityDropdown(true)}
+                                    placeholder="Select locality"
+                                    style={{ 
+                                      padding: "14px 18px",
+                                      fontSize: "15px",
+                                      height: "auto",
+                                      boxShadow: "none"
+                                    }}
+                                  />
+                                  <button
+                                    onClick={() => setShowLocalityDropdown(!showLocalityDropdown)}
+                                    style={{
+                                      border: "none",
+                                      background: "none",
+                                      padding: "0 18px",
+                                      color: "#666",
+                                      cursor: "pointer",
+                                      height: "100%",
+                                      display: "flex",
+                                      alignItems: "center"
+                                    }}
+                                  >
+                                    <i className="fas fa-chevron-down" style={{ fontSize: "14px" }}></i>
+                                  </button>
+                                </div>
+                                {showLocalityDropdown && (
+                                  <div
+                                    style={{
+                                      position: "absolute",
+                                      top: "calc(100% + 4px)",
+                                      left: 0,
+                                      right: 0,
+                                      backgroundColor: "white",
+                                      borderRadius: "8px",
+                                      maxHeight: "250px",
+                                      overflowY: "auto",
+                                      zIndex: 1000,
+                                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                      border: "1px solid #e0e0e0"
+                                    }}
+                                  >
+                                    {filteredLocalities.map((locality) => (
+                                      <div
+                                        key={locality}
+                                        style={{
+                                          cursor: "pointer",
+                                          padding: "14px 18px",
+                                          fontSize: "15px",
+                                          color: "#333",
+                                          backgroundColor: selectedLocality === locality ? "#f0f7ff" : "white",
+                                          borderBottom: "1px solid #f5f5f5",
+                                          transition: "all 0.2s"
+                                        }}
+                                        onClick={() => {
+                                          setSelectedLocality(locality);
+                                          setSearchLocality(locality);
+                                          setShowLocalityDropdown(false);
+                                        }}
+                                        onMouseOver={(e) => e.target.style.backgroundColor = selectedLocality === locality ? "#f0f7ff" : "#f8f9fa"}
+                                        onMouseOut={(e) => e.target.style.backgroundColor = selectedLocality === locality ? "#f0f7ff" : "white"}
+                                      >
+                                        {locality}
+                                      </div>
+                                    ))}
+                                    {!filteredLocalities.some(loc => loc.toLowerCase() === searchLocality.toLowerCase()) && searchLocality && (
+                                      <div
+                                        style={{
+                                          cursor: "pointer",
+                                          padding: "14px 18px",
+                                          fontSize: "15px",
+                                          color: "#2067d1",
+                                          backgroundColor: "#f8f9fa",
+                                          borderTop: "1px solid #f5f5f5"
+                                        }}
+                                        onClick={() => {
+                                          if (!localities[selectedCity]) {
+                                            localities[selectedCity] = [];
+                                          }
+                                          localities[selectedCity].push(searchLocality);
+                                          setSelectedLocality(searchLocality);
+                                          setSearchLocality(searchLocality);
+                                          setShowLocalityDropdown(false);
+                                        }}
+                                      >
+                                        + Add "{searchLocality}" as new locality
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
 
-                          {/* Locality Selection */}
-                          <div className="mb-3">
-                            <label className="form-label">Locality</label>
-                            <div className="position-relative">
-                              <select
-                                className="form-select form-select-sm mb-2"
-                                value={selectedLocality}
-                                onChange={e => {
-                                  setSelectedLocality(e.target.value);
-                                }}
-                              >
-                                <option value="">Select Locality</option>
-                                {(localities[selectedCity] || []).map(loc => (
-                                  <option key={loc} value={loc}>{loc}</option>
-                                ))}
-                              </select>
-                              <input
-                                type="text"
-                                className="form-control form-control-sm"
-                                placeholder="Search locality..."
-                                value={searchLocality}
-                                onChange={(e) => setSearchLocality(e.target.value)}
-                              />
-                              {searchLocality && (
-                                <div
-                                  style={{
-                                    position: "absolute",
-                                    top: "100%",
-                                    left: 0,
-                                    right: 0,
-                                    backgroundColor: "white",
-                                    border: "1px solid #dee2e6",
-                                    borderRadius: "4px",
-                                    maxHeight: "150px",
-                                    overflowY: "auto",
-                                    zIndex: 1000,
-                                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-                                  }}
-                                >
-                                  {filteredLocalities.map((locality) => (
-                                    <div
-                                      key={locality}
-                                      className="p-2"
-                                      style={{
-                                        cursor: "pointer",
-                                        backgroundColor: selectedLocality === locality ? "#e9ecef" : "white",
-                                        borderBottom: "1px solid #dee2e6",
-                                        fontSize: "12px"
-                                      }}
-                                      onClick={() => {
-                                        setSelectedLocality(locality);
-                                        setSearchLocality("");
-                                      }}
-                                    >
-                                      {locality}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="d-flex justify-content-end gap-2">
+                          {/* Footer */}
+                          <div 
+                            style={{
+                              padding: "20px 28px",
+                              borderTop: "1px solid #eee",
+                              display: "flex",
+                              justifyContent: "flex-end",
+                              gap: "12px"
+                            }}
+                          >
+                            
                             <button
-                              className="btn btn-secondary btn-sm"
-                              onClick={() => setShowLocationModal(false)}
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              className="btn btn-primary btn-sm"
+                              className="btn btn-primary w-100 responsive-modal-btn"
                               onClick={() => {
-                                handleInputChange("city", cities.find(c => c.id === selectedCity).name);
-                                handleInputChange("locality", selectedLocality);
+                                // Get city name - either from selected city or search text
+                                const selectedCityObj = cities.find(c => c.id === selectedCity);
+                                const cityName = selectedCityObj ? selectedCityObj.name : searchCity;
+
+                                // Get locality - either selected or search text
+                                const localityName = selectedLocality || searchLocality;
+
+                                // Update both city and locality
+                                handleInputChange("city", cityName);
+                                handleInputChange("locality", localityName);
+
+                                // Close modal and reset states
                                 setShowLocationModal(false);
+                                setSearchCity("");
+                                setSearchLocality("");
                               }}
-                              style={{ backgroundColor: "#2067d1", borderColor: "#2067d1" }}
                             >
                               Apply
                             </button>

@@ -80,6 +80,7 @@ const PaymentPlanSection = ({
                     fontWeight: "bold",
                     padding: "2px 10px",
                     fontSize: "14px",
+                  
                   }}
                   onClick={handleSave}
                 >
@@ -87,7 +88,7 @@ const PaymentPlanSection = ({
                 </button>
                 <button
                   className="btn btn-secondary btn-sm"
-                  style={{ color: "white", fontWeight: "bold" }}
+                  style={{ color: "white", fontWeight: "bold" , width:"auto"}}
                   onClick={handleCancel}
                 >
                   Cancel
@@ -201,6 +202,9 @@ const PaymentPlanSection = ({
                               setLocalPaymentPlans(prev => prev.filter((_, i) => i !== index))
                             }
                             className="btn btn-danger btn-sm"
+                            style={
+                              { fontSize: "13px", fontWeight: 600, width: "auto" }
+                            }
                           >
                             Remove
                           </button>
@@ -228,6 +232,8 @@ const PaymentPlanSection = ({
                     padding: "8px 16px",
                     fontSize: "14px",
                     cursor: "pointer",
+                    width:"auto",
+                    margin:"10px"
                   }}
                 >
                   + Add New Payment Plan

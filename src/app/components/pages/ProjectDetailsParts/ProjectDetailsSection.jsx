@@ -76,7 +76,7 @@ const ProjectDetailsSection = ({
                 </button>
                 <button
                   className="btn btn-secondary btn-sm"
-                  style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold" }}
+                  style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width:"auto"}}
                   onClick={() => {
                     // Reset logic here if needed, or just exit edit mode
                     if (typeof handleEdit === "function") handleEdit(false); // or call a cancel handler if you have one

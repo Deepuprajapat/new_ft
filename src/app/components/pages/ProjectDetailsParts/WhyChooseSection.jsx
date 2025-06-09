@@ -58,10 +58,11 @@ return(
                   <button
                     className="btn btn-secondary btn-sm"
                     style={{
-                      marginLeft: 8,
+                    
                       backgroundColor: "#6c757d",
                       color: "white",
                       fontWeight: "bold",
+                       width:"auto"
                     }}
                    onClick={handleCancel}
 
