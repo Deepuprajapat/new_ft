@@ -5,6 +5,7 @@ const KnowAboutSection = ({
   isMobileView,
   handleDownloadBrochure,
   handleDownloadBrochuree,
+  showEdit
 }) => {
   const [isAboutEditing, setIsAboutEditing] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -56,22 +57,23 @@ const KnowAboutSection = ({
           }}
         >
           Know About {projectData?.name}
-          <span style={{ cursor: "pointer", marginRight: "12px" }}>
-            {isAboutEditing ? (
-              <>
-              <button
-                className="btn btn-success btn-sm"
-                style={{
-                  backgroundColor: "white",
-                  color: "#2067d1",
-                  border: "1px solid #2067d1",
-                  fontWeight: "bold"
-                }}
-                onClick={handleEditToggle}
-              >
-                Save
-              </button>
-                <button
+          {showEdit && (
+            <span style={{ cursor: "pointer", marginRight: "12px" }}>
+              {isAboutEditing ? (
+                <>
+                  <button
+                    className="btn btn-success btn-sm"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#2067d1",
+                      border: "1px solid #2067d1",
+                      fontWeight: "bold"
+                    }}
+                    onClick={handleEditToggle}
+                  >
+                    Save
+                  </button>
+                  <button
                     className="btn btn-secondary btn-sm"
                     style={{
                       marginLeft: 8,
@@ -79,21 +81,21 @@ const KnowAboutSection = ({
                       color: "white",
                       fontWeight: "bold",
                     }}
-                   onClick={handleCancel}
-
+                    onClick={handleCancel}
                   >
                     Cancel
                   </button>
-                  </>
-            ) : (
-              <img
-                src="/images/edit-icon.svg"
-                alt="Edit"
-                style={{ width: "18px", height: "18px" }}
-                onClick={handleEditToggle}
-              />
-            )}
-          </span>
+                </>
+              ) : (
+                <img
+                  src="/images/edit-icon.svg"
+                  alt="Edit"
+                  style={{ width: "18px", height: "18px" }}
+                  onClick={handleEditToggle}
+                />
+              )}
+            </span>
+          )}
         </h2>
         <div className="px-3">
           <div

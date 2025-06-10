@@ -16,9 +16,7 @@ import {
 } from "../../apis/api";
 import "react-multi-carousel/lib/styles.css";
 import { Helmet } from "react-helmet";
-import DOMPurify from "dompurify";
 import Swal from "sweetalert2";
-import Header from "../Header";
 import WhyChooseSection from "./ProjectDetailsParts/WhyChooseSection";
 import KnowAboutSection from "./ProjectDetailsParts/KnowAboutSection";
 import FloorPlanSection from "./ProjectDetailsParts/FloorPlanSection";
@@ -29,15 +27,15 @@ import VideoPresentationSection from "./ProjectDetailsParts/VideoPresentationSec
 import LocationMapSection from "./ProjectDetailsParts/LocationMapSection";
 import SitePlanSection from "./ProjectDetailsParts/SitePlanSection";
 import FAQSection from "./ProjectDetailsParts/FAQSection";
-//import AddProjectForm from "./ProjectDetailsParts/AddProject/AddProjectForm"; // <-- add this line
 import SimilarProjectsSection from "./ProjectDetailsParts/SimilarProjectsSection";
 import ConnectExpertSection from "./ProjectDetailsParts/ConnectExpertSection";
 import ProjectHeaderSection from "./ProjectDetailsParts/ProjectHeaderSection";
 import ProjectDetailsSection from "./ProjectDetailsParts/ProjectDetailsSection";
 import MetaFormSection from "./ProjectDetailsParts/MetaForm";
 import ProjectGallerySection from "./ProjectDetailsParts/ProjectGallerySection";
+import AboutDeveloperSection from "./ProjectDetailsParts/AboutDeveloperSection";
 const BASE_URL = "https://image.investmango.com/images/";
-const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
+const FALLBACK_IMAGE = "/images/For-Website.jpg"; 
 
 const ProjectDetails = () => {
   const [activeSection, setActiveSection] = useState("overview");
@@ -46,7 +44,6 @@ const ProjectDetails = () => {
   const [developerId, setDeveloperId] = useState("");
   const [projectId, setProjectId] = useState("");
   const [developerDetails, setDeveloperDetails] = useState(null);
-  const [reraDetails, setReraDetails] = useState(null);
   const { urlName } = useParams();
   const [activeFilter, setActiveFilter] = useState("all");
   const [showMobileNav, setShowMobileNav] = useState(false);
@@ -54,34 +51,28 @@ const ProjectDetails = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isNavFixed, setIsNavFixed] = useState(false);
   const [navInitialPosition, setNavInitialPosition] = useState(null);
-  const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
-  const [isGalleryEditing, setIsGalleryEditing] = useState(false);
-  const [addProject, setAddProject] = useState(false);
-
-  const [isPriceEditing, setIsPriceEditing] = useState(false);
-  const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
-  const [floorplans, setFloorplans] = useState(projectData?.floorplans || []);
-
-  const updateFloorplan = (index, key, value) => {
-    setFloorplans(prev =>
-      prev.map((plan, i) => i === index ? { ...plan, [key]: value } : plan)
-    );
-  };
-
-
   const navigate = useNavigate();
+  const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
+  // const [floorplans, setFloorplans] = useState(projectData?.floorplans || []);
 
-  
+  // const updateFloorplan = (index, key, value) => {
+  //   setFloorplans(prev =>
+  //     prev.map((plan, i) => i === index ? { ...plan, [key]: value } : plan)
+  //   );
+  // };
+
+
+
+
 
   const [isEditing, setIsEditing] = useState(false);
   const [AddProjectButton, setAddProjectButton] = useState(false);
   const [isPaymentEditing, setIsPaymentEditing] = useState(false);
   const [paymentPara, setPaymentPara] = useState(projectData?.paymentPara || '');
   const [paymentPlans, setPaymentPlans] = useState(projectData?.paymentPlans || []);
-  const [isHeaderEditing, setIsHeaderEditing] = useState(false);
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
-  const [amenitiesPara, setAmenitiesPara] = useState(projectData?.amenitiesPara || '');
   const [editableAmenities, setEditableAmenities] = useState([]);
+  const [reraDetails, setReraDetails] = useState(null);
 
   // State variables  youtube
   const [isVideoEditing, setIsVideoEditing] = useState(false);
@@ -92,14 +83,12 @@ const ProjectDetails = () => {
 
   const [isLocationEditing, setIsLocationEditing] = useState(false);
   const [locationMapHtml, setLocationMapHtml] = useState(projectData?.locationMap || "");
-  const [locationUrl, setLocationUrl] = useState(projectData?.locationUrl || "");
 
   //  state variable for site plan
   const [isSitePlanEditing, setIsSitePlanEditing] = useState(false);
   const [siteplanParaHtml, setSiteplanParaHtml] = useState(projectData?.siteplanPara || "");
   const [siteplanImgUrl, setSiteplanImgUrl] = useState(projectData?.siteplanImg || "");
   //state variabe for ace group
-  const [isDeveloperEditing, setIsDeveloperEditing] = useState(false);
   const [developerForm, setDeveloperForm] = useState({
     logo: developerDetails?.logo || "",
     altLogo: developerDetails?.altLogo || "",
@@ -108,14 +97,30 @@ const ProjectDetails = () => {
     about: developerDetails?.about || "",
   });
 
+  // To update the project data
+  const [PatchFormData, setPatchFormData] = useState({
+    name: projectData?.name || "",
+    description: projectData?.description || "",
+    location: projectData?.location || "",
+    price: projectData?.price || "",
+    amenities: projectData?.amenities || [],
+    floorplans: projectData?.floorplans || [],
+  });
 
-  //anushaka
+  const updatePatchFormData = (field, value) => {
+    setPatchFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const [expandedIndex, setExpandedIndex] = useState(null);
+
   const handleEdit = () => {
     setIsEditing(!isEditing);
   };
   const handleSave = () => {
     setIsEditing(false);
-    // Here you would typically save the data to your backend
     console.log('Saving project data:', projectData);
   };
 
@@ -128,16 +133,6 @@ const ProjectDetails = () => {
     }));
   };
 
-  //whychoose section
-  const [isWhyChooseEditing, setIsWhyChooseEditing] = useState(false);
-
-  const handleArrayInputChange = (field, value) => {
-    const arrayValue = value.split(',').map(item => item.trim());
-    setProjectData(prev => ({
-      ...prev,
-      [field]: arrayValue
-    }));
-  };
   // ace group
   useEffect(() => {
     setDeveloperForm({
@@ -159,7 +154,6 @@ const ProjectDetails = () => {
   // Keep state in sync with projectData location map and URL
   useEffect(() => {
     setLocationMapHtml(projectData?.locationMap || "");
-    setLocationUrl(projectData?.locationUrl || "");
   }, [projectData]);
 
 
@@ -171,60 +165,60 @@ const ProjectDetails = () => {
   }, [isAmenitiesEditing]);
 
   // Functions
-  const processEditableAmenities = () => {
-    return editableAmenities;
-  };
+  // const processEditableAmenities = () => {
+  //   return editableAmenities;
+  // };
 
-  const updateCategoryName = (categoryIndex, newName) => {
-    const updated = [...editableAmenities];
-    updated[categoryIndex].name = newName;
-    setEditableAmenities(updated);
-  };
+  // const updateCategoryName = (categoryIndex, newName) => {
+  //   const updated = [...editableAmenities];
+  //   updated[categoryIndex].name = newName;
+  //   setEditableAmenities(updated);
+  // };
 
-  const updateAmenity = (categoryIndex, amenityIndex, field, value) => {
-    const updated = [...editableAmenities];
-    updated[categoryIndex].assets[amenityIndex][field] = value;
-    setEditableAmenities(updated);
-  };
+  // const updateAmenity = (categoryIndex, amenityIndex, field, value) => {
+  //   const updated = [...editableAmenities];
+  //   updated[categoryIndex].assets[amenityIndex][field] = value;
+  //   setEditableAmenities(updated);
+  // };
 
-  const removeAmenity = (categoryIndex, amenityIndex) => {
-    const updated = [...editableAmenities];
-    updated[categoryIndex].assets.splice(amenityIndex, 1);
-    setEditableAmenities(updated);
-  };
+  // const removeAmenity = (categoryIndex, amenityIndex) => {
+  //   const updated = [...editableAmenities];
+  //   updated[categoryIndex].assets.splice(amenityIndex, 1);
+  //   setEditableAmenities(updated);
+  // };
 
-  const addNewAmenity = (categoryIndex) => {
-    const updated = [...editableAmenities];
-    updated[categoryIndex].assets.push({
-      name: 'New Amenity',
-      icon: '/images/default-icon.svg'
-    });
-    setEditableAmenities(updated);
-  };
+  // const addNewAmenity = (categoryIndex) => {
+  //   const updated = [...editableAmenities];
+  //   updated[categoryIndex].assets.push({
+  //     name: 'New Amenity',
+  //     icon: '/images/default-icon.svg'
+  //   });
+  //   setEditableAmenities(updated);
+  // };
 
-  const removeCategoryAmenities = (categoryIndex) => {
-    const updated = editableAmenities.filter((_, index) => index !== categoryIndex);
-    setEditableAmenities(updated);
-  };
+  // const removeCategoryAmenities = (categoryIndex) => {
+  //   const updated = editableAmenities.filter((_, index) => index !== categoryIndex);
+  //   setEditableAmenities(updated);
+  // };
 
-  const addNewCategory = () => {
-    const newCategory = {
-      name: 'New Category',
-      assets: [
-        {
-          name: 'Sample Amenity',
-          icon: '/images/default-icon.svg'
-        }
-      ]
-    };
-    setEditableAmenities([...editableAmenities, newCategory]);
-  };
+  // const addNewCategory = () => {
+  //   const newCategory = {
+  //     name: 'New Category',
+  //     assets: [
+  //       {
+  //         name: 'Sample Amenity',
+  //         icon: '/images/default-icon.svg'
+  //       }
+  //     ]
+  //   };
+  //   setEditableAmenities([...editableAmenities, newCategory]);
+  // };
 
-  const saveAmenitiesChanges = () => {
-    // Save logic here - update projectData or call API
-    // You'll need to convert editableAmenities back to your original format
-    setIsAmenitiesEditing(false);
-  };
+  // const saveAmenitiesChanges = () => {
+  //   // Save logic here - update projectData or call API
+  //   // You'll need to convert editableAmenities back to your original format
+  //   setIsAmenitiesEditing(false);
+  // };
   // Functions
   const updatePaymentPlan = (index, field, value) => {
     const updated = [...paymentPlans];
@@ -237,26 +231,17 @@ const ProjectDetails = () => {
     setPaymentPlans(updated);
   };
 
-  const addNewPaymentPlan = () => {
-    setPaymentPlans(prev => [
-      ...prev,
-      { planName: "", details: "" }
-    ]);
-  };
 
   const savePaymentChanges = () => {
     // Save logic here - update projectData or call API
     setIsPaymentEditing(false);
   };
 
-  // Update aboutHtml when projectData changes
-
 
   // Store initial nav position on mount
   useEffect(() => {
     const navElement = document.getElementById("navigation-section");
     if (navElement) {
-      // Set fixed trigger height to 800px
       setNavInitialPosition(500);
     }
   }, []);
@@ -268,8 +253,8 @@ const ProjectDetails = () => {
           const data = await getAllProjectsByUrlName(urlName, navigate);
           if (data) {
             setProjectData(data);
-            setDeveloperId(data.developerId); 
-            setProjectId(data.id); 
+            setDeveloperId(data.developerId);
+            setProjectId(data.id);
             if (Array.isArray(data.schema) && data.schema.length > 0) {
               const parsedSchemas = data.schema
                 .map((schemaStr) => {
@@ -352,30 +337,12 @@ const ProjectDetails = () => {
         setReraDetails([]); // Resets state on error
       }
     };
-
     fetchReraInfo();
   }, [projectId]);
 
-
-  // Update your existing useEffect
-  useEffect(() => {
-    setPriceListPara(projectData?.priceListPara || "");
-    setFloorplans(projectData?.floorplans ? [...projectData.floorplans] : []);
-  }, [projectData]);
-
-  // Add these functions
-  const savePriceChanges = () => {
-    setProjectData(prev => ({
-      ...prev,
-      priceListPara: priceListPara,
-      floorplans: floorplans
-    }));
-    setIsPriceEditing(false);
-  };
-
-
-
-
+  // useEffect(() => {
+  //   setFloorplans(projectData?.floorplans ? [...projectData.floorplans] : []);
+  // }, [projectData]);
 
   // Initialize editable videos when editing starts
   useEffect(() => {
@@ -396,7 +363,6 @@ const ProjectDetails = () => {
 
   const removeVideo = (index) => {
     const updated = editableVideos.filter((_, i) => i !== index);
-    // Ensure at least one empty field remains
     if (updated.length === 0) {
       updated.push('');
     }
@@ -419,11 +385,11 @@ const ProjectDetails = () => {
   };
 
   // Helper function to extract YouTube video ID from various URL formats
-  const extractYouTubeId = (url) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : url;
-  };
+  // const extractYouTubeId = (url) => {
+  //   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  //   const match = url.match(regExp);
+  //   return (match && match[2].length === 11) ? match[2] : url;
+  // };
 
   const formatPrice = (price) => {
     if (!price) return "Prices On Request";
@@ -656,6 +622,7 @@ const ProjectDetails = () => {
   // };
 
   // Update active section based on scroll position and handle nav fixing
+
   useEffect(() => {
     const handleScroll = () => {
       const sections = [
@@ -731,7 +698,6 @@ const ProjectDetails = () => {
   };
 
   const [showBrochurePopup, setShowBrochurePopup] = useState(false);
-  const closeBrochurePopup = () => setShowBrochurePopup(false);
   const handleDownloadBrochuree = () => setShowBrochurePopup(true);
 
   const [isMobileView, setIsMobileView] = useState(false); // To track if mobile/tablet view
@@ -745,12 +711,6 @@ const ProjectDetails = () => {
 
     return () => window.removeEventListener("resize", handleResize); // Clean up listener
   }, []);
-
-  const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
-  // const [modalType, setModalType] = useState("");
-  const handleDownloadFloorPlan = () => setShowFloorPlanPopup(true);
-  const closeFloorPlanPopup = () => setShowFloorPlanPopup(false);
-
   const [showSitePopup, setShowSitePopup] = useState(false);
   const handleSitePopup = () => setShowSitePopup(true);
   const closeSitePopup = () => setShowSitePopup(false);
@@ -766,23 +726,23 @@ const ProjectDetails = () => {
   };
 
   // const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
-  const [showImagePopup, setShowImagePopup] = useState(false); // State for image popup
-  const [selectedImage, setSelectedImage] = useState(""); // State to hold selected image URL
+  // const [showImagePopup, setShowImagePopup] = useState(false); // State for image popup
+  // const [selectedImage, setSelectedImage] = useState(""); // State to hold selected image URL
 
 
-  
+
   // Function to clean and extract numbers for sorting
-  const cleanQuestion = (question) => {
-    const match = question.match(/^(\d+)[.\s\t]+(.*)/); // Extracts number and question
-    return match
-      ? { number: parseInt(match[1]), text: match[2] }
-      : { number: null, text: question.trim() };
-  };
+  // const cleanQuestion = (question) => {
+  //   const match = question.match(/^(\d+)[.\s\t]+(.*)/); // Extracts number and question
+  //   return match
+  //     ? { number: parseInt(match[1]), text: match[2] }
+  //     : { number: null, text: question.trim() };
+  // };
 
   // Sort FAQs based on extracted number
-  const sortedFaqs = projectData?.faqs
-    ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) })) // Add cleaned data
-    ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); // Sort numerically if a number exists
+  // const sortedFaqs = projectData?.faqs
+  //   ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) })) // Add cleaned data
+  //   ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); // Sort numerically if a number exists
 
   const imageSrc =
     projectData?.siteplanImg && projectData.siteplanImg.trim() !== ""
@@ -794,14 +754,15 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     if (projectData?.shortAddress) {
-      setShortAddress(projectData.shortAddress); // 🔹 Update shortAddress in AppLayout
+      setShortAddress(projectData.shortAddress); 
     }
   }, [projectData, setShortAddress]);
 
-  const validPaymentPlans = projectData?.paymentPlans?.filter(
-    (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
-  );
-
+  // const validPaymentPlans = projectData?.paymentPlans?.filter(
+  //   (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
+  // );
+  
+  const [showEdit, setShowEdit] = useState(true);
 
   return (
     <>
@@ -849,6 +810,9 @@ const ProjectDetails = () => {
             setProjectData={setProjectData}
             setShowFullScreen={setShowFullScreen}
             setCurrentImageIndex={setCurrentImageIndex}
+            showEdit={showEdit}
+            PatchFormData= {PatchFormData}
+            updatePatchFormData={updatePatchFormData}
           />
 
           {/* Fullscreen Image Modal */}
@@ -1122,63 +1086,42 @@ const ProjectDetails = () => {
           </div>
         </div>
         {/* meta form */}
-        <div className="d-flex gap-3">
-        <MetaFormSection />
-        {/* Section 1 */}
-        {/* <button 
-          onClick={() => {
-            setAddProject(true);
-            console.log("addProject", addProject);
-          }} 
-          className="btn btn-primary"
-          style={{ margin: "20px 0" }}
-        >
-          Add Project
-        </button> */}
-        {/* {addProject && (
-         <AddProjectForm show={addProject} handleClose={() => setAddProject(false)} onSubmit={() => {}}/>
-        )} */}
-        </div>
+        { showEdit && <div className="d-flex gap-3">
+          <MetaFormSection />
+        </div>}
         <ProjectHeaderSection
           projectData={projectData}
-          reraDetails={reraDetails}
           formatPrice={formatPrice}
           getLeastPriceOfFloorPlan={getLeastPriceOfFloorPlan}
           getHighestPriceOfFloorPlan={getHighestPriceOfFloorPlan}
-          isEditing={isHeaderEditing}
-          handleEdit={() => setIsHeaderEditing(true)}
-          handleSave={() => setIsHeaderEditing(false)}
           handleInputChange={handleInputChange}
-          handleHeaderCancel={() => setIsHeaderEditing(false)}
+          showEdit={showEdit}
         />
 
         {/* Project Details */}
         <section className="container-fluid" style={{ width: window.innerWidth <= 768 ? "90%" : "95%", margin: "0 auto" }}>
           <div className="row">
             <section className="col-md-8">
-              <ProjectDetailsSection 
+              <ProjectDetailsSection
                 projectData={projectData}
                 isEditing={isEditing}
+                setProjectData={setProjectData}
                 handleEdit={handleEdit}
                 handleSave={handleSave}
                 handleInputChange={handleInputChange}
-                handleArrayInputChange={handleArrayInputChange}
                 AddProjectButton={AddProjectButton}
                 formatPrice={formatPrice}
+                showEdit={showEdit}
               />
 
               {/* Why to choose */}
               <WhyChooseSection
                 projectData={projectData}
-                isEditing={isWhyChooseEditing}
-                handleEdit={() => setIsWhyChooseEditing(true)}
-                handleSave={() => setIsWhyChooseEditing(false)}
                 setProjectData={setProjectData}
                 handleSitePopup={handleSitePopup}
                 showSitePopup={showSitePopup}
                 closeSitePopup={closeSitePopup}
-                setIsEditing={setIsWhyChooseEditing}
-                
+                showEdit={showEdit}
               />
               {/* Know About */}
               {projectData && (
@@ -1187,6 +1130,7 @@ const ProjectDetails = () => {
                   isMobileView={isMobileView}
                   handleDownloadBrochure={handleDownloadBrochure}
                   handleDownloadBrochuree={handleDownloadBrochuree}
+                  showEdit={showEdit}
                 />
               )}
               {/* Floor Plan */}
@@ -1195,18 +1139,13 @@ const ProjectDetails = () => {
                 activeFilter={activeFilter}
                 setActiveFilter={setActiveFilter}
                 formatPrice={formatPrice}
+                showEdit={showEdit}
               />
               {/* Price List */}
               <PriceListSection
                 projectData={projectData}
-                isPriceEditing={isPriceEditing}
-                setIsPriceEditing={setIsPriceEditing}
-                priceListPara={priceListPara}
-                setPriceListPara={setPriceListPara}
-                floorplans={floorplans}
-                updateFloorplan={updateFloorplan}
-                savePriceChanges={savePriceChanges}
                 formatPrice={formatPrice}
+                showEdit={showEdit}
               />
 
               {/* Get Free Consultation */}
@@ -1244,10 +1183,10 @@ const ProjectDetails = () => {
                 paymentPlans={paymentPlans}
                 updatePaymentPlan={updatePaymentPlan}
                 removePaymentPlan={removePaymentPlan}
-                addNewPaymentPlan={addNewPaymentPlan}
                 savePaymentChanges={savePaymentChanges}
+                showEdit={showEdit}
               />
-              
+
 
               {/* )} */}
               {/* Amenities */}
@@ -1255,7 +1194,7 @@ const ProjectDetails = () => {
                 amenities={projectData?.projectAmenities || []}
                 amenitiesPara={projectData?.amenitiesPara || ""}
                 name={projectData?.name || ""}
-              // onSave={yourSaveHandler} // optional
+                showEdit={showEdit}
               />
               {/* video presentation */}
               <VideoPresentationSection
@@ -1267,6 +1206,7 @@ const ProjectDetails = () => {
                 removeVideo={removeVideo}
                 addNewVideo={addNewVideo}
                 saveVideoChanges={saveVideoChanges}
+                showEdit={showEdit}
               />
               {/* Location Advantage */}
               {/* <div
@@ -1315,8 +1255,7 @@ const ProjectDetails = () => {
                 setIsLocationEditing={setIsLocationEditing}
                 locationMapHtml={locationMapHtml}
                 setLocationMapHtml={setLocationMapHtml}
-                locationUrl={locationUrl}
-                setLocationUrl={setLocationUrl}
+                showEdit={showEdit}
               />
               <SitePlanSection
                 projectData={projectData}
@@ -1330,10 +1269,27 @@ const ProjectDetails = () => {
                 isModalOpen={isModalOpen}
                 openModal={openModal}
                 closeModal={closeModal}
+                showEdit={showEdit}
               />
+
+              {/* About Developer Section */}
+              <AboutDeveloperSection
+                developerDetails={developerDetails}
+                expandedIndex={expandedIndex}
+                setExpandedIndex={setExpandedIndex}
+                projectData={projectData}
+                isMobileView={window.innerWidth <= 768}
+                handleDownloadBrochure={handleDownloadBrochure}
+                handleDownloadBrochuree={handleDownloadBrochuree}
+                showEdit={showEdit}
+              />
+
               {/* Frequently Asked Questions */}
-        <FAQSection 
-        projectData={projectData} />
+              <FAQSection
+                projectData={projectData}
+                setProjectData={setProjectData}
+                showEdit={showEdit}
+              />
               {/* Similar Projects */}
               <SimilarProjectsSection
                 allSimilarProjects={allSimilarProjects}

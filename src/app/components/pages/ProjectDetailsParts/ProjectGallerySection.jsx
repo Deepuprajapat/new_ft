@@ -18,7 +18,6 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// Path to your local dummy image
 const DUMMY_IMAGE_PATH = require('../../../assets/img/dummy.webp');
 
 const SortableImage = ({
@@ -31,6 +30,7 @@ const SortableImage = ({
   setHoveredImageIndex,
   setShowFullScreen,
   setCurrentImageIndex,
+  showEdit,
 }) => {
   const {
     attributes,
@@ -53,8 +53,8 @@ const SortableImage = ({
     <div
       className={`position-relative ${isMainImage ? 'h-100' : ''}`}
       style={{ height: isMainImage ? "540px" : "270px" }}
-      onMouseEnter={() => setHoveredImageIndex(index)}
-      onMouseLeave={() => setHoveredImageIndex(null)}
+      onMouseEnter={() => showEdit && setHoveredImageIndex(index)}
+      onMouseLeave={() => showEdit && setHoveredImageIndex(null)}
     >
       <a
         href={imageUrl}
@@ -75,13 +75,13 @@ const SortableImage = ({
           style={{
             objectFit: "cover",
             cursor: "pointer",
-            filter: hoveredImageIndex === index ? "blur(4px)" : "none",
+            filter: showEdit && hoveredImageIndex === index ? "blur(4px)" : "none",
             transition: "filter 0.3s ease"
           }}
           fetchpriority="high"
         />
       </a>
-      {hoveredImageIndex === index && (
+      {showEdit && hoveredImageIndex === index && (
         <div
           className="position-absolute d-flex align-items-center justify-content-center"
           style={{
@@ -121,8 +121,7 @@ const SortableImage = ({
   return (
     <div
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
+      {...(showEdit ? { ...attributes, ...listeners } : {})}
       className={isMainImage ? "col-12 col-md-6 p-0 pe-0 pe-md-1" : "col-6"}
       style={{
         ...style,
@@ -140,14 +139,23 @@ const ProjectGallerySection = ({
   setProjectData,
   setShowFullScreen,
   setCurrentImageIndex,
+  showEdit,
 }) => {
   const [hoveredImageIndex, setHoveredImageIndex] = useState(null);
   const [localImages, setLocalImages] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Initialize localImages with projectData images or empty array
   useEffect(() => {
     setLocalImages(projectData?.images || []);
   }, [projectData]);
+
+  const handleEdit = () => setIsEditing(true);
+  const handleSave = () => setIsEditing(false);
+  const handleCancel = () => {
+    setLocalImages(projectData?.images || []);
+    setIsEditing(false);
+  };
 
   const handleImageUpload = (index, event) => {
     const file = event.target.files[0];
@@ -224,53 +232,55 @@ const ProjectGallerySection = ({
   );
 
   return (
-    <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={items}
-          strategy={horizontalListSortingStrategy}
+      <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
         >
-          <div className="d-flex flex-wrap w-100">
-            {/* Main Image */}
-            <SortableImage
-              id={items[0]}
-              index={0}
-              imageData={imageSlots[0]}
-              isMainImage={true}
-              handleImageUpload={handleImageUpload}
-              hoveredImageIndex={hoveredImageIndex}
-              setHoveredImageIndex={setHoveredImageIndex}
-              setShowFullScreen={setShowFullScreen}
-              setCurrentImageIndex={setCurrentImageIndex}
-            />
+          <SortableContext
+            items={items}
+            strategy={horizontalListSortingStrategy}
+          >
+            <div className="d-flex flex-wrap w-100">
+              {/* Main Image */}
+              <SortableImage
+                id={items[0]}
+                index={0}
+                imageData={imageSlots[0]}
+                isMainImage={true}
+                handleImageUpload={handleImageUpload}
+                hoveredImageIndex={hoveredImageIndex}
+                setHoveredImageIndex={setHoveredImageIndex}
+                setShowFullScreen={setShowFullScreen}
+                setCurrentImageIndex={setCurrentImageIndex}
+                showEdit={showEdit}
+              />
 
-            {/* Grid Images */}
-            <div className="col-12 col-md-6 p-0">
-              <div className="row g-0">
-                {[1, 2, 3, 4].map((index) => (
-                  <SortableImage
-                    key={items[index]}
-                    id={items[index]}
-                    index={index}
-                    imageData={imageSlots[index]}
-                    isMainImage={false}
-                    handleImageUpload={handleImageUpload}
-                    hoveredImageIndex={hoveredImageIndex}
-                    setHoveredImageIndex={setHoveredImageIndex}
-                    setShowFullScreen={setShowFullScreen}
-                    setCurrentImageIndex={setCurrentImageIndex}
-                  />
-                ))}
+              {/* Grid Images */}
+              <div className="col-12 col-md-6 p-0">
+                <div className="row g-0">
+                  {[1, 2, 3, 4].map((index) => (
+                    <SortableImage
+                      key={items[index]}
+                      id={items[index]}
+                      index={index}
+                      imageData={imageSlots[index]}
+                      isMainImage={false}
+                      handleImageUpload={handleImageUpload}
+                      hoveredImageIndex={hoveredImageIndex}
+                      setHoveredImageIndex={setHoveredImageIndex}
+                      setShowFullScreen={setShowFullScreen}
+                      setCurrentImageIndex={setCurrentImageIndex}
+                      showEdit={showEdit}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </SortableContext>
-      </DndContext>
-    </div>
+          </SortableContext>
+        </DndContext>
+      </div>
   );
 };
 

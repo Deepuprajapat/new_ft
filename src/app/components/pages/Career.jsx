@@ -49,7 +49,6 @@ const Career = () => {
         console.error("Error fetching vacancies:", error);
       }
     };
-
     loadVacancies();
   }, []);
 

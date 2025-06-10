@@ -14,6 +14,7 @@ const SitePlanSection = ({
   isModalOpen,
   openModal,
   closeModal,
+  showEdit,
 }) => {
   const fileInputRef = useRef(null);
   const [hovered, setHovered] = useState(false);
@@ -45,6 +46,7 @@ const SitePlanSection = ({
         }}
       >
         {projectData?.name} Site Plan
+        {showEdit && (
         <span style={{ cursor: "pointer", marginLeft: "12px" }}>
           {isSitePlanEditing ? (
             <>
@@ -80,8 +82,9 @@ const SitePlanSection = ({
               style={{ width: "18px", height: "18px" }}
               onClick={() => setIsSitePlanEditing(true)}
             />
-          )}
-        </span>
+            )}
+          </span>
+        )}
       </h2>
       <div className="row">
         <div className="col-12">

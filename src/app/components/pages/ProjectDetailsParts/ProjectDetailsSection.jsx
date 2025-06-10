@@ -18,11 +18,19 @@ const ProjectDetailsSection = ({
   isEditing,
   handleEdit,
   handleSave,
+  setProjectData,
   handleInputChange,
-  handleArrayInputChange,
   AddProjectButton,
-  formatPrice
+  showEdit,
 }) => {
+
+    const handleArrayInputChange = (field, value) => {
+      const arrayValue = value.split(',').map(item => item.trim());
+      setProjectData(prev => ({
+        ...prev,
+        [field]: arrayValue
+      }));
+    };
    
     const getSizeRange = () => {
         if (!projectData?.floorplans || projectData.floorplans.length === 0) {
@@ -64,6 +72,7 @@ const ProjectDetailsSection = ({
           }}
         >
           <span>Project Details</span>
+          {showEdit && (
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isEditing ? (
               <>
@@ -101,8 +110,9 @@ const ProjectDetailsSection = ({
                   style={{ width: "18px", height: "18px" }}
                 />
               </span>
-            )}
-          </span>
+              )}
+            </span>
+          )}
         </div>
 
         <div className="px-3">

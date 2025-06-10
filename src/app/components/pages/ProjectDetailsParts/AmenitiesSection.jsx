@@ -6,6 +6,7 @@ const AmenitiesSection = ({
   amenitiesPara = "",
   name = "",
   onSave, // Optional: callback to save changes to parent or API
+  showEdit
 }) => {
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [editableAmenities, setEditableAmenities] = useState([]);
@@ -244,58 +245,45 @@ const AmenitiesSection = ({
           }}
         >
           {name} Amenities
-          <span style={{ cursor: "pointer", marginRight: "12px" }}>
-            {isAmenitiesEditing ? (
-              <>
-                <button
-                  className="btn btn-success btn-sm me-2"
-                  style={{ 
-                    backgroundColor: "white", 
-                    color: "black",
-                    border: "none",
-                    padding: "4px 12px",
-                    borderRadius: "4px",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseOver={(e) => e.target.style.backgroundColor = "#f8f9fa"}
-                  onMouseOut={(e) => e.target.style.backgroundColor = "white"}
-                  onClick={saveAmenitiesChanges}
-                >
-                  Save
-                </button>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  style={{
-                    color: "white",
-                    fontWeight: "bold",
-                    backgroundColor: "#6c757d",
-                    border: "none",
-                    padding: "4px 12px",
-                    borderRadius: "4px",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseOver={(e) => e.target.style.backgroundColor = "#5a6268"}
-                  onMouseOut={(e) => e.target.style.backgroundColor = "#6c757d"}
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <img
-                src="/images/edit-icon.svg"
-                alt="Edit"
-                style={{ 
-                  width: "18px", 
-                  height: "18px",
-                  transition: "transform 0.2s",
-                }}
-                onMouseOver={(e) => e.target.style.transform = "scale(1.1)"}
-                onMouseOut={(e) => e.target.style.transform = "scale(1)"}
-                onClick={() => setIsAmenitiesEditing(true)}
-              />
-            )}
-          </span>
+          {showEdit && (
+            <span style={{ cursor: "pointer", marginRight: "12px" }}>
+              {isAmenitiesEditing ? (
+                <>
+                  <button
+                    className="btn btn-success btn-sm"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#2067d1",
+                      border: "1px solid #2067d1",
+                      fontWeight: "bold"
+                    }}
+                    onClick={saveAmenitiesChanges}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      marginLeft: 8,
+                      backgroundColor: "#6c757d",
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <img
+                  src="/images/edit-icon.svg"
+                  alt="Edit"
+                  style={{ width: "18px", height: "18px" }}
+                  onClick={() => setIsAmenitiesEditing(true)}
+                />
+              )}
+            </span>
+          )}
         </h2>
         <div className="px-3">
           <div

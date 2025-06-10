@@ -63,12 +63,11 @@ const PriceRow = ({
 const PriceListSection = ({
   projectData,
   formatPrice,
+  showEdit,
 }) => {
-    // price list
-  const [isPriceEditing, setIsPriceEditing] = useState(false);
-  const [floorplans, setFloorplans] = useState(projectData?.floorplans || []);
   const [isEditing, setIsEditing] = useState(false);
   const [priceList, setPriceList] = useState(projectData?.floorplans || []);
+  const [isPriceEditing, setIsPriceEditing] = useState(false);
   const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
   const [newPlan, setNewPlan] = useState({
     title: "",
@@ -88,6 +87,16 @@ const PriceListSection = ({
       )
     );
   };
+    // // Add these functions
+    // const savePriceChanges = () => {
+    //   setProjectData(prev => ({
+    //     ...prev,
+    //     priceListPara: priceListPara,
+    //     floorplans: floorplans
+    //   }));
+    //   setIsPriceEditing(false);
+    // };
+  
 
   const addPriceList = () => {
     if (!newPlan.title || !newPlan.size || !newPlan.price) return;
@@ -120,6 +129,7 @@ const PriceListSection = ({
               borderRadius: "4px 4px 0 0",
             }}>
           {projectData?.name} Price List
+          {showEdit && (
          <span style={{ cursor: "pointer", marginRight: "12px" }}>
   {isEditing ? (
     <>
@@ -146,6 +156,7 @@ const PriceListSection = ({
     />
   )}
 </span>
+)}
         </h2>
         <div className="px-3">
           <div className="mb-3">

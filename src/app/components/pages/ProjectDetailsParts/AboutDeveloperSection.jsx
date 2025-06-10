@@ -8,6 +8,7 @@ const AboutDeveloperSection = ({
   isMobileView,
   handleDownloadBrochuree,
   handleDownloadBrochure,
+  showEdit,
 }) => {
   // Local state for editing and form
   const [isDeveloperEditing, setIsDeveloperEditing] = useState(false);
@@ -17,6 +18,7 @@ const AboutDeveloperSection = ({
     establishedYear: developerDetails?.establishedYear || "",
     totalProjects: developerDetails?.totalProjects || "",
     about: developerDetails?.about || "",
+    address: developerDetails?.address || "",
   });
 
   // Sync form with developerDetails when not editing
@@ -28,6 +30,7 @@ const AboutDeveloperSection = ({
         establishedYear: developerDetails.establishedYear || "",
         totalProjects: developerDetails.totalProjects || "",
         about: developerDetails.about || "",
+        address: developerDetails.address || "",
       });
     }
   }, [developerDetails, isDeveloperEditing]);
@@ -39,16 +42,16 @@ const AboutDeveloperSection = ({
     // Optionally: call a prop function to update parent state or API
     // onSave(developerForm);
   };
-const handleCancel = () => {
-  setDeveloperForm({
-    logo: developerDetails?.logo || "",
-    altLogo: developerDetails?.altLogo || "",
-    establishedYear: developerDetails?.establishedYear || "",
-    totalProjects: developerDetails?.totalProjects || "",
-    about: developerDetails?.about || "",
-  });
-  setIsDeveloperEditing(false);
-};
+  const handleCancel = () => {
+    setDeveloperForm({
+      logo: developerDetails?.logo || "",
+      altLogo: developerDetails?.altLogo || "",
+      establishedYear: developerDetails?.establishedYear || "",
+      totalProjects: developerDetails?.totalProjects || "",
+      about: developerDetails?.about || "",
+    });
+    setIsDeveloperEditing(false);
+  };
 
   return (
     <div className="mb-4" style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }} id="developer">
@@ -60,31 +63,33 @@ const handleCancel = () => {
             borderRadius: "4px 4px 0 0",
           }}>
           About {developerDetails?.name}
+          {showEdit && (
           <span style={{ cursor: "pointer", marginLeft: "12px" }}>
             {isDeveloperEditing ? (
               <>
-              <button
-                className="btn btn-success btn-sm"
-                style={{ backgroundColor: "#000", borderColor: "#000", marginRight: "19px" }}
-                onClick={handleSave}
-              >
-                Save
-              </button>
-               <button
-          className="btn btn-secondary btn-sm"
-          style={{ color: "white", fontWeight: "bold" ,backgroundColor: "#6c757d"}}
-          onClick={handleCancel}
-        >
-          Cancel
-        </button>
-        </>
+                <button
+                  className="btn btn-success btn-sm"
+                  style={{ backgroundColor: "#000", borderColor: "#000", marginRight: "19px" }}
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  style={{ color: "white", fontWeight: "bold", backgroundColor: "#6c757d" }}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              </>
             ) : (
-              <img src="/images/edit-icon.svg" alt="Edit" style={{ width: "18px", height: "18px" ,marginRight: "19px"}}
+              <img src="/images/edit-icon.svg" alt="Edit" style={{ width: "18px", height: "18px", marginRight: "19px" }}
                 onClick={() => setIsDeveloperEditing(true)} />
             )}
-          </span>
+            </span>
+          )}
         </h2>
-        
+
         <div className="row px-3">
           <div className="col-12">
             {isDeveloperEditing ? (
@@ -115,7 +120,12 @@ const handleCancel = () => {
                     onChange={e => setDeveloperForm(f => ({ ...f, about: e.target.value }))}
                     placeholder="About Developer" />
                 </div>
-                <button type="submit" className="btn btn-primary btn-sm">Save</button>
+                <div className="mb-2">
+                  <input type="text" className="form-control"
+                    value={developerForm.address}
+                    onChange={e => setDeveloperForm(f => ({ ...f, address: e.target.value }))}
+                    placeholder="Address" />
+                </div>
               </form>
             ) : (
               <>
@@ -165,7 +175,18 @@ const handleCancel = () => {
                 </h4>
                 <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? "12px" : "14px" }}>
                   <b>{projectData?.name}</b><br />
-                  <b>Address:</b> {projectData?.address}<br />
+                  <b>Address:</b> {isDeveloperEditing ? (
+                    <input
+                      type="text"
+                      className="form-control d-inline-block"
+                      style={{ width: "auto", display: "inline-block" }}
+                      value={developerForm.address}
+                      onChange={e => setDeveloperForm(f => ({ ...f, address: e.target.value }))}
+                      placeholder="Address"
+                    />
+                  ) : (
+                    projectData?.address
+                  )}<br />
                   <b>Phone:</b>{" "}
                   <a href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] || "8595189189"}`}
                     style={{ textDecoration: "none", color: "#2067d1", fontWeight: "bold" }}>

@@ -10,6 +10,7 @@ const VideoPresentationSection = ({
   removeVideo,
   addNewVideo,
   saveVideoChanges,
+  showEdit,
 }) => {
   // Always keep videoPara in sync with API/projectData when not editing
   const [videoPara, setVideoPara] = useState(projectData?.videoPara || '');
@@ -36,6 +37,7 @@ const VideoPresentationSection = ({
           }}
         >
           Video Presentation of {projectData?.name}
+          {showEdit && (
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isVideoEditing ? (
               <>
@@ -76,6 +78,7 @@ const VideoPresentationSection = ({
               />
             )}
           </span>
+          )}
         </h2>
         <div className="px-3">
           <div className="mb-3 mb-md-5">
@@ -160,7 +163,7 @@ const VideoPresentationSection = ({
                   </div>
                 ))}
                 <div style={{ textAlign: "center", marginTop: "16px" }}>
-                  <button
+                  {/* <button
                     onClick={addNewVideo}
                     style={{
                       border: "1px solid #2067d1",
@@ -174,7 +177,7 @@ const VideoPresentationSection = ({
                     }}
                   >
                     + Add Video
-                  </button>
+                  </button> */}
                   <div style={{ marginTop: "12px", fontSize: "12px", color: "#666" }}>
                     <strong>How to get YouTube video ID:</strong>
                     <br />

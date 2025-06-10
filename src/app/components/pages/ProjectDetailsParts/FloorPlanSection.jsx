@@ -20,6 +20,7 @@ const FloorPlanSection = ({
   fetchFloorPlansFromApi,
   saveFloorPlansToApi,
   removeFloorPlanFromApi,
+  showEdit
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableFloorPara, setEditableFloorPara] = useState(projectData?.floorPara || "");
@@ -145,33 +146,35 @@ const FloorPlanSection = ({
           }}
         >
           {projectData?.name} Floor Plan
-          <span style={{ cursor: "pointer", marginRight: "12px" }}>
-            {isEditing ? (
-              <>
-                <button
-                  className="btn btn-success btn-sm"
-                  style={{ backgroundColor: "white", color: "#2067d1", fontWeight: "bold" }}
-                  onClick={handleSave}
-                >
-                  Save
-                </button>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  style={{ color: "white", fontWeight: "bold", marginLeft: 8 }}
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <img
-                src="/images/edit-icon.svg"
-                alt="Edit"
-                style={{ width: "18px", height: "18px" }}
-                onClick={() => setIsEditing(true)}
-              />
-            )}
-          </span>
+          {showEdit && (
+            <span style={{ cursor: "pointer", marginRight: "12px" }}>
+              {isEditing ? (
+                <>
+                  <button
+                    className="btn btn-success btn-sm"
+                    style={{ backgroundColor: "white", color: "#2067d1", fontWeight: "bold" }}
+                    onClick={handleSave}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    style={{ color: "white", fontWeight: "bold", marginLeft: 8 }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <img
+                  src="/images/edit-icon.svg"
+                  alt="Edit"
+                  style={{ width: "18px", height: "18px" }}
+                  onClick={() => setIsEditing(true)}
+                />
+              )}
+            </span>
+          )}
         </h2>
         <div className="px-3">
           <div className="mb-3">
