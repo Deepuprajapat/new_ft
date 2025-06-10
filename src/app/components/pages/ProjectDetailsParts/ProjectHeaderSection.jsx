@@ -141,13 +141,8 @@ const ProjectHeaderSection = ({
                   marginRight: window.innerWidth <= 768 ? "12px" : "20px",
                   marginBottom: window.innerWidth <= 768 ? "10px" : "0",
                 }}
-<<<<<<< HEAD
-                onMouseEnter={() => setLogoHovered(true)}
-                onMouseLeave={() => setLogoHovered(false)}
-=======
                 onMouseEnter={() => showEdit && isEditing && setIsHovered(true)}
                 onMouseLeave={() => showEdit && isEditing && setIsHovered(false)}
->>>>>>> 136fcae (hide edit button)
               >
                 <img
                   src={projectData?.projectLogo || "defaultLogo.jpg"}
@@ -158,43 +153,11 @@ const ProjectHeaderSection = ({
                     maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
                     height: window.innerWidth <= 768 ? "44px" : "64px",
                     objectFit: "contain",
-<<<<<<< HEAD
-                    filter: isEditing && logoHovered ? "blur(2px)" : "none",
-                    transition: "filter 0.2s"
-=======
                     filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
                     transition: "filter 0.3s ease"
->>>>>>> 136fcae (hide edit button)
                   }}
                   onClick={isEditing ? () => fileInputRef.current.click() : undefined}
                 />
-<<<<<<< HEAD
-                {isEditing && logoHovered && (
-                  <div
-                    className="position-absolute d-flex align-items-center justify-content-center"
-                    style={{
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      background: "rgba(0,0,0,0.4)",
-                      zIndex: 2,
-                      cursor: "pointer"
-                    }}
-                    onClick={() => fileInputRef.current.click()}
-                  >
-                    <i className="fas fa-camera" style={{ color: "#fff", fontSize: window.innerWidth <= 768 ? "18px" : "24px" }}></i>
-                  </div>
-                )}
-                {isEditing && (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    style={{ display: "none" }}
-                    onChange={handleImageChange}
-                  />
-=======
                 {showEdit && isEditing && isHovered && (
                   <div
                     className="position-absolute d-flex align-items-center justify-content-center"
@@ -227,7 +190,6 @@ const ProjectHeaderSection = ({
                       onChange={handleImageChange}
                     />
                   </div>
->>>>>>> 136fcae (hide edit button)
                 )}
               </div>
               <div className="text-center text-md-start w-100">
