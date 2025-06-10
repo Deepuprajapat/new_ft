@@ -362,24 +362,18 @@ const AmenitiesSection = ({
               height: "400px",
               overflowY: "auto",
               overflowX: "hidden",
-              padding: "8px",
-              borderRadius: "8px",
-              backgroundColor: "#f8f9fa",
             }}
           >
             {(isAmenitiesEditing
               ? processEditableAmenities()
               : groupedAmenities
             ).map((category, categoryIndex) => (
-              <div key={categoryIndex} style={{ marginBottom: "32px" }}>
+              <div key={categoryIndex} style={{ marginBottom: "10px" }}>
                 <div style={{ 
                   display: "flex", 
                   alignItems: "center", 
                   marginBottom: "16px",
                   padding: "8px 12px",
-                  backgroundColor: "#fff",
-                  borderRadius: "6px",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                 }}>
                   {isAmenitiesEditing ? (
                     <>
@@ -404,7 +398,6 @@ const AmenitiesSection = ({
                           border: "none",
                           background: "#dc3545",
                           color: "white",
-                          borderRadius: "50%",
                           width: "28px",
                           height: "28px",
                           fontSize: "16px",
@@ -439,10 +432,9 @@ const AmenitiesSection = ({
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+                    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr 1fr",
                     gap: "8px",
                     width: "100%",
-                    marginBottom: isMobile ? "12px" : "16px",
                   }}
                 >
                   {category.assets.map((amenity, index) => (
@@ -451,13 +443,11 @@ const AmenitiesSection = ({
                       className="d-flex align-items-center"
                       style={{
                         fontSize: isMobile ? "11px" : "14px",
-                        marginBottom: "16px",
-                        fontWeight: "500",
+                        color: "black",
+                        marginBottom: "8px",
+                        fontWeight: "700",
                         position: "relative",
-                        backgroundColor: "#fff",
                         padding: "12px",
-                        borderRadius: "6px",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                         transition: "transform 0.2s",
                       }}
                       onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
@@ -479,8 +469,7 @@ const AmenitiesSection = ({
                                 }}
                               />
                               <span style={{ color: "#444" }}>{amenity.name}</span>
-                            </div>
-                            <button
+                              <button
                               onClick={() => removeAmenity(categoryIndex, index)}
                               style={{
                                 border: "none",
@@ -503,6 +492,8 @@ const AmenitiesSection = ({
                             >
                               ×
                             </button>
+                            </div>
+                            
                           </div>
                         </>
                       ) : (

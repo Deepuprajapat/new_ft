@@ -1,5 +1,6 @@
-// navData.js
 
+
+const show = false
 const navItems = [
     { label: 'Home', path: '/' },
     {
@@ -13,22 +14,18 @@ const navItems = [
       ],
     },
     {
-      label: 'Our Projects',
-      dropdown: [
-        { label: 'All Projects', path: '/allProjects' },
-        { label: 'Featured Properties', path: '/featuredProperties' },
-        { label: 'Add Project', path: '/addProject' },
-       
-        // { label: 'Properties', path: '/allProperties' },
-        
-      ],
-    },
+  label: 'Our Projects',
+  dropdown: [
+    { label: 'All Projects', path: '/allProjects' },
+    { label: 'Featured Properties', path: '/featuredProperties' },
+    show ? { label: 'Add Project', path: '/addProject' } : null,
+  ].filter(Boolean),
+},
     { label: 'All Properties', path: '/allProperties' },
     { label: 'Compare Projects',path: '/compare'},
     { label: 'Career', path: '/career' },
     { label: 'Contact Us', path: '/contact' },
   ];
-  
-  
-export default navItems;  
-  
+
+
+export default navItems;

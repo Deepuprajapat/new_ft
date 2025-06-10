@@ -10,38 +10,48 @@ const FloorPlanSection = ({
   activeFilter,
   setActiveFilter,
   formatPrice,
-  handleImageClick,
-  showImagePopup,
-  selectedImage,
-  closeImagePopup,
-  handleDownloadFloorPlan,
-  showFloorPlanPopup,
-  closeFloorPlanPopup,
-  fetchFloorPlansFromApi,
-  saveFloorPlansToApi,
-  removeFloorPlanFromApi,
   showEdit
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableFloorPara, setEditableFloorPara] = useState(projectData?.floorPara || "");
   const [editableFloorplans, setEditableFloorplans] = useState([]);
   const [removeIndex, setRemoveIndex] = useState(null);
+  const [showImagePopup, setShowImagePopup] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
 
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setShowImagePopup(true); // Open the popup with the clicked image
+  };
+
+  const closeImagePopup = () => {
+    setShowImagePopup(false);
+    setSelectedImage(null);
+  };
+
+  const handleDownloadFloorPlan = () => {
+    setShowFloorPlanPopup(true);
+  };
+
+  const closeFloorPlanPopup = () => {
+    setShowFloorPlanPopup(false);
+  };
   // For file input refs
   const fileInputRefs = useRef([]);
 
   useEffect(() => {
-    if (!isEditing && fetchFloorPlansFromApi) {
-      fetchFloorPlansFromApi().then((data) => {
-        setEditableFloorplans(data?.floorplans || []);
-        setEditableFloorPara(data?.floorPara || "");
-      });
-    } else {
-      setEditableFloorPara(projectData?.floorPara || "");
-      setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
-    }
+    // if (!isEditing && fetchFloorPlansFromApi) {
+    //   fetchFloorPlansFromApi().then((data) => {
+    //     setEditableFloorplans(data?.floorplans || []);
+    //     setEditableFloorPara(data?.floorPara || "");
+    //   });
+    // } else {
+    //   setEditableFloorPara(projectData?.floorPara || "");
+    //   setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
+    // }
     // eslint-disable-next-line
-  }, [projectData, isEditing]);
+  }, []);
 
   const handleFloorPlanChange = (index, field, value) => {
     const updated = [...editableFloorplans];
@@ -74,9 +84,9 @@ const FloorPlanSection = ({
 
   const handleRemoveFloorPlan = async (index) => {
     const planToRemove = editableFloorplans[index];
-    if (removeFloorPlanFromApi && planToRemove.id) {
-      await removeFloorPlanFromApi(planToRemove.id);
-    }
+    // if (removeFloorPlanFromApi && planToRemove.id) {
+    //   await removeFloorPlanFromApi(planToRemove.id);
+    // }
     const updated = [...editableFloorplans];
     updated.splice(index, 1);
     setEditableFloorplans(updated);
@@ -85,24 +95,24 @@ const FloorPlanSection = ({
 
   const handleSave = async () => {
     setIsEditing(false);
-    if (saveFloorPlansToApi) {
-      await saveFloorPlansToApi({
-        floorPara: editableFloorPara,
-        floorplans: editableFloorplans,
-      });
-    }
+    // if (saveFloorPlansToApi) {
+    //   await saveFloorPlansToApi({
+    //     floorPara: editableFloorPara,
+    //     floorplans: editableFloorplans,
+    //   });
+    // }
   };
 
   const handleCancel = async () => {
     setIsEditing(false);
-    if (fetchFloorPlansFromApi) {
-      const data = await fetchFloorPlansFromApi();
-      setEditableFloorplans(data?.floorplans || []);
-      setEditableFloorPara(data?.floorPara || "");
-    } else {
-      setEditableFloorPara(projectData?.floorPara || "");
-      setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
-    }
+    // if (fetchFloorPlansFromApi) {
+    //   const data = await fetchFloorPlansFromApi();
+    //   setEditableFloorplans(data?.floorplans || []);
+    //   setEditableFloorPara(data?.floorPara || "");
+    // } else {
+    //   setEditableFloorPara(projectData?.floorPara || "");
+    //   setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
+    // }
   };
 
   // Handle image upload for a floor plan
