@@ -3,11 +3,11 @@ import DOMPurify from "dompurify";
 
 const PaymentPlanSection = ({
   projectData,
+  showEdit,
 }) => {
-  const [isPaymentEditing, setIsPaymentEditing] = useState(false);
   const [localPaymentPlans, setLocalPaymentPlans] = useState(projectData?.paymentPlans || []);
   const [localPaymentPara, setLocalPaymentPara] = useState(projectData?.paymentPara || "");
-
+  const [isPaymentEditing, setIsPaymentEditing] = useState(false);
   // Sync with projectData when not editing
   useEffect(() => {
     if (!isPaymentEditing) {
@@ -68,41 +68,42 @@ const PaymentPlanSection = ({
               borderRadius: "4px 4px 0 0",
             }}>
           {projectData?.name} Payment Plan
-          <span style={{ cursor: "pointer", marginRight: "12px" }}>
-            {isPaymentEditing ? (
-              <>
-                <button
-                  className="btn btn-success btn-sm"
-                  style={{
-                    backgroundColor: "white",
-                    color: "#2067d1",
-                    border: "1px solid #2067d1",
-                    fontWeight: "bold",
-                    padding: "2px 10px",
-                    fontSize: "14px",
-                  
-                  }}
-                  onClick={handleSave}
-                >
-                  Save
-                </button>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  style={{ color: "white", fontWeight: "bold" , width:"auto"}}
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <img
-                src="/images/edit-icon.svg"
-                alt="Edit"
-                style={{ width: "18px", height: "18px" }}
-                onClick={() => setIsPaymentEditing(true)}
-              />
-            )}
-          </span>
+          {showEdit && (
+            <span style={{ cursor: "pointer", marginRight: "12px" }}>
+              {isPaymentEditing ? (
+                <>
+                  <button
+                    className="btn btn-success btn-sm"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#2067d1",
+                      border: "1px solid #2067d1",
+                      fontWeight: "bold",
+                      padding: "2px 10px",
+                      fontSize: "14px",
+                    }}
+                    onClick={handleSave}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    style={{ color: "white", fontWeight: "bold" }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <img
+                  src="/images/edit-icon.svg"
+                  alt="Edit"
+                  style={{ width: "18px", height: "18px" }}
+                  onClick={() => setIsPaymentEditing(true)}
+                />
+              )}
+            </span>
+          )}
         </h2>
         <div className="p-3">
           <div

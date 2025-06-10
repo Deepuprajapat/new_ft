@@ -4,9 +4,10 @@ const ProjectHeaderSection = ({
   projectData,
   formatPrice,
   handleInputChange,
-
+  showEdit,
 }) => {
   const fileInputRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Local state for prices
   const [minPrice, setMinPrice] = useState("");
@@ -140,8 +141,13 @@ const ProjectHeaderSection = ({
                   marginRight: window.innerWidth <= 768 ? "12px" : "20px",
                   marginBottom: window.innerWidth <= 768 ? "10px" : "0",
                 }}
+<<<<<<< HEAD
                 onMouseEnter={() => setLogoHovered(true)}
                 onMouseLeave={() => setLogoHovered(false)}
+=======
+                onMouseEnter={() => showEdit && isEditing && setIsHovered(true)}
+                onMouseLeave={() => showEdit && isEditing && setIsHovered(false)}
+>>>>>>> 136fcae (hide edit button)
               >
                 <img
                   src={projectData?.projectLogo || "defaultLogo.jpg"}
@@ -152,11 +158,17 @@ const ProjectHeaderSection = ({
                     maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
                     height: window.innerWidth <= 768 ? "44px" : "64px",
                     objectFit: "contain",
+<<<<<<< HEAD
                     filter: isEditing && logoHovered ? "blur(2px)" : "none",
                     transition: "filter 0.2s"
+=======
+                    filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
+                    transition: "filter 0.3s ease"
+>>>>>>> 136fcae (hide edit button)
                   }}
                   onClick={isEditing ? () => fileInputRef.current.click() : undefined}
                 />
+<<<<<<< HEAD
                 {isEditing && logoHovered && (
                   <div
                     className="position-absolute d-flex align-items-center justify-content-center"
@@ -182,6 +194,40 @@ const ProjectHeaderSection = ({
                     style={{ display: "none" }}
                     onChange={handleImageChange}
                   />
+=======
+                {showEdit && isEditing && isHovered && (
+                  <div
+                    className="position-absolute d-flex align-items-center justify-content-center"
+                    style={{
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      borderRadius: '50%',
+                      padding: '10px',
+                      cursor: 'pointer',
+                      zIndex: 2
+                    }}
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    <img
+                      src="/images/camera-icon.svg"
+                      alt="Upload"
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        filter: "invert(1)"
+                      }}
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      style={{ display: "none" }}
+                      onChange={handleImageChange}
+                    />
+                  </div>
+>>>>>>> 136fcae (hide edit button)
                 )}
               </div>
               <div className="text-center text-md-start w-100">
@@ -593,7 +639,8 @@ const ProjectHeaderSection = ({
                       style={{ fontSize: "20px" }}
                     >
                       {projectData?.name || "Project Name"}
-                      <span style={{ marginLeft: 10 }}>
+                      {showEdit && (
+                      <span style={{ marginLeft: 10, cursor: "pointer" }}>
                         <button
                           className="btn btn-light btn-sm"
                           onClick={handleEdit}
@@ -605,7 +652,8 @@ const ProjectHeaderSection = ({
                             style={{ width: "18px", height: "18px" }}
                           />
                         </button>
-                      </span>
+                        </span>
+                      )}
                     </h1>
                     <p className="mb-0 mt-2" style={{ fontSize: "11px" }}>
                       {projectData?.shortAddress || "Project Address"}

@@ -6,10 +6,12 @@ import { useNavigate } from 'react-router-dom';
 const AddProject = ({ show, handleClose, onSubmit }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    projectName: '',
-    projectUrl: '',
-    projectType: '',
-    developerId: ''
+    project_name: '',
+    project_url: '',
+    project_type: '',
+    locality: '',
+    project_city: '',
+    developer_id: '',
   });
   const [developers, setDevelopers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -77,8 +79,8 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
             <Form.Label>Project Name</Form.Label>
             <Form.Control
               type="text"
-              name="projectName"
-              value={formData.projectName}
+              name="project_name"
+              value={formData.project_name}
               onChange={handleChange}
               placeholder="Enter project name"
               required
@@ -89,8 +91,8 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
             <Form.Label>Project URL</Form.Label>
             <Form.Control
               type="text"
-              name="projectUrl"
-              value={formData.projectUrl}
+              name="project_url"
+              value={formData.project_url}
               onChange={handleChange}
               placeholder="Enter project URL"
               required
@@ -100,8 +102,8 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
           <Form.Group className="mb-3">
             <Form.Label>Project Type</Form.Label>
             <Form.Select
-              name="projectType"
-              value={formData.projectType}
+              name="project_type"
+              value={formData.project_type}
               onChange={handleChange}
               required
             >
@@ -114,8 +116,8 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
           <Form.Group className="mb-3">
             <Form.Label>Developer</Form.Label>
             <Form.Select
-              name="developerId"
-              value={formData.developerId}
+              name="developer_id"
+              value={formData.developer_id}
               onChange={handleChange}
               required
             >
@@ -129,8 +131,8 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
           </Form.Group>
 
           <div className="d-flex justify-content-end gap-2">
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               type="submit"
               disabled={loading}
             >

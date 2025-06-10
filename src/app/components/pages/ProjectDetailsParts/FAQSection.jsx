@@ -35,7 +35,7 @@ function cleanQuestion(question) {
     : { number: null, text: question.trim() };
 }
 
-const FAQSection = ({ projectData }) => {
+const FAQSection = ({ projectData  , showEdit}) => {
   // State for expanded/collapsed
   const [expandedIndex, setExpandedIndex] = useState(null);
   // State for editing
@@ -124,6 +124,7 @@ const FAQSection = ({ projectData }) => {
           >
             Frequently Asked Questions (FAQs)
           </h4>
+          {showEdit && (
           <span style={{ cursor: "pointer", marginLeft: "12px" }}>
             {isEditing ? (
               <>
@@ -167,8 +168,9 @@ const FAQSection = ({ projectData }) => {
                   style={{ width: "18px", height: "18px" }}
                 />
               </span>
-            )}
-          </span>
+              )}
+            </span>
+          )}
         </div>
         <div className="px-3">
           {(isEditing ? editFaqs : faqs)?.map((faq, index) => (
