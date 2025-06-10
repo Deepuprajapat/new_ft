@@ -51,6 +51,7 @@ const PriceRow = ({
       <td>
         <button
           className="btn btn-danger btn-sm"
+          style={{ fontSize: "13px", fontWeight: 600, width: "auto" }}
           onClick={() => removePriceList(index)}
         >
           Remove
@@ -135,13 +136,14 @@ const PriceListSection = ({
     <>
       <button
         className="btn btn-success btn-sm"
-        style={{ marginRight: 8, backgroundColor: "white", color: "#2067d1", border: "1px solid #2067d1", fontWeight: "bold" }}
+        style={{  backgroundColor: "white", color: "#2067d1", border: "1px solid #2067d1", fontWeight: "bold"}}
         onClick={handleSave}
       >
         Save
       </button>
       <button
         className="btn btn-secondary btn-sm"
+        style={{width:"auto"}}
         onClick={handleCancel}
       >
         Cancel
@@ -233,7 +235,7 @@ const PriceListSection = ({
                 <button
                   className="btn btn-primary btn-sm"
                   type="button"
-                  style={{ fontSize: "13px", fontWeight: 600 }}
+                  style={{ fontSize: "13px", fontWeight: 600,width: "auto", }}
                   onClick={addPriceList}
                   title="Add new price list row"
                 >

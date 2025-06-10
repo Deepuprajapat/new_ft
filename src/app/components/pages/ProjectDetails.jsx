@@ -762,8 +762,9 @@ const ProjectDetails = () => {
   //   (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   // );
   
-  const [showEdit, setShowEdit] = useState(false);
 
+
+  const [showEdit, setShowEdit] = useState(false);
   return (
     <>
       {projectData && (

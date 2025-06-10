@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faFile, faTrash } from "@fortawesome/free-solid-svg-icons";
+import "../../styles/css/metaform.css";
 
 function MetaFormSection() {
   const [showMetaForm, setShowMetaForm] = useState(false);
@@ -66,18 +67,26 @@ function MetaFormSection() {
 
   return (
     <section
-      className=""
-      // style={{
-      //   width: window.innerWidth <= 768 ? "10%" : "15%",
-      // }}
-    >
+    className="container"
+    style={{
+     width:"auto",
+   marginRight:"10px",
+      justifyContent: "flex-end",
+      alignItems:"end",
+    }}
+  >
+    <div className="d-flex justify-content-center justify-content-md-end my-3 w-100">
       <button
-        className="btn btn-primary"
+      style={{alignItems:'end',width:'100%',backgroundColor:'#2067d1',color:'white',borderRadius:'10px',padding:'10px',fontSize:'16px',fontWeight:'500',cursor:'pointer'}}
+        className="btn btn-primary meta-data-btn w-100 w-md-auto"
         onClick={() => setShowMetaForm(true)}
-        style={{ margin: "20px 0" , marginLeft: "10px"}}
+        type="button"
       >
         Meta Data
       </button>
+
+
+      </div>
 
       {showMetaForm && (
         <div
@@ -95,7 +104,7 @@ function MetaFormSection() {
           }}
         >
           <div
-            className="p-4 bg-white rounded shadow"
+            className="meta-form-modal p-4 bg-white rounded shadow"
             style={{
               maxWidth: 530,
               width: "95%",

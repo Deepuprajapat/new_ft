@@ -141,6 +141,7 @@ const VideoPresentationSection = ({
                           padding: "8px 12px",
                           fontSize: "12px",
                           cursor: "pointer",
+                          width:"auto"
                         }}
                       >
                         Remove
@@ -174,6 +175,7 @@ const VideoPresentationSection = ({
                       fontSize: "14px",
                       cursor: "pointer",
                       marginRight: "8px",
+                      width:"auto"
                     }}
                   >
                     + Add Video

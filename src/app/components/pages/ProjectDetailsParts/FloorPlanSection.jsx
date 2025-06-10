@@ -202,7 +202,7 @@ const FloorPlanSection = ({
               className="btn btn-outline-primary mb-3"
               type="button"
               onClick={handleAddFloorPlan}
-              style={{ fontWeight: 600, borderRadius: "20px" }}
+              style={{ fontWeight: 600, borderRadius: "20px", width:"auto"}}
             >
               + Add Floor Plan
             </button>
@@ -336,6 +336,7 @@ const FloorPlanSection = ({
                             />
                             <button
                               className="btn btn-outline-secondary btn-sm"
+                              style={{ width: "auto" }}
                               type="button"
                               onClick={() => fileInputRefs.current[index]?.click()}
                             >
@@ -375,7 +376,7 @@ const FloorPlanSection = ({
                           className="btn btn-danger btn-sm"
                           type="button"
                           onClick={() => setRemoveIndex(index)}
-                          style={{ marginTop: "5px" }}
+                          style={{ marginTop: "5px",width: "auto", }}
                         >
                           Remove
                         </button>
@@ -416,6 +417,7 @@ const FloorPlanSection = ({
                               </button>
                               <button
                                 className="btn btn-secondary"
+                                style={{ width: "auto" }}
                                 onClick={() => setRemoveIndex(null)}
                               >
                                 Cancel

@@ -203,6 +203,9 @@ const PaymentPlanSection = ({
                               setLocalPaymentPlans(prev => prev.filter((_, i) => i !== index))
                             }
                             className="btn btn-danger btn-sm"
+                            style={
+                              { fontSize: "13px", fontWeight: 600, width: "auto" }
+                            }
                           >
                             Remove
                           </button>
@@ -230,6 +233,8 @@ const PaymentPlanSection = ({
                     padding: "8px 16px",
                     fontSize: "14px",
                     cursor: "pointer",
+                    width:"auto",
+                    margin:"10px"
                   }}
                 >
                   + Add New Payment Plan
