@@ -13,7 +13,9 @@ const FloorPlanSection = ({
   showEdit
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editableFloorPara, setEditableFloorPara] = useState(projectData?.floorPara || "");
+  const [editableFloorPara, setEditableFloorPara] = useState(
+    projectData?.floorPara || ""
+  );
   const [editableFloorplans, setEditableFloorplans] = useState([]);
   const [removeIndex, setRemoveIndex] = useState(null);
   const [showImagePopup, setShowImagePopup] = useState(false);
@@ -128,11 +130,12 @@ const FloorPlanSection = ({
   };
 
   // Filtering logic
-  const filteredPlans = isEditing ? editableFloorplans : (projectData?.floorplans || []);
+  const filteredPlans = isEditing
+    ? editableFloorplans
+    : projectData?.floorplans || [];
   const filtered = filteredPlans.filter(
     (plan) =>
-      activeFilter === "all" ||
-      plan.projectConfigurationName === activeFilter
+      activeFilter === "all" || plan.projectConfigurationName === activeFilter
   );
   const sortedPlans = filtered.sort((a, b) => {
     const sizeA = parseFloat(a.size);
@@ -162,14 +165,22 @@ const FloorPlanSection = ({
                 <>
                   <button
                     className="btn btn-success btn-sm"
-                    style={{ backgroundColor: "white", color: "#2067d1", fontWeight: "bold" }}
+                    style={{
+                      backgroundColor: "white",
+                      color: "#2067d1",
+                      fontWeight: "bold",
+                    }}
                     onClick={handleSave}
                   >
                     Save
                   </button>
                   <button
                     className="btn btn-secondary btn-sm"
-                    style={{ color: "white", fontWeight: "bold", marginLeft: 8 }}
+                    style={{
+                      color: "white",
+                      fontWeight: "bold",
+                      marginLeft: 8,
+                    }}
                     onClick={handleCancel}
                   >
                     Cancel
@@ -192,7 +203,7 @@ const FloorPlanSection = ({
               <textarea
                 className="form-control"
                 value={editableFloorPara}
-                onChange={e => setEditableFloorPara(e.target.value)}
+                onChange={(e) => setEditableFloorPara(e.target.value)}
                 rows={3}
                 style={{ fontSize: window.innerWidth <= 768 ? "12px" : "16px" }}
               />
@@ -212,7 +223,7 @@ const FloorPlanSection = ({
               className="btn btn-outline-primary mb-3"
               type="button"
               onClick={handleAddFloorPlan}
-              style={{ fontWeight: 600, borderRadius: "20px", width:"auto"}}
+              style={{ fontWeight: 600, borderRadius: "20px", width: "auto" }}
             >
               + Add Floor Plan
             </button>
@@ -244,7 +255,9 @@ const FloorPlanSection = ({
                 <button
                   key={index}
                   onClick={() => setActiveFilter(config)}
-                  className={`btn ${activeFilter === config ? "btn-primary" : ""}`}
+                  className={`btn ${
+                    activeFilter === config ? "btn-primary" : ""
+                  }`}
                   style={{
                     border: "2px solid #000",
                     borderRadius: "15px",
@@ -288,7 +301,16 @@ const FloorPlanSection = ({
             style={{ width: "60%", margin: "0 auto" }}
           >
             {sortedPlans.map((plan, index) => (
-              <div key={index} className="px-2 d-flex justify-content-center">
+              <div
+                style={{
+                  borderRadius: "8px",
+                  border: "1px  gray",
+                  borderColor: isEditing ? "gray" : "white",
+                  padding: "10px",
+                }}
+                key={index}
+                className="px-2 d-flex justify-content-center"
+              >
                 <div
                   className="card border-0"
                   style={{
@@ -296,100 +318,147 @@ const FloorPlanSection = ({
                     maxWidth: window.innerWidth <= 768 ? "80%" : "auto",
                   }}
                 >
-                  <div className="card-body p-3">
+                  <div className="card-body p-1">
                     {isEditing ? (
-                      <>
-                        <input
-                          className="form-control mb-2"
-                          type="text"
-                          value={plan.title}
-                          onChange={e => handleFloorPlanChange(index, "title", e.target.value)}
-                          placeholder="Title"
-                        />
-                        <div className="mb-2">
-                          <label style={{ fontSize: "13px", fontWeight: 500, display: "block" }}>
-                            Floor Plan Image
-                          </label>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "10px",
-                            }}
-                          >
-                            <img
-                              src={
-                                plan.imageUrl
-                                  ? plan.imageUrl
-                                  : "/images/Floor.png"
-                              }
-                              alt="Floor Plan"
-                              style={{
-                                width: "60px",
-                                height: "60px",
-                                objectFit: "cover",
-                                borderRadius: "8px",
-                                border: "1px solid #ddd",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => fileInputRefs.current[index]?.click()}
-                            />
-                            <input
-                              type="file"
-                              accept="image/*"
-                              ref={el => (fileInputRefs.current[index] = el)}
-                              style={{ display: "none" }}
-                              onChange={e => {
-                                const file = e.target.files[0];
-                                handleImageUpload(index, file);
-                              }}
-                            />
-                            <button
-                              className="btn btn-outline-secondary btn-sm"
-                              style={{ width: "auto" }}
-                              type="button"
-                              onClick={() => fileInputRefs.current[index]?.click()}
-                            >
-                              Upload
-                            </button>
-                          </div>
-                        </div>
-                        <input
-                          className="form-control mb-2"
-                          type="text"
-                          value={plan.size}
-                          onChange={e => handleFloorPlanChange(index, "size", e.target.value)}
-                          placeholder="Size (sq.ft)"
-                        />
-                        <input
-                          className="form-control mb-2"
-                          type="text"
-                          value={plan.price}
-                          onChange={e => handleFloorPlanChange(index, "price", e.target.value)}
-                          placeholder="Price"
-                        />
-                        <input
-                          className="form-control mb-2"
-                          type="text"
-                          value={plan.projectConfigurationName}
-                          onChange={e => handleFloorPlanChange(index, "projectConfigurationName", e.target.value)}
-                          placeholder="Configuration Name"
-                        />
-                        <input
-                          className="form-control mb-2"
-                          type="text"
-                          value={plan.type}
-                          onChange={e => handleFloorPlanChange(index, "type", e.target.value)}
-                          placeholder="Type"
-                        />
-                        <button
-                          className="btn btn-danger btn-sm"
-                          type="button"
-                          onClick={() => setRemoveIndex(index)}
-                          style={{ marginTop: "5px",width: "auto", }}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          background: "#fff", // Change here: white background inside main editing div
+                          border: "1.5px solid #e0e0e0",
+                          borderRadius: "12px",
+                          padding: "60px 60px 24px 24px",
+                          position: "relative",
+                          minHeight: "200px",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        {/* Delete Icon Wrapper */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "6px",
+                            right: "6px",
+                            zIndex: 2,
+                            background: "#fff",
+                            borderRadius: "50%",
+                            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                            padding: "10px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "48px",
+                            height: "48px",
+                          }}
                         >
-                          Remove
-                        </button>
+                          <img
+                            src="/images/delete1.png"
+                            alt="Remove"
+                            onClick={() => setRemoveIndex(index)}
+                            style={{
+                              width: "25px",
+                              height: "25px",
+                              cursor: "pointer",
+                            }}
+                          />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <input
+                            className="form-control mb-2"
+                            type="text"
+                            value={plan.title}
+                            onChange={(e) =>
+                              handleFloorPlanChange(index, "title", e.target.value)
+                            }
+                            placeholder="Title"
+                          />
+                          <div className="mb-2">
+                            <label
+                              style={{
+                                fontSize: "13px",
+                                fontWeight: 500,
+                                display: "block",
+                              }}
+                            >
+                              Floor Plan Image
+                            </label>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                              }}
+                            >
+                              <img
+                                src={plan.imageUrl ? plan.imageUrl : "/images/Floor.png"}
+                                alt="Floor Plan"
+                                style={{
+                                  width: "60px",
+                                  height: "60px",
+                                  objectFit: "cover",
+                                  borderRadius: "8px",
+                                  border: "1px solid #ddd",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => fileInputRefs.current[index]?.click()}
+                              />
+                              <input
+                                type="file"
+                                accept="image/*"
+                                ref={(el) => (fileInputRefs.current[index] = el)}
+                                style={{ display: "none" }}
+                                onChange={(e) => {
+                                  const file = e.target.files[0];
+                                  handleImageUpload(index, file);
+                                }}
+                              />
+                              <button
+                                className="btn btn-outline-secondary btn-sm"
+                                style={{ width: "auto" }}
+                                type="button"
+                                onClick={() => fileInputRefs.current[index]?.click()}
+                              >
+                                Upload
+                              </button>
+                            </div>
+                          </div>
+                          <input
+                            className="form-control mb-2"
+                            type="text"
+                            value={plan.size}
+                            onChange={(e) =>
+                              handleFloorPlanChange(index, "size", e.target.value)
+                            }
+                            placeholder="Size (sq.ft)"
+                          />
+                          <input
+                            className="form-control mb-2"
+                            type="text"
+                            value={plan.price}
+                            onChange={(e) =>
+                              handleFloorPlanChange(index, "price", e.target.value)
+                            }
+                            placeholder="Price"
+                          />
+                          <input
+                            className="form-control mb-2"
+                            type="text"
+                            value={plan.projectConfigurationName}
+                            onChange={(e) =>
+                              handleFloorPlanChange(index, "projectConfigurationName", e.target.value)
+                            }
+                            placeholder="Configuration Name"
+                          />
+                          <input
+                            className="form-control mb-2"
+                            type="text"
+                            value={plan.type}
+                            onChange={(e) =>
+                              handleFloorPlanChange(index, "type", e.target.value)
+                            }
+                            placeholder="Type"
+                          />
+                        </div>
                         {/* Confirmation Popup */}
                         {removeIndex === index && (
                           <div
@@ -414,9 +483,15 @@ const FloorPlanSection = ({
                                 boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
                                 minWidth: "300px",
                                 textAlign: "center",
+                                border: "2px solid #2067d1",
                               }}
                             >
-                              <p style={{ marginBottom: "18px", fontWeight: 500 }}>
+                              <p
+                                style={{
+                                  marginBottom: "18px",
+                                  fontWeight: 500,
+                                }}
+                              >
                                 Are you sure you want to remove this floor plan?
                               </p>
                               <button
@@ -435,13 +510,14 @@ const FloorPlanSection = ({
                             </div>
                           </div>
                         )}
-                      </>
+                      </div>
                     ) : (
                       <>
                         <p
                           className="mb-3"
                           style={{
-                            fontSize: window.innerWidth <= 768 ? "14px" : "16px",
+                            fontSize:
+                              window.innerWidth <= 768 ? "14px" : "16px",
                             fontWeight: "600",
                           }}
                         >
@@ -466,7 +542,8 @@ const FloorPlanSection = ({
                             <small
                               className="text-muted"
                               style={{
-                                fontSize: window.innerWidth <= 768 ? "11px" : "12px",
+                                fontSize:
+                                  window.innerWidth <= 768 ? "11px" : "12px",
                               }}
                             >
                               Builtup Area
@@ -474,7 +551,8 @@ const FloorPlanSection = ({
                             <p
                               className="mb-0"
                               style={{
-                                fontSize: window.innerWidth <= 768 ? "13px" : "14px",
+                                fontSize:
+                                  window.innerWidth <= 768 ? "13px" : "14px",
                                 fontWeight: "600",
                               }}
                             >
@@ -485,7 +563,8 @@ const FloorPlanSection = ({
                             <small
                               className="text-muted"
                               style={{
-                                fontSize: window.innerWidth <= 768 ? "11px" : "12px",
+                                fontSize:
+                                  window.innerWidth <= 768 ? "11px" : "12px",
                               }}
                             >
                               Price
@@ -493,7 +572,8 @@ const FloorPlanSection = ({
                             <p
                               className="mb-0"
                               style={{
-                                fontSize: window.innerWidth <= 768 ? "13px" : "14px",
+                                fontSize:
+                                  window.innerWidth <= 768 ? "13px" : "14px",
                                 fontWeight: "600",
                               }}
                             >
@@ -503,37 +583,41 @@ const FloorPlanSection = ({
                         </div>
                       </>
                     )}
-                    <div className="d-flex flex-column gap-2 align-items-center">
-                      <a
-                        href={`tel:+91${
-                          projectData?.locality?.city?.phoneNumber?.[0] ||
-                          "8595189189"
-                        }`}
-                        className="btn btn-primary w-100"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                          backgroundColor: "rgb(32, 103, 209)",
-                        }}
-                      >
-                        Talk to our Expert
-                      </a>
-                      <button
-                        onClick={handleDownloadFloorPlan}
-                        className="btn btn-outline-primary w-100"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                          margin: "0px",
-                        }}
-                      >
-                        Download Floor Plan
-                      </button>
-                      <BrochurePopupDialog
-                        open={showFloorPlanPopup}
-                        onClose={closeFloorPlanPopup}
-                        projectName={projectData?.name || "Invest Mango"}
-                        brochure={projectData?.brochure}
-                      />
-                    </div>
+                    {!isEditing && (
+                      <div className="d-flex flex-column gap-2 align-items-center">
+                        <a
+                          href={`tel:+91${
+                            projectData?.locality?.city?.phoneNumber?.[0] ||
+                            "8595189189"
+                          }`}
+                          className="btn btn-primary w-100"
+                          style={{
+                            fontSize:
+                              window.innerWidth <= 768 ? "12px" : "14px",
+                            backgroundColor: "rgb(32, 103, 209)",
+                          }}
+                        >
+                          Talk to our Expert
+                        </a>
+                        <button
+                          onClick={handleDownloadFloorPlan}
+                          className="btn btn-outline-primary w-100"
+                          style={{
+                            fontSize:
+                              window.innerWidth <= 768 ? "12px" : "14px",
+                            margin: "0px",
+                          }}
+                        >
+                          Download Floor Plan
+                        </button>
+                        <BrochurePopupDialog
+                          open={showFloorPlanPopup}
+                          onClose={closeFloorPlanPopup}
+                          projectName={projectData?.name || "Invest Mango"}
+                          brochure={projectData?.brochure}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

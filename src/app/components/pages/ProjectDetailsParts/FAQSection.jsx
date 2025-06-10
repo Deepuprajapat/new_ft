@@ -222,15 +222,20 @@ const FAQSection = ({ projectData  , showEdit}) => {
                     </svg>
                   </span>
                   {isEditing && (
-                    <button
-                      className="btn btn-sm btn-danger ms-2"
+                     <img
+                      src="/images/delete1.png" // adjust the path as needed
+                      alt="Delete FAQ"
                       onClick={e => {
                         e.stopPropagation();
                         handleRemoveFaq(index);
                       }}
-                    >
-                      <i className="fa fa-trash"></i>
-                    </button>
+                      style={{
+                        width: "25px",
+                        height: "25px",
+                        cursor: "pointer",
+                        marginLeft: "8px", // like `ms-2` Bootstrap spacing
+                      }}
+                    />
                   )}
                 </span>
               </div>
