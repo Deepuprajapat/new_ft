@@ -62,6 +62,7 @@ const VideoPresentationSection = ({
                       backgroundColor: "#6c757d",
                       color: "white",
                       fontWeight: "bold",
+                      width: "auto",
                     }}
                    onClick={handleCancel}
 

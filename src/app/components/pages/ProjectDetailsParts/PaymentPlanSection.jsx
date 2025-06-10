@@ -88,7 +88,7 @@ const PaymentPlanSection = ({
                   </button>
                   <button
                     className="btn btn-secondary btn-sm"
-                    style={{ color: "white", fontWeight: "bold" }}
+                    style={{ color: "white", fontWeight: "bold" ,width:"auto"}}
                     onClick={handleCancel}
                   >
                     Cancel
@@ -198,17 +198,21 @@ const PaymentPlanSection = ({
                           />
                         </td>
                         <td>
-                          <button
-                            onClick={() =>
-                              setLocalPaymentPlans(prev => prev.filter((_, i) => i !== index))
-                            }
-                            className="btn btn-danger btn-sm"
-                            style={
-                              { fontSize: "13px", fontWeight: 600, width: "auto" }
-                            }
-                          >
-                            Remove
-                          </button>
+                          <img
+  src="/images/delete1.png" // update this path as needed
+  onClick={() =>
+    setLocalPaymentPlans(prev => prev.filter((_, i) => i !== index))
+  }
+  style={{
+    padding: "4px",
+  width: "30px", 
+  marginTop:"10px" ,    // adjust size as needed
+  height: "30px",     // adjust size as needed
+  verticalAlign: "middle",
+    cursor: "pointer",  
+    marginLeft:"10px"   // optional spacing
+  }}
+/>
                         </td>
                       </tr>
                     ))

@@ -49,13 +49,19 @@ const PriceRow = ({
     </td>
     {isEditing && (
       <td>
-        <button
-          className="btn btn-danger btn-sm"
-          style={{ fontSize: "13px", fontWeight: 600, width: "auto" }}
-          onClick={() => removePriceList(index)}
-        >
-          Remove
-        </button>
+       <img
+  src="/images/delete1.png"  // adjust if path differs
+  alt="Remove"
+  onClick={() => removePriceList(index)}
+  style={{
+   padding: "4px",
+  width: "30px",      // adjust size as needed
+  height: "30px",     // adjust size as needed
+  verticalAlign: "middle",
+    cursor: "pointer",  
+    marginLeft:"10px"   // optional spacing
+  }}
+/>
       </td>
     )}
   </tr>

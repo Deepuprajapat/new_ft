@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCamera } from "@fortawesome/free-solid-svg-icons";
 const ProjectHeaderSection = ({
   projectData,
   formatPrice,
@@ -173,15 +174,15 @@ const ProjectHeaderSection = ({
                     }}
                     onClick={() => fileInputRef.current.click()}
                   >
-                    <img
-                      src="/images/camera-icon.svg"
-                      alt="Upload"
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        filter: "invert(1)"
-                      }}
-                    />
+                     <FontAwesomeIcon
+                                           icon={faCamera}
+                                           style={{
+                                             color: 'white',
+                                             fontSize: '10px',
+                                             transition: 'transform 0.3s ease',
+                                             transform: 'scale(1.2)'
+                                           }}
+                                         />
                     <input
                       type="file"
                       accept="image/*"

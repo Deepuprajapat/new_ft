@@ -64,19 +64,25 @@ const AboutDeveloperSection = ({
           }}>
           About {developerDetails?.name}
           {showEdit && (
-          <span style={{ cursor: "pointer", marginLeft: "12px" }}>
+          <span style={{ cursor: "pointer", }}>
             {isDeveloperEditing ? (
               <>
                 <button
                   className="btn btn-success btn-sm"
-                  style={{ backgroundColor: "#000", borderColor: "#000", marginRight: "19px" }}
+                  style={{ backgroundColor: "#000", borderColor: "#000", }}
                   onClick={handleSave}
                 >
                   Save
                 </button>
                 <button
                   className="btn btn-secondary btn-sm"
-                  style={{ color: "white", fontWeight: "bold", backgroundColor: "#6c757d" }}
+                   style={{
+                
+                      backgroundColor: "#6c757d",
+                      color: "white",
+                      fontWeight: "bold",
+                      width: "auto",
+                    }}
                   onClick={handleCancel}
                 >
                   Cancel
