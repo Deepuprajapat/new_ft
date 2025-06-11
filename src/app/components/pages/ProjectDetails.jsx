@@ -764,7 +764,7 @@ const ProjectDetails = () => {
   
 
 
-  const [showEdit, setShowEdit] = useState(true);
+  const [showEdit, setShowEdit] = useState(false);
   return (
     <>
       {projectData && (

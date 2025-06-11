@@ -25,6 +25,8 @@ import ThankYouPage from "./app/components/ThankYouPage";
 import FeaturedProperties from "./app/components/pages/FeaturedProperties";
 import Privacy from "./app/components/pages/Privacy";
 import TermAndCondition from "./app/components/pages/TermAndCondition";
+import Login from "./app/components/pages/Login/Login";
+import LoginDashboard from "./app/components/pages/Login/LoginDashboard";
 
 
 const router = createBrowserRouter([
@@ -56,7 +58,8 @@ const router = createBrowserRouter([
       { path: "/privacy-policy", element: <Privacy /> },
       { path: "/terms-and-conditions", element: <TermAndCondition /> },
       {path:"/projectDetails", element: <ProjectDetails />},
-
+      {path:"/login", element: <Login isOpen={true} onClose={() => {}} />}, // Login route
+       {path:"/loginadmin" , element : <LoginDashboard />}, // Login Dashboard route
  
     ],
   },
