@@ -845,30 +845,14 @@ const AmenitiesSection = ({
                   </div>
                 )}
               </div>
-
-              <div style={{ margin: isMobile ? "12px 0" : "0" }}>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => setShowCreateNewCategoryModal(true)}
-                  style={{
-                    width: isMobile ? "100%" : "auto",
-                    padding: isMobile ? "12px" : "8px 20px",
-                    fontSize: isMobile ? "17px" : "15px",
-                    borderRadius: "6px",
-                    fontWeight: 600,
-                  }}
-                >
-                  Create New
-                </button>
-              </div>
             </div>
 
             <div
               style={{
                 display: "flex",
                 flexDirection: isMobile ? "column" : "row",
-                justifyContent: "flex-end",
-                alignItems: isMobile ? "stretch" : "center",
+                justifyContent: isMobile ? "stretch" : "space-between",
+                alignItems: "center",
                 gap: "12px",
                 borderTop: "1px solid #eee",
                 paddingTop: "16px",
@@ -877,50 +861,66 @@ const AmenitiesSection = ({
               }}
             >
               <button
-                className="btn btn-light"
-                onClick={() => {
-                  setShowAmenityModal(false);
-                  setSelectedAmenities([]);
-                  setSelectAll(false);
-                }}
-                style={{
-                  width: isMobile ? "100%" : "auto",
-                  padding: isMobile ? "12px" : "8px 20px",
-                  fontSize: isMobile ? "17px" : "14px",
-                  border: "1px solid #ddd",
-                  borderRadius: "6px",
-                  fontWeight: 500,
-                  color: "#666",
-                  backgroundColor: "#fff",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-              >
-                Cancel
-              </button>
-              <button
                 className="btn btn-primary"
-                onClick={() => {
-                  handleAddAmenity();
-                  setShowAmenityModal(false);
-                }}
-                disabled={selectedAmenities.length === 0}
+                onClick={() => setShowCreateNewCategoryModal(true)}
                 style={{
                   width: isMobile ? "100%" : "auto",
                   padding: isMobile ? "12px" : "8px 20px",
                   fontSize: isMobile ? "17px" : "14px",
-                  border: "none",
                   borderRadius: "6px",
-                  fontWeight: 500,
-                  color: "#fff",
-                  backgroundColor: "#2067d1",
-                  cursor: "pointer",
-                  opacity: selectedAmenities.length === 0 ? 0.6 : 1,
-                  transition: "all 0.2s",
+                  fontWeight: 600,
+                  order: isMobile ? 2 : 0, // On mobile, move below
                 }}
               >
-                Add Selected Amenities ({selectedAmenities.length})
+                Create New Category
               </button>
+              <div style={{ display: "flex", gap: "12px", width: isMobile ? "100%" : "auto" }}>
+                <button
+                  className="btn btn-light"
+                  onClick={() => {
+                    setShowAmenityModal(false);
+                    setSelectedAmenities([]);
+                    setSelectAll(false);
+                  }}
+                  style={{
+                    width: isMobile ? "100%" : "auto",
+                    padding: isMobile ? "12px" : "8px 20px",
+                    fontSize: isMobile ? "17px" : "14px",
+                    border: "1px solid #ddd",
+                    borderRadius: "6px",
+                    fontWeight: 500,
+                    color: "#666",
+                    backgroundColor: "#fff",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    handleAddAmenity();
+                    setShowAmenityModal(false);
+                  }}
+                  disabled={selectedAmenities.length === 0}
+                  style={{
+                    width: isMobile ? "100%" : "auto",
+                    padding: isMobile ? "12px" : "8px 20px",
+                    fontSize: isMobile ? "17px" : "14px",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontWeight: 500,
+                    color: "#fff",
+                    backgroundColor: "#2067d1",
+                    cursor: "pointer",
+                    opacity: selectedAmenities.length === 0 ? 0.6 : 1,
+                    transition: "all 0.2s",
+                  }}
+                >
+                  Add Selected Amenities ({selectedAmenities.length})
+                </button>
+              </div>
             </div>
           </div>
         </div>
