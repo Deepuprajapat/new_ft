@@ -2,12 +2,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 // const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
 
-// let BASE_URL = process.env.REACT_APP_BASE_URL;
-// let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
-const BASE_URL="https://api.investmango.com"
+let BASE_URL = process.env.REACT_APP_BASE_URL;
+let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
+// const BASE_URL="https://api.investmango.com"
 
 // const BASE_URL="http://localhost:8282"
-const BASE_URL1="https://api.virtualintelligence.co.in"
+// const BASE_URL1="https://api.virtualintelligence.co.in"
 
 
 console.log("BASE_URL", BASE_URL);

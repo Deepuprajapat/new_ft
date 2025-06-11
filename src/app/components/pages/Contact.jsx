@@ -323,6 +323,24 @@ const ContactUs = () => {
                                   {error}
                                 </div>
                               )}
+                              <div className="form-group my-3 d-flex align-items-start">
+                                <input
+                                  type="checkbox"
+                                  id="consentCheckbox"
+                                  required
+                                  style={{
+                                    marginTop: "5px",
+                                    marginRight: "10px",
+                                    flexShrink: 0,
+                                  }}
+                                />
+                                <label htmlFor="consentCheckbox" style={{ fontSize: "14px", lineHeight: "1.5", padding: "0px", }}>
+                                  I authorize <strong>Invest Mango</strong> and its representative to contact
+                                  me with updates and notifications via Email, SMS, WhatsApp, and Call. This
+                                  will override the registry on DND / NDNC.
+                                </label>
+                              </div>
+
 
                               <button type="submit" className="theme-btn">
                                 Send
