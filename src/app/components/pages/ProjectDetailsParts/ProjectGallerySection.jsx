@@ -31,6 +31,7 @@ const SortableImage = ({
   setShowFullScreen,
   setCurrentImageIndex,
   showEdit,
+  loadingImg,
 }) => {
   const {
     attributes,
@@ -46,7 +47,11 @@ const SortableImage = ({
   };
 
   // Use dummy image if no imageUrl is present
-  const imageUrl = imageData?.imageUrl || DUMMY_IMAGE_PATH;
+  const imageUrl = imageData?.imageUrl
+    ? imageData.imageUrl
+    : loadingImg  
+      ? "" // Show nothing or a spinner while loading
+      : DUMMY_IMAGE_PATH;
   const caption = imageData?.caption || `Image ${index + 1}`;
 
   const imageContent = (
@@ -144,10 +149,15 @@ const ProjectGallerySection = ({
   const [hoveredImageIndex, setHoveredImageIndex] = useState(null);
   const [localImages, setLocalImages] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [loadingImg, setLoadingImg] = useState(false);
 
   // Initialize localImages with projectData images or empty array
   useEffect(() => {
     setLocalImages(projectData?.images || []);
+   const timeout = setTimeout(() => {
+      setLoadingImg(false);
+    }, 500);
+    return () => clearTimeout(timeout);
   }, [projectData]);
 
   const handleEdit = () => setIsEditing(true);
@@ -255,6 +265,7 @@ const ProjectGallerySection = ({
                 setShowFullScreen={setShowFullScreen}
                 setCurrentImageIndex={setCurrentImageIndex}
                 showEdit={showEdit}
+                loadingImg={loadingImg}
               />
 
               {/* Grid Images */}

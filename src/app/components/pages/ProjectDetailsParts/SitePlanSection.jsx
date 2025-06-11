@@ -47,41 +47,41 @@ const SitePlanSection = ({
       >
         {projectData?.name} Site Plan
         {showEdit && (
-        <span style={{ cursor: "pointer", marginLeft: "12px" }}>
-          {isSitePlanEditing ? (
-            <>
-              <button
-                className="btn btn-success btn-sm"
-                style={{
-                  backgroundColor: "white",
-                  color: "#2067d1",
-                  border: "1px solid #2067d1",
-                  fontWeight: "bold",
-                }}
-                onClick={() => setIsSitePlanEditing(false)}
-              >
-                Save
-              </button>
-              <button
-                className="btn btn-secondary btn-sm"
-                style={{
-                  backgroundColor: "#6c757d",
-                  color: "white",
-                  fontWeight: "bold",
-                    width:"auto"
-                }}
-                onClick={handleCancel}
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <img
-              src="/images/edit-icon.svg"
-              alt="Edit"
-              style={{ width: "18px", height: "18px" }}
-              onClick={() => setIsSitePlanEditing(true)}
-            />
+          <span style={{ cursor: "pointer", marginLeft: "12px" }}>
+            {isSitePlanEditing ? (
+              <>
+                <button
+                  className="btn btn-success btn-sm"
+                  style={{
+                    backgroundColor: "white",
+                    color: "#2067d1",
+                    border: "1px solid #2067d1",
+                    fontWeight: "bold",
+                  }}
+                  onClick={() => setIsSitePlanEditing(false)}
+                >
+                  Save
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  style={{
+                    backgroundColor: "#6c757d",
+                    color: "white",
+                    fontWeight: "bold",
+                    width: "auto",
+                  }}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <img
+                src="/images/edit-icon.svg"
+                alt="Edit"
+                style={{ width: "18px", height: "18px" }}
+                onClick={() => setIsSitePlanEditing(true)}
+              />
             )}
           </span>
         )}
@@ -100,9 +100,11 @@ const SitePlanSection = ({
             }}
             contentEditable={isSitePlanEditing}
             suppressContentEditableWarning={true}
-            onInput={e => setSiteplanParaHtml(e.currentTarget.innerHTML)}
+            onInput={(e) => setSiteplanParaHtml(e.currentTarget.innerHTML)}
             dangerouslySetInnerHTML={{
-              __html: isSitePlanEditing ? siteplanParaHtml : (projectData?.siteplanPara || "")
+              __html: isSitePlanEditing
+                ? siteplanParaHtml
+                : projectData?.siteplanPara || "",
             }}
           />
           <div className="position-relative px-3">
@@ -140,31 +142,38 @@ const SitePlanSection = ({
                     zIndex: 1,
                     filter: isSitePlanEditing && hovered ? "blur(4px)" : "none",
                   }}
-                  onClick={isSitePlanEditing ? () => fileInputRef.current.click() : openModal}
+                  onClick={
+                    isSitePlanEditing
+                      ? () => fileInputRef.current.click()
+                      : openModal
+                  }
                 />
                 {isSitePlanEditing && hovered && (
                   <div
                     className="position-absolute d-flex align-items-center justify-content-center"
                     style={{
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      backgroundColor: 'rgba(0,0,0,0.5)',
-                      borderRadius: '50%',
-                      padding: '15px',
-                      cursor: 'pointer',
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      backgroundColor: "rgba(0,0,0,0.5)",
+                      borderRadius: "50%",
+                      padding: "15px",
+                      cursor: "pointer",
                       zIndex: 2,
                     }}
                     onClick={() => fileInputRef.current.click()}
                   >
-                    <label htmlFor="siteplan-image-upload" style={{ margin: 0, cursor: 'pointer' }}>
+                    <label
+                      htmlFor="siteplan-image-upload"
+                      style={{ margin: 0, cursor: "pointer" }}
+                    >
                       <FontAwesomeIcon
                         icon={faCamera}
                         style={{
-                          color: 'white',
-                          fontSize: '25px',
-                          transition: 'transform 0.3s ease',
-                          transform: 'scale(1.2)'
+                          color: "white",
+                          fontSize: "25px",
+                          transition: "transform 0.3s ease",
+                          transform: "scale(1.2)",
                         }}
                       />
                     </label>
@@ -172,7 +181,7 @@ const SitePlanSection = ({
                       type="file"
                       id="siteplan-image-upload"
                       accept="image/*"
-                      style={{ display: 'none' }}
+                      style={{ display: "none" }}
                       ref={fileInputRef}
                       onChange={handleImageUpload}
                     />
@@ -180,7 +189,13 @@ const SitePlanSection = ({
                 )}
               </div>
             </div>
-            <div className="position-absolute top-0 end-0">
+            <div
+              className="position-absolute top-0 end-0"
+              style={{
+                zIndex: 3,
+                margin: "10px",
+              }}
+            >
               <button
                 className="d-block border-0 mb-1"
                 id="zoom-in"
@@ -191,6 +206,7 @@ const SitePlanSection = ({
                   height: "40px",
                   cursor: "pointer",
                   color: "#000",
+                  zIndex: 3,
                 }}
                 onClick={() => {
                   const img = document.getElementById("zoom-image");
