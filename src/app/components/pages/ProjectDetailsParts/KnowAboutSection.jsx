@@ -9,13 +9,13 @@ const KnowAboutSection = ({
 }) => {
   const [isAboutEditing, setIsAboutEditing] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [aboutHtml, setAboutHtml] = useState(projectData?.about || '');
+  const [aboutHtml, setAboutHtml] = useState(projectData?.web_cards?.know_about?.description || '');
   const editableRef = useRef(null);
  const handleCancel = () => setIsAboutEditing(false);
   // Update local state when projectData changes
   useEffect(() => {
-    setAboutHtml(projectData?.about || '');
-  }, [projectData?.about]);
+    setAboutHtml(projectData?.web_cards?.know_about?.description || '');
+  }, [projectData?.web_cards?.know_about?.description]);
 
   const handleSave = () => {
     // You can add your save logic here
@@ -202,6 +202,7 @@ const KnowAboutSection = ({
               .
             </p>
           )}
+         
 
           {!isAboutEditing && (
             <button

@@ -104,7 +104,7 @@ const SitePlanSection = ({
             dangerouslySetInnerHTML={{
               __html: isSitePlanEditing
                 ? siteplanParaHtml
-                : projectData?.siteplanPara || "",
+                : projectData?.web_cards?.site_plan?.html_content || "",
             }}
           />
           <div className="position-relative px-3">
@@ -118,6 +118,8 @@ const SitePlanSection = ({
               <div
                 id="image-container"
                 style={{
+                    width: "100vw", // full viewport width
+  
                   position: "relative",
                   width: "100%",
                   height: "100%",
@@ -126,28 +128,29 @@ const SitePlanSection = ({
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
               >
-                <img
-                  className="img-fluid"
-                  id="zoom-image"
-                  alt={`${projectData?.name} Site Plan`}
-                  src={isSitePlanEditing ? siteplanImgUrl : imageSrc}
-                  loading="lazy"
-                  fetchpriority="high"
-                  style={{
-                    transform: "scale(1) translate(0px, 0px)",
-                    transition: "transform 0.3s ease-in-out, filter 0.3s",
-                    position: "absolute",
-                    maxWidth: "100%",
-                    cursor: isSitePlanEditing ? "pointer" : "grab",
-                    zIndex: 1,
-                    filter: isSitePlanEditing && hovered ? "blur(4px)" : "none",
-                  }}
-                  onClick={
-                    isSitePlanEditing
-                      ? () => fileInputRef.current.click()
-                      : openModal
-                  }
-                />
+               <img
+  className="img-fluid"
+  id="zoom-image"
+  alt={`${projectData?.name} Site Plan`}
+  src={isSitePlanEditing ? siteplanImgUrl : projectData?.web_cards?.site_plan?.image || imageSrc}
+  loading="lazy"
+  fetchpriority="high"
+  style={{
+    width: "120%",
+    height: "100%",
+
+    transition: "transform 0.3s ease-in-out, filter 0.3s",
+    // position: "absolute", // isko hata dein
+    cursor: isSitePlanEditing ? "pointer" : "grab",
+    zIndex: 1,
+    filter: isSitePlanEditing && hovered ? "blur(4px)" : "none",
+  }}
+  onClick={
+    isSitePlanEditing
+      ? () => fileInputRef.current.click()
+      : openModal
+  }
+/>
                 {isSitePlanEditing && hovered && (
                   <div
                     className="position-absolute d-flex align-items-center justify-content-center"
@@ -210,17 +213,13 @@ const SitePlanSection = ({
                 }}
                 onClick={() => {
                   const img = document.getElementById("zoom-image");
-                  const currentScale = parseFloat(
-                    img.style.transform.match(/scale\((.*?)\)/)[1]
-                  );
-                  const [translateX, translateY] = img.style.transform
-                    .match(/translate\((.*?), (.*?)\)/)
-                    ?.slice(1)
-                    .map(parseFloat) || [0, 0];
-                  img.style.transform = `scale(${Math.min(
-                    3,
-                    currentScale * 1.2
-                  )}) translate(${translateX}px, ${translateY}px)`;
+                  const match = img.style.transform.match(/scale\((.*?)\)/);
+                  const currentScale = match ? parseFloat(match[1]) : 1;
+                  const translateMatch = img.style.transform.match(/translate\((.*?), (.*?)\)/);
+                  const [translateX, translateY] = translateMatch
+                    ? translateMatch.slice(1).map(parseFloat)
+                    : [0, 0];
+                  img.style.transform = `scale(${Math.min(3, currentScale * 1.2)}) translate(${translateX}px, ${translateY}px)`;
                 }}
               >
                 +
@@ -288,7 +287,7 @@ const SitePlanSection = ({
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={isSitePlanEditing ? siteplanImgUrl : imageSrc}
+              src={isSitePlanEditing ? siteplanImgUrl : projectData?.web_cards?.site_plan?.image || imageSrc}
               alt={`${projectData?.name} Site Plan`}
               loading="lazy"
               style={{

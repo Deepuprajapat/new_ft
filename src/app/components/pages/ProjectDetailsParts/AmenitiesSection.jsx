@@ -123,51 +123,51 @@ const AmenitiesSection = ({
     "Other",
   ];
 
-  const ALL_AMENITIES = {
+  const ICON_BASE_URL = "http://localhost:8000/";
+
+
+ const ALL_AMENITIES = {
     "Club House": [
-      { name: "Banquet Hall", icon: "/images/noimage.png" },
-      { name: "Indoor Games", icon: "/images/noimage.png" },
+      { name: "Banquet Hall", icon: `${ICON_BASE_URL}golf_course.svg` },
+      { name: "Indoor Games", icon: `${ICON_BASE_URL}golf_course.svg` },
     ],
     "Swimming Pool": [
-      { name: "Kids Pool", icon: "/images/noimage.png" },
-      { name: "Lap Pool", icon: "/images/noimage.png" },
+      { name: "Kids Pool", icon: `${ICON_BASE_URL}golf_course.svg` },
+      { name: "Lap Pool", icon: `${ICON_BASE_URL}golf_course.svg` },
     ],
-    "Gym": [
-      { name: "Cardio Zone", icon: "/images/noimage.png" },
-      { name: "Weight Training", icon: "/images/noimage.png" },
-      { name: "Yoga Studio", icon: "/images/noimage.png" },
-      { name: "CrossFit Area", icon: "/images/noimage.png" },
-      { name: "Steam Room", icon: "/images/noimage.png" },
-      { name: "Sauna", icon: "/images/noimage.png" },
-      { name: "Personal Training", icon: "/images/noimage.png" },
-      { name: "Fitness Classes", icon: "/images/noimage.png" },
-      { name: "Spinning Studio", icon: "/images/noimage.png" },
-      { name: "Boxing Area", icon: "/images/noimage.png" },
-      { name: "Dance Studio", icon: "/images/noimage.png" },
-      { name: "Pilates Room", icon: "/images/noimage.png" },
-      { name: "Zumba Classes", icon: "/images/noimage.png" },
-      { name: "Aerobics Room", icon: "/images/noimage.png" },
-      { name: "Stretching Area", icon: "/images/noimage.png" },
-    ],
-    "Security": [
-      { name: "24/7 Security", icon: "/images/noimage.png" },
-      { name: "CCTV Surveillance", icon: "/images/noimage.png" },
-      { name: "Security Guards", icon: "/images/noimage.png" },
-    ],
-    "Parking": [
-      { name: "Car Parking", icon: "/images/noimage.png" },
-      { name: "Bike Parking", icon: "/images/noimage.png" },
-      { name: "Visitor Parking", icon: "/images/noimage.png" },
-    ],
+     Gym: [
+    { name: "Cardio Zone", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "Weight Training", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "Yoga Studio", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "CrossFit Area", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "Steam Room", icon: `${ICON_BASE_URL}golf_course.svg`},
+    { name: "Sauna", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "Personal Training", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "Fitness Classes", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "Spinning Studio", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "Boxing Area", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "Dance Studio", icon: `${ICON_BASE_URL}golf_course.svg`},
+    { name: "Zumba Classes", icon: `${ICON_BASE_URL}golf_course.svg` },
+  ],
+  Security: [
+    { name: "24/7 Security", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "CCTV Surveillance", icon: `${ICON_BASE_URL}golf_course.svg`},
+    { name: "Security Guards", icon: `${ICON_BASE_URL}golf_course.svg` },
+  ],
+  Parking: [
+    { name: "Car Parking", icon:`${ICON_BASE_URL}golf_course.svg`},
+    { name: "Bike Parking", icon: `${ICON_BASE_URL}golf_course.svg` },
+    { name: "Visitor Parking", icon:`${ICON_BASE_URL}golf_course.svg`},
+  ],
     "Garden": [
-      { name: "Landscaped Garden", icon: "/images/noimage.png" },
-      { name: "Children's Play Area", icon: "/images/noimage.png" },
-      { name: "Walking Track", icon: "/images/noimage.png" },
+      { name: "Landscaped Garden", icon: `${ICON_BASE_URL}golf_course.svg` },
+      { name: "Children's Play Area", icon: `${ICON_BASE_URL}golf_course.svg` },
+      { name: "Walking Track", icon: `${ICON_BASE_URL}golf_course.svg` },
     ],
     "Other": [
-      { name: "Power Backup", icon: "/images/noimage.png" },
-      { name: "Rain Water Harvesting", icon: "/images/noimage.png" },
-      { name: "Solar Panels", icon: "/images/noimage.png" },
+      { name: "Power Backup", icon: `${ICON_BASE_URL}golf_course.svg` },
+      { name: "Rain Water Harvesting", icon: `${ICON_BASE_URL}golf_course.svg` },
+      { name: "Solar Panels", icon: `${ICON_BASE_URL}golf_course.svg` },
     ],
   };
 

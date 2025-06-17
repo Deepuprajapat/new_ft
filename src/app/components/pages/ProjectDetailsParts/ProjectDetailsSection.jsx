@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faExpandArrowsAlt,
@@ -15,46 +15,78 @@ import {
 
 const ProjectDetailsSection = ({
   projectData,
-  isEditing,
-  handleEdit,
-  handleSave,
   setProjectData,
-  handleInputChange,
   AddProjectButton,
   showEdit,
 }) => {
+  // Local state for editing
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({});
 
-    const handleArrayInputChange = (field, value) => {
-      const arrayValue = value.split(',').map(item => item.trim());
-      setProjectData(prev => ({
-        ...prev,
-        [field]: arrayValue
-      }));
-    };
-   
-    const getSizeRange = () => {
-        if (!projectData?.floorplans || projectData.floorplans.length === 0) {
-          return "Size not available";
-        }
-        const sizes = projectData.floorplans.map(fp => fp.size);
-        const minSize = Math.min(...sizes);
-        const maxSize = Math.max(...sizes);
-        return `${minSize} - ${maxSize} Sq. Ft.`;
-      };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "-";
-    if (dateStr.toLowerCase().includes("coming")) return "Coming Soon";
-    try {
-      const date = new Date(isNaN(dateStr) ? dateStr : Number(dateStr));
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-      });
-    } catch {
-      return dateStr;
-    }
+  // Start editing: copy data
+  const handleEdit = () => {
+    setEditData(JSON.parse(JSON.stringify(projectData)));
+    setIsEditing(true);
   };
+
+  // Save: update main data
+  const handleSave = () => {
+    setProjectData(editData);
+    setIsEditing(false);
+  };
+
+  // Cancel: discard changes
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
+
+  // Input change for nested keys
+  const handleInputChange = (path, value) => {
+    setEditData(prev => {
+      const newData = { ...prev };
+      // Support nested keys like 'web_cards.project_details.area.value'
+      const keys = path.split('.');
+      let obj = newData;
+      for (let i = 0; i < keys.length - 1; i++) {
+        obj[keys[i]] = obj[keys[i]] || {};
+        obj = obj[keys[i]];
+      }
+      obj[keys[keys.length - 1]] = value;
+      return newData;
+    });
+  };
+
+    // const handleArrayInputChange = (field, value) => {
+    //   const arrayValue = value.split(',').map(item => item.trim());
+    //   setProjectData(prev => ({
+    //     ...prev,
+    //     [field]: arrayValue
+    //   }));
+    // };
+   
+  //   const getSizeRange = () => {
+  //       if (!projectData?.floorplans || projectData.floorplans.length === 0) {
+  //         return "Size not available";
+  //       }
+  //       const sizes = projectData.floorplans.map(fp => fp.size);
+  //       const minSize = Math.min(...sizes);
+  //       const maxSize = Math.max(...sizes);
+  //       return `${minSize} - ${maxSize} Sq. Ft.`;
+  //     };
+
+  // const formatDate = (dateStr) => {
+  //   if (!dateStr) return "-";
+  //   if (dateStr.toLowerCase().includes("coming")) return "Coming Soon";
+  //   try {
+  //     const date = new Date(isNaN(dateStr) ? dateStr : Number(dateStr));
+  //     return date.toLocaleDateString("en-US", {
+  //       year: "numeric",
+  //       month: "long",
+  //     });
+  //   } catch {
+  //     return dateStr;
+  //   }
+  // };
 
   return (
     <div
@@ -86,10 +118,7 @@ const ProjectDetailsSection = ({
                 <button
                   className="btn btn-secondary btn-sm"
                   style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width:"auto"}}
-                  onClick={() => {
-                    // Reset logic here if needed, or just exit edit mode
-                    if (typeof handleEdit === "function") handleEdit(false); // or call a cancel handler if you have one
-                  }}
+                  onClick={handleCancel}
                 >
                   Cancel
                 </button>
@@ -120,10 +149,11 @@ const ProjectDetailsSection = ({
             {isEditing ? (
               <textarea
                 className="form-control"
-                value={AddProjectButton ? '' : (projectData?.overviewPara || '')}
+                value={editData?.overviewPara || ''}
                 onChange={(e) => handleInputChange('overviewPara', e.target.value)}
                 rows="3"
                 placeholder="Project description..."
+                maxLength={500}
               />
             ) : (
               <div
@@ -161,8 +191,9 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={AddProjectButton ? '' : (projectData?.area || '')}
-                      onChange={(e) => handleInputChange('area', e.target.value)}
+                      value={editData?.web_cards?.project_details?.area?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.area.value', e.target.value)}
+                      maxLength={500}
                     />
                   ) : (
                     <p
@@ -174,7 +205,7 @@ const ProjectDetailsSection = ({
                         fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {AddProjectButton ? '-- --' : projectData?.area}
+                      {projectData?.web_cards?.project_details?.area?.value || '-- --'}
                     </p>
                   )}
                 </div>
@@ -206,12 +237,9 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={AddProjectButton ? '' : (projectData?.floorplans?.map(fp => fp.size).join(', ') || '')}
-                      onChange={(e) => {
-                        const sizes = e.target.value.split(',').map(s => ({ size: parseInt(s.trim()) || 0 }));
-                        handleInputChange('floorplans', sizes);
-                      }}
-                      placeholder="850, 1200, 1650, 2100"
+                      value={editData?.web_cards?.project_details?.sizes?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.sizes.value', e.target.value)}
+                      maxLength={500}
                     />
                   ) : (
                     <p
@@ -223,7 +251,7 @@ const ProjectDetailsSection = ({
                         fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {AddProjectButton ? '-- --' : getSizeRange()}
+                      {projectData?.web_cards?.project_details?.sizes?.value || '-- --'}
                     </p>
                   )}
                 </div>
@@ -231,7 +259,7 @@ const ProjectDetailsSection = ({
             </div>
 
             {/* Project Units */}
-            <div className="col-6 col-md-4 mt-2 mt-md-4">
+            <div className="col-6 col-md-4 mt-4">
               <div className="d-flex align-items-center flex-column flex-md-row">
                 <FontAwesomeIcon
                   icon={faBuilding}
@@ -255,8 +283,9 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={AddProjectButton ? '' : (projectData?.units || '')}
-                      onChange={(e) => handleInputChange('units', e.target.value)}
+                      value={editData?.web_cards?.project_details?.units?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.units.value', e.target.value)}
+                      maxLength={500}
                     />
                   ) : (
                     <p
@@ -265,9 +294,10 @@ const ProjectDetailsSection = ({
                         color: "#000",
                         fontSize: window.innerWidth <= 768 ? "12px" : "13px",
                         marginTop: "2px",
+                        fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {AddProjectButton ? '-- --' : projectData?.units}
+                      {projectData?.web_cards?.project_details?.units?.value || '-- --'}
                     </p>
                   )}
                 </div>
@@ -275,7 +305,7 @@ const ProjectDetailsSection = ({
             </div>
 
             {/* Launch Date */}
-            <div className="col-6 col-md-4 mt-2 mt-md-4">
+            <div className="col-6 col-md-4 mt-4">
               <div className="d-flex align-items-center flex-column flex-md-row">
                 <FontAwesomeIcon
                   icon={faCalendarAlt}
@@ -297,10 +327,11 @@ const ProjectDetailsSection = ({
                   </small>
                   {isEditing ? (
                     <input
-                      type="date"
+                      type="text"
                       className="form-control form-control-sm mt-1"
-                      value={AddProjectButton ? '' : (projectData?.launchDate || '')}
-                      onChange={(e) => handleInputChange('launchDate', e.target.value)}
+                      value={editData?.web_cards?.project_details?.launch_date?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.launch_date.value', e.target.value)}
+                      maxLength={500}
                     />
                   ) : (
                     <p
@@ -309,9 +340,10 @@ const ProjectDetailsSection = ({
                         color: "#000",
                         fontSize: window.innerWidth <= 768 ? "12px" : "13px",
                         marginTop: "2px",
+                        fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {AddProjectButton ? '-- --' : formatDate(projectData?.launchDate)}
+                      {projectData?.web_cards?.project_details?.launch_date?.value || '-- --'}
                     </p>
                   )}
                 </div>
@@ -319,7 +351,7 @@ const ProjectDetailsSection = ({
             </div>
 
             {/* Possession Date */}
-            <div className="col-6 col-md-4 mt-2 mt-md-4">
+            <div className="col-6 col-md-4 mt-4">
               <div className="d-flex align-items-center flex-column flex-md-row">
                 <FontAwesomeIcon
                   icon={faGavel}
@@ -343,8 +375,9 @@ const ProjectDetailsSection = ({
                     <input
                       type="date"
                       className="form-control form-control-sm mt-1"
-                      value={AddProjectButton ? '' : (projectData?.possessionDate || '')}
-                      onChange={(e) => handleInputChange('possessionDate', e.target.value)}
+                      value={editData?.web_cards?.project_details?.possession_date?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.possession_date.value', e.target.value)}
+                      maxLength={500}
                     />
                   ) : (
                     <p
@@ -353,9 +386,10 @@ const ProjectDetailsSection = ({
                         color: "#000",
                         fontSize: window.innerWidth <= 768 ? "12px" : "13px",
                         marginTop: "2px",
+                        fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {AddProjectButton ? '-- --' : formatDate(projectData?.possessionDate)}
+                      {projectData?.web_cards?.project_details?.possession_date?.value || '-- --'}
                     </p>
                   )}
                 </div>
@@ -363,99 +397,99 @@ const ProjectDetailsSection = ({
             </div>
 
             {/* Total Towers */}
-            {((projectData?.totalTowers && !AddProjectButton) || isEditing) && (
-              <div className="col-6 col-md-4 mt-2 mt-md-4">
-                <div className="d-flex align-items-center flex-column flex-md-row">
-                  <FontAwesomeIcon
-                    icon={faBuilding}
-                    className="mb-2 mb-md-0 me-md-3"
+            <div className="col-6 col-md-4 mt-4">
+              <div className="d-flex align-items-center flex-column flex-md-row">
+                <FontAwesomeIcon
+                  icon={faBuilding}
+                  className="mb-2 mb-md-0 me-md-3"
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? "14px" : "20px",
+                    color: "#2067d1",
+                  }}
+                />
+                <div className="text-center text-md-start w-100">
+                  <small
                     style={{
-                      fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                      color: "#2067d1",
+                      color: "#000",
+                      fontSize: window.innerWidth <= 768 ? "11px" : "15px",
+                      fontWeight: "600",
                     }}
-                  />
-                  <div className="text-center text-md-start w-100">
-                    <small
+                  >
+                    Total Towers
+                  </small>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="form-control form-control-sm mt-1"
+                      value={editData?.web_cards?.project_details?.total_towers?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.total_towers.value', e.target.value)}
+                      maxLength={500}
+                    />
+                  ) : (
+                    <p
+                      className="mb-0 fw-normal fw-md-bolder"
                       style={{
                         color: "#000",
-                        fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                        fontWeight: "600",
+                        fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                        marginTop: "2px",
+                        fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      Total Towers
-                    </small>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        className="form-control form-control-sm mt-1"
-                        value={AddProjectButton ? '' : (projectData?.totalTowers || '')}
-                        onChange={(e) => handleInputChange('totalTowers', e.target.value)}
-                      />
-                    ) : (
-                      <p
-                        className="mb-0 fw-normal fw-md-bolder"
-                        style={{
-                          color: "#000",
-                          fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                          marginTop: "2px",
-                        }}
-                      >
-                        {AddProjectButton ? '-- --' : `${projectData?.totalTowers || ""} Towers`}
-                      </p>
-                    )}
-                  </div>
+                      {projectData?.web_cards?.project_details?.total_towers?.value || '-- --'}
+                    </p>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
 
             {/* Total Floors */}
-            {((projectData?.totalFloor && !AddProjectButton) || isEditing) && (
-              <div className="col-6 col-md-4 mt-2 mt-md-4">
-                <div className="d-flex align-items-center flex-column flex-md-row">
-                  <FontAwesomeIcon
-                    icon={faBars}
-                    className="mb-2 mb-md-0 me-md-3"
+            <div className="col-6 col-md-4 mt-4">
+              <div className="d-flex align-items-center flex-column flex-md-row">
+                <FontAwesomeIcon
+                  icon={faBars}
+                  className="mb-2 mb-md-0 me-md-3"
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? "14px" : "20px",
+                    color: "#2067d1",
+                  }}
+                />
+                <div className="text-center text-md-start w-100">
+                  <small
                     style={{
-                      fontSize: window.innerWidth <= 768 ? "14px" : "20px",
-                      color: "#2067d1",
+                      color: "#000",
+                      fontSize: window.innerWidth <= 768 ? "11px" : "15px",
+                      fontWeight: "600",
                     }}
-                  />
-                  <div className="text-center text-md-start w-100">
-                    <small
+                  >
+                    Total Floors
+                  </small>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="form-control form-control-sm mt-1"
+                      value={editData?.web_cards?.project_details?.total_floors?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.total_floors.value', e.target.value)}
+                      maxLength={500}
+                    />
+                  ) : (
+                    <p
+                      className="mb-0 fw-normal fw-md-bolder"
                       style={{
                         color: "#000",
-                        fontSize: window.innerWidth <= 768 ? "11px" : "15px",
-                        fontWeight: "600",
+                        fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                        marginTop: "2px",
+                        fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      Total Floors
-                    </small>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        className="form-control form-control-sm mt-1"
-                        value={AddProjectButton ? '' : (projectData?.totalFloor || '')}
-                        onChange={(e) => handleInputChange('totalFloor', e.target.value)}
-                      />
-                    ) : (
-                      <p
-                        className="mb-0 fw-normal fw-md-bolder"
-                        style={{
-                          color: "#000",
-                          fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                          marginTop: "2px",
-                        }}
-                      >
-                        {AddProjectButton ? '-- --' : `${projectData?.totalFloor} Floors`}
-                      </p>
-                    )}
-                  </div>
+                      {projectData?.web_cards?.project_details?.total_floors?.value || '-- --'}
+                    </p>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
 
             {/* Project Status */}
-            <div className="col-6 col-md-4 mt-2 mt-md-4">
+            <div className="col-6 col-md-4 mt-4">
               <div className="d-flex align-items-center flex-column flex-md-row">
                 <FontAwesomeIcon
                   icon={faFlag}
@@ -476,18 +510,13 @@ const ProjectDetailsSection = ({
                     Project Status
                   </small>
                   {isEditing ? (
-                    <select
+                    <input
+                      type="text"
                       className="form-control form-control-sm mt-1"
-                      style={{ paddingTop: "6px", paddingBottom: "6px" }}
-                      value={AddProjectButton ? '' : (projectData?.status || '')}
-                      onChange={(e) => handleInputChange('status', e.target.value)}
-                    >
-                      <option value="">Select Status</option>
-                      <option value="upcoming">Upcoming</option>
-                      <option value="under_construction">Under Construction</option>
-                      <option value="ready_to_move">Ready To Move</option>
-                      <option value="completed">Completed</option>
-                    </select>
+                      value={editData?.web_cards?.project_details?.project_status?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.project_status.value', e.target.value)}
+                      maxLength={500}
+                    />
                   ) : (
                     <p
                       className="mb-0 fw-normal fw-md-bolder"
@@ -495,12 +524,10 @@ const ProjectDetailsSection = ({
                         color: "#000",
                         fontSize: window.innerWidth <= 768 ? "12px" : "13px",
                         marginTop: "2px",
+                        fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {AddProjectButton ? '-- --' : (projectData?.status
-                        ?.toLowerCase()
-                        ?.replace(/_/g, " ")
-                        ?.replace(/\b\w/g, (char) => char.toUpperCase()))}
+                      {projectData?.web_cards?.project_details?.project_status?.value || '-- --'}
                     </p>
                   )}
                 </div>
@@ -528,21 +555,31 @@ const ProjectDetailsSection = ({
                   >
                     Property Type
                   </small>
-                  <p
-                    className="mb-0 fw-normal fw-md-bolder"
-                    style={{
-                      color: "#000",
-                      fontSize: window.innerWidth <= 768 ? "12px" : "13px",
-                      marginTop: "2px",
-                    }}
-                  >
-                    {AddProjectButton
-                      ? '-- --'
-                      : (projectData?.configurationsType?.propertyType &&
-                        projectData.configurationsType.propertyType
-                          .toLowerCase()
-                          .replace(/^\w/, (c) => c.toUpperCase()))}
-                  </p>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="form-control form-control-sm mt-1"
+                      value={editData?.configurationsType?.propertyType || ''}
+                      onChange={(e) => handleInputChange('configurationsType.propertyType', e.target.value)}
+                      maxLength={500}
+                    />
+                  ) : (
+                    <p
+                      className="mb-0 fw-normal fw-md-bolder"
+                      style={{
+                        color: "#000",
+                        fontSize: window.innerWidth <= 768 ? "12px" : "13px",
+                        marginTop: "2px",
+                      }}
+                    >
+                      {AddProjectButton
+                        ? '-- --'
+                        : (projectData?.configurationsType?.propertyType &&
+                          projectData.configurationsType.propertyType
+                            .toLowerCase()
+                            .replace(/^\w/, (c) => c.toUpperCase()))}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -572,9 +609,15 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={AddProjectButton ? '' : (projectData?.configurations?.join(', ') || '')}
-                      onChange={(e) => handleArrayInputChange('configurations', e.target.value)}
+                      value={editData?.configurations?.join(', ') || ''}
+                      onChange={(e) =>
+                        setEditData(prev => ({
+                          ...prev,
+                          configurations: e.target.value.split(',').map(item => item.trim())
+                        }))
+                      }
                       placeholder="1BHK, 2BHK, 3BHK, 4BHK"
+                      maxLength={500}
                     />
                   ) : (
                     <p
@@ -623,8 +666,9 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={AddProjectButton ? '' : (projectData?.rera || '')}
+                      value={editData?.rera || ''}
                       onChange={(e) => handleInputChange('rera', e.target.value)}
+                      maxLength={500}
                     />
                   ) : (
                     <p

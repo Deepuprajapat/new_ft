@@ -132,16 +132,27 @@ const FloorPlanSection = ({
   // Filtering logic
   const filteredPlans = isEditing
     ? editableFloorplans
-    : projectData?.floorplans || [];
+    : projectData?.web_cards?.floor_plan?.products || [];
+
   const filtered = filteredPlans.filter(
     (plan) =>
-      activeFilter === "all" || plan.projectConfigurationName === activeFilter
+      activeFilter === "all" || plan.projectConfigurationName === activeFilter || plan.flat_type === activeFilter // for new API
   );
   const sortedPlans = filtered.sort((a, b) => {
-    const sizeA = parseFloat(a.size);
-    const sizeB = parseFloat(b.size);
+    const sizeA = parseFloat(a.building_area || a.size);
+    const sizeB = parseFloat(b.building_area || b.size);
     return sizeA - sizeB;
   });
+
+  const handleEdit = () => {
+    setEditableFloorPara(projectData?.floorPara || "");
+    setEditableFloorplans(
+      projectData?.web_cards?.floor_plan?.products
+        ? JSON.parse(JSON.stringify(projectData.web_cards.floor_plan.products))
+        : []
+    );
+    setIsEditing(true);
+  };
 
   return (
     <div
@@ -191,7 +202,7 @@ const FloorPlanSection = ({
                   src="/images/edit-icon.svg"
                   alt="Edit"
                   style={{ width: "18px", height: "18px" }}
-                  onClick={() => setIsEditing(true)}
+                  onClick={handleEdit} // <-- use handleEdit here!
                 />
               )}
             </span>
@@ -202,7 +213,12 @@ const FloorPlanSection = ({
             {isEditing ? (
               <textarea
                 className="form-control"
-                value={editableFloorPara}
+                value={
+                  typeof editableFloorPara === "string" &&
+                  editableFloorPara.length > 0
+                    ? editableFloorPara
+                    : projectData?.web_cards?.floor_plan?.title || ""
+                }
                 onChange={(e) => setEditableFloorPara(e.target.value)}
                 rows={3}
                 style={{ fontSize: window.innerWidth <= 768 ? "12px" : "16px" }}
@@ -213,7 +229,7 @@ const FloorPlanSection = ({
                   fontSize: window.innerWidth <= 768 ? "12px" : "16px",
                 }}
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(projectData?.floorPara),
+                  __html: DOMPurify.sanitize(projectData?.web_cards?.floor_plan?.title || ""),
                 }}
               />
             )}
@@ -525,17 +541,14 @@ const FloorPlanSection = ({
                         </p>
                         <img
                           src={
-                            plan.imageUrl &&
-                            plan.imageUrl !== BASE_URL &&
-                            plan.imageUrl !== ""
-                              ? plan.imageUrl
-                              : "/images/Floor.png"
+                            plan.image || plan.imageUrl ||
+                            "/images/Floor.png"
                           }
-                          alt={`${plan.type} Floor Plan`}
+                          alt={`${plan.flat_type || plan.type} Floor Plan`}
                           loading="lazy"
                           className="img-fluid mb-3"
                           style={{ width: "100%" }}
-                          onClick={() => handleImageClick(plan.imageUrl)}
+                          onClick={() => handleImageClick(plan.image || plan.imageUrl)}
                         />
                         <div className="row mb-3">
                           <div className="col-6">
@@ -556,7 +569,7 @@ const FloorPlanSection = ({
                                 fontWeight: "600",
                               }}
                             >
-                              {plan.size} sq.ft
+                              {plan.building_area || plan.size} sq.ft
                             </p>
                           </div>
                           <div className="col-6">
