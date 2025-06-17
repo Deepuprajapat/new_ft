@@ -82,6 +82,19 @@ const VideoPresentationSection = ({
           )}
         </h2>
         <div className="px-3">
+          {/* Show video description from API if available */}
+          {projectData?.web_cards?.video_presentation?.description && (
+            <div
+              style={{
+                fontSize: window.innerWidth <= 768 ? "13px" : "15px",
+                color: "#333",
+                fontWeight: 500,
+                marginBottom: "12px"
+              }}
+            >
+              {projectData.web_cards.video_presentation.description}
+            </div>
+          )}
           <div className="mb-3 mb-md-5">
             {isVideoEditing ? (
               <textarea

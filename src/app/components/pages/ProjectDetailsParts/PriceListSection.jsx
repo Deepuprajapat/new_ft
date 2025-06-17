@@ -126,6 +126,9 @@ const PriceListSection = ({
     setIsEditing(false);
   };
 
+  // Get the price list description from API data
+const priceListDescription = projectData?.web_cards?.price_list?.description || "";
+
   return (
     <div className="mb-4" id="price" style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
       <div className="p-0 pb-2">
@@ -167,7 +170,20 @@ const PriceListSection = ({
 )}
         </h2>
         <div className="px-3">
-          <div className="mb-3">
+          {priceListDescription && (
+            <div
+              style={{
+                fontSize: window.innerWidth <= 768 ? "12px" : "16px",
+                color: "#333",
+                fontWeight: 500,
+                marginBottom: "0px", 
+              }}
+            >
+              {priceListDescription}
+            </div>
+          )}
+
+          <div className="px-1">
             <div
               style={{
                 fontSize: window.innerWidth <= 768 ? "12px" : "16px",

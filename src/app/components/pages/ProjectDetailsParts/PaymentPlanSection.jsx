@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 
-const PaymentPlanSection = ({
-  projectData,
-  showEdit,
-}) => {
-  const [localPaymentPlans, setLocalPaymentPlans] = useState(projectData?.paymentPlans || []);
-  const [localPaymentPara, setLocalPaymentPara] = useState(projectData?.paymentPara || "");
+const PaymentPlanSection = ({ projectData, showEdit }) => {
+  const [localPaymentPlans, setLocalPaymentPlans] = useState(
+    projectData?.paymentPlans || []
+  );
+  const [localPaymentPara, setLocalPaymentPara] = useState(
+    projectData?.paymentPara || ""
+  );
   const [isPaymentEditing, setIsPaymentEditing] = useState(false);
   // Sync with projectData when not editing
   useEffect(() => {
@@ -18,24 +19,19 @@ const PaymentPlanSection = ({
 
   // Update a payment plan row
   const updatePaymentPlan = (index, field, value) => {
-    setLocalPaymentPlans(prev =>
-      prev.map((plan, i) =>
-        i === index ? { ...plan, [field]: value } : plan
-      )
+    setLocalPaymentPlans((prev) =>
+      prev.map((plan, i) => (i === index ? { ...plan, [field]: value } : plan))
     );
   };
 
   // Remove a payment plan row
   const removePaymentPlan = (index) => {
-    setLocalPaymentPlans(prev => prev.filter((_, i) => i !== index));
+    setLocalPaymentPlans((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Add a new payment plan row
   const addNewPaymentPlan = () => {
-    setLocalPaymentPlans(prev => [
-      ...prev,
-      { planName: "", details: "" }
-    ]);
+    setLocalPaymentPlans((prev) => [...prev, { planName: "", details: "" }]);
   };
 
   // Save changes
@@ -51,7 +47,9 @@ const PaymentPlanSection = ({
     setIsPaymentEditing(false);
   };
 
-  const validPaymentPlans = (isPaymentEditing ? localPaymentPlans : projectData?.paymentPlans)?.filter(
+  const validPaymentPlans = (
+    isPaymentEditing ? localPaymentPlans : projectData?.paymentPlans
+  )?.filter(
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   );
 
@@ -59,14 +57,20 @@ const PaymentPlanSection = ({
   if (!isPaymentEditing && !validPaymentPlans?.length) return null;
 
   return (
-    <div className="mb-4" id="payment_plan" style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
+    <div
+      className="mb-4"
+      id="payment_plan"
+      style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
+    >
       <div className="p-0 pb-2">
-        <h2 className="mb-3 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
-            style={{
-              fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-              backgroundColor: "#2067d1",
-              borderRadius: "4px 4px 0 0",
-            }}>
+        <h2
+          className="mb-3 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
+          style={{
+            fontSize: window.innerWidth <= 768 ? "16px" : "18px",
+            backgroundColor: "#2067d1",
+            borderRadius: "4px 4px 0 0",
+          }}
+        >
           {projectData?.name} Payment Plan
           {showEdit && (
             <span style={{ cursor: "pointer", marginRight: "12px" }}>
@@ -88,7 +92,11 @@ const PaymentPlanSection = ({
                   </button>
                   <button
                     className="btn btn-secondary btn-sm"
-                    style={{ color: "white", fontWeight: "bold" ,width:"auto"}}
+                    style={{
+                      color: "white",
+                      fontWeight: "bold",
+                      width: "auto",
+                    }}
                     onClick={handleCancel}
                   >
                     Cancel
@@ -119,7 +127,7 @@ const PaymentPlanSection = ({
             }}
             contentEditable={isPaymentEditing}
             suppressContentEditableWarning={true}
-            onInput={e => setLocalPaymentPara(e.currentTarget.innerHTML)}
+            onInput={(e) => setLocalPaymentPara(e.currentTarget.innerHTML)}
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(
                 isPaymentEditing ? localPaymentPara : projectData?.paymentPara
@@ -185,34 +193,48 @@ const PaymentPlanSection = ({
                           <input
                             type="text"
                             value={plan.planName}
-                            onChange={e => updatePaymentPlan(index, "planName", e.target.value)}
+                            onChange={(e) =>
+                              updatePaymentPlan(
+                                index,
+                                "planName",
+                                e.target.value
+                              )
+                            }
                             className="form-control"
                           />
                         </td>
                         <td>
                           <textarea
                             value={plan.details}
-                            onChange={e => updatePaymentPlan(index, "details", e.target.value)}
+                            onChange={(e) =>
+                              updatePaymentPlan(
+                                index,
+                                "details",
+                                e.target.value
+                              )
+                            }
                             className="form-control"
                             style={{ minHeight: "60px", resize: "vertical" }}
                           />
                         </td>
                         <td>
                           <img
-  src="/images/delete1.png" // update this path as needed
-  onClick={() =>
-    setLocalPaymentPlans(prev => prev.filter((_, i) => i !== index))
-  }
-  style={{
-    padding: "4px",
-  width: "30px", 
-  marginTop:"10px" ,    // adjust size as needed
-  height: "30px",     // adjust size as needed
-  verticalAlign: "middle",
-    cursor: "pointer",  
-    marginLeft:"10px"   // optional spacing
-  }}
-/>
+                            src="/images/delete1.png" // update this path as needed
+                            onClick={() =>
+                              setLocalPaymentPlans((prev) =>
+                                prev.filter((_, i) => i !== index)
+                              )
+                            }
+                            style={{
+                              padding: "4px",
+                              width: "30px",
+                              marginTop: "10px", // adjust size as needed
+                              height: "30px", // adjust size as needed
+                              verticalAlign: "middle",
+                              cursor: "pointer",
+                              marginLeft: "10px", // optional spacing
+                            }}
+                          />
                         </td>
                       </tr>
                     ))
@@ -237,8 +259,8 @@ const PaymentPlanSection = ({
                     padding: "8px 16px",
                     fontSize: "14px",
                     cursor: "pointer",
-                    width:"auto",
-                    margin:"10px"
+                    width: "auto",
+                    margin: "10px",
                   }}
                 >
                   + Add New Payment Plan

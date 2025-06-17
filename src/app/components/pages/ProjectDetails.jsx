@@ -68,8 +68,12 @@ const ProjectDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [AddProjectButton, setAddProjectButton] = useState(false);
   const [isPaymentEditing, setIsPaymentEditing] = useState(false);
-  const [paymentPara, setPaymentPara] = useState(projectData?.paymentPara || '');
-  const [paymentPlans, setPaymentPlans] = useState(projectData?.paymentPlans || []);
+  const [paymentPara, setPaymentPara] = useState(
+    projectData?.paymentPara || ""
+  );
+  const [paymentPlans, setPaymentPlans] = useState(
+    projectData?.paymentPlans || []
+  );
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [editableAmenities, setEditableAmenities] = useState([]);
   const [reraDetails, setReraDetails] = useState(null);
@@ -78,23 +82,30 @@ const ProjectDetails = () => {
   const [isVideoEditing, setIsVideoEditing] = useState(false);
   const [editableVideos, setEditableVideos] = useState([]);
 
-
   // ...existing code... location map
 
   const [isLocationEditing, setIsLocationEditing] = useState(false);
-  const [locationMapHtml, setLocationMapHtml] = useState(projectData?.locationMap || "");
+  const [locationMapHtml, setLocationMapHtml] = useState(
+    projectData?.locationMap || ""
+  );
 
   //  state variable for site plan
   const [isSitePlanEditing, setIsSitePlanEditing] = useState(false);
-  const [siteplanParaHtml, setSiteplanParaHtml] = useState(projectData?.siteplanPara || "");
-  const [siteplanImgUrl, setSiteplanImgUrl] = useState(projectData?.siteplanImg || "");
+  const [siteplanParaHtml, setSiteplanParaHtml] = useState(
+    projectData?.web_cards?.site_plan?.html_content || ""
+  );
+  const [siteplanImgUrl, setSiteplanImgUrl] = useState(
+    projectData?.web_cards?.site_plan?.image || ""
+  );
+  // ...existing code...
   //state variabe for ace group
   const [developerForm, setDeveloperForm] = useState({
-    logo: developerDetails?.logo || "",
-    altLogo: developerDetails?.altLogo || "",
-    establishedYear: developerDetails?.establishedYear || "",
-    totalProjects: developerDetails?.totalProjects || "",
-    about: developerDetails?.about || "",
+    logo: developerDetails?.logo_url || "",
+    establishedYear: developerDetails?.establishment_year || "",
+    totalProjects: developerDetails?.total_properties || "",
+    about: developerDetails?.description || "",
+    address: developerDetails?.contact_details?.project_address || "",
+    name: developerDetails?.contact_details?.name || "",
   });
 
   // To update the project data
@@ -108,7 +119,7 @@ const ProjectDetails = () => {
   });
 
   const updatePatchFormData = (field, value) => {
-    setPatchFormData(prev => ({
+    setPatchFormData((prev) => ({
       ...prev,
       [field]: value
     }));
@@ -127,35 +138,34 @@ const ProjectDetails = () => {
 
 
   const handleInputChange = (field, value) => {
-    setProjectData(prev => ({
+    setProjectData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   // ace group
   useEffect(() => {
     setDeveloperForm({
-      logo: developerDetails?.logo || "",
-      altLogo: developerDetails?.altLogo || "",
-      establishedYear: developerDetails?.establishedYear || "",
-      totalProjects: developerDetails?.totalProjects || "",
-      about: developerDetails?.about || "",
+      logo: developerDetails?.logo_url || "",
+      establishedYear: developerDetails?.establishment_year || "",
+      totalProjects: developerDetails?.total_properties || "",
+      about: developerDetails?.description || "",
+      address: developerDetails?.contact_details?.project_address || "",
+      name: developerDetails?.contact_details?.name || "",
     });
   }, [developerDetails]);
 
   //  site plan popup
   useEffect(() => {
-    setSiteplanParaHtml(projectData?.siteplanPara || "");
-    setSiteplanImgUrl(projectData?.siteplanImg || "");
+    setSiteplanParaHtml(projectData?.web_cards?.site_plan?.html_content || "");
+    setSiteplanImgUrl(projectData?.web_cards?.site_plan?.image || "");
   }, [projectData]);
-
 
   // Keep state in sync with projectData location map and URL
   useEffect(() => {
     setLocationMapHtml(projectData?.locationMap || "");
   }, [projectData]);
-
 
   // Initialize editable amenities when editing starts
   useEffect(() => {
@@ -230,7 +240,6 @@ const ProjectDetails = () => {
     const updated = paymentPlans.filter((_, i) => i !== index);
     setPaymentPlans(updated);
   };
-
 
   const savePaymentChanges = () => {
     // Save logic here - update projectData or call API
@@ -347,9 +356,9 @@ const ProjectDetails = () => {
   // Initialize editable videos when editing starts
   useEffect(() => {
     if (isVideoEditing) {
-      const videos = projectData?.videos || [''];
+      const videos = projectData?.videos || [""];
       // Ensure at least one empty field for new video
-      const videosWithEmpty = videos.length === 0 ? [''] : [...videos];
+      const videosWithEmpty = videos.length === 0 ? [""] : [...videos];
       setEditableVideos(videosWithEmpty);
     }
   }, [isVideoEditing, projectData?.videos]);
@@ -364,18 +373,18 @@ const ProjectDetails = () => {
   const removeVideo = (index) => {
     const updated = editableVideos.filter((_, i) => i !== index);
     if (updated.length === 0) {
-      updated.push('');
+      updated.push("");
     }
     setEditableVideos(updated);
   };
 
   const addNewVideo = () => {
-    setEditableVideos([...editableVideos, '']);
+    setEditableVideos([...editableVideos, ""]);
   };
 
   const saveVideoChanges = () => {
     // Filter out empty video URLs before saving
-    const validVideos = editableVideos.filter(url => url.trim() !== '');
+    const validVideos = editableVideos.filter((url) => url.trim() !== "");
 
     // Save logic here - update projectData or call API
     // projectData.videos = validVideos;
@@ -448,6 +457,20 @@ const ProjectDetails = () => {
 
     return Object.values(groupedAmenities);
   };
+
+  // API se amenities data map karo
+  const apiAmenities =
+    projectData?.web_cards?.amenities?.categories_with_amenities || {};
+  const amenities = Object.entries(apiAmenities).map(([category, assets]) => ({
+    name: category.charAt(0) + category.slice(1).toLowerCase(),
+    assets: assets.map((item) => ({
+      name: item.value
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase()),
+      icon: item.icon,
+    })),
+  }));
+  const amenitiesPara = projectData?.web_cards?.amenities?.description || "";
 
   function getLeastPriceOfFloorPlan(floorPlan) {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
@@ -1087,9 +1110,11 @@ const ProjectDetails = () => {
           </div>
         </div>
         {/* meta form */}
-        { showEdit && <div className="d-flex gap-3">
-          <MetaFormSection />
-        </div>}
+        {showEdit && (
+          <div className="d-flex gap-3">
+            <MetaFormSection />
+          </div>
+        )}
         <ProjectHeaderSection
           projectData={projectData}
           formatPrice={formatPrice}
@@ -1176,24 +1201,28 @@ const ProjectDetails = () => {
               </div>
               {/* Payment Plan */}
               <PaymentPlanSection
-                projectData={projectData}
+                projectData={{
+                  ...projectData,
+                  paymentPlans:
+                    projectData?.web_cards?.payment_plans?.plans?.map(
+                      (plan) => ({
+                        planName: plan.name,
+                        details: plan.details,
+                      })
+                    ) || [],
+                  paymentPara:
+                    projectData?.web_cards?.payment_plans?.description || "",
+                }}
                 isPaymentEditing={isPaymentEditing}
                 setIsPaymentEditing={setIsPaymentEditing}
-                paymentPara={paymentPara}
-                setPaymentPara={setPaymentPara}
-                paymentPlans={paymentPlans}
-                updatePaymentPlan={updatePaymentPlan}
-                removePaymentPlan={removePaymentPlan}
-                savePaymentChanges={savePaymentChanges}
                 showEdit={showEdit}
               />
-
 
               {/* )} */}
               {/* Amenities */}
               <AmenitiesSection
-                amenities={projectData?.projectAmenities || []}
-                amenitiesPara={projectData?.amenitiesPara || ""}
+                amenities={amenities}
+                amenitiesPara={amenitiesPara}
                 name={projectData?.name || ""}
                 showEdit={showEdit}
               />
@@ -1275,21 +1304,36 @@ const ProjectDetails = () => {
 
               {/* About Developer Section */}
               <AboutDeveloperSection
-                developerDetails={developerDetails}
-                expandedIndex={expandedIndex}
-                setExpandedIndex={setExpandedIndex}
-                projectData={projectData}
-                isMobileView={window.innerWidth <= 768}
-                handleDownloadBrochure={handleDownloadBrochure}
-                handleDownloadBrochuree={handleDownloadBrochuree}
-                showEdit={showEdit}
-              />
-
+  developerDetails={{
+    logo: projectData?.web_cards?.about?.logo_url || "",
+    altLogo: projectData?.web_cards?.about?.contact_details?.name || "",
+    establishedYear: projectData?.web_cards?.about?.establishment_year || "",
+    totalProjects: projectData?.web_cards?.about?.total_projects || "",
+    about: projectData?.web_cards?.about?.description || "",
+    address: projectData?.web_cards?.about?.contact_details?.project_address || "",
+    name: projectData?.web_cards?.about?.contact_details?.name || "",
+    phone: projectData?.web_cards?.about?.contact_details?.phone || "",
+    bookingLink: projectData?.web_cards?.about?.contact_details?.booking_link || "",
+  }}
+  expandedIndex={expandedIndex}
+  setExpandedIndex={setExpandedIndex}
+  projectData={projectData}
+  isMobileView={window.innerWidth <= 768}
+  handleDownloadBrochure={handleDownloadBrochure}
+  handleDownloadBrochuree={handleDownloadBrochuree}
+  showEdit={showEdit}
+/>
               {/* Frequently Asked Questions */}
               <FAQSection
-                projectData={projectData}
-                setProjectData={setProjectData}
-                showEdit={showEdit}
+                projectData={{
+                  ...projectData,
+                  faqs: projectData?.web_cards?.faqs || [],
+                  name: projectData?.basic_info?.project_name || "",
+                  area:
+                    projectData?.web_cards?.project_details?.area?.value || "",
+                  shortAddress: projectData?.location_info?.short_address || "",
+                }}
+                showEdit={true}
               />
               {/* Similar Projects */}
               <SimilarProjectsSection
@@ -1323,7 +1367,6 @@ const ProjectDetails = () => {
                   projectData={projectData}
                 />
               )}
-
             </section>
           </div>
         </section>

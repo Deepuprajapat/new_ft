@@ -145,20 +145,45 @@ const ProjectHeaderSection = ({
                 onMouseEnter={() => showEdit && isEditing && setIsHovered(true)}
                 onMouseLeave={() => showEdit && isEditing && setIsHovered(false)}
               >
-                <img
-                  src={projectData?.projectLogo || "defaultLogo.jpg"}
-                  alt={projectData?.projectLogo || "Project Logo"}
-                  loading="lazy"
-                  className="img-fluid"
-                  style={{
-                    maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
-                    height: window.innerWidth <= 768 ? "44px" : "64px",
-                    objectFit: "contain",
-                    filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
-                    transition: "filter 0.3s ease"
-                  }}
-                  onClick={isEditing ? () => fileInputRef.current.click() : undefined}
-                />
+                {projectData?.web_cards?.images?.length > 0
+                  ? projectData.web_cards.images.map((imgUrl, index) => {
+                      if (!imgUrl) return null;
+                      return (
+                        <img
+                          key={index}
+                          src={imgUrl}
+                          alt={`Web Card Image ${index + 1}`}
+                          loading="lazy"
+                          className="img-fluid"
+                          style={{
+                            maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
+                            height: window.innerWidth <= 768 ? "44px" : "64px",
+                            objectFit: "contain",
+                            marginRight: "4px",
+                            filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
+                            transition: "filter 0.3s ease"
+                          }}
+                          onClick={isEditing ? () => fileInputRef.current.click() : undefined}
+                        />
+                      );
+                    })
+                  : (
+                    <img
+                      src={projectData?.projectLogo || "defaultLogo.jpg"}
+                      alt={projectData?.projectLogo || "Project Logo"}
+                      loading="lazy"
+                      className="img-fluid"
+                      style={{
+                        maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
+                        height: window.innerWidth <= 768 ? "44px" : "64px",
+                        objectFit: "contain",
+                        filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
+                        transition: "filter 0.3s ease"
+                      }}
+                      onClick={isEditing ? () => fileInputRef.current.click() : undefined}
+                    />
+                  )
+                }
                 {showEdit && isEditing && isHovered && (
                   <div
                     className="position-absolute d-flex align-items-center justify-content-center"
@@ -174,15 +199,15 @@ const ProjectHeaderSection = ({
                     }}
                     onClick={() => fileInputRef.current.click()}
                   >
-                     <FontAwesomeIcon
-                                           icon={faCamera}
-                                           style={{
-                                             color: 'white',
-                                             fontSize: '10px',
-                                             transition: 'transform 0.3s ease',
-                                             transform: 'scale(1.2)'
-                                           }}
-                                         />
+                    <FontAwesomeIcon
+                      icon={faCamera}
+                      style={{
+                        color: 'white',
+                        fontSize: '10px',
+                        transition: 'transform 0.3s ease',
+                        transform: 'scale(1.2)'
+                      }}
+                    />
                     <input
                       type="file"
                       accept="image/*"
@@ -699,14 +724,30 @@ const ProjectHeaderSection = ({
                         <input
                           type="text"
                           className="form-control form-control-sm d-inline w-auto ms-2"
-                          value={projectData?.reraLink || ""}
-                          onChange={e => handleInputChange("reraLink", e.target.value)}
+                          value={projectData?.web_cards?.rera_info?.website_link || ""}
+                          onChange={e =>
+                            handleInputChange(
+                              "web_cards",
+                              {
+                                ...projectData.web_cards,
+                                rera_info: {
+                                  ...projectData.web_cards?.rera_info,
+                                  website_link: e.target.value,
+                                },
+                              }
+                            )
+                          }
                           placeholder="Website Link"
                           style={{ fontSize: "10px", minWidth: 180, display: "inline-block" }}
                         />
                       ) : (
-                        <a href={projectData?.reraLink || "N/A"} target="_blank" rel="noopener noreferrer">
-                          {" "}{projectData?.reraLink || "N/A"}
+                        <a
+                          href={projectData?.web_cards?.rera_info?.website_link || "N/A"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ marginLeft: 8 }}
+                        >
+                          {projectData?.web_cards?.rera_info?.website_link || "N/A"}
                         </a>
                       )}
                     </span>
@@ -775,42 +816,83 @@ const ProjectHeaderSection = ({
                                   item.reraNumber || "-"
                                 )}
                               </td>
-                              <td style={{ fontSize: "12px", padding: "10px", fontWeight: "600" }}>
+                              <td style={{ fontSize: "12px", padding: "10px", fontWeight: "600", verticalAlign: "middle" }}>
                                 {isEditing ? (
-                                  <>
-                                    {item.qrImages ? (
-                                      <img
-                                        src={item.qrImages}
-                                        alt="qrImage"
+                                  <div style={{ display: "flex", alignItems: "center", gap: 10, position: "relative" }}>
+                                    <div style={{ position: "relative", width: "40px", height: "40px" }}>
+                                      {item.qrImages ? (
+                                        <img
+                                          src={item.qrImages}
+                                          alt="qrImage"
+                                          style={{
+                                            marginTop: "5px",
+                                            height: "30px",
+                                            width: "30px",
+                                            objectFit: "cover",
+                                            border: "1.5px solid gray",
+                                            borderRadius: "6px",
+                                            background: "#f8fbff"
+                                          }}
+                                        />
+                                      ) : (
+                                        <span style={{
+                                           marginTop: "5px",
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          height: "30px",
+                                          width: "30px",
+                                          border: "1.5px solid gray",
+                                          borderRadius: "6px",
+                                          background: "#f8fbff",
+                                          color: "#bbb",
+                                          fontSize: "18px"
+                                        }}>
+                                          <i className="fas fa-qrcode"></i>
+                                        </span>
+                                      )}
+                                      <label
+                                        htmlFor={`qr-upload-${index}`}
                                         style={{
-                                          height: "40px",
-                                          width: "40px",
-                                          objectFit: "cover",
-                                          marginBottom: 4,
+                                          position: "absolute",
+                                          bottom: "-8px",
+                                          right: "-8px",
+                                          background: "gray",
+                                          color: "#fff",
+                                          borderRadius: "50%",
+                                          width: "22px",
+                                          height: "22px",
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          cursor: "pointer",
+                                          border: "2px solid #fff",
+                                          boxShadow: "0 2px 6px rgba(0,0,0,0.08)"
                                         }}
-                                      />
-                                    ) : (
-                                      <span>N/A</span>
-                                    )}
-                                    <input
-                                      type="file"
-                                      accept="image/*"
-                                      className="form-control form-control-sm mt-1"
-                                      style={{ fontSize: "10px" }}
-                                      onChange={e => {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                          const reader = new FileReader();
-                                          reader.onload = ev => {
-                                            const updated = [...projectData.reraDetails];
-                                            updated[index].qrImages = ev.target.result;
-                                            handleInputChange("reraDetails", updated);
-                                          };
-                                          reader.readAsDataURL(file);
-                                        }
-                                      }}
-                                    />
-                                  </>
+                                        title="Upload QR"
+                                      >
+                                        <FontAwesomeIcon icon={faCamera} style={{ fontSize: "12px" }} />
+                                        <input
+                                          id={`qr-upload-${index}`}
+                                          type="file"
+                                          accept="image/*"
+                                          style={{ display: "none" }}
+                                          onChange={e => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                              const reader = new FileReader();
+                                              reader.onload = ev => {
+                                                const updated = [...projectData.reraDetails];
+                                                updated[index].qrImages = ev.target.result;
+                                                handleInputChange("reraDetails", updated);
+                                              };
+                                              reader.readAsDataURL(file);
+                                            }
+                                          }}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
                                 ) : item.qrImages ? (
                                   <img
                                     src={item.qrImages}
@@ -819,24 +901,52 @@ const ProjectHeaderSection = ({
                                       height: "40px",
                                       width: "40px",
                                       objectFit: "cover",
+                                      border: "1.5px solid gra",
+                                      borderRadius: "6px",
+                                      background: "#f8fbff"
                                     }}
                                   />
                                 ) : (
-                                  <span>N/A</span>
+                                  <span style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    height: "40px",
+                                    width: "40px",
+                                    border: "1.5px solid gray",
+                                    borderRadius: "6px",
+                                    background: "#f8fbff",
+                                    color: "#bbb",
+                                    fontSize: "18px"
+                                  }}>
+                                    <i className="fas fa-qrcode"></i>
+                                  </span>
                                 )}
                               </td>
                               {isEditing && (
-                                <td>
+                                <td style={{ verticalAlign: "middle" }}>
                                   <button
                                     className="btn btn-danger btn-sm"
-                                    style={{ fontSize: 10, padding: "2px 6px" }}
+                                    style={{
+                                      fontSize: 16,
+                                      padding: "6px",
+                                      borderRadius: "50%",
+                                      background: "#e74c3c",
+                                      border: "none",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      width: "32px",
+                                      height: "32px"
+                                    }}
+                                    title="Delete"
                                     onClick={() => {
                                       const updated = [...projectData.reraDetails];
                                       updated.splice(index, 1);
                                       handleInputChange("reraDetails", updated);
                                     }}
                                   >
-                                    Delete
+                                    <i className="fas fa-trash"></i>
                                   </button>
                                 </td>
                               )}

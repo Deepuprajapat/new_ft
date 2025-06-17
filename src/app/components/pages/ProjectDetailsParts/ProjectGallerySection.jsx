@@ -151,10 +151,18 @@ const ProjectGallerySection = ({
   const [isEditing, setIsEditing] = useState(false);
   const [loadingImg, setLoadingImg] = useState(false);
 
-  // Initialize localImages with projectData images or empty array
+  // Initialize localImages with projectData.web_cards.images (skip first image)
   useEffect(() => {
-    setLocalImages(projectData?.images || []);
-   const timeout = setTimeout(() => {
+    // Skip the first image (index 0)
+    const images =
+      projectData?.web_cards?.images?.length > 1
+        ? projectData.web_cards.images.slice(1).map((url, idx) => ({
+            imageUrl: url,
+            caption: `Image ${idx + 2}`,
+          }))
+        : [];
+    setLocalImages(images);
+    const timeout = setTimeout(() => {
       setLoadingImg(false);
     }, 500);
     return () => clearTimeout(timeout);

@@ -10,10 +10,13 @@ const LocationMapSection = ({
   setLocationMapHtml,
   showEdit
 }) => {
-  const [locationUrl, setLocationUrl] = useState(projectData?.locationUrl || "");
+  // Use location_info from projectData if available
+  const locationInfo = projectData?.location_info || {};
+  const [locationUrl, setLocationUrl] = useState(locationInfo.google_map_link || projectData?.locationUrl || "");
   const handleCancel = () => {
     setLocationMapHtml(projectData?.locationMap || "");
     setIsLocationEditing(false);
+    setLocationUrl(locationInfo.google_map_link || projectData?.locationUrl || "");
   };
 
   return (
@@ -69,23 +72,32 @@ const LocationMapSection = ({
         </h2>
         <div className="row">
           <div className="col-12">
-            <div
-              className="mb-4 px-3"
-              style={{
-                fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                outline: isLocationEditing ? "1px solid #2067d1" : "none",
-                background: isLocationEditing ? "#f8faff" : "transparent",
-                borderRadius: "4px",
-                padding: isLocationEditing ? "8px" : "0",
-                minHeight: "40px",
-              }}
-              contentEditable={isLocationEditing}
-              suppressContentEditableWarning={true}
-              onInput={e => setLocationMapHtml(e.currentTarget.innerHTML)}
-              dangerouslySetInnerHTML={{
-                __html: isLocationEditing ? locationMapHtml : (projectData?.locationMap || "")
-              }}
-            />
+            {/* Show short address if available */}
+            {locationInfo.short_address && (
+              <div className="mb-2 px-3 text-muted" style={{ fontSize: "14px" }}>
+                <strong>Address:</strong> {locationInfo.short_address}
+              </div>
+            )}
+            {/* Show locationMapHtml only if it has content or editing is on */}
+            {(isLocationEditing || (projectData?.locationMap && projectData.locationMap.trim() !== "")) && (
+              <div
+                className="mb-4 px-3"
+                style={{
+                  fontSize: window.innerWidth <= 768 ? "12px" : "14px",
+                  outline: isLocationEditing ? "1px solid #2067d1" : "none",
+                  background: isLocationEditing ? "#f8faff" : "transparent",
+                  borderRadius: "4px",
+                  padding: isLocationEditing ? "8px" : "0",
+                  minHeight: "40px",
+                }}
+                contentEditable={isLocationEditing}
+                suppressContentEditableWarning={true}
+                onInput={e => setLocationMapHtml(e.currentTarget.innerHTML)}
+                dangerouslySetInnerHTML={{
+                  __html: isLocationEditing ? locationMapHtml : (projectData?.locationMap || "")
+                }}
+              />
+            )}
             <div className="position-relative mt-3">
               <div
                 style={{
@@ -115,15 +127,18 @@ const LocationMapSection = ({
                   style={{ objectFit: "cover", borderRadius: "4px" }}
                 />
               ) : (
-                <iframe
-                  title="Location"
-                  src={isLocationEditing ? locationUrl : projectData?.locationUrl}
-                  width="100%"
-                  height="300"
-                  style={{ border: 0 }}
-                  allowFullScreen=""
-                  loading="lazy"
-                />
+                // Only show iframe if link exists
+                (locationInfo.google_map_link || projectData?.locationUrl) && (
+                  <iframe
+                    title="Location"
+                    src={isLocationEditing ? locationUrl : (locationInfo.google_map_link || projectData?.locationUrl)}
+                    width="100%"
+                    height="300"
+                    style={{ border: 0 }}
+                    allowFullScreen=""
+                    loading="lazy"
+                  />
+                )
               )}
             </div>
           </div>

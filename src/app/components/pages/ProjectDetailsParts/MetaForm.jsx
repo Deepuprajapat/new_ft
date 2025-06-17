@@ -11,8 +11,50 @@ function MetaFormSection() {
   const [metaKeywords, setMetaKeywords] = useState([]);
   const [keywordInput, setKeywordInput] = useState("");
   const [schema, setSchema] = useState("");
+  const [canonical, setCanonical] = useState("");
   const [brochure, setBrochure] = useState(null);
   const [brochureError, setBrochureError] = useState("");
+
+  // Prefill with your provided meta_info JSON when form opens
+  useEffect(() => {
+    if (showMetaForm) {
+      // Replace this with dynamic data if needed
+      const meta_info = {
+        "title": "ACE Divino | 4 BHK Luxury Flats in Sector 1, Noida Extension",
+        "description": "ACE Divino Sector 1, Noida Extension: Explore prices, floor plans, payment options, location, photos, videos, and more. Download the project brochure now!",
+        "keywords": "ace divino,  ace divino noida extension,  ace divino noida,  flat at noida extension,  ace divino floor plan,  ace divino price list,  2 bhk flat in noida extension,  3 bhk flats in noida extension,  4 bhk flat in noida extension,  ace divino possession date,  ready to move flats in noida extension,  ace divino location,  ace divino latest construction update,  ace divino reviews,  ready to move flats in noida extension,  ultra luxury apartments in noida,  3 bhk flats in noida extension ready to move,  ace group,  residential apartment in noida extension,  residential apartment in noida extension,  best residential project in noida extension,  ready to move apartments",
+        "canonical": "ace-divino",
+        "project_schema": [
+          `<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "ACE Divino",
+  "image": "https://image.investmango.com/images/img/ace-divino/ace-divino-greater-noida-west.webp",
+  "description": "ACE Divino Sector 1, Noida Extension: Explore prices, floor plans, payment options, location, photos, videos, and more. Download the project brochure now!",
+  "brand": {
+    "@type": "Brand",
+    "name": "Ace Group of India"
+  },
+  "offers": {
+    "@type": "AggregateOffer",
+    "url": "https://www.investmango.com/ace-divino",
+    "priceCurrency": "INR",
+    "lowPrice": "18800000",
+    "highPrice": "22500000"
+  }
+}
+</script>`
+        ]
+      };
+      setMetaTitle(meta_info.title || "");
+      setMetaDescription(meta_info.description || "");
+      setMetaKeywords(meta_info.keywords ? meta_info.keywords.split(",").map(k => k.trim()).filter(Boolean) : []);
+      setKeywordInput(meta_info.keywords || "");
+      setSchema(Array.isArray(meta_info.project_schema) ? meta_info.project_schema[0] : meta_info.project_schema || "");
+      setCanonical(meta_info.canonical || "");
+    }
+  }, [showMetaForm]);
 
   const addKeyword = () => {
     if (keywordInput.trim() && !metaKeywords.includes(keywordInput.trim())) {
@@ -67,25 +109,33 @@ function MetaFormSection() {
 
   return (
     <section
-    className="container"
-    style={{
-     width:"auto",
-   marginRight:"10px",
-      justifyContent: "flex-end",
-      alignItems:"end",
-    }}
-  >
-    <div className="d-flex justify-content-center justify-content-md-end my-3 w-100">
-      <button
-      style={{alignItems:'end',width:'100%',backgroundColor:'#2067d1',color:'white',borderRadius:'10px',padding:'10px',fontSize:'16px',fontWeight:'500',cursor:'pointer'}}
-        className="btn btn-primary meta-data-btn w-100 w-md-auto"
-        onClick={() => setShowMetaForm(true)}
-        type="button"
-      >
-        Meta Data
-      </button>
-
-
+      className="container"
+      style={{
+        width: "auto",
+        marginRight: "10px",
+        justifyContent: "flex-end",
+        alignItems: "end",
+      }}
+    >
+      <div className="d-flex justify-content-center justify-content-md-end my-3 w-100">
+        <button
+          style={{
+            alignItems: 'end',
+            width: '100%',
+            backgroundColor: '#2067d1',
+            color: 'white',
+            borderRadius: '10px',
+            padding: '10px',
+            fontSize: '16px',
+            fontWeight: '500',
+            cursor: 'pointer'
+          }}
+          className="btn btn-primary meta-data-btn w-100 w-md-auto"
+          onClick={() => setShowMetaForm(true)}
+          type="button"
+        >
+          Meta Data
+        </button>
       </div>
 
       {showMetaForm && (
@@ -106,8 +156,8 @@ function MetaFormSection() {
           <div
             className="meta-form-modal p-4 bg-white rounded shadow"
             style={{
-              maxWidth: 530,
-              width: "95%",
+              maxWidth: 700, // Increased from 530 to 700
+              width: "98%",  // Increased from 95% to 98%
               borderRadius: 16,
               boxShadow: "0 8px 32px rgba(60,60,60,0.18)",
               position: "relative",
@@ -204,6 +254,19 @@ function MetaFormSection() {
               </div>
               <div className="mb-3">
                 <label className="form-label" style={{ fontWeight: 500 }}>
+                  Canonical
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={canonical}
+                  onChange={(e) => handleInputChange(e, setCanonical)}
+                  placeholder="Canonical URL or slug"
+                  style={{ borderRadius: 8, fontSize: 16 }}
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label" style={{ fontWeight: 500 }}>
                   Schema
                 </label>
                 <div
@@ -272,14 +335,6 @@ function MetaFormSection() {
               </div>
 
               <div className="d-flex justify-content-end mt-4">
-                {/* <button
-                  type="button"
-                  className="btn btn-secondary me-2"
-                  onClick={() => setShowMetaForm(false)}
-                  style={{ borderRadius: 8, fontWeight: 500 }}
-                >
-                  Close
-                </button> */}
                 <button
                   type="submit"
                   className="btn btn-primary"

@@ -15,10 +15,18 @@ const WhyChooseSection = ({
 
   // Create an array of 6 USPs, filling empty slots with empty strings
   const displayUSPs = Array(6).fill("").map((_, index) =>
-    projectData?.usps?.[index] || ""
-  );
+  projectData?.web_cards?.why_to_choose?.usp_list?.[index]?.description || ""
+);
   const handleEdit = () => setIsEditing(true);
   const handleSave = () => setIsEditing(false);
+
+  // Map why_to_choose.image_urls to images array for UI compatibility
+  const images = projectData?.web_cards?.why_to_choose?.image_urls?.length
+  ? projectData.web_cards.why_to_choose.image_urls.map((url, idx) => ({
+      imageUrl: url,
+      caption: `Image ${idx + 1}`,
+    }))
+  : [];
 
   return (
     <div
@@ -89,13 +97,13 @@ const WhyChooseSection = ({
                 <div className="col-md-6">
                   <div className="row g-1">
                     {/* First row with single image */}
-                    {projectData?.images && projectData?.images[0] && (
+                    {images && images[0] && (
                       <div className="col-12 mb-1">
                         <img
                           alt={
-                            projectData?.images[0].caption || "Project Image 1"
+                            images[0].caption || "Project Image 1"
                           }
-                          src={projectData?.images[0].imageUrl}
+                          src={images[0].imageUrl}
                           loading="lazy"
                           className="img-fluid rounded w-100"
                           style={{
@@ -121,8 +129,8 @@ const WhyChooseSection = ({
                   Close
                 </button> */}
 
-                        {projectData?.images &&
-                          projectData?.images
+                        {images &&
+                          images
                             ?.slice(1, 3)
                             .map((image, index) => (
                               <div className="col-6" key={index + 1}>
@@ -188,7 +196,13 @@ const WhyChooseSection = ({
                                 updatedUSPs[idx] = e.target.value;
                                 setProjectData({
                                   ...projectData,
-                                  usps: updatedUSPs.filter(usp => usp !== ""), 
+                                  web_cards: {
+                                    ...projectData.web_cards,
+                                    why_to_choose: {
+                                      ...projectData.web_cards?.why_to_choose,
+                                      usp_list: updatedUSPs.map(desc => ({ description: desc }))
+                                    }
+                                  }
                                 });
                               }}
                               style={{

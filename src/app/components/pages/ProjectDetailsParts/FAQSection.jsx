@@ -1,21 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 
-const defaultFaqs = [
-  {
-    question: "Why choose Invest Mango?",
-    answer:
-      "Invest Mango works as one team with a common purpose to provide best-in-class services, thoroughly understands the changing needs of its clients. We are client-centric as client is the focal point of Invest Mango. We provide advice and recommendations that are in the client's best interest. We strive to understand the client's requirement by entering into his shoes and offer advice which have far reaching impact. A happy client is what makes us happy and we are proud to serve our client's.",
-  },
-  {
-    question: "How much is the total size of {{projectData.name}}?",
-    answer: "{{projectData.area}}.",
-  },
-  {
-    question: "What is the project location?",
-    answer: "{{projectData.shortAddress}}.",
-  },
-];
+
 
 function injectProjectData(template, data) {
   return template
@@ -36,27 +22,19 @@ function cleanQuestion(question) {
 }
 
 const FAQSection = ({ projectData  , showEdit}) => {
-  // State for expanded/collapsed
   const [expandedIndex, setExpandedIndex] = useState(null);
-  // State for editing
   const [isEditing, setIsEditing] = useState(false);
-  // State for faqs
   const [faqs, setFaqs] = useState([]);
 
   // Prepare faqs on mount or when projectData changes
-  useEffect(() => {
-    let sortedFaqs = projectData?.faqs
-      ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) }))
-      ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity));
-    let initialFaqs =
-      Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
-        ? sortedFaqs
-        : defaultFaqs.map((faq) => ({
-            question: injectProjectData(faq.question, projectData),
-            answer: injectProjectData(faq.answer, projectData),
-          }));
-    setFaqs(initialFaqs);
-  }, [projectData]);
+ useEffect(() => {
+  let sortedFaqs = Array.isArray(projectData?.faqs)
+    ? projectData.faqs
+        .map((faq) => ({ ...faq, ...cleanQuestion(faq.question) }))
+        .sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity))
+    : [];
+  setFaqs(sortedFaqs);
+}, [projectData]);
 
   // For editing
   const [editFaqs, setEditFaqs] = useState([]);
@@ -270,6 +248,9 @@ const FAQSection = ({ projectData  , showEdit}) => {
               )}
             </div>
           ))}
+          {faqs.length === 0 && !isEditing && (
+  <div className="text-center text-muted py-3">No FAQs available.</div>
+)}
           {isEditing && (
             <div className="mb-3 text-end">
               <button
