@@ -128,7 +128,7 @@ const SitePlanSection = ({
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
               >
-<<<<<<< HEAD
+
                 <img
                   className="img-fluid"
                   id="zoom-image"
@@ -152,7 +152,6 @@ const SitePlanSection = ({
                       : openModal
                   }
                 />
-=======
                <img
   className="img-fluid"
   id="zoom-image"
@@ -176,7 +175,7 @@ const SitePlanSection = ({
       : openModal
   }
 />
->>>>>>> 1c4bfbd (get api data display)
+
                 {isSitePlanEditing && hovered && (
                   <div
                     className="position-absolute d-flex align-items-center justify-content-center"
