@@ -6,6 +6,8 @@ const ProjectHeaderSection = ({
   formatPrice,
   handleInputChange,
   showEdit,
+  handleSave,
+  setPatchFormData
 }) => {
   const fileInputRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -15,9 +17,8 @@ const ProjectHeaderSection = ({
   const [maxPrice, setMaxPrice] = useState("");
   const [showReraDetails, setShowReraDetails] = useState(false);
   const [isReraDetailHovered, setIsReraDetailHovered] = useState(false);
- const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const handleEdit = () => setIsEditing(true);
-  const handleSave = () => setIsEditing(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [searchCity, setSearchCity] = useState("");
   const [searchLocality, setSearchLocality] = useState("");
@@ -44,7 +45,7 @@ const ProjectHeaderSection = ({
 
     if (validFloorPlans.length === 0) return 0; // If all prices were 1.5, return 0
 
-    const sortedFloorPlan = [...validFloorPlans].sort(  
+    const sortedFloorPlan = [...validFloorPlans].sort(
       (a, b) => b.price - a.price
     );
     return sortedFloorPlan[0].price;
@@ -66,11 +67,63 @@ const ProjectHeaderSection = ({
     }
   }, [isEditing, projectData, getLeastPriceOfFloorPlan, getHighestPriceOfFloorPlan]);
 
-  // Handle Save: update parent state for prices, then call handleSave
-  const handleSaveAll = () => {
+    const handleSaveAll = () => {
+    // Create an object to track changes
+    const updatedData = {};
+    
+    // Check if minPrice changed
+    const originalMinPrice = projectData?.minPrice ?? getLeastPriceOfFloorPlan(projectData?.floorplans?.filter(plan => plan.price > 1)) ?? "";
+    if (minPrice !== originalMinPrice) {
+      updatedData.minPrice = minPrice || "";
+    }
+    
+    // Check if maxPrice changed
+    const originalMaxPrice = projectData?.maxPrice ?? getHighestPriceOfFloorPlan(projectData?.floorplans) ?? "";
+    if (maxPrice !== originalMaxPrice) {
+      updatedData.maxPrice = maxPrice || "";
+    }
+
+    // Check if project name changed
+    const originalName = projectData?.name || "";
+    if (projectData?.name !== originalName) {
+      updatedData.name = projectData?.name || "";
+    }
+
+    // Check if developer name changed
+    const originalDeveloperName = projectData?.developerName || "";
+    if (projectData?.developerName !== originalDeveloperName) {
+      updatedData.developerName = projectData?.developerName || "";
+    }
+
+    // Check if city/locality changed
+    const originalCity = projectData?.city || "";
+    const originalLocality = projectData?.locality || "";
+    if (projectData?.city !== originalCity || projectData?.locality !== originalLocality) {
+      updatedData.city = projectData?.city || "";
+      updatedData.locality = projectData?.locality || "";
+    }
+
+    // Check if RERA details changed
+    const originalReraDetails = projectData?.reraDetails || [];
+    if (JSON.stringify(projectData?.reraDetails) !== JSON.stringify(originalReraDetails)) {
+      updatedData.reraDetails = projectData?.reraDetails || [];
+    }
+
+    // Check if web_cards changed
+    const originalWebCards = projectData?.web_cards || {};
+    if (JSON.stringify(projectData?.web_cards) !== JSON.stringify(originalWebCards)) {
+      updatedData.web_cards = projectData?.web_cards || {};
+    }
+
+    // Only set patch data if there are changes
+    if (Object.keys(updatedData).length > 0) {
+      setPatchFormData(updatedData);
+    }
+
     handleInputChange("minPrice", minPrice);
     handleInputChange("maxPrice", maxPrice);
-    handleSave();
+    handleSave(updatedData);
+    setIsEditing(false);
   };
 
   // Handle image upload and preview
@@ -103,11 +156,11 @@ const ProjectHeaderSection = ({
   const [selectedLocality, setSelectedLocality] = useState(localities[cities[0].id][0]);
 
   // Filter cities and localities based on search
-  const filteredCities = cities.filter(city => 
+  const filteredCities = cities.filter(city =>
     city.name.toLowerCase().includes(searchCity.toLowerCase())
   );
 
-  const filteredLocalities = (localities[selectedCity] || []).filter(locality => 
+  const filteredLocalities = (localities[selectedCity] || []).filter(locality =>
     locality.toLowerCase().includes(searchLocality.toLowerCase())
   );
 
@@ -147,26 +200,26 @@ const ProjectHeaderSection = ({
               >
                 {projectData?.web_cards?.images?.length > 0
                   ? projectData.web_cards.images.map((imgUrl, index) => {
-                      if (!imgUrl) return null;
-                      return (
-                        <img
-                          key={index}
-                          src={imgUrl}
-                          alt={`Web Card Image ${index + 1}`}
-                          loading="lazy"
-                          className="img-fluid"
-                          style={{
-                            maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
-                            height: window.innerWidth <= 768 ? "44px" : "64px",
-                            objectFit: "contain",
-                            marginRight: "4px",
-                            filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
-                            transition: "filter 0.3s ease"
-                          }}
-                          onClick={isEditing ? () => fileInputRef.current.click() : undefined}
-                        />
-                      );
-                    })
+                    if (!imgUrl) return null;
+                    return (
+                      <img
+                        key={index}
+                        src={imgUrl}
+                        alt={`Web Card Image ${index + 1}`}
+                        loading="lazy"
+                        className="img-fluid"
+                        style={{
+                          maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
+                          height: window.innerWidth <= 768 ? "44px" : "64px",
+                          objectFit: "contain",
+                          marginRight: "4px",
+                          filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
+                          transition: "filter 0.3s ease"
+                        }}
+                        onClick={isEditing ? () => fileInputRef.current.click() : undefined}
+                      />
+                    );
+                  })
                   : (
                     <img
                       src={projectData?.projectLogo || "defaultLogo.jpg"}
@@ -232,7 +285,7 @@ const ProjectHeaderSection = ({
                       />
                       <button
                         className="btn btn-primary btn-sm"
-                        style={{ backgroundColor: "#2067d1", borderColor: "#2067d1" ,width: "70px"}}
+                        style={{ backgroundColor: "#2067d1", borderColor: "#2067d1", width: "70px" }}
                         onClick={handleSaveAll}
                         type="button"
                       >
@@ -240,7 +293,7 @@ const ProjectHeaderSection = ({
                       </button>
                       <button
                         className="btn btn-secondary btn-sm cancel-btn"
-                        style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold" ,width: "70px"}}
+                        style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width: "70px" }}
                         type="button"
                         onClick={() => {
                           setSelectedCity(cities[0].id);
@@ -265,17 +318,17 @@ const ProjectHeaderSection = ({
                       <button
                         className="btn btn-outline-secondary btn-sm"
                         onClick={() => setShowLocationModal(true)}
-                        style={{ 
-                          display: "flex", 
-                          alignItems: "center", 
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
                           gap: "4px",
-                          width:'auto',
+                          width: 'auto',
                           borderColor: "#2067d1",
                           color: "#2067d1"
                         }}
                       >
                         <i className="fas fa-map-marker-alt"></i>
-                        {projectData?.locality && projectData?.city 
+                        {projectData?.locality && projectData?.city
                           ? `${projectData.locality}, ${projectData.city}`
                           : "Select Location"}
                       </button>
@@ -307,7 +360,7 @@ const ProjectHeaderSection = ({
                           }}
                         >
                           {/* Header */}
-                          <div 
+                          <div
                             style={{
                               padding: "24px 28px",
                               borderBottom: "1px solid #eee",
@@ -319,7 +372,7 @@ const ProjectHeaderSection = ({
                             <h5 className="m-0" style={{ fontSize: "20px", fontWeight: "600", color: "#1a1a1a" }}>Select Location</h5>
                             <button
                               onClick={() => setShowLocationModal(false)}
-                              style={{ 
+                              style={{
                                 background: "none",
                                 border: "none",
                                 fontSize: "24px",
@@ -347,7 +400,7 @@ const ProjectHeaderSection = ({
                             <div className="mb-4">
                               <label className="form-label" style={{ fontSize: "15px", fontWeight: "500", color: "#666", marginBottom: "10px" }}>City</label>
                               <div className="position-relative">
-                                <div 
+                                <div
                                   className="d-flex align-items-center"
                                   style={{
                                     border: "1px solid #e0e0e0",
@@ -367,7 +420,7 @@ const ProjectHeaderSection = ({
                                     }}
                                     onFocus={() => setShowCityDropdown(true)}
                                     placeholder="Select city"
-                                    style={{ 
+                                    style={{
                                       padding: "14px 18px",
                                       fontSize: "15px",
                                       height: "auto",
@@ -462,7 +515,7 @@ const ProjectHeaderSection = ({
                             <div className="mb-4">
                               <label className="form-label" style={{ fontSize: "15px", fontWeight: "500", color: "#666", marginBottom: "10px" }}>Locality</label>
                               <div className="position-relative">
-                                <div 
+                                <div
                                   className="d-flex align-items-center"
                                   style={{
                                     border: "1px solid #e0e0e0",
@@ -482,7 +535,7 @@ const ProjectHeaderSection = ({
                                     }}
                                     onFocus={() => setShowLocalityDropdown(true)}
                                     placeholder="Select locality"
-                                    style={{ 
+                                    style={{
                                       padding: "14px 18px",
                                       fontSize: "15px",
                                       height: "auto",
@@ -574,7 +627,7 @@ const ProjectHeaderSection = ({
                           </div>
 
                           {/* Footer */}
-                          <div 
+                          <div
                             style={{
                               padding: "20px 28px",
                               borderTop: "1px solid #eee",
@@ -583,7 +636,7 @@ const ProjectHeaderSection = ({
                               gap: "12px"
                             }}
                           >
-                            
+
                             <button
                               className="btn btn-primary w-100 responsive-modal-btn"
                               onClick={() => {
@@ -628,18 +681,18 @@ const ProjectHeaderSection = ({
                     >
                       {projectData?.name || "Project Name"}
                       {showEdit && (
-                      <span style={{ marginLeft: 10, cursor: "pointer" }}>
-                        <button
-                          className="btn btn-light btn-sm"
-                          onClick={handleEdit}
-                          style={{ border: "1px solid #2067d1", marginLeft: 8, backgroundColor: "#2067d1" }}
-                        >
-                          <img
-                            src="/images/edit-icon.svg"
-                            alt="Edit"
-                            style={{ width: "18px", height: "18px" }}
-                          />
-                        </button>
+                        <span style={{ marginLeft: 10, cursor: "pointer" }}>
+                          <button
+                            className="btn btn-light btn-sm"
+                            onClick={handleEdit}
+                            style={{ border: "1px solid #2067d1", marginLeft: 8, backgroundColor: "#2067d1" }}
+                          >
+                            <img
+                              src="/images/edit-icon.svg"
+                              alt="Edit"
+                              style={{ width: "18px", height: "18px" }}
+                            />
+                          </button>
                         </span>
                       )}
                     </h1>
@@ -836,7 +889,7 @@ const ProjectHeaderSection = ({
                                         />
                                       ) : (
                                         <span style={{
-                                           marginTop: "5px",
+                                          marginTop: "5px",
                                           display: "flex",
                                           alignItems: "center",
                                           justifyContent: "center",

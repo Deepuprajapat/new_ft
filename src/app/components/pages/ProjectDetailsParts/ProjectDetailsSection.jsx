@@ -15,23 +15,22 @@ import {
 
 const ProjectDetailsSection = ({
   projectData,
-  setProjectData,
   AddProjectButton,
   showEdit,
+  handleSave
 }) => {
   // Local state for editing
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
 
-  // Start editing: copy data
   const handleEdit = () => {
     setEditData(JSON.parse(JSON.stringify(projectData)));
     setIsEditing(true);
   };
 
   // Save: update main data
-  const handleSave = () => {
-    setProjectData(editData);
+  const handleSaver = () => {
+    handleSave(editData);
     setIsEditing(false);
   };
 
@@ -56,14 +55,14 @@ const ProjectDetailsSection = ({
     });
   };
 
-    // const handleArrayInputChange = (field, value) => {
-    //   const arrayValue = value.split(',').map(item => item.trim());
-    //   setProjectData(prev => ({
-    //     ...prev,
-    //     [field]: arrayValue
-    //   }));
-    // };
-   
+  // const handleArrayInputChange = (field, value) => {
+  //   const arrayValue = value.split(',').map(item => item.trim());
+  //   setProjectData(prev => ({
+  //     ...prev,
+  //     [field]: arrayValue
+  //   }));
+  // };
+
   //   const getSizeRange = () => {
   //       if (!projectData?.floorplans || projectData.floorplans.length === 0) {
   //         return "Size not available";
@@ -105,40 +104,40 @@ const ProjectDetailsSection = ({
         >
           <span>Project Details</span>
           {showEdit && (
-          <span style={{ cursor: "pointer", marginRight: "12px" }}>
-            {isEditing ? (
-              <>
-                <button
-                  className="btn btn-success btn-sm"
-                  style={{ backgroundColor: "white", color: "#2067d1", fontWeight: 'bold' }}
-                  onClick={handleSave}
+            <span style={{ cursor: "pointer", marginRight: "12px" }}>
+              {isEditing ? (
+                <>
+                  <button
+                    className="btn btn-success btn-sm"
+                    style={{ backgroundColor: "white", color: "#2067d1", fontWeight: 'bold' }}
+                    onClick={handleSaver}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width: "auto" }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <span
+                  onClick={handleEdit}
+                  style={{
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                  }}
                 >
-                  Save
-                </button>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width:"auto"}}
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <span
-                onClick={handleEdit}
-                style={{
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                }}
-              >
-                <img
-                  src="/images/edit-icon.svg"
-                  alt="Edit"
-                  fill="true"
-                  style={{ width: "18px", height: "18px" }}
-                />
-              </span>
+                  <img
+                    src="/images/edit-icon.svg"
+                    alt="Edit"
+                    fill="true"
+                    style={{ width: "18px", height: "18px" }}
+                  />
+                </span>
               )}
             </span>
           )}

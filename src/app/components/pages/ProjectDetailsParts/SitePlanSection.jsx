@@ -15,6 +15,7 @@ const SitePlanSection = ({
   openModal,
   closeModal,
   showEdit,
+  handleSave,
 }) => {
   const fileInputRef = useRef(null);
   const [hovered, setHovered] = useState(false);
@@ -30,6 +31,22 @@ const SitePlanSection = ({
   };
 
   const handleCancel = () => setIsSitePlanEditing(false);
+
+  const handleSaveChanges = () => {
+    const updatedData = {
+      ...projectData,
+      web_cards: {
+        ...projectData.web_cards,
+        site_plan: {
+          ...projectData.web_cards?.site_plan,
+          image: siteplanImgUrl,
+          html_content: siteplanParaHtml
+        }
+      }
+    };
+    handleSave(updatedData);
+    setIsSitePlanEditing(false);
+  };
 
   return (
     <div className="bg-white rounded-3 mb-4" id="siteplan">
@@ -58,7 +75,7 @@ const SitePlanSection = ({
                     border: "1px solid #2067d1",
                     fontWeight: "bold",
                   }}
-                  onClick={() => setIsSitePlanEditing(false)}
+                  onClick={handleSaveChanges}
                 >
                   Save
                 </button>

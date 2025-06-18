@@ -8,7 +8,8 @@ const LocationMapSection = ({
   setIsLocationEditing,
   locationMapHtml,
   setLocationMapHtml,
-  showEdit
+  showEdit,
+  handleSave,
 }) => {
   // Use location_info from projectData if available
   const locationInfo = projectData?.location_info || {};
@@ -17,6 +18,24 @@ const LocationMapSection = ({
     setLocationMapHtml(projectData?.locationMap || "");
     setIsLocationEditing(false);
     setLocationUrl(locationInfo.google_map_link || projectData?.locationUrl || "");
+  };
+
+  const handleSaveChanges = () => {
+    const updatedData = {
+      ...projectData,
+      locationMap: locationMapHtml,
+      locationUrl: locationUrl,
+      web_cards: {
+        ...projectData.web_cards,
+        location_map: {
+          ...projectData.web_cards?.location_map,
+          description: locationMapHtml,
+          google_map_link: locationUrl
+        }
+      }
+    };
+    handleSave(updatedData);
+    setIsLocationEditing(false);
   };
 
   return (
@@ -41,7 +60,7 @@ const LocationMapSection = ({
                       border: "1px solid #2067d1",
                       fontWeight: "bold"
                     }}
-                    onClick={() => setIsLocationEditing(false)}
+                    onClick={handleSaveChanges}
                   >
                     Save
                   </button>

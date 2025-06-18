@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 // let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
 const BASE_URL="https://api.investmango.com"
 
-// const BASE_URL="http://localhost:8282"
+// const BASE_URL="http://localhost:8080"
 const BASE_URL1="https://api.virtualintelligence.co.in"
 
 
@@ -163,16 +163,20 @@ export const getAllProject = async (filters = {}) => {
 };
 
 //  get all project by urlname
-export const getAllProjectsByUrlName = async (urlName ,navigate) => {
+export const getAllProjectsByUrlName = async (urlName, navigate) => {
   try {
-    const res = await axios.get(`${BASE_URL}/project/get/by/url/${urlName}`);
-    return res.data || {}; // Ensures that if the response body is empty, we return an empty object
+    const res = await axios.get(`http://localhost:8080/projects/${urlName}`, {
+      headers: {
+        'Content-Type': 'application/json', // 👈 explicitly set
+      },
+    });
+    return res.data || {};
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
     if (error.response && error.response.status === 400) {
-      navigate("/404"); // Redirects to the 404 page
+      navigate("/404");
     }
-    return {}; // Return an empty object if there's an error
+    return {};
   }
 };
 

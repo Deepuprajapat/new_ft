@@ -10,7 +10,8 @@ const FloorPlanSection = ({
   activeFilter,
   setActiveFilter,
   formatPrice,
-  showEdit
+  showEdit,
+  handleSave,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableFloorPara, setEditableFloorPara] = useState(
@@ -95,14 +96,22 @@ const FloorPlanSection = ({
     setRemoveIndex(null);
   };
 
-  const handleSave = async () => {
+  const handleSaveChanges = async () => {
+    const updatedData = {
+      ...projectData,
+      floorPara: editableFloorPara,
+      floorplans: editableFloorplans,
+      web_cards: {
+        ...projectData.web_cards,
+        floor_plan: {
+          ...projectData.web_cards?.floor_plan,
+          title: editableFloorPara,
+          products: editableFloorplans
+        }
+      }
+    };
+    handleSave(updatedData);
     setIsEditing(false);
-    // if (saveFloorPlansToApi) {
-    //   await saveFloorPlansToApi({
-    //     floorPara: editableFloorPara,
-    //     floorplans: editableFloorplans,
-    //   });
-    // }
   };
 
   const handleCancel = async () => {
@@ -181,7 +190,7 @@ const FloorPlanSection = ({
                       color: "#2067d1",
                       fontWeight: "bold",
                     }}
-                    onClick={handleSave}
+                    onClick={handleSaveChanges}
                   >
                     Save
                   </button>
@@ -215,7 +224,7 @@ const FloorPlanSection = ({
                 className="form-control"
                 value={
                   typeof editableFloorPara === "string" &&
-                  editableFloorPara.length > 0
+                    editableFloorPara.length > 0
                     ? editableFloorPara
                     : projectData?.web_cards?.floor_plan?.title || ""
                 }
@@ -271,9 +280,8 @@ const FloorPlanSection = ({
                 <button
                   key={index}
                   onClick={() => setActiveFilter(config)}
-                  className={`btn ${
-                    activeFilter === config ? "btn-primary" : ""
-                  }`}
+                  className={`btn ${activeFilter === config ? "btn-primary" : ""
+                    }`}
                   style={{
                     border: "2px solid #000",
                     borderRadius: "15px",
@@ -599,10 +607,9 @@ const FloorPlanSection = ({
                     {!isEditing && (
                       <div className="d-flex flex-column gap-2 align-items-center">
                         <a
-                          href={`tel:+91${
-                            projectData?.locality?.city?.phoneNumber?.[0] ||
+                          href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
                             "8595189189"
-                          }`}
+                            }`}
                           className="btn btn-primary w-100"
                           style={{
                             fontSize:
@@ -663,8 +670,8 @@ const FloorPlanSection = ({
                 <img
                   src={
                     selectedImage &&
-                    selectedImage !== BASE_URL &&
-                    selectedImage !== ""
+                      selectedImage !== BASE_URL &&
+                      selectedImage !== ""
                       ? selectedImage
                       : "/images/Floor.png"
                   }

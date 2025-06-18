@@ -35,7 +35,7 @@ import MetaFormSection from "./ProjectDetailsParts/MetaForm";
 import ProjectGallerySection from "./ProjectDetailsParts/ProjectGallerySection";
 import AboutDeveloperSection from "./ProjectDetailsParts/AboutDeveloperSection";
 const BASE_URL = "https://image.investmango.com/images/";
-const FALLBACK_IMAGE = "/images/For-Website.jpg"; 
+const FALLBACK_IMAGE = "/images/For-Website.jpg";
 
 const ProjectDetails = () => {
   const [activeSection, setActiveSection] = useState("overview");
@@ -44,7 +44,8 @@ const ProjectDetails = () => {
   const [developerId, setDeveloperId] = useState("");
   const [projectId, setProjectId] = useState("");
   const [developerDetails, setDeveloperDetails] = useState(null);
-  const { urlName } = useParams();
+  // const { urlName } = useParams();
+  const urlName = '8ca4e2ce-4bda-4510-89dc-6e20dc52fb20';
   const [activeFilter, setActiveFilter] = useState("all");
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -109,30 +110,81 @@ const ProjectDetails = () => {
   });
 
   // To update the project data
-  const [PatchFormData, setPatchFormData] = useState({
-    name: projectData?.name || "",
-    description: projectData?.description || "",
-    location: projectData?.location || "",
-    price: projectData?.price || "",
-    amenities: projectData?.amenities || [],
-    floorplans: projectData?.floorplans || [],
-  });
+  // const [PatchFormData, setPatchFormData] = useState({
+  //   id: projectData?.id || "",
+  //   name: projectData?.name || "",
+  //   status: projectData?.status || "",
+  //   project_configurations: projectData?.project_configurations || "",
+  //   total_towers: projectData?.total_towers || 0,
+  //   price_unit: projectData?.price_unit || "",
+  //   timeline_info: {
+  //     project_launch_date: projectData?.timeline_info?.project_launch_date || "",
+  //     project_possession_date: projectData?.timeline_info?.project_possession_date || ""
+  //   },
+  //   meta_info: {
+  //     title: projectData?.meta_info?.title || "",
+  //     description: projectData?.meta_info?.description || "",
+  //     keywords: projectData?.meta_info?.keywords || "",
+  //     canonical: projectData?.meta_info?.canonical || "",
+  //     project_schema: projectData?.meta_info?.project_schema || []
+  //   },
+  //   web_cards: {
+  //     images: projectData?.web_cards?.images || [],
+  //     rera_info: projectData?.web_cards?.rera_info || {},
+  //     project_details: projectData?.web_cards?.project_details || {},
+  //     why_to_choose: projectData?.web_cards?.why_to_choose || {},
+  //     know_about: projectData?.web_cards?.know_about || {},
+  //     floor_plan: projectData?.web_cards?.floor_plan || {},
+  //     price_list: projectData?.web_cards?.price_list || {},
+  //     amenities: projectData?.web_cards?.amenities || {},
+  //     video_presentation: projectData?.web_cards?.video_presentation || {},
+  //     payment_plans: projectData?.web_cards?.payment_plans || {},
+  //     site_plan: projectData?.web_cards?.site_plan || {},
+  //     about: projectData?.web_cards?.about || {},
+  //     faqs: projectData?.web_cards?.faqs || []
+  //   },
+  //   location_info: {
+  //     short_address: projectData?.location_info?.short_address || "",
+  //     longitude: projectData?.location_info?.longitude || "",
+  //     latitude: projectData?.location_info?.latitude || "",
+  //     google_map_link: projectData?.location_info?.google_map_link || ""
+  //   },
+  //   is_featured: projectData?.is_featured || false,
+  //   is_premium: projectData?.is_premium || false,
+  //   is_priority: projectData?.is_priority || false,
+  //   search_context: projectData?.search_context || []
+  // });
 
-  const updatePatchFormData = (field, value) => {
-    setPatchFormData((prev) => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  // const updatePatchFormData = (field, value) => {
+  //   setPatchFormData((prev) => ({
+  //     ...prev,
+  //     [field]: value
+  //   }));
+  // };
 
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const handleEdit = () => {
     setIsEditing(!isEditing);
   };
-  const handleSave = () => {
+  const handleSave = (updatedData) => {
+    // Log the updated data received from child component
+    console.log('Updated data received from child:', updatedData);
+
+    // Update the projectData with the new values from child component
+    if (updatedData) {
+      setProjectData(prevData => {
+        const newData = {
+          ...prevData,
+          ...updatedData
+        };
+        console.log('New project data after update:', newData);
+        return newData;
+      });
+    }
+
+    // Your existing save logic here
     setIsEditing(false);
-    console.log('Saving project data:', projectData);
   };
 
 
@@ -226,7 +278,6 @@ const ProjectDetails = () => {
 
   // const saveAmenitiesChanges = () => {
   //   // Save logic here - update projectData or call API
-  //   // You'll need to convert editableAmenities back to your original format
   //   setIsAmenitiesEditing(false);
   // };
   // Functions
@@ -287,6 +338,9 @@ const ProjectDetails = () => {
         } catch (error) {
           console.error("Error fetching project data:", error);
         }
+      }
+      else {
+        console.error("No URL name provided");
       }
     };
     fetchData();
@@ -382,16 +436,7 @@ const ProjectDetails = () => {
     setEditableVideos([...editableVideos, ""]);
   };
 
-  const saveVideoChanges = () => {
-    // Filter out empty video URLs before saving
-    const validVideos = editableVideos.filter((url) => url.trim() !== "");
 
-    // Save logic here - update projectData or call API
-    // projectData.videos = validVideos;
-    // projectData.videoPara = videoPara;
-
-    setIsVideoEditing(false);
-  };
 
   // Helper function to extract YouTube video ID from various URL formats
   // const extractYouTubeId = (url) => {
@@ -502,7 +547,6 @@ const ProjectDetails = () => {
     username: "",
     useremail: "",
     userType: "",
-    // dial_code: "91",
     usermobile: "",
     intersted_in: "",
     usermsg: "",
@@ -777,17 +821,17 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     if (projectData?.shortAddress) {
-      setShortAddress(projectData.shortAddress); 
+      setShortAddress(projectData.shortAddress);
     }
   }, [projectData, setShortAddress]);
 
   // const validPaymentPlans = projectData?.paymentPlans?.filter(
   //   (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   // );
-  
 
 
-  const [showEdit, setShowEdit] = useState(false);
+
+  const [showEdit, setShowEdit] = useState(true);
   return (
     <>
       {projectData && (
@@ -835,8 +879,6 @@ const ProjectDetails = () => {
             setShowFullScreen={setShowFullScreen}
             setCurrentImageIndex={setCurrentImageIndex}
             showEdit={showEdit}
-            PatchFormData= {PatchFormData}
-            updatePatchFormData={updatePatchFormData}
           />
 
           {/* Fullscreen Image Modal */}
@@ -1122,6 +1164,7 @@ const ProjectDetails = () => {
           getHighestPriceOfFloorPlan={getHighestPriceOfFloorPlan}
           handleInputChange={handleInputChange}
           showEdit={showEdit}
+          handleSave={handleSave}
         />
 
         {/* Project Details */}
@@ -1131,7 +1174,6 @@ const ProjectDetails = () => {
               <ProjectDetailsSection
                 projectData={projectData}
                 isEditing={isEditing}
-                setProjectData={setProjectData}
                 handleEdit={handleEdit}
                 handleSave={handleSave}
                 handleInputChange={handleInputChange}
@@ -1148,6 +1190,8 @@ const ProjectDetails = () => {
                 showSitePopup={showSitePopup}
                 closeSitePopup={closeSitePopup}
                 showEdit={showEdit}
+                handleSave={handleSave}
+
               />
               {/* Know About */}
               {projectData && (
@@ -1157,6 +1201,7 @@ const ProjectDetails = () => {
                   handleDownloadBrochure={handleDownloadBrochure}
                   handleDownloadBrochuree={handleDownloadBrochuree}
                   showEdit={showEdit}
+                  handleSave={handleSave}
                 />
               )}
               {/* Floor Plan */}
@@ -1166,12 +1211,14 @@ const ProjectDetails = () => {
                 setActiveFilter={setActiveFilter}
                 formatPrice={formatPrice}
                 showEdit={showEdit}
+                handleSave={handleSave}
               />
               {/* Price List */}
               <PriceListSection
                 projectData={projectData}
                 formatPrice={formatPrice}
                 showEdit={showEdit}
+                handleSave={handleSave}
               />
 
               {/* Get Free Consultation */}
@@ -1216,6 +1263,7 @@ const ProjectDetails = () => {
                 isPaymentEditing={isPaymentEditing}
                 setIsPaymentEditing={setIsPaymentEditing}
                 showEdit={showEdit}
+                handleSave={handleSave}
               />
 
               {/* )} */}
@@ -1225,6 +1273,7 @@ const ProjectDetails = () => {
                 amenitiesPara={amenitiesPara}
                 name={projectData?.name || ""}
                 showEdit={showEdit}
+                handleSave={handleSave}
               />
               {/* video presentation */}
               <VideoPresentationSection
@@ -1235,8 +1284,8 @@ const ProjectDetails = () => {
                 updateVideoUrl={updateVideoUrl}
                 removeVideo={removeVideo}
                 addNewVideo={addNewVideo}
-                saveVideoChanges={saveVideoChanges}
                 showEdit={showEdit}
+                handleSave={handleSave}
               />
               {/* Location Advantage */}
               {/* <div
@@ -1286,6 +1335,7 @@ const ProjectDetails = () => {
                 locationMapHtml={locationMapHtml}
                 setLocationMapHtml={setLocationMapHtml}
                 showEdit={showEdit}
+                handleSave={handleSave}
               />
               <SitePlanSection
                 projectData={projectData}
@@ -1300,29 +1350,31 @@ const ProjectDetails = () => {
                 openModal={openModal}
                 closeModal={closeModal}
                 showEdit={showEdit}
+                handleSave={handleSave}
               />
 
               {/* About Developer Section */}
               <AboutDeveloperSection
-  developerDetails={{
-    logo: projectData?.web_cards?.about?.logo_url || "",
-    altLogo: projectData?.web_cards?.about?.contact_details?.name || "",
-    establishedYear: projectData?.web_cards?.about?.establishment_year || "",
-    totalProjects: projectData?.web_cards?.about?.total_projects || "",
-    about: projectData?.web_cards?.about?.description || "",
-    address: projectData?.web_cards?.about?.contact_details?.project_address || "",
-    name: projectData?.web_cards?.about?.contact_details?.name || "",
-    phone: projectData?.web_cards?.about?.contact_details?.phone || "",
-    bookingLink: projectData?.web_cards?.about?.contact_details?.booking_link || "",
-  }}
-  expandedIndex={expandedIndex}
-  setExpandedIndex={setExpandedIndex}
-  projectData={projectData}
-  isMobileView={window.innerWidth <= 768}
-  handleDownloadBrochure={handleDownloadBrochure}
-  handleDownloadBrochuree={handleDownloadBrochuree}
-  showEdit={showEdit}
-/>
+                developerDetails={{
+                  logo: projectData?.web_cards?.about?.logo_url || "",
+                  altLogo: projectData?.web_cards?.about?.contact_details?.name || "",
+                  establishedYear: projectData?.web_cards?.about?.establishment_year || "",
+                  totalProjects: projectData?.web_cards?.about?.total_projects || "",
+                  about: projectData?.web_cards?.about?.description || "",
+                  address: projectData?.web_cards?.about?.contact_details?.project_address || "",
+                  name: projectData?.web_cards?.about?.contact_details?.name || "",
+                  phone: projectData?.web_cards?.about?.contact_details?.phone || "",
+                  bookingLink: projectData?.web_cards?.about?.contact_details?.booking_link || "",
+                }}
+                expandedIndex={expandedIndex}
+                setExpandedIndex={setExpandedIndex}
+                projectData={projectData}
+                isMobileView={window.innerWidth <= 768}
+                handleDownloadBrochure={handleDownloadBrochure}
+                handleDownloadBrochuree={handleDownloadBrochuree}
+                showEdit={showEdit}
+                handleSave={handleSave}
+              />
               {/* Frequently Asked Questions */}
               <FAQSection
                 projectData={{
@@ -1334,6 +1386,7 @@ const ProjectDetails = () => {
                   shortAddress: projectData?.location_info?.short_address || "",
                 }}
                 showEdit={true}
+                handleSave={handleSave}
               />
               {/* Similar Projects */}
               <SimilarProjectsSection
