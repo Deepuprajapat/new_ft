@@ -105,17 +105,10 @@ const MailSection = () => {
           <form id="contactpage" onSubmit={handleFormSubmit}>
             <div className="row">
               <div className="col-md-12">
-                <label>Role:</label>
+                {/* <label>Role:</label>
                 <select
                   name="userType"
                   className="form-select"
-                  // style={{
-                  //   width: "100%",
-                  //   padding: "8px",
-                  //   margin: "8px 0", // Similar to `margin="dense"`
-                  //   borderRadius: "4px",
-                  //   border: "1px solid #ccc",
-                  // }}
                   value={formData.userType} // Ensure this is in your state
                   onChange={handleChange}
                 >
@@ -125,7 +118,7 @@ const MailSection = () => {
                   <option value="Broker">Broker</option>
                   <option value="Seller">Seller</option>
                   <option value="Buyer">Buyer</option>
-                </select>
+                </select> */}
                 <label>Name:</label>
                 <input
                   required

@@ -1646,7 +1646,7 @@ const PropertyDetails = () => {
                             />
                           </div>
                         </div>
-                        <div className="mb-3">
+                        {/* <div className="mb-3">
                           <label className="form-label fw-bold">
                             I am interested in
                           </label>
@@ -1663,7 +1663,7 @@ const PropertyDetails = () => {
                                     </option>
                              ))}
                           </select>
-                        </div>
+                        </div> */}
                         <div className="mb-3">
                           <textarea
                             name="usermsg"
@@ -2576,7 +2576,7 @@ const PropertyDetails = () => {
                             />
                           </div>
                         </div>
-                        <div className="mb-3">
+                        {/* <div className="mb-3">
                           <label className="form-label fw-bold">
                             I am interested in
                           </label>
@@ -2590,7 +2590,7 @@ const PropertyDetails = () => {
                             <option value="2bhk">2 BHK</option>
                             <option value="3bhk">3 BHK</option>
                           </select>
-                        </div>
+                        </div> */}
                         <div className="mb-3">
                           <textarea
                             name="usermsg"

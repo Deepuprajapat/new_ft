@@ -137,7 +137,6 @@ const Footer = ({ shortAddress }) => {
             <div className="callnow">
               <a href={`tel:+91${number}`}>
                 <i
-                  style={{ transform: "rotate(95deg)" }}
                   className="fas fa-phone"
                 ></i>{" "}
                 {number}
@@ -148,7 +147,6 @@ const Footer = ({ shortAddress }) => {
           <div className="callnow">
             <a href="tel:+918368547490">
               <i
-                style={{ transform: "rotate(95deg)" }}
                 className="fas fa-phone"
               ></i>{" "}
               8595189189
@@ -337,17 +335,17 @@ const Footer = ({ shortAddress }) => {
                   </li>
                   <li>
                     <a href="tel:+91-8595-189-189">
-                      <i className="fas fa-phone"></i> +91-8595-189-189
+                      <i className="fas fa-phone" ></i> +91-8595-189-189
                     </a>
                   </li>
                   <li>
                     <a href="tel:+91-7428-189-189">
-                      <i className="fas fa-phone"></i> +91-7428-189-189
+                      <i className="fas fa-phone" ></i> +91-7428-189-189
                     </a>
                   </li>
                   <li>
                     <a href="tel:+91-9911-189-189">
-                      <i className="fas fa-phone"></i> +91-9911-189-189
+                      <i className="fas fa-phone" ></i> +91-9911-189-189
                     </a>
                   </li>
                 </ul>

@@ -23,11 +23,26 @@ mb-6"
         website, use our services, or interact with us in any way.
       </p>
 
+
+
+
+<h2
+        className="text-xl font-semibold
+mt-6"
+      >
+        1. Information Collected From Interactive Forms
+      </h2>
+
+      <p>
+        When you voluntarily send us electronic mail / fillup the form, we will keep a record of this information so that we can respond to you. We only collect information from you when you register on our site or fill out a form. Also, when filling out a form on our site, you may be asked to enter your: name, e-mail address or phone number. You may, however, visit our site anonymously. In case you have submitted your personal information and contact details, we reserve the rights to Call, SMS, Email or WhatsApp about our products and offers, even if your number has DND activated on it.
+      </p>
+
+
       <h2
         className="text-xl font-semibold
 mt-6"
       >
-        1. Information We Collect
+        2. Information We Collect
       </h2>
 
       <p>
@@ -43,7 +58,7 @@ mt-6"
         className="text-xl font-semibold
 mt-6"
       >
-        2. How We Use Your Information
+        3. How We Use Your Information
       </h2>
 
       <p>
@@ -58,7 +73,7 @@ mt-6"
         className="text-xl font-semibold
 mt-6"
       >
-        3. Sharing Your Information
+        4. Sharing Your Information
       </h2>
 
       <p>
@@ -69,7 +84,7 @@ mt-6"
         law or for legal processes.
       </p>
 
-      <h2 className="text-xl font-semibold mt-6">4. Data Security</h2>
+      <h2 className="text-xl font-semibold mt-6">5. Data Security</h2>
 
       <p>
         We implement industry-standard security measures to protect your
@@ -82,7 +97,7 @@ mt-6"
         className="text-xl font-semibold
 mt-6"
       >
-        5. Cookies & Tracking Technologies
+        6. Cookies & Tracking Technologies
       </h2>
 
       <p>
@@ -91,7 +106,7 @@ mt-6"
         cookies through your browser settings at any time.
       </p>
 
-      <h2 className="text-xl font-semibold mt-6">6. Your Rights</h2>
+      <h2 className="text-xl font-semibold mt-6">7. Your Rights</h2>
 
       <p>
         You have the right to access, correct, or delete your personal data, opt
@@ -104,7 +119,7 @@ mt-6"
         className="text-xl font-semibold
 mt-6"
       >
-        7. Third Party Links
+        8. Third Party Links
       </h2>
 
       <p>
@@ -116,7 +131,7 @@ mt-6"
         className="text-xl font-semibold
 mt-6"
       >
-        8. Children’s Privacy
+        9. Children’s Privacy
       </h2>
 
       <p>
@@ -128,7 +143,7 @@ mt-6"
         className="text-xl font-semibold
 mt-6"
       >
-        9. Changes to this Policy
+        10. Changes to this Policy
       </h2>
 
       <p>
@@ -140,7 +155,7 @@ mt-6"
         className="text-xl font-semibold
 mt-6"
       >
-        10. Contact Us
+        11. Contact Us
       </h2>
 
       <p>
