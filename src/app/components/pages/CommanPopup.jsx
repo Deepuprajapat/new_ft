@@ -26,7 +26,7 @@ const PopupDialog = ({ open, onClose, projectName }) => {
     username: "",
     usermobile: "",
     usermsg: projectName || "",
-    userType: "",
+    // userType: "",
   });
 
   const [error, setError] = useState("");
@@ -185,7 +185,7 @@ const PopupDialog = ({ open, onClose, projectName }) => {
                 {projectName || "Invest Mango"}
               </div>
             </p>
-            <select
+            {/* <select
               name="userType"
               className="form-select"
               style={{
@@ -204,7 +204,7 @@ const PopupDialog = ({ open, onClose, projectName }) => {
               <option value="Broker">Broker</option>
               <option value="Seller">Seller</option>
               <option value="Buyer">Buyer</option>
-            </select>
+            </select> */}
             <input
               type="text"
               name="username"

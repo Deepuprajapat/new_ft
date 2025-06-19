@@ -468,7 +468,7 @@ const ProjectDetails = () => {
         }
       }
     };
-  
+
     // Delay scrolling slightly to allow DOM to render
     setTimeout(scrollToHash, 300);
   }, []);
@@ -583,21 +583,21 @@ const ProjectDetails = () => {
 
   const isValidFaq = (faq) =>
     faq?.question?.trim() !== "" || faq?.answer?.trim() !== "";
-  
+
   const displayedFaqs =
     Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
       ? sortedFaqs
       : defaultFaqs.map((faq) => ({
-          question: injectProjectData(faq.question, projectData),
-          answer: injectProjectData(faq.answer, projectData),
-        }));
+        question: injectProjectData(faq.question, projectData),
+        answer: injectProjectData(faq.answer, projectData),
+      }));
 
 
-        const validPaymentPlans = projectData?.paymentPlans?.filter(
-          (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
-        );
+  const validPaymentPlans = projectData?.paymentPlans?.filter(
+    (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
+  );
 
-        
+
   return (
     <>
       {projectData && (
@@ -831,9 +831,8 @@ const ProjectDetails = () => {
                 <li key={item} className="mx-1">
                   <a
                     href={`#${item}`}
-                    className={`text-white text-decoration-none ${
-                      activeSection === item ? "fw-bold" : ""
-                    }`}
+                    className={`text-white text-decoration-none ${activeSection === item ? "fw-bold" : ""
+                      }`}
                     style={{
                       fontWeight: activeSection === item ? "bold" : "400",
                       textDecoration:
@@ -1069,7 +1068,7 @@ const ProjectDetails = () => {
                       cursor: "pointer",
                     }}
                     onMouseEnter={() => setShowReraDetails(true)}
-                    // onMouseLeave={() => setShowReraDetails(false)}
+                  // onMouseLeave={() => setShowReraDetails(false)}
                   >
                     Rera
                   </span>
@@ -1458,16 +1457,16 @@ const ProjectDetails = () => {
                               }}
                             >
                               {projectData?.floorplans &&
-                              projectData.floorplans.length > 0
+                                projectData.floorplans.length > 0
                                 ? `${Math.min(
-                                    ...projectData.floorplans.map(
-                                      (fp) => fp.size
-                                    )
-                                  )} - ${Math.max(
-                                    ...projectData.floorplans.map(
-                                      (fp) => fp.size
-                                    )
-                                  )} Sq. Ft.`
+                                  ...projectData.floorplans.map(
+                                    (fp) => fp.size
+                                  )
+                                )} - ${Math.max(
+                                  ...projectData.floorplans.map(
+                                    (fp) => fp.size
+                                  )
+                                )} Sq. Ft.`
                                 : "Size not available"}
                             </p>
                           </div>
@@ -1547,7 +1546,7 @@ const ProjectDetails = () => {
                                 .includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.launchDate
-                                ? new Date(
+                                  ? new Date(
                                     isNaN(projectData.launchDate)
                                       ? projectData.launchDate
                                       : Number(projectData.launchDate)
@@ -1555,7 +1554,7 @@ const ProjectDetails = () => {
                                     year: "numeric",
                                     month: "long",
                                   })
-                                : "-"}
+                                  : "-"}
                             </p>
                           </div>
                         </div>
@@ -1597,7 +1596,7 @@ const ProjectDetails = () => {
                                 .includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.possessionDate
-                                ? new Date(
+                                  ? new Date(
                                     isNaN(projectData.possessionDate)
                                       ? projectData.possessionDate
                                       : Number(projectData.possessionDate)
@@ -1605,7 +1604,7 @@ const ProjectDetails = () => {
                                     year: "numeric",
                                     month: "long",
                                   })
-                                : "-"}
+                                  : "-"}
                             </p>
                           </div>
                         </div>
@@ -1934,7 +1933,7 @@ const ProjectDetails = () => {
                             />
                           </div>
                         </div>
-                        <div className="mb-3">
+                        {/* <div className="mb-3">
                           <label className="form-label fw-bold">
                             I am interested in
                           </label>
@@ -1959,7 +1958,7 @@ const ProjectDetails = () => {
                                 </option>
                               ))}
                           </select>
-                        </div>
+                        </div> */}
                         <div className="mb-3">
                           <textarea
                             name="usermsg"
@@ -2264,10 +2263,9 @@ const ProjectDetails = () => {
                               />
                               <div className="col-12 mt-2">
                                 <a
-                                  href={`tel:+91${
-                                    projectData?.locality?.city
+                                  href={`tel:+91${projectData?.locality?.city
                                       ?.phoneNumber?.[0] || "8595189189"
-                                  }`}
+                                    }`}
                                   className="btn w-100 py-1"
                                   style={{
                                     backgroundColor: "#fff",
@@ -2458,9 +2456,8 @@ const ProjectDetails = () => {
                     <div className="d-flex gap-2 mb-3">
                       <button
                         onClick={() => setActiveFilter("all")}
-                        className={`btn ${
-                          activeFilter === "all" ? "btn-primary" : ""
-                        }`}
+                        className={`btn ${activeFilter === "all" ? "btn-primary" : ""
+                          }`}
                         style={{
                           border: "2px solid #000",
                           borderRadius: "15px",
@@ -2485,9 +2482,8 @@ const ProjectDetails = () => {
                           <button
                             key={index}
                             onClick={() => setActiveFilter(config)}
-                            className={`btn ${
-                              activeFilter === config ? "btn-primary" : ""
-                            }`}
+                            className={`btn ${activeFilter === config ? "btn-primary" : ""
+                              }`}
                             style={{
                               border: "2px solid #000",
                               borderRadius: "15px",
@@ -2580,8 +2576,8 @@ const ProjectDetails = () => {
                                 <img
                                   src={
                                     plan.imageUrl &&
-                                    plan.imageUrl !== BASE_URL &&
-                                    plan.imageUrl !== ""
+                                      plan.imageUrl !== BASE_URL &&
+                                      plan.imageUrl !== ""
                                       ? plan.imageUrl
                                       : "/images/Floor.png" // Fallback image in other cases
                                   }
@@ -2647,10 +2643,9 @@ const ProjectDetails = () => {
                                 </div>
                                 <div className="d-flex flex-column gap-2 align-items-center">
                                   <a
-                                    href={`tel:+91${
-                                      projectData?.locality?.city
+                                    href={`tel:+91${projectData?.locality?.city
                                         ?.phoneNumber?.[0] || "8595189189"
-                                    }`}
+                                      }`}
                                     className="btn btn-primary w-100"
                                     style={{
                                       fontSize:
@@ -2721,8 +2716,8 @@ const ProjectDetails = () => {
                           <img
                             src={
                               selectedImage &&
-                              selectedImage !== BASE_URL &&
-                              selectedImage !== ""
+                                selectedImage !== BASE_URL &&
+                                selectedImage !== ""
                                 ? selectedImage
                                 : "/images/Floor.png" // Fallback image when no image is available
                             }
@@ -2962,20 +2957,18 @@ const ProjectDetails = () => {
               >
                 Get Free Consultation for this property. Call us at:{" "}
                 <a
-                  href={`tel:+91${
-                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                  href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595189189"
-                  }`}
+                    }`}
                   style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
-                  {`+91-${
-                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                  {`+91-${projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595-189-189"
-                  }`}
+                    }`}
                 </a>
               </div>
               {/* Payment Plan */}
-              
+
               {validPaymentPlans?.length > 0 && (
                 <div
                   className="mb-4"
@@ -3181,10 +3174,10 @@ const ProjectDetails = () => {
 
                     <div className="d-flex flex-column">
                       {projectData?.videos &&
-                      projectData.videos.length > 0 &&
-                      projectData.videos.some(
-                        (videoUrl) => videoUrl.trim() !== ""
-                      ) ? (
+                        projectData.videos.length > 0 &&
+                        projectData.videos.some(
+                          (videoUrl) => videoUrl.trim() !== ""
+                        ) ? (
                         projectData.videos.map(
                           (videoUrl, index) =>
                             videoUrl.trim() !== "" && ( // Ignore empty strings
@@ -3194,9 +3187,8 @@ const ProjectDetails = () => {
                               >
                                 <iframe
                                   src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                                  title={`${
-                                    projectData?.name
-                                  } Video Presentation ${index + 1}`}
+                                  title={`${projectData?.name
+                                    } Video Presentation ${index + 1}`}
                                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                   allowFullScreen
                                   style={{
@@ -3347,7 +3339,7 @@ const ProjectDetails = () => {
                 </h2>
                 <div className="row">
                   <div className="col-12">
-                    <p
+                    {/* <p
                       className="mb-4 px-3"
                       style={{
                         fontSize: window.innerWidth <= 768 ? "12px" : "14px",
@@ -3360,14 +3352,14 @@ const ProjectDetails = () => {
                           }}
                         />
                       )}
-                    </p>
+                    </p> */}
 
                     <div className="position-relative px-3">
                       <div
                         className="position-relative"
                         style={{
                           overflow: "hidden",
-                          height: window.innerWidth <= 768 ? "200px" : "400px",
+                          height: window.innerWidth <= 768 ? "200px" : "600px",
                         }}
                       >
                         <div
@@ -3417,9 +3409,8 @@ const ProjectDetails = () => {
 
                                 // Only allow movement if zoomed in
                                 if (scale > 1) {
-                                  img.style.transform = `scale(${scale}) translate(${
-                                    translateX + deltaX
-                                  }px, ${translateY + deltaY}px)`;
+                                  img.style.transform = `scale(${scale}) translate(${translateX + deltaX
+                                    }px, ${translateY + deltaY}px)`;
                                 }
                               };
 
@@ -3628,16 +3619,16 @@ const ProjectDetails = () => {
                                 __html:
                                   expandedIndex === "about"
                                     ? developerDetails.about
-                                        .replace(
-                                          /<ul>/g,
-                                          '<ul style="padding-left: 20px; margin-top: 10px;">'
-                                        )
-                                        .replace(
-                                          /<li>/g,
-                                          '<li style="font-size: 1em; color: #666;">'
-                                        ) // Adds inline styles to <li>
+                                      .replace(
+                                        /<ul>/g,
+                                        '<ul style="padding-left: 20px; margin-top: 10px;">'
+                                      )
+                                      .replace(
+                                        /<li>/g,
+                                        '<li style="font-size: 1em; color: #666;">'
+                                      ) // Adds inline styles to <li>
                                     : developerDetails.about.substring(0, 150) +
-                                      "...",
+                                    "...",
                               }}
                             />
                             <button
@@ -3648,7 +3639,7 @@ const ProjectDetails = () => {
                               }
                               className="btn btn-link p-0 read-more-btn"
                               style={{
-                                width:"fit-content",
+                                width: "fit-content",
                                 fontSize:
                                   window.innerWidth <= 768 ? "12px" : "14px",
                                 color: "#2067d1", // Set the text color
@@ -3685,10 +3676,9 @@ const ProjectDetails = () => {
                         <br />
                         <b>Phone:</b>{" "}
                         <a
-                          href={`tel:+91${
-                            projectData?.locality?.city?.phoneNumber?.[0] ||
+                          href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
                             "8595189189"
-                          }`}
+                            }`}
                           style={{
                             textDecoration: "none",
                             color: "#2067d1",
@@ -3712,7 +3702,7 @@ const ProjectDetails = () => {
                               ? handleDownloadBrochuree
                               : handleDownloadBrochure
                           } // Use the correct handler based on screen size
-                          // onClick={handleDownloadBrochure}
+                        // onClick={handleDownloadBrochure}
                         >
                           Click Here
                         </span>
@@ -3832,7 +3822,7 @@ const ProjectDetails = () => {
                           }}
                         >
                           {allSimilarProjects &&
-                          allSimilarProjects.length > 0 ? (
+                            allSimilarProjects.length > 0 ? (
                             allSimilarProjects.map((project, index) => (
                               <div key={index} className="px-2">
                                 <div className="similar_projects_item">
@@ -3907,14 +3897,13 @@ const ProjectDetails = () => {
                                           ></i>
                                           Size Info:{" "}
                                           {project?.configurations &&
-                                          project.configurations.length > 0
-                                            ? `${
-                                                Math.min(
-                                                  ...project.configurations.map(
-                                                    (config) => parseInt(config)
-                                                  )
-                                                ) + "BHK"
-                                              }`
+                                            project.configurations.length > 0
+                                            ? `${Math.min(
+                                              ...project.configurations.map(
+                                                (config) => parseInt(config)
+                                              )
+                                            ) + "BHK"
+                                            }`
                                             : ""}
                                         </p>
                                       )}
@@ -4181,7 +4170,7 @@ const ProjectDetails = () => {
                             />
                           </div>
                         </div>
-                        <div className="mb-3">
+                        {/* <div className="mb-3">
                           <label className="form-label fw-bold">
                             I am interested in
                           </label>
@@ -4207,7 +4196,7 @@ const ProjectDetails = () => {
                                 </option>
                               ))}
                           </select>
-                        </div>
+                        </div> */}
 
                         <div className="mb-3">
                           <textarea
