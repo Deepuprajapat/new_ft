@@ -1892,7 +1892,7 @@ const ProjectDetails = () => {
                             onChange={handleChange}
                           />
                         </div>
-                        <div className="mb-3">
+                        {/* <div className="mb-3">
                           <select
                             name="userType"
                             className="form-select"
@@ -1907,7 +1907,7 @@ const ProjectDetails = () => {
                             <option value="Seller">Seller</option>
                             <option value="Buyer">Buyer</option>
                           </select>
-                        </div>
+                        </div> */}
 
                         <div className="mb-3">
                           <div className="input-group">
@@ -2409,6 +2409,7 @@ const ProjectDetails = () => {
                         setShowFullDescription(!showFullDescription);
                       }}
                       style={{
+                        width: "fit-content",
                         fontSize: window.innerWidth <= 768 ? "12px" : "16px",
                         color: "black", // Default color is black
                         display: "block", // Makes the button a block element
@@ -3647,6 +3648,7 @@ const ProjectDetails = () => {
                               }
                               className="btn btn-link p-0 read-more-btn"
                               style={{
+                                width:"fit-content",
                                 fontSize:
                                   window.innerWidth <= 768 ? "12px" : "14px",
                                 color: "#2067d1", // Set the text color
@@ -4027,7 +4029,7 @@ const ProjectDetails = () => {
                           />
                         </div>
 
-                        <div className="mb-3">
+                        {/* <div className="mb-3">
                           <select
                             name="userType"
                             className="form-select"
@@ -4042,7 +4044,7 @@ const ProjectDetails = () => {
                             <option value="Seller">Seller</option>
                             <option value="Buyer">Buyer</option>
                           </select>
-                        </div>
+                        </div> */}
 
                         <div className="mb-3">
                           <div className="input-group">
