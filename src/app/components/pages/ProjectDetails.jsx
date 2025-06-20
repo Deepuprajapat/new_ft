@@ -639,92 +639,145 @@ const ProjectDetails = () => {
       <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
           {/* Gallery Section */}
-          <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
-            {projectData &&
-              projectData.images &&
-              projectData.images.length > 0 && (
-                <>
-                  {/* Main Image - Full width on mobile, half width on desktop */}
-                  <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
-                    {projectData?.images[0] && (
+<div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
+  {projectData &&
+    projectData.images &&
+    projectData.images.length > 0 && (
+      <>
+        {/* Mobile View: Horizontal Scrollable Images */}
+        {window.innerWidth <= 768 ? (
+          <div
+            className="w-100"
+            style={{
+              overflowX: "auto",
+              whiteSpace: "nowrap",
+              display: "flex",
+              gap: "8px",
+              paddingBottom: "8px",
+            }}
+          >
+            {projectData.images.map((img, idx) => (
+              <div
+                key={idx}
+                style={{
+                  flex: "0 0 90%",
+                  maxWidth: "90%",
+                  minWidth: "90%",
+                  display: "inline-block",
+                  position: "relative",
+                }}
+              >
+                <a
+                  href={img.imageUrl}
+                  data-toggle="lightbox"
+                  data-gallery="gallery"
+                  className="d-flex align-items-center justify-content-center w-100 h-100"
+                  onClick={e => {
+                    e.preventDefault();
+                    setShowFullScreen(true);
+                    setCurrentImageIndex(idx);
+                  }}
+                >
+                  <img
+                    alt={img.caption || `Image ${idx + 1}`}
+                    src={img.imageUrl}
+                    loading="lazy"
+                    className="img-fluid w-100 h-100 rounded-0"
+                    style={{
+                      objectFit: "cover",
+                      cursor: "pointer",
+                      height: "220px",
+                    }}
+                    fetchpriority="high"
+                  />
+                </a>
+              </div>
+            ))}
+          </div>
+        ) : (
+          // Desktop View: Original Grid
+          <>
+            {/* Main Image */}
+            <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
+              {projectData?.images[0] && (
+                <div
+                  className="h-100 d-flex align-items-center justify-content-center"
+                  style={{
+                    minHeight: "184px",
+                    maxHeight: "700px",
+                    padding: ".5px",
+                  }}
+                >
+                  <a
+                    href={projectData?.images[0]?.imageUrl}
+                    data-toggle="lightbox"
+                    data-gallery="gallery"
+                    className="d-flex align-items-center justify-content-center w-100 h-100"
+                    onClick={e => {
+                      e.preventDefault();
+                      setShowFullScreen(true);
+                      setCurrentImageIndex(0);
+                    }}
+                  >
+                    <img
+                      alt={projectData?.images[0]?.caption || "Image"}
+                      src={projectData?.images[0]?.imageUrl}
+                      loading="lazy"
+                      className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
+                      style={{ objectFit: "cover", cursor: "pointer" }}
+                      fetchpriority="high"
+                    />
+                  </a>
+                </div>
+              )}
+            </div>
+            {/* Additional Images Grid */}
+            <div className="col-12 col-md-6 p-0">
+              <div className="row g-0 h-100">
+                {[1, 2, 3, 4].map(
+                  index =>
+                    projectData?.images[index] && (
                       <div
-                        className="h-100 d-flex align-items-center justify-content-center"
-                        style={{
-                          minHeight: "184px",
-                          maxHeight: "700px",
-                          padding: ".5px",
-                        }}
+                        key={index}
+                        className="col-3 col-md-6"
+                        style={{ height: "270px" }}
                       >
                         <a
-                          href={projectData?.images[0]?.imageUrl}
+                          href={projectData?.images[index]?.imageUrl}
                           data-toggle="lightbox"
                           data-gallery="gallery"
-                          className="d-flex align-items-center justify-content-center w-100 h-100"
-                          onClick={(e) => {
+                          className="d-block h-100"
+                          onClick={e => {
                             e.preventDefault();
                             setShowFullScreen(true);
-                            setCurrentImageIndex(0);
+                            setCurrentImageIndex(index);
                           }}
                         >
                           <img
-                            alt={projectData?.images[0]?.caption || "Image"}
-                            src={projectData?.images[0]?.imageUrl}
+                            alt={
+                              projectData?.images[index]?.caption || "Image"
+                            }
+                            src={projectData?.images[index]?.imageUrl}
                             loading="lazy"
-                            className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
-                            style={{ objectFit: "cover", cursor: "pointer" }}
+                            className="w-100 h-100 rounded-0"
+                            style={{
+                              objectFit: "cover",
+                              cursor: "pointer",
+                              padding: ".5px",
+                            }}
                             fetchpriority="high"
                           />
                         </a>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Additional Images Grid */}
-                  <div className="col-12 col-md-6 p-0">
-                    <div className="row g-0 h-100">
-                      {[1, 2, 3, 4].map(
-                        (index) =>
-                          projectData?.images[index] && (
-                            <div
-                              key={index}
-                              className="col-3 col-md-6"
-                              style={{ height: "270px" }}
-                            >
-                              <a
-                                href={projectData?.images[index]?.imageUrl}
-                                data-toggle="lightbox"
-                                data-gallery="gallery"
-                                className="d-block h-100"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setShowFullScreen(true);
-                                  setCurrentImageIndex(index);
-                                }}
-                              >
-                                <img
-                                  alt={
-                                    projectData?.images[index]?.caption ||
-                                    "Image"
-                                  }
-                                  src={projectData?.images[index]?.imageUrl}
-                                  loading="lazy"
-                                  className="w-100 h-100 rounded-0"
-                                  style={{
-                                    objectFit: "cover",
-                                    cursor: "pointer",
-                                    padding: ".5px",
-                                  }}
-                                  fetchpriority="high"
-                                />
-                              </a>
-                            </div>
-                          )
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-          </div>
+                    )
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </>
+    )}
+</div>
 
           {/* Fullscreen Image Modal */}
           {showFullScreen && projectData?.images && (
