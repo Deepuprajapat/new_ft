@@ -38,6 +38,31 @@ const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
 // const FALLBACK_Floor_IMAGE = "/images/coming_soon_floor.jpg";
 
+// Helper function to parse flexible date formats (cross-browser compatible)
+const parseFlexibleDate = (dateStr) => {
+  if (!dateStr) return null;
+  const trimmed = dateStr.trim();
+  // Handle timestamps
+  if (!isNaN(trimmed)) {
+    return new Date(Number(trimmed));
+  }
+  // Handle "Month Year" or "Month, Year" format
+  if (/^[a-zA-Z]+,?\s+\d{4}$/.test(trimmed)) {
+    const parts = trimmed.replace(',', '').split(/\s+/);
+    const monthName = parts[0];
+    const year = parts[1];
+    const monthIndex = new Date(Date.parse(monthName + " 1, 2000")).getMonth();
+    return new Date(parseInt(year), monthIndex, 1);
+  }
+  // Handle YYYY-MM-DD format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return new Date(trimmed + 'T00:00:00');
+  }
+  // Handle other formats by converting dashes to slashes (Safari-friendly)
+  const safariDate = trimmed.replace(/-/g, "/");
+  return new Date(safariDate);
+};
+
 const ProjectDetails = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const [projectData, setProjectData] = useState(null);
@@ -639,92 +664,145 @@ const ProjectDetails = () => {
       <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
           {/* Gallery Section */}
-          <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
-            {projectData &&
-              projectData.images &&
-              projectData.images.length > 0 && (
-                <>
-                  {/* Main Image - Full width on mobile, half width on desktop */}
-                  <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
-                    {projectData?.images[0] && (
+<div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
+  {projectData &&
+    projectData.images &&
+    projectData.images.length > 0 && (
+      <>
+        {/* Mobile View: Horizontal Scrollable Images */}
+        {window.innerWidth <= 768 ? (
+          <div
+            className="w-100"
+            style={{
+              overflowX: "auto",
+              whiteSpace: "nowrap",
+              display: "flex",
+              gap: "8px",
+              paddingBottom: "8px",
+            }}
+          >
+            {projectData.images.map((img, idx) => (
+              <div
+                key={idx}
+                style={{
+                  flex: "0 0 90%",
+                  maxWidth: "90%",
+                  minWidth: "90%",
+                  display: "inline-block",
+                  position: "relative",
+                }}
+              >
+                <a
+                  href={img.imageUrl}
+                  data-toggle="lightbox"
+                  data-gallery="gallery"
+                  className="d-flex align-items-center justify-content-center w-100 h-100"
+                  onClick={e => {
+                    e.preventDefault();
+                    setShowFullScreen(true);
+                    setCurrentImageIndex(idx);
+                  }}
+                >
+                  <img
+                    alt={img.caption || `Image ${idx + 1}`}
+                    src={img.imageUrl}
+                    loading="lazy"
+                    className="img-fluid w-100 h-100 rounded-0"
+                    style={{
+                      objectFit: "cover",
+                      cursor: "pointer",
+                      height: "220px",
+                    }}
+                    fetchpriority="high"
+                  />
+                </a>
+              </div>
+            ))}
+          </div>
+        ) : (
+          // Desktop View: Original Grid
+          <>
+            {/* Main Image */}
+            <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
+              {projectData?.images[0] && (
+                <div
+                  className="h-100 d-flex align-items-center justify-content-center"
+                  style={{
+                    minHeight: "184px",
+                    maxHeight: "700px",
+                    padding: ".5px",
+                  }}
+                >
+                  <a
+                    href={projectData?.images[0]?.imageUrl}
+                    data-toggle="lightbox"
+                    data-gallery="gallery"
+                    className="d-flex align-items-center justify-content-center w-100 h-100"
+                    onClick={e => {
+                      e.preventDefault();
+                      setShowFullScreen(true);
+                      setCurrentImageIndex(0);
+                    }}
+                  >
+                    <img
+                      alt={projectData?.images[0]?.caption || "Image"}
+                      src={projectData?.images[0]?.imageUrl}
+                      loading="lazy"
+                      className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
+                      style={{ objectFit: "cover", cursor: "pointer" }}
+                      fetchpriority="high"
+                    />
+                  </a>
+                </div>
+              )}
+            </div>
+            {/* Additional Images Grid */}
+            <div className="col-12 col-md-6 p-0">
+              <div className="row g-0 h-100">
+                {[1, 2, 3, 4].map(
+                  index =>
+                    projectData?.images[index] && (
                       <div
-                        className="h-100 d-flex align-items-center justify-content-center"
-                        style={{
-                          minHeight: "184px",
-                          maxHeight: "700px",
-                          padding: ".5px",
-                        }}
+                        key={index}
+                        className="col-3 col-md-6"
+                        style={{ height: "270px" }}
                       >
                         <a
-                          href={projectData?.images[0]?.imageUrl}
+                          href={projectData?.images[index]?.imageUrl}
                           data-toggle="lightbox"
                           data-gallery="gallery"
-                          className="d-flex align-items-center justify-content-center w-100 h-100"
-                          onClick={(e) => {
+                          className="d-block h-100"
+                          onClick={e => {
                             e.preventDefault();
                             setShowFullScreen(true);
-                            setCurrentImageIndex(0);
+                            setCurrentImageIndex(index);
                           }}
                         >
                           <img
-                            alt={projectData?.images[0]?.caption || "Image"}
-                            src={projectData?.images[0]?.imageUrl}
+                            alt={
+                              projectData?.images[index]?.caption || "Image"
+                            }
+                            src={projectData?.images[index]?.imageUrl}
                             loading="lazy"
-                            className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
-                            style={{ objectFit: "cover", cursor: "pointer" }}
+                            className="w-100 h-100 rounded-0"
+                            style={{
+                              objectFit: "cover",
+                              cursor: "pointer",
+                              padding: ".5px",
+                            }}
                             fetchpriority="high"
                           />
                         </a>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Additional Images Grid */}
-                  <div className="col-12 col-md-6 p-0">
-                    <div className="row g-0 h-100">
-                      {[1, 2, 3, 4].map(
-                        (index) =>
-                          projectData?.images[index] && (
-                            <div
-                              key={index}
-                              className="col-3 col-md-6"
-                              style={{ height: "270px" }}
-                            >
-                              <a
-                                href={projectData?.images[index]?.imageUrl}
-                                data-toggle="lightbox"
-                                data-gallery="gallery"
-                                className="d-block h-100"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setShowFullScreen(true);
-                                  setCurrentImageIndex(index);
-                                }}
-                              >
-                                <img
-                                  alt={
-                                    projectData?.images[index]?.caption ||
-                                    "Image"
-                                  }
-                                  src={projectData?.images[index]?.imageUrl}
-                                  loading="lazy"
-                                  className="w-100 h-100 rounded-0"
-                                  style={{
-                                    objectFit: "cover",
-                                    cursor: "pointer",
-                                    padding: ".5px",
-                                  }}
-                                  fetchpriority="high"
-                                />
-                              </a>
-                            </div>
-                          )
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-          </div>
+                    )
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </>
+    )}
+</div>
 
           {/* Fullscreen Image Modal */}
           {showFullScreen && projectData?.images && (
@@ -1541,19 +1619,17 @@ const ProjectDetails = () => {
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.launchDate
-                                ?.toLowerCase()
-                                .includes("coming")
+                              {projectData?.launchDate?.toLowerCase().includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.launchDate
-                                  ? new Date(
-                                    isNaN(projectData.launchDate)
-                                      ? projectData.launchDate
-                                      : Number(projectData.launchDate)
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "long",
-                                  })
+                                  ? (() => {
+                                      const dateObj = parseFlexibleDate(projectData.launchDate);
+                                      if (!dateObj || isNaN(dateObj.getTime())) return "-";
+                                      return dateObj.toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                      });
+                                    })()
                                   : "-"}
                             </p>
                           </div>
@@ -1591,19 +1667,17 @@ const ProjectDetails = () => {
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.possessionDate
-                                ?.toLowerCase()
-                                .includes("coming")
+                              {projectData?.possessionDate?.toLowerCase().includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.possessionDate
-                                  ? new Date(
-                                    isNaN(projectData.possessionDate)
-                                      ? projectData.possessionDate
-                                      : Number(projectData.possessionDate)
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "long",
-                                  })
+                                  ? (() => {
+                                      const dateObj = parseFlexibleDate(projectData.possessionDate);
+                                      if (!dateObj || isNaN(dateObj.getTime())) return "-";
+                                      return dateObj.toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                      });
+                                    })()
                                   : "-"}
                             </p>
                           </div>
