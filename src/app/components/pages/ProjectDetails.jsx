@@ -38,6 +38,31 @@ const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
 // const FALLBACK_Floor_IMAGE = "/images/coming_soon_floor.jpg";
 
+// Helper function to parse flexible date formats (cross-browser compatible)
+const parseFlexibleDate = (dateStr) => {
+  if (!dateStr) return null;
+  const trimmed = dateStr.trim();
+  // Handle timestamps
+  if (!isNaN(trimmed)) {
+    return new Date(Number(trimmed));
+  }
+  // Handle "Month Year" or "Month, Year" format
+  if (/^[a-zA-Z]+,?\s+\d{4}$/.test(trimmed)) {
+    const parts = trimmed.replace(',', '').split(/\s+/);
+    const monthName = parts[0];
+    const year = parts[1];
+    const monthIndex = new Date(Date.parse(monthName + " 1, 2000")).getMonth();
+    return new Date(parseInt(year), monthIndex, 1);
+  }
+  // Handle YYYY-MM-DD format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return new Date(trimmed + 'T00:00:00');
+  }
+  // Handle other formats by converting dashes to slashes (Safari-friendly)
+  const safariDate = trimmed.replace(/-/g, "/");
+  return new Date(safariDate);
+};
+
 const ProjectDetails = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const [projectData, setProjectData] = useState(null);
@@ -1594,19 +1619,17 @@ const ProjectDetails = () => {
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.launchDate
-                                ?.toLowerCase()
-                                .includes("coming")
+                              {projectData?.launchDate?.toLowerCase().includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.launchDate
-                                  ? new Date(
-                                    isNaN(projectData.launchDate)
-                                      ? projectData.launchDate
-                                      : Number(projectData.launchDate)
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "long",
-                                  })
+                                  ? (() => {
+                                      const dateObj = parseFlexibleDate(projectData.launchDate);
+                                      if (!dateObj || isNaN(dateObj.getTime())) return "-";
+                                      return dateObj.toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                      });
+                                    })()
                                   : "-"}
                             </p>
                           </div>
@@ -1644,19 +1667,17 @@ const ProjectDetails = () => {
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.possessionDate
-                                ?.toLowerCase()
-                                .includes("coming")
+                              {projectData?.possessionDate?.toLowerCase().includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.possessionDate
-                                  ? new Date(
-                                    isNaN(projectData.possessionDate)
-                                      ? projectData.possessionDate
-                                      : Number(projectData.possessionDate)
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "long",
-                                  })
+                                  ? (() => {
+                                      const dateObj = parseFlexibleDate(projectData.possessionDate);
+                                      if (!dateObj || isNaN(dateObj.getTime())) return "-";
+                                      return dateObj.toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                      });
+                                    })()
                                   : "-"}
                             </p>
                           </div>
