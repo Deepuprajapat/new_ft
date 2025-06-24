@@ -866,6 +866,44 @@ footer {
       }
     }
   }
+
+  .callnow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2067d1;
+    color: #fff;
+    font-size: 16px;
+    padding: 6px 22px;
+    border-radius: 8px;
+    margin: 10px auto;
+    width: fit-content;
+    transition: all 0.3s;
+
+    a {
+      color: #fff;
+      font-size: 16px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .callnow {
+      width: 100%;
+      font-size: 15px;
+      padding: 10px 0;
+      border-radius: 0;
+      margin: 10px 0 0 0;
+      justify-content: center;
+
+      a {
+        font-size: 15px;
+        width: 100%;
+        text-align: center;
+      }
+    }
+  }
 }
 
 @media (width <= 1200px) and (width >= 676px) {
@@ -924,7 +962,7 @@ footer {
   background-color: #2067d1;
   color: #fff;
   font-size: 16px;
-  padding: 6px 22px;
+  padding: 7px 20px;
   flex-basis: 50%;
   justify-content: center;
   display: flex;
@@ -934,7 +972,7 @@ footer {
 .CTA .whatsapp {
     background-color: #058735;
     color: #fff;
-    padding: 6px 28px;
+    padding: 7px 20px;
     flex-basis: 50%;
     font-size: 16px;
     align-items: center;
@@ -944,7 +982,6 @@ footer {
 }
 
 .CTA .whatsapp a,.CTA .callnow a{
-  font-size: 18px;
   color: white;
 }
 
