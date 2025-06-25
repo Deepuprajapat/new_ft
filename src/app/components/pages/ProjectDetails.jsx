@@ -664,145 +664,145 @@ const ProjectDetails = () => {
       <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
           {/* Gallery Section */}
-<div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
-  {projectData &&
-    projectData.images &&
-    projectData.images.length > 0 && (
-      <>
-        {/* Mobile View: Horizontal Scrollable Images */}
-        {window.innerWidth <= 768 ? (
-          <div
-            className="w-100"
-            style={{
-              overflowX: "auto",
-              whiteSpace: "nowrap",
-              display: "flex",
-              gap: "8px",
-              paddingBottom: "8px",
-            }}
-          >
-            {projectData.images.map((img, idx) => (
-              <div
-                key={idx}
-                style={{
-                  flex: "0 0 90%",
-                  maxWidth: "90%",
-                  minWidth: "90%",
-                  display: "inline-block",
-                  position: "relative",
-                }}
-              >
-                <a
-                  href={img.imageUrl}
-                  data-toggle="lightbox"
-                  data-gallery="gallery"
-                  className="d-flex align-items-center justify-content-center w-100 h-100"
-                  onClick={e => {
-                    e.preventDefault();
-                    setShowFullScreen(true);
-                    setCurrentImageIndex(idx);
-                  }}
-                >
-                  <img
-                    alt={img.caption || `Image ${idx + 1}`}
-                    src={img.imageUrl}
-                    loading="lazy"
-                    className="img-fluid w-100 h-100 rounded-0"
-                    style={{
-                      objectFit: "cover",
-                      cursor: "pointer",
-                      height: "220px",
-                    }}
-                    fetchpriority="high"
-                  />
-                </a>
-              </div>
-            ))}
-          </div>
-        ) : (
-          // Desktop View: Original Grid
-          <>
-            {/* Main Image */}
-            <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
-              {projectData?.images[0] && (
-                <div
-                  className="h-100 d-flex align-items-center justify-content-center"
-                  style={{
-                    minHeight: "184px",
-                    maxHeight: "700px",
-                    padding: ".5px",
-                  }}
-                >
-                  <a
-                    href={projectData?.images[0]?.imageUrl}
-                    data-toggle="lightbox"
-                    data-gallery="gallery"
-                    className="d-flex align-items-center justify-content-center w-100 h-100"
-                    onClick={e => {
-                      e.preventDefault();
-                      setShowFullScreen(true);
-                      setCurrentImageIndex(0);
-                    }}
-                  >
-                    <img
-                      alt={projectData?.images[0]?.caption || "Image"}
-                      src={projectData?.images[0]?.imageUrl}
-                      loading="lazy"
-                      className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
-                      style={{ objectFit: "cover", cursor: "pointer" }}
-                      fetchpriority="high"
-                    />
-                  </a>
-                </div>
-              )}
-            </div>
-            {/* Additional Images Grid */}
-            <div className="col-12 col-md-6 p-0">
-              <div className="row g-0 h-100">
-                {[1, 2, 3, 4].map(
-                  index =>
-                    projectData?.images[index] && (
-                      <div
-                        key={index}
-                        className="col-3 col-md-6"
-                        style={{ height: "270px" }}
-                      >
-                        <a
-                          href={projectData?.images[index]?.imageUrl}
-                          data-toggle="lightbox"
-                          data-gallery="gallery"
-                          className="d-block h-100"
-                          onClick={e => {
-                            e.preventDefault();
-                            setShowFullScreen(true);
-                            setCurrentImageIndex(index);
+          <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
+            {projectData &&
+              projectData.images &&
+              projectData.images.length > 0 && (
+                <>
+                  {/* Mobile View: Horizontal Scrollable Images */}
+                  {window.innerWidth <= 768 ? (
+                    <div
+                      className="w-100"
+                      style={{
+                        overflowX: "auto",
+                        whiteSpace: "nowrap",
+                        display: "flex",
+                        gap: "8px",
+                        paddingBottom: "8px",
+                      }}
+                    >
+                      {projectData.images.map((img, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            flex: "0 0 90%",
+                            maxWidth: "90%",
+                            minWidth: "90%",
+                            display: "inline-block",
+                            position: "relative",
                           }}
                         >
-                          <img
-                            alt={
-                              projectData?.images[index]?.caption || "Image"
-                            }
-                            src={projectData?.images[index]?.imageUrl}
-                            loading="lazy"
-                            className="w-100 h-100 rounded-0"
+                          <a
+                            href={img.imageUrl}
+                            data-toggle="lightbox"
+                            data-gallery="gallery"
+                            className="d-flex align-items-center justify-content-center w-100 h-100"
+                            onClick={e => {
+                              e.preventDefault();
+                              setShowFullScreen(true);
+                              setCurrentImageIndex(idx);
+                            }}
+                          >
+                            <img
+                              alt={img.caption || `Image ${idx + 1}`}
+                              src={img.imageUrl}
+                              loading="lazy"
+                              className="img-fluid w-100 h-100 rounded-0"
+                              style={{
+                                objectFit: "cover",
+                                cursor: "pointer",
+                                height: "220px",
+                              }}
+                              fetchpriority="high"
+                            />
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    // Desktop View: Original Grid
+                    <>
+                      {/* Main Image */}
+                      <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
+                        {projectData?.images[0] && (
+                          <div
+                            className="h-100 d-flex align-items-center justify-content-center"
                             style={{
-                              objectFit: "cover",
-                              cursor: "pointer",
+                              minHeight: "184px",
+                              maxHeight: "700px",
                               padding: ".5px",
                             }}
-                            fetchpriority="high"
-                          />
-                        </a>
+                          >
+                            <a
+                              href={projectData?.images[0]?.imageUrl}
+                              data-toggle="lightbox"
+                              data-gallery="gallery"
+                              className="d-flex align-items-center justify-content-center w-100 h-100"
+                              onClick={e => {
+                                e.preventDefault();
+                                setShowFullScreen(true);
+                                setCurrentImageIndex(0);
+                              }}
+                            >
+                              <img
+                                alt={projectData?.images[0]?.caption || "Image"}
+                                src={projectData?.images[0]?.imageUrl}
+                                loading="lazy"
+                                className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
+                                style={{ objectFit: "cover", cursor: "pointer" }}
+                                fetchpriority="high"
+                              />
+                            </a>
+                          </div>
+                        )}
                       </div>
-                    )
-                )}
-              </div>
-            </div>
-          </>
-        )}
-      </>
-    )}
-</div>
+                      {/* Additional Images Grid */}
+                      <div className="col-12 col-md-6 p-0">
+                        <div className="row g-0 h-100">
+                          {[1, 2, 3, 4].map(
+                            index =>
+                              projectData?.images[index] && (
+                                <div
+                                  key={index}
+                                  className="col-3 col-md-6"
+                                  style={{ height: "270px" }}
+                                >
+                                  <a
+                                    href={projectData?.images[index]?.imageUrl}
+                                    data-toggle="lightbox"
+                                    data-gallery="gallery"
+                                    className="d-block h-100"
+                                    onClick={e => {
+                                      e.preventDefault();
+                                      setShowFullScreen(true);
+                                      setCurrentImageIndex(index);
+                                    }}
+                                  >
+                                    <img
+                                      alt={
+                                        projectData?.images[index]?.caption || "Image"
+                                      }
+                                      src={projectData?.images[index]?.imageUrl}
+                                      loading="lazy"
+                                      className="w-100 h-100 rounded-0"
+                                      style={{
+                                        objectFit: "cover",
+                                        cursor: "pointer",
+                                        padding: ".5px",
+                                      }}
+                                      fetchpriority="high"
+                                    />
+                                  </a>
+                                </div>
+                              )
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+          </div>
 
           {/* Fullscreen Image Modal */}
           {showFullScreen && projectData?.images && (
@@ -1623,13 +1623,13 @@ const ProjectDetails = () => {
                                 ? "Coming Soon"
                                 : projectData?.launchDate
                                   ? (() => {
-                                      const dateObj = parseFlexibleDate(projectData.launchDate);
-                                      if (!dateObj || isNaN(dateObj.getTime())) return "-";
-                                      return dateObj.toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "long",
-                                      });
-                                    })()
+                                    const dateObj = parseFlexibleDate(projectData.launchDate);
+                                    if (!dateObj || isNaN(dateObj.getTime())) return "-";
+                                    return dateObj.toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "long",
+                                    });
+                                  })()
                                   : "-"}
                             </p>
                           </div>
@@ -1671,13 +1671,13 @@ const ProjectDetails = () => {
                                 ? "Coming Soon"
                                 : projectData?.possessionDate
                                   ? (() => {
-                                      const dateObj = parseFlexibleDate(projectData.possessionDate);
-                                      if (!dateObj || isNaN(dateObj.getTime())) return "-";
-                                      return dateObj.toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "long",
-                                      });
-                                    })()
+                                    const dateObj = parseFlexibleDate(projectData.possessionDate);
+                                    if (!dateObj || isNaN(dateObj.getTime())) return "-";
+                                    return dateObj.toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "long",
+                                    });
+                                  })()
                                   : "-"}
                             </p>
                           </div>
@@ -2338,7 +2338,7 @@ const ProjectDetails = () => {
                               <div className="col-12 mt-2">
                                 <a
                                   href={`tel:+91${projectData?.locality?.city
-                                      ?.phoneNumber?.[0] || "8595189189"
+                                    ?.phoneNumber?.[0] || "8595189189"
                                     }`}
                                   className="btn w-100 py-1"
                                   style={{
@@ -2718,7 +2718,7 @@ const ProjectDetails = () => {
                                 <div className="d-flex flex-column gap-2 align-items-center">
                                   <a
                                     href={`tel:+91${projectData?.locality?.city
-                                        ?.phoneNumber?.[0] || "8595189189"
+                                      ?.phoneNumber?.[0] || "8595189189"
                                       }`}
                                     className="btn btn-primary w-100"
                                     style={{
@@ -3277,22 +3277,26 @@ const ProjectDetails = () => {
                         <div
                           style={{
                             width: "100%",
-                            height: "160px",
-                            backgroundImage:
-                              "url('/images/investmango-youtube-banner.webp')",
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
                             borderRadius: "8px",
+                            backgroundColor: "#f0f0f0",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            color: "#fff",
-                            fontSize: "20px",
-                            fontWeight: "bold",
-                            textAlign: "center",
-                            backgroundColor: "#f0f0f0",
+                            overflow: "hidden",
                           }}
-                        ></div>
+                        >
+                          <img
+                            src="/images/investmango-youtube-banner.webp"
+                            alt="YouTube Channel Banner"
+                            style={{
+                              width: "100%",
+                              height: "auto",
+                              objectFit: "contain",
+                              borderRadius: "8px",
+                              display: "block",
+                            }}
+                          />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -3411,163 +3415,146 @@ const ProjectDetails = () => {
                 >
                   {projectData?.name} Site Plan
                 </h2>
-                <div className="row">
-                  <div className="col-12">
-                    {/* <p
-                      className="mb-4 px-3"
+                <div>
+                  <div
+                    className="position-relative"
+                    style={{
+                      overflow: "hidden",
+                      marginBottom:0,
+                    }}
+                  >
+                    <div
+                      id="image-container"
                       style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "14px",
+                        position: "relative",
+                        width: "100%",
+                        overflow: "hidden",
                       }}
                     >
-                      {projectData?.siteplanPara && (
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: projectData.siteplanPara,
-                          }}
-                        />
-                      )}
-                    </p> */}
-
-                    <div className="position-relative px-3">
-                      <div
-                        className="position-relative"
+                      <img
+                        className="img-fluid"
+                        id="zoom-image"
+                        alt={`${projectData?.name} Site Plan`}
+                        src={imageSrc}
+                        loading="lazy"
+                        fetchpriority="high"
                         style={{
-                          overflow: "hidden",
-                          height: window.innerWidth <= 768 ? "200px" : "600px",
+                          transform: "scale(1) translate(0px, 0px)",
+                          transition: "transform 0.3s ease-in-out",
+                          maxWidth: "100%",
+                          maxHeight:"100%",
+                          width:"100%",
+                          height:"auto",
+                          objectFit:"contain",
+                          cursor: "grab",
                         }}
-                      >
-                        <div
-                          id="image-container"
-                          style={{
-                            position: "relative",
-                            width: "100%",
-                            height: "100%",
-                            overflow: "hidden",
-                          }}
-                        >
-                          <img
-                            className="img-fluid"
-                            id="zoom-image"
-                            alt={`${projectData?.name} Site Plan`}
-                            src={imageSrc}
-                            loading="lazy"
-                            fetchpriority="high"
-                            style={{
-                              transform: "scale(1) translate(0px, 0px)",
-                              transition: "transform 0.3s ease-in-out",
-                              position: "absolute",
-                              maxWidth: "100%",
-                              cursor: "grab",
-                            }}
-                            onClick={openModal} // Open modal on image click
-                            onMouseDown={(e) => {
-                              const img = e.target;
-                              img.style.cursor = "grabbing";
-                              let lastX = e.clientX;
-                              let lastY = e.clientY;
+                        onClick={openModal} // Open modal on image click
+                        onMouseDown={(e) => {
+                          const img = e.target;
+                          img.style.cursor = "grabbing";
+                          let lastX = e.clientX;
+                          let lastY = e.clientY;
 
-                              const onMouseMove = (moveEvent) => {
-                                const deltaX = moveEvent.clientX - lastX;
-                                const deltaY = moveEvent.clientY - lastY;
-                                lastX = moveEvent.clientX;
-                                lastY = moveEvent.clientY;
+                          const onMouseMove = (moveEvent) => {
+                            const deltaX = moveEvent.clientX - lastX;
+                            const deltaY = moveEvent.clientY - lastY;
+                            lastX = moveEvent.clientX;
+                            lastY = moveEvent.clientY;
 
-                                const transform = img.style.transform;
-                                const scale = parseFloat(
-                                  transform.match(/scale\((.*?)\)/)[1]
-                                );
-                                const [translateX, translateY] = transform
-                                  .match(/translate\((.*?), (.*?)\)/)
-                                  ?.slice(1)
-                                  .map(parseFloat) || [0, 0];
-
-                                // Only allow movement if zoomed in
-                                if (scale > 1) {
-                                  img.style.transform = `scale(${scale}) translate(${translateX + deltaX
-                                    }px, ${translateY + deltaY}px)`;
-                                }
-                              };
-
-                              const onMouseUp = () => {
-                                img.style.cursor = "grab";
-                                document.removeEventListener(
-                                  "mousemove",
-                                  onMouseMove
-                                );
-                                document.removeEventListener(
-                                  "mouseup",
-                                  onMouseUp
-                                );
-                              };
-
-                              document.addEventListener(
-                                "mousemove",
-                                onMouseMove
-                              );
-                              document.addEventListener("mouseup", onMouseUp);
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="position-absolute top-0 end-0">
-                        <button
-                          className="d-block border-0 mb-1"
-                          id="zoom-in"
-                          aria-label="Zoom In"
-                          style={{
-                            background: "#dddd",
-                            width: "40px",
-                            height: "40px",
-                            cursor: "pointer",
-                            color: "#000",
-                          }}
-                          onClick={() => {
-                            const img = document.getElementById("zoom-image");
-                            const currentScale = parseFloat(
-                              img.style.transform.match(/scale\((.*?)\)/)[1]
+                            const transform = img.style.transform;
+                            const scale = parseFloat(
+                              transform.match(/scale\((.*?)\)/)[1]
                             );
-                            const [translateX, translateY] = img.style.transform
+                            const [translateX, translateY] = transform
                               .match(/translate\((.*?), (.*?)\)/)
                               ?.slice(1)
                               .map(parseFloat) || [0, 0];
-                            img.style.transform = `scale(${Math.min(
-                              3,
-                              currentScale * 1.2
-                            )}) translate(${translateX}px, ${translateY}px)`;
-                          }}
-                        >
-                          +
-                        </button>
-                        <button
-                          className="d-block border-0"
-                          id="zoom-out"
-                          aria-label="Zoom Out"
-                          style={{
-                            background: "#dddd",
-                            width: "40px",
-                            height: "40px",
-                            cursor: "pointer",
-                            color: "#000",
-                          }}
-                          onClick={() => {
-                            const img = document.getElementById("zoom-image");
-                            const currentScale = parseFloat(
-                              img.style.transform.match(/scale\((.*?)\)/)[1]
+
+                            // Only allow movement if zoomed in
+                            if (scale > 1) {
+                              img.style.transform = `scale(${scale}) translate(${translateX + deltaX
+                                }px, ${translateY + deltaY}px)`;
+                            }
+                          };
+
+                          const onMouseUp = () => {
+                            img.style.cursor = "grab";
+                            document.removeEventListener(
+                              "mousemove",
+                              onMouseMove
                             );
-                            const [translateX, translateY] = img.style.transform
-                              .match(/translate\((.*?), (.*?)\)/)
-                              ?.slice(1)
-                              .map(parseFloat) || [0, 0];
-                            img.style.transform = `scale(${Math.max(
-                              1,
-                              currentScale / 1.2
-                            )}) translate(${translateX}px, ${translateY}px)`;
-                          }}
-                        >
-                          -
-                        </button>
-                      </div>
+                            document.removeEventListener(
+                              "mouseup",
+                              onMouseUp
+                            );
+                          };
+
+                          document.addEventListener(
+                            "mousemove",
+                            onMouseMove
+                          );
+                          document.addEventListener("mouseup", onMouseUp);
+                        }}
+                      />
                     </div>
+                  </div>
+                  <div className="position-absolute top-0 end-0">
+                    <button
+                      className="d-block border-0 mb-1"
+                      id="zoom-in"
+                      aria-label="Zoom In"
+                      style={{
+                        background: "#dddd",
+                        width: "40px",
+                        height: "40px",
+                        cursor: "pointer",
+                        color: "#000",
+                      }}
+                      onClick={() => {
+                        const img = document.getElementById("zoom-image");
+                        const currentScale = parseFloat(
+                          img.style.transform.match(/scale\((.*?)\)/)[1]
+                        );
+                        const [translateX, translateY] = img.style.transform
+                          .match(/translate\((.*?), (.*?)\)/)
+                          ?.slice(1)
+                          .map(parseFloat) || [0, 0];
+                        img.style.transform = `scale(${Math.min(
+                          3,
+                          currentScale * 1.2
+                        )}) translate(${translateX}px, ${translateY}px)`;
+                      }}
+                    >
+                      +
+                    </button>
+                    <button
+                      className="d-block border-0"
+                      id="zoom-out"
+                      aria-label="Zoom Out"
+                      style={{
+                        background: "#dddd",
+                        width: "40px",
+                        height: "40px",
+                        cursor: "pointer",
+                        color: "#000",
+                      }}
+                      onClick={() => {
+                        const img = document.getElementById("zoom-image");
+                        const currentScale = parseFloat(
+                          img.style.transform.match(/scale\((.*?)\)/)[1]
+                        );
+                        const [translateX, translateY] = img.style.transform
+                          .match(/translate\((.*?), (.*?)\)/)
+                          ?.slice(1)
+                          .map(parseFloat) || [0, 0];
+                        img.style.transform = `scale(${Math.max(
+                          1,
+                          currentScale / 1.2
+                        )}) translate(${translateX}px, ${translateY}px)`;
+                      }}
+                    >
+                      -
+                    </button>
                   </div>
                 </div>
 
