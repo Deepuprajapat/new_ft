@@ -964,7 +964,7 @@ footer {
   font-size: 16px;
   padding: 7px 20px;
   flex-basis: 50%;
-  justify-content: center;
+  justify-content: center;  
   display: flex;
   align-items: center;
 }
@@ -1873,4 +1873,29 @@ a:hover{
   color: #212529;
   padding: .75rem;
   vertical-align: top;
+}
+
+#siteplan .position-absolute.top-0.end-0 {
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+#siteplan .position-absolute.top-0.end-0 button {
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+@media (max-width: 768px) {
+  #siteplan .position-absolute.top-0.end-0 {
+    top: 8px !important;
+    right: 8px !important;
+  }
+  #siteplan .position-absolute.top-0.end-0 button {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
 }
