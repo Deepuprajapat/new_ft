@@ -96,6 +96,16 @@ const AddHeadScripts = () => {
       alt="facebook"/>
     `;
     document.body.appendChild(fbPixelNoScript);
+    // Google Tag Manager (noscript) - insert as first child of <body>
+    const gtmNoScript = document.createElement("noscript");
+    gtmNoScript.innerHTML = `
+      <iframe src=\"https://www.googletagmanager.com/ns.html?id=GTM-P4VQSDP\" height=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe>
+    `;
+    if (document.body.firstChild) {
+      document.body.insertBefore(gtmNoScript, document.body.firstChild);
+    } else {
+      document.body.appendChild(gtmNoScript);
+    }
     return () => {
       // Cleanup: Remove all added scripts if necessary
       document.head.removeChild(gtmScript);
@@ -104,6 +114,9 @@ const AddHeadScripts = () => {
       document.head.removeChild(schemaScript);
       document.head.removeChild(fbPixelScript);
       document.body.removeChild(fbPixelNoScript);
+      if (document.body.contains(gtmNoScript)) {
+        document.body.removeChild(gtmNoScript);
+      }
     };
   }, []);
   return null; // No UI elements

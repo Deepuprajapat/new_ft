@@ -587,7 +587,7 @@ const ProjectDetails = () => {
     {
       question: "Why choose Invest Mango?",
       answer:
-        "Invest Mango works as one team with a common purpose to provide best-in-class services, thoroughly understands the changing needs of its clients. We are client-centric as client is the focal point of Invest Mango. We provide advice and recommendations that are in the client’s best interest. We strive to understand the client’s requirement by entering into his shoes and offer advice which have far reaching impact. A happy client is what makes us happy and we are proud to serve our client’s.",
+        "Invest Mango works as one team with a common purpose to provide best-in-class services, thoroughly understands the changing needs of its clients. We are client-centric as client is the focal point of Invest Mango. We provide advice and recommendations that are in the client's best interest. We strive to understand the client's requirement by entering into his shoes and offer advice which have far reaching impact. A happy client is what makes us happy and we are proud to serve our client's.",
     },
     {
       question: "How much is the total size of {{projectData.name}}?",
@@ -3420,7 +3420,7 @@ const ProjectDetails = () => {
                     className="position-relative"
                     style={{
                       overflow: "hidden",
-                      marginBottom:0,
+                      marginBottom: 0,
                     }}
                   >
                     <div
@@ -3442,10 +3442,10 @@ const ProjectDetails = () => {
                           transform: "scale(1) translate(0px, 0px)",
                           transition: "transform 0.3s ease-in-out",
                           maxWidth: "100%",
-                          maxHeight:"100%",
-                          width:"100%",
-                          height:"auto",
-                          objectFit:"contain",
+                          maxHeight: "100%",
+                          width: "100%",
+                          height: "auto",
+                          objectFit: "contain",
                           cursor: "grab",
                         }}
                         onClick={openModal} // Open modal on image click
@@ -3496,65 +3496,96 @@ const ProjectDetails = () => {
                           document.addEventListener("mouseup", onMouseUp);
                         }}
                       />
+                      <div
+                        className="position-absolute zoom-btn-container"
+                        style={{
+                          top: 8,
+                          right: 8,
+                          zIndex: 2,
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "4px",
+                        }}
+                      >
+                        <button
+                          className="d-block border-0 mb-1 zoom-btn"
+                          id="zoom-in"
+                          aria-label="Zoom In"
+                          style={{
+                            background: "#dddd",
+                            width: "40px",
+                            height: "40px",
+                            cursor: "pointer",
+                            color: "#000",
+                            fontSize: "22px",
+                          }}
+                          onClick={() => {
+                            const img = document.getElementById("zoom-image");
+                            const currentScale = parseFloat(
+                              img.style.transform.match(/scale\((.*?)\)/)[1]
+                            );
+                            const [translateX, translateY] = img.style.transform
+                              .match(/translate\((.*?), (.*?)\)/)
+                              ?.slice(1)
+                              .map(parseFloat) || [0, 0];
+                            img.style.transform = `scale(${Math.min(
+                              3,
+                              currentScale * 1.2
+                            )}) translate(${translateX}px, ${translateY}px)`;
+                          }}
+                        >
+                          +
+                        </button>
+                        <button
+                          className="d-block border-0 zoom-btn"
+                          id="zoom-out"
+                          aria-label="Zoom Out"
+                          style={{
+                            background: "#dddd",
+                            width: "40px",
+                            height: "40px",
+                            cursor: "pointer",
+                            color: "#000",
+                            fontSize: "22px",
+                          }}
+                          onClick={() => {
+                            const img = document.getElementById("zoom-image");
+                            const currentScale = parseFloat(
+                              img.style.transform.match(/scale\((.*?)\)/)[1]
+                            );
+                            const [translateX, translateY] = img.style.transform
+                              .match(/translate\((.*?), (.*?)\)/)
+                              ?.slice(1)
+                              .map(parseFloat) || [0, 0];
+                            img.style.transform = `scale(${Math.max(
+                              1,
+                              currentScale / 1.2
+                            )}) translate(${translateX}px, ${translateY}px)`;
+                          }}
+                        >
+                          -
+                        </button>
+                      </div>
+                      <style>
+                        {`
+                          @media (max-width: 768px) {
+                            #image-container .zoom-btn {
+                              width: 30px !important;
+                              height: 30px !important;
+                              font-size: 18px !important;
+                            }
+                            #image-container .zoom-btn + .zoom-btn {
+                              margin-top: 4px !important;
+                            }
+                            #image-container .zoom-btn-container {
+                              top: 6px !important;
+                              right: 6px !important;
+                              gap: 2px !important;
+                            }
+                          }
+                        `}
+                      </style>
                     </div>
-                  </div>
-                  <div className="position-absolute top-0 end-0">
-                    <button
-                      className="d-block border-0 mb-1"
-                      id="zoom-in"
-                      aria-label="Zoom In"
-                      style={{
-                        background: "#dddd",
-                        width: "40px",
-                        height: "40px",
-                        cursor: "pointer",
-                        color: "#000",
-                      }}
-                      onClick={() => {
-                        const img = document.getElementById("zoom-image");
-                        const currentScale = parseFloat(
-                          img.style.transform.match(/scale\((.*?)\)/)[1]
-                        );
-                        const [translateX, translateY] = img.style.transform
-                          .match(/translate\((.*?), (.*?)\)/)
-                          ?.slice(1)
-                          .map(parseFloat) || [0, 0];
-                        img.style.transform = `scale(${Math.min(
-                          3,
-                          currentScale * 1.2
-                        )}) translate(${translateX}px, ${translateY}px)`;
-                      }}
-                    >
-                      +
-                    </button>
-                    <button
-                      className="d-block border-0"
-                      id="zoom-out"
-                      aria-label="Zoom Out"
-                      style={{
-                        background: "#dddd",
-                        width: "40px",
-                        height: "40px",
-                        cursor: "pointer",
-                        color: "#000",
-                      }}
-                      onClick={() => {
-                        const img = document.getElementById("zoom-image");
-                        const currentScale = parseFloat(
-                          img.style.transform.match(/scale\((.*?)\)/)[1]
-                        );
-                        const [translateX, translateY] = img.style.transform
-                          .match(/translate\((.*?), (.*?)\)/)
-                          ?.slice(1)
-                          .map(parseFloat) || [0, 0];
-                        img.style.transform = `scale(${Math.max(
-                          1,
-                          currentScale / 1.2
-                        )}) translate(${translateX}px, ${translateY}px)`;
-                      }}
-                    >
-                      -
-                    </button>
                   </div>
                 </div>
 
@@ -3647,7 +3678,7 @@ const ProjectDetails = () => {
                           src={developerDetails?.logo}
                           className="img-fluid me-3"
                           alt={developerDetails?.altLogo}
-                          loading="lazy"
+                          loading="lazy"p
                           style={{ maxWidth: "90px", border: "1px solid grey" }}
                           fetchpriority="high"
                         />
