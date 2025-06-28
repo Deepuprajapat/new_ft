@@ -21,7 +21,7 @@ function cleanQuestion(question) {
     : { number: null, text: question.trim() };
 }
 
-const FAQSection = ({ projectData  , showEdit}) => {
+const FAQSection = ({ projectData  , showEdit , handleSave }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [faqs, setFaqs] = useState([]);
@@ -52,8 +52,19 @@ const FAQSection = ({ projectData  , showEdit}) => {
     );
   };
 
-  const handleSave = () => {
-    setFaqs(editFaqs);
+  const handleSaveChanges = () => {
+    const updatedData = {
+      ...projectData,
+      faqs: faqs,
+      web_cards: {
+        ...projectData.web_cards,
+        faq: {
+          ...projectData.web_cards?.faq,
+          faqs: faqs
+        }
+      }
+    };
+    handleSave(updatedData);
     setIsEditing(false);
   };
 
@@ -114,7 +125,7 @@ const FAQSection = ({ projectData  , showEdit}) => {
                     color: "#2067d1",
                     fontWeight: "bold",
                   }}
-                  onClick={handleSave}
+                  onClick={handleSaveChanges}
                 >
                   Save
                 </button>

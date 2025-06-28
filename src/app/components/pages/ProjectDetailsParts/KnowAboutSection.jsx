@@ -5,7 +5,8 @@ const KnowAboutSection = ({
   isMobileView,
   handleDownloadBrochure,
   handleDownloadBrochuree,
-  showEdit
+  showEdit,
+  handleSave,
 }) => {
   const [isAboutEditing, setIsAboutEditing] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -17,15 +18,25 @@ const KnowAboutSection = ({
     setAboutHtml(projectData?.web_cards?.know_about?.description || '');
   }, [projectData?.web_cards?.know_about?.description]);
 
-  const handleSave = () => {
-    // You can add your save logic here
-    // For example: onSave(aboutHtml);
+  const handleSaveChanges = () => {
+    // Create updated project data with new HTML content
+    const updatedData = {
+      ...projectData,
+      web_cards: {
+        ...projectData.web_cards,
+        know_about: {
+          ...projectData.web_cards?.know_about,
+          description: aboutHtml
+        }
+      }
+    };
+    handleSave(updatedData); // Send updated data to parent component
     setIsAboutEditing(false);
   };
 
   const handleEditToggle = () => {
     if (isAboutEditing) {
-      handleSave();
+      handleSaveChanges();
     } else {
       setIsAboutEditing(true);
       // Focus the editable area after state update

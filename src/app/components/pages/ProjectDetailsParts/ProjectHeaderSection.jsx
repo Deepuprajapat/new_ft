@@ -6,7 +6,25 @@ const ProjectHeaderSection = ({
   formatPrice,
   handleInputChange,
   showEdit,
+  handleSave,
+  setPatchFormData
 }) => {
+  // Map API data to camelCase for UI
+  const mappedData = {
+    name: projectData?.name || projectData?.project_name || "",
+    minPrice: projectData?.minPrice ?? projectData?.min_price ?? "",
+    maxPrice: projectData?.maxPrice ?? projectData?.max_price ?? "",
+    developerName: projectData?.developerName || projectData?.developer_name || "",
+    shortAddress: projectData?.shortAddress || projectData?.short_address || "",
+    city: projectData?.city || "",
+    locality: projectData?.locality || "",
+    reraDetails: projectData?.reraDetails || projectData?.rera_details || [],
+    web_cards: projectData?.web_cards || {},
+    projectLogo: projectData?.projectLogo || projectData?.project_logo || "",
+    floorplans: projectData?.floorplans || [],
+    // ...aur bhi fields agar chahiye toh yahan add kar lo
+  };
+
   const fileInputRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -15,13 +33,17 @@ const ProjectHeaderSection = ({
   const [maxPrice, setMaxPrice] = useState("");
   const [showReraDetails, setShowReraDetails] = useState(false);
   const [isReraDetailHovered, setIsReraDetailHovered] = useState(false);
- const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const handleEdit = () => setIsEditing(true);
-  const handleSave = () => setIsEditing(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [searchCity, setSearchCity] = useState("");
   const [searchLocality, setSearchLocality] = useState("");
   const [logoHovered, setLogoHovered] = useState(false);
+
+  const [editName, setEditName] = useState(mappedData.name);
+  const [editDeveloperName, setEditDeveloperName] = useState(mappedData.developerName);
+  const [editCity, setEditCity] = useState(mappedData.city);
+  const [editLocality, setEditLocality] = useState(mappedData.locality);
 
   function getLeastPriceOfFloorPlan(floorPlan) {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
@@ -44,7 +66,7 @@ const ProjectHeaderSection = ({
 
     if (validFloorPlans.length === 0) return 0; // If all prices were 1.5, return 0
 
-    const sortedFloorPlan = [...validFloorPlans].sort(  
+    const sortedFloorPlan = [...validFloorPlans].sort(
       (a, b) => b.price - a.price
     );
     return sortedFloorPlan[0].price;
@@ -53,25 +75,33 @@ const ProjectHeaderSection = ({
   // Initialize local state when entering edit mode or when projectData changes
   useEffect(() => {
     if (isEditing) {
-      setMinPrice(
-        projectData?.minPrice ??
-        getLeastPriceOfFloorPlan(projectData?.floorplans?.filter(plan => plan.price > 1)) ??
-        ""
-      );
-      setMaxPrice(
-        projectData?.maxPrice ??
-        getHighestPriceOfFloorPlan(projectData?.floorplans) ??
-        ""
-      );
+      setMinPrice(mappedData?.minPrice ?? "");
+      setMaxPrice(mappedData?.maxPrice ?? "");
+      setEditName(mappedData?.name ?? "");
+      setEditDeveloperName(mappedData?.developerName ?? "");
+      setEditCity(mappedData?.city ?? "");
+      setEditLocality(mappedData?.locality ?? "");
     }
-  }, [isEditing, projectData, getLeastPriceOfFloorPlan, getHighestPriceOfFloorPlan]);
+    // eslint-disable-next-line
+  }, [isEditing]);
 
-  // Handle Save: update parent state for prices, then call handleSave
   const handleSaveAll = () => {
-    handleInputChange("minPrice", minPrice);
-    handleInputChange("maxPrice", maxPrice);
-    handleSave();
-  };
+  const updatedData = {};
+
+  if (editName !== mappedData.name) updatedData.name = editName;
+  if (editDeveloperName !== mappedData.developerName) updatedData.developerName = editDeveloperName;
+  if (minPrice !== mappedData.minPrice) updatedData.min_price = minPrice;
+  if (maxPrice !== mappedData.maxPrice) updatedData.max_price = maxPrice;
+  if (editCity !== mappedData.city) updatedData.city = editCity;
+  if (editLocality !== mappedData.locality) updatedData.locality = editLocality;
+
+  // ...other fields...
+
+  if (Object.keys(updatedData).length > 0) {
+    handleSave(updatedData);
+  }
+  setIsEditing(false);
+};
 
   // Handle image upload and preview
   const handleImageChange = (e) => {
@@ -103,11 +133,11 @@ const ProjectHeaderSection = ({
   const [selectedLocality, setSelectedLocality] = useState(localities[cities[0].id][0]);
 
   // Filter cities and localities based on search
-  const filteredCities = cities.filter(city => 
+  const filteredCities = cities.filter(city =>
     city.name.toLowerCase().includes(searchCity.toLowerCase())
   );
 
-  const filteredLocalities = (localities[selectedCity] || []).filter(locality => 
+  const filteredLocalities = (localities[selectedCity] || []).filter(locality =>
     locality.toLowerCase().includes(searchLocality.toLowerCase())
   );
 
@@ -145,32 +175,32 @@ const ProjectHeaderSection = ({
                 onMouseEnter={() => showEdit && isEditing && setIsHovered(true)}
                 onMouseLeave={() => showEdit && isEditing && setIsHovered(false)}
               >
-                {projectData?.web_cards?.images?.length > 0
-                  ? projectData.web_cards.images.map((imgUrl, index) => {
-                      if (!imgUrl) return null;
-                      return (
-                        <img
-                          key={index}
-                          src={imgUrl}
-                          alt={`Web Card Image ${index + 1}`}
-                          loading="lazy"
-                          className="img-fluid"
-                          style={{
-                            maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
-                            height: window.innerWidth <= 768 ? "44px" : "64px",
-                            objectFit: "contain",
-                            marginRight: "4px",
-                            filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
-                            transition: "filter 0.3s ease"
-                          }}
-                          onClick={isEditing ? () => fileInputRef.current.click() : undefined}
-                        />
-                      );
-                    })
+                {mappedData?.web_cards?.images?.length > 0
+                  ? mappedData.web_cards.images.map((imgUrl, index) => {
+                    if (!imgUrl) return null;
+                    return (
+                      <img
+                        key={index}
+                        src={imgUrl}
+                        alt={`Web Card Image ${index + 1}`}
+                        loading="lazy"
+                        className="img-fluid"
+                        style={{
+                          maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
+                          height: window.innerWidth <= 768 ? "44px" : "64px",
+                          objectFit: "contain",
+                          marginRight: "4px",
+                          filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
+                          transition: "filter 0.3s ease"
+                        }}
+                        onClick={isEditing ? () => fileInputRef.current.click() : undefined}
+                      />
+                    );
+                  })
                   : (
                     <img
-                      src={projectData?.projectLogo || "defaultLogo.jpg"}
-                      alt={projectData?.projectLogo || "Project Logo"}
+                      src={mappedData?.projectLogo || "defaultLogo.jpg"}
+                      alt={mappedData?.projectLogo || "Project Logo"}
                       loading="lazy"
                       className="img-fluid"
                       style={{
@@ -225,14 +255,14 @@ const ProjectHeaderSection = ({
                       <input
                         type="text"
                         className="form-control form-control-sm"
-                        value={projectData?.name || ""}
-                        onChange={e => handleInputChange("name", e.target.value)}
+                        value={editName}
+                        onChange={e => setEditName(e.target.value)}
                         placeholder="Project Name"
                         style={{ fontSize: "18px", fontWeight: 600 }}
                       />
                       <button
                         className="btn btn-primary btn-sm"
-                        style={{ backgroundColor: "#2067d1", borderColor: "#2067d1" ,width: "70px"}}
+                        style={{ backgroundColor: "#2067d1", borderColor: "#2067d1", width: "70px" }}
                         onClick={handleSaveAll}
                         type="button"
                       >
@@ -240,19 +270,19 @@ const ProjectHeaderSection = ({
                       </button>
                       <button
                         className="btn btn-secondary btn-sm cancel-btn"
-                        style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold" ,width: "70px"}}
+                        style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width: "70px" }}
                         type="button"
                         onClick={() => {
                           setSelectedCity(cities[0].id);
                           setSelectedLocality(localities[cities[0].id][0]);
                           setMinPrice(
-                            projectData?.minPrice ??
-                            getLeastPriceOfFloorPlan(projectData?.floorplans?.filter(plan => plan.price > 1)) ??
+                            mappedData?.minPrice ??
+                            getLeastPriceOfFloorPlan(mappedData?.floorplans?.filter(plan => plan.price > 1)) ??
                             ""
                           );
                           setMaxPrice(
-                            projectData?.maxPrice ??
-                            getHighestPriceOfFloorPlan(projectData?.floorplans) ??
+                            mappedData?.maxPrice ??
+                            getHighestPriceOfFloorPlan(mappedData?.floorplans) ??
                             ""
                           );
                           setIsEditing(false);
@@ -265,18 +295,18 @@ const ProjectHeaderSection = ({
                       <button
                         className="btn btn-outline-secondary btn-sm"
                         onClick={() => setShowLocationModal(true)}
-                        style={{ 
-                          display: "flex", 
-                          alignItems: "center", 
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
                           gap: "4px",
-                          width:'auto',
+                          width: 'auto',
                           borderColor: "#2067d1",
                           color: "#2067d1"
                         }}
                       >
                         <i className="fas fa-map-marker-alt"></i>
-                        {projectData?.locality && projectData?.city 
-                          ? `${projectData.locality}, ${projectData.city}`
+                        {mappedData?.locality && mappedData?.city
+                          ? `${mappedData.locality}, ${mappedData.city}`
                           : "Select Location"}
                       </button>
                     </div>
@@ -307,7 +337,7 @@ const ProjectHeaderSection = ({
                           }}
                         >
                           {/* Header */}
-                          <div 
+                          <div
                             style={{
                               padding: "24px 28px",
                               borderBottom: "1px solid #eee",
@@ -319,7 +349,7 @@ const ProjectHeaderSection = ({
                             <h5 className="m-0" style={{ fontSize: "20px", fontWeight: "600", color: "#1a1a1a" }}>Select Location</h5>
                             <button
                               onClick={() => setShowLocationModal(false)}
-                              style={{ 
+                              style={{
                                 background: "none",
                                 border: "none",
                                 fontSize: "24px",
@@ -347,7 +377,7 @@ const ProjectHeaderSection = ({
                             <div className="mb-4">
                               <label className="form-label" style={{ fontSize: "15px", fontWeight: "500", color: "#666", marginBottom: "10px" }}>City</label>
                               <div className="position-relative">
-                                <div 
+                                <div
                                   className="d-flex align-items-center"
                                   style={{
                                     border: "1px solid #e0e0e0",
@@ -367,7 +397,7 @@ const ProjectHeaderSection = ({
                                     }}
                                     onFocus={() => setShowCityDropdown(true)}
                                     placeholder="Select city"
-                                    style={{ 
+                                    style={{
                                       padding: "14px 18px",
                                       fontSize: "15px",
                                       height: "auto",
@@ -462,7 +492,7 @@ const ProjectHeaderSection = ({
                             <div className="mb-4">
                               <label className="form-label" style={{ fontSize: "15px", fontWeight: "500", color: "#666", marginBottom: "10px" }}>Locality</label>
                               <div className="position-relative">
-                                <div 
+                                <div
                                   className="d-flex align-items-center"
                                   style={{
                                     border: "1px solid #e0e0e0",
@@ -482,7 +512,7 @@ const ProjectHeaderSection = ({
                                     }}
                                     onFocus={() => setShowLocalityDropdown(true)}
                                     placeholder="Select locality"
-                                    style={{ 
+                                    style={{
                                       padding: "14px 18px",
                                       fontSize: "15px",
                                       height: "auto",
@@ -574,7 +604,7 @@ const ProjectHeaderSection = ({
                           </div>
 
                           {/* Footer */}
-                          <div 
+                          <div
                             style={{
                               padding: "20px 28px",
                               borderTop: "1px solid #eee",
@@ -583,7 +613,7 @@ const ProjectHeaderSection = ({
                               gap: "12px"
                             }}
                           >
-                            
+
                             <button
                               className="btn btn-primary w-100 responsive-modal-btn"
                               onClick={() => {
@@ -614,46 +644,39 @@ const ProjectHeaderSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mb-2"
-                      value={projectData?.developerName || ""}
-                      onChange={e => handleInputChange("developerName", e.target.value)}
+                      value={editDeveloperName}
+                      onChange={e => setEditDeveloperName(e.target.value)}
                       placeholder="Developer Name"
                       style={{ fontSize: "13px", display: "inline-block", maxWidth: 200 }}
                     />
                   </>
                 ) : (
                   <>
-                    <h1
-                      className="h3 mb-0 text-center text-md-start"
-                      style={{ fontSize: "20px" }}
-                    >
-                      {projectData?.name || "Project Name"}
+                    <h1 className="h3 mb-0 text-center text-md-start" style={{ fontSize: "20px" }}>
+                      {mappedData.name || "Project Name"}
                       {showEdit && (
-                      <span style={{ marginLeft: 10, cursor: "pointer" }}>
-                        <button
-                          className="btn btn-light btn-sm"
-                          onClick={handleEdit}
-                          style={{ border: "1px solid #2067d1", marginLeft: 8, backgroundColor: "#2067d1" }}
-                        >
-                          <img
-                            src="/images/edit-icon.svg"
-                            alt="Edit"
-                            style={{ width: "18px", height: "18px" }}
-                          />
-                        </button>
+                        <span style={{ marginLeft: 10, cursor: "pointer" }}>
+                          <button
+                            className="btn btn-light btn-sm"
+                            onClick={handleEdit}
+                            style={{ border: "1px solid #2067d1", marginLeft: 8, backgroundColor: "#2067d1" }}
+                          >
+                            <img
+                              src="/images/edit-icon.svg"
+                              alt="Edit"
+                              style={{ width: "18px", height: "18px" }}
+                            />
+                          </button>
                         </span>
                       )}
                     </h1>
                     <p className="mb-0 mt-2" style={{ fontSize: "11px" }}>
-                      {projectData?.shortAddress || "Project Address"}
+                      {mappedData?.shortAddress || "Project Address"}
                     </p>
                     <span style={{ fontSize: "13px" }}>
                       By{" "}
-                      <a
-                        href={projectData?.developerLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {projectData?.developerName || "Developer Name"}
+                      <a href={mappedData.developerLink} target="_blank" rel="noopener noreferrer">
+                        {mappedData.developerName || "Developer Name"}
                       </a>
                     </span>
                   </>
@@ -724,14 +747,14 @@ const ProjectHeaderSection = ({
                         <input
                           type="text"
                           className="form-control form-control-sm d-inline w-auto ms-2"
-                          value={projectData?.web_cards?.rera_info?.website_link || ""}
+                          value={mappedData?.web_cards?.rera_info?.website_link || ""}
                           onChange={e =>
                             handleInputChange(
                               "web_cards",
                               {
-                                ...projectData.web_cards,
+                                ...mappedData.web_cards,
                                 rera_info: {
-                                  ...projectData.web_cards?.rera_info,
+                                  ...mappedData.web_cards?.rera_info,
                                   website_link: e.target.value,
                                 },
                               }
@@ -742,12 +765,12 @@ const ProjectHeaderSection = ({
                         />
                       ) : (
                         <a
-                          href={projectData?.web_cards?.rera_info?.website_link || "N/A"}
+                          href={mappedData?.web_cards?.rera_info?.website_link || "N/A"}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{ marginLeft: 8 }}
                         >
-                          {projectData?.web_cards?.rera_info?.website_link || "N/A"}
+                          {mappedData?.web_cards?.rera_info?.website_link || "N/A"}
                         </a>
                       )}
                     </span>
@@ -762,8 +785,8 @@ const ProjectHeaderSection = ({
                         </tr>
                       </thead>
                       <tbody>
-                        {(projectData?.reraDetails || []).length > 0 ? (
-                          projectData.reraDetails.map((item, index) => (
+                        {(mappedData?.reraDetails || []).length > 0 ? (
+                          mappedData.reraDetails.map((item, index) => (
                             <tr key={index}>
                               <td style={{ fontSize: "12px", padding: "10px", fontWeight: "500" }}>
                                 {isEditing ? (
@@ -772,7 +795,7 @@ const ProjectHeaderSection = ({
                                     className="form-control form-control-sm"
                                     value={item.phase || ""}
                                     onChange={e => {
-                                      const updated = [...projectData.reraDetails];
+                                      const updated = [...mappedData.reraDetails];
                                       updated[index].phase = e.target.value;
                                       handleInputChange("reraDetails", updated);
                                     }}
@@ -789,7 +812,7 @@ const ProjectHeaderSection = ({
                                     className="form-control form-control-sm"
                                     value={item.status || ""}
                                     onChange={e => {
-                                      const updated = [...projectData.reraDetails];
+                                      const updated = [...mappedData.reraDetails];
                                       updated[index].status = e.target.value;
                                       handleInputChange("reraDetails", updated);
                                     }}
@@ -806,7 +829,7 @@ const ProjectHeaderSection = ({
                                     className="form-control form-control-sm"
                                     value={item.reraNumber || ""}
                                     onChange={e => {
-                                      const updated = [...projectData.reraDetails];
+                                      const updated = [...mappedData.reraDetails];
                                       updated[index].reraNumber = e.target.value;
                                       handleInputChange("reraDetails", updated);
                                     }}
@@ -836,7 +859,7 @@ const ProjectHeaderSection = ({
                                         />
                                       ) : (
                                         <span style={{
-                                           marginTop: "5px",
+                                          marginTop: "5px",
                                           display: "flex",
                                           alignItems: "center",
                                           justifyContent: "center",
@@ -882,7 +905,7 @@ const ProjectHeaderSection = ({
                                             if (file) {
                                               const reader = new FileReader();
                                               reader.onload = ev => {
-                                                const updated = [...projectData.reraDetails];
+                                                const updated = [...mappedData.reraDetails];
                                                 updated[index].qrImages = ev.target.result;
                                                 handleInputChange("reraDetails", updated);
                                               };
@@ -941,7 +964,7 @@ const ProjectHeaderSection = ({
                                     }}
                                     title="Delete"
                                     onClick={() => {
-                                      const updated = [...projectData.reraDetails];
+                                      const updated = [...mappedData.reraDetails];
                                       updated.splice(index, 1);
                                       handleInputChange("reraDetails", updated);
                                     }}
@@ -976,7 +999,7 @@ const ProjectHeaderSection = ({
                                 style={{ fontSize: 12 }}
                                 onClick={() => {
                                   const updated = [
-                                    ...(projectData.reraDetails || []),
+                                    ...(mappedData.reraDetails || []),
                                     { phase: "", status: "", reraNumber: "", qrImages: "" },
                                   ];
                                   handleInputChange("reraDetails", updated);
@@ -1078,16 +1101,7 @@ const ProjectHeaderSection = ({
                 className="h2 mb-0 fw-bold text-center text-md-end"
                 style={{ fontSize: "25px", fontWeight: "800" }}
               >
-                ₹{" "}
-                {formatPrice(
-                  projectData?.minPrice ??
-                  getLeastPriceOfFloorPlan(projectData?.floorplans?.filter(plan => plan.price > 1))
-                )}{" "}
-                - ₹{" "}
-                {formatPrice(
-                  projectData?.maxPrice ??
-                  getHighestPriceOfFloorPlan(projectData?.floorplans)
-                )}
+                ₹ {formatPrice(mappedData.minPrice)} - ₹ {formatPrice(mappedData.maxPrice)}
               </h2>
             )}
           </div>

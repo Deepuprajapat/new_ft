@@ -71,6 +71,7 @@ const PriceListSection = ({
   projectData,
   formatPrice,
   showEdit,
+  handleSave,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [priceList, setPriceList] = useState(projectData?.floorplans || []);
@@ -115,9 +116,22 @@ const PriceListSection = ({
     setPriceList(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSave = () => {
+  const handleSaveChanges = () => {
+    // Create updated project data with new price list and description
+    const updatedData = {
+      ...projectData,
+      floorplans: priceList,
+      priceListPara: priceListPara,
+      web_cards: {
+        ...projectData.web_cards,
+        price_list: {
+          ...projectData.web_cards?.price_list,
+          description: priceListPara
+        }
+      }
+    };
+    handleSave(updatedData); // Send updated data to parent component
     setIsEditing(false);
-    // Optionally: send priceList to API here
   };
 
   const handleCancel = () => {
@@ -146,7 +160,7 @@ const priceListDescription = projectData?.web_cards?.price_list?.description || 
       <button
         className="btn btn-success btn-sm"
         style={{  backgroundColor: "white", color: "#2067d1", border: "1px solid #2067d1", fontWeight: "bold"}}
-        onClick={handleSave}
+        onClick={handleSaveChanges}
       >
         Save
       </button>

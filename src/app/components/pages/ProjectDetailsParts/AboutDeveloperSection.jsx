@@ -9,6 +9,7 @@ const AboutDeveloperSection = ({
   handleDownloadBrochuree,
   handleDownloadBrochure,
   showEdit,
+  handleSave,
 }) => {
   // Local state for editing and form
   const [isDeveloperEditing, setIsDeveloperEditing] = useState(false);
@@ -36,11 +37,12 @@ const AboutDeveloperSection = ({
   }, [developerDetails, isDeveloperEditing]);
 
   // Save handler (could call an API or lift state up if needed)
-  const handleSave = (e) => {
+  const handleSaveChanges = (e) => {
     e.preventDefault();
     setIsDeveloperEditing(false);
     // Optionally: call a prop function to update parent state or API
     // onSave(developerForm);
+    handleSave(developerForm);
   };
   const handleCancel = () => {
     setDeveloperForm({
@@ -76,7 +78,7 @@ const AboutDeveloperSection = ({
                   <button
                     className="btn btn-success btn-sm"
                     style={{ backgroundColor: "#000", borderColor: "#000" }}
-                    onClick={handleSave}
+                    onClick={handleSaveChanges  }
                   >
                     Save
                   </button>
@@ -108,7 +110,7 @@ const AboutDeveloperSection = ({
         <div className="row px-3">
           <div className="col-12">
             {isDeveloperEditing ? (
-              <form className="px-3" onSubmit={handleSave}>
+              <form className="px-3" onSubmit={handleSaveChanges}>
                 <div className="mb-2 d-flex align-items-center">
                   <input
                     type="text"

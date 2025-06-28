@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 // const BASE_URL="https://api.investmango.com"
 
  const BASE_URL="http://localhost:8282"
- const BASE_URL1="https://api.virtualintelligence.co.in"
+const BASE_URL1="https://api.virtualintelligence.co.in"
 
 
 console.log("BASE_URL", BASE_URL);
@@ -163,16 +163,35 @@ export const getAllProject = async (filters = {}) => {
 };
 
 //  get all project by urlname
-export const getAllProjectsByUrlName = async (urlName ,navigate) => {
+export const getAllProjectsByUrlName = async (urlName, navigate) => {
   try {
-    const res = await axios.get(`${BASE_URL}/project/get/by/url/${urlName}`);
-    return res.data || {}; // Ensures that if the response body is empty, we return an empty object
+    // Always use your test URL for now
+    const res = await axios.get("http://localhost:8080/v1/api/projects/00328ce57bbc14b3");
+    return res.data.data || {};
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
     if (error.response && error.response.status === 400) {
-      navigate("/404"); // Redirects to the 404 page
+      navigate("/404");
     }
-    return {}; // Return an empty object if there's an error
+    return {};
+  }
+};
+//patch
+export const patchProjectByTestUrl = async (patchData) => {
+  try {
+    const res = await axios.patch(
+      "http://localhost:8080/v1/api/projects/00328ce57bbc14b3", // <-- use 8888
+      patchData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return res.data.data || {};
+  } catch (error) {
+    console.error("Error patching project by test URL:", error);
+    throw error;
   }
 };
 

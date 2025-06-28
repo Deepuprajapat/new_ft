@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 
-const PaymentPlanSection = ({ projectData, showEdit }) => {
+
+const PaymentPlanSection = ({ projectData, showEdit , handleSave }) => {
+
   const [localPaymentPlans, setLocalPaymentPlans] = useState(
     projectData?.paymentPlans || []
   );
@@ -35,9 +37,21 @@ const PaymentPlanSection = ({ projectData, showEdit }) => {
   };
 
   // Save changes
-  const handleSave = () => {
+  const handleSaveChanges = () => {
+    const updatedData = {
+      ...projectData,
+      paymentPlans: localPaymentPlans,
+      paymentPara: localPaymentPara,
+      web_cards: {
+        ...projectData.web_cards,
+        payment_plan: {
+          ...projectData.web_cards?.payment_plan,
+          description: localPaymentPara
+        }
+      }
+    };
+    handleSave(updatedData);
     setIsPaymentEditing(false);
-    // Optionally: send localPaymentPlans to API or parent here
   };
 
   // Cancel editing and reset changes
@@ -86,7 +100,7 @@ const PaymentPlanSection = ({ projectData, showEdit }) => {
                       padding: "2px 10px",
                       fontSize: "14px",
                     }}
-                    onClick={handleSave}
+                    onClick={handleSaveChanges}
                   >
                     Save
                   </button>

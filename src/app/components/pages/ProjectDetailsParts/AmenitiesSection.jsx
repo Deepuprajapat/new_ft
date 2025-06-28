@@ -8,7 +8,9 @@ const AmenitiesSection = ({
   amenitiesPara = "",
   name = "",
   onSave, // Optional: callback to save changes to parent or API
-  showEdit
+  showEdit,
+  handleSave,
+  projectData
 }) => {
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [editableAmenities, setEditableAmenities] = useState([]);
@@ -105,8 +107,23 @@ const AmenitiesSection = ({
   };
 
   const saveAmenitiesChanges = () => {
+    const safeProjectData = projectData || {};
+    const safeWebCards = safeProjectData.web_cards || {};
+    const updatedData = {
+      ...safeProjectData,
+      amenities: editableAmenities,
+      amenitiesPara: editableAmenitiesPara,
+      web_cards: {
+        ...safeWebCards,
+        amenities: {
+          ...(safeWebCards.amenities || {}),
+          description: editableAmenitiesPara,
+          amenities: editableAmenities
+        }
+      }
+    };
+    handleSave(updatedData);
     setIsAmenitiesEditing(false);
-    if (onSave) onSave(editableAmenities, editableAmenitiesPara);
   };
 
   // Use grouped amenities for display

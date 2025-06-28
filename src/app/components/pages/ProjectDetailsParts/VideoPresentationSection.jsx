@@ -9,17 +9,42 @@ const VideoPresentationSection = ({
   updateVideoUrl,
   removeVideo,
   addNewVideo,
-  saveVideoChanges,
   showEdit,
+  handleSave,
 }) => {
   // Always keep videoPara in sync with API/projectData when not editing
   const [videoPara, setVideoPara] = useState(projectData?.videoPara || '');
  const handleCancel = () => setIsVideoEditing(false);
+
   useEffect(() => {
     if (!isVideoEditing) {
       setVideoPara(projectData?.videoPara || '');
     }
   }, [isVideoEditing, projectData?.videoPara]);
+
+  const handleSaveChanges = () => {
+    // Remove empty or whitespace-only video URLs
+    const validVideos = editableVideos
+      .map(url => url.trim())
+      .filter(url => url !== "");
+
+    // Ensure web_cards and video_presentation objects exist
+    const updatedData = {
+      ...projectData,
+      videos: validVideos,
+      videoPara: videoPara,
+      web_cards: {
+        ...(projectData.web_cards || {}),
+        video_presentation: {
+          ...(projectData.web_cards?.video_presentation || {}),
+          description: videoPara,
+        },
+      },
+    };
+
+    handleSave(updatedData);
+    setIsVideoEditing(false);
+  };
 
   return (
     <div
@@ -51,7 +76,7 @@ const VideoPresentationSection = ({
                   padding: "2px 10px",
                   fontSize: "14px",
                 }}
-                onClick={saveVideoChanges}
+                onClick={handleSaveChanges}
               >
                 Save
               </button>

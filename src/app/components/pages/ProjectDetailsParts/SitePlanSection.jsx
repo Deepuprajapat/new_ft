@@ -15,6 +15,7 @@ const SitePlanSection = ({
   openModal,
   closeModal,
   showEdit,
+  handleSave,
 }) => {
   const fileInputRef = useRef(null);
   const [hovered, setHovered] = useState(false);
@@ -30,6 +31,22 @@ const SitePlanSection = ({
   };
 
   const handleCancel = () => setIsSitePlanEditing(false);
+
+  const handleSaveChanges = () => {
+    const updatedData = {
+      ...projectData,
+      web_cards: {
+        ...projectData.web_cards,
+        site_plan: {
+          ...projectData.web_cards?.site_plan,
+          image: siteplanImgUrl,
+          html_content: siteplanParaHtml
+        }
+      }
+    };
+    handleSave(updatedData);
+    setIsSitePlanEditing(false);
+  };
 
   return (
     <div className="bg-white rounded-3 mb-4" id="siteplan">
@@ -58,7 +75,7 @@ const SitePlanSection = ({
                     border: "1px solid #2067d1",
                     fontWeight: "bold",
                   }}
-                  onClick={() => setIsSitePlanEditing(false)}
+                  onClick={handleSaveChanges}
                 >
                   Save
                 </button>
@@ -128,30 +145,6 @@ const SitePlanSection = ({
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
               >
-
-                <img
-                  className="img-fluid"
-                  id="zoom-image"
-                  alt={`${projectData?.name} Site Plan`}
-                  src={isSitePlanEditing ? siteplanImgUrl : imageSrc}
-                  loading="lazy"
-                  fetchpriority="high"
-                  style={{
-                    transform: "scale(1) translate(0px, 0px)",
-                    transition: "transform 0.3s ease-in-out, filter 0.3s",
-                    position: "absolute",
-                    maxWidth: "97%",
-                    maxHeight: "100%",
-                    cursor: isSitePlanEditing ? "pointer" : "grab",
-                    zIndex: 1,
-                    filter: isSitePlanEditing && hovered ? "blur(4px)" : "none",
-                  }}
-                  onClick={
-                    isSitePlanEditing
-                      ? () => fileInputRef.current.click()
-                      : openModal
-                  }
-                />
                <img
   className="img-fluid"
   id="zoom-image"
@@ -175,7 +168,6 @@ const SitePlanSection = ({
       : openModal
   }
 />
-
                 {isSitePlanEditing && hovered && (
                   <div
                     className="position-absolute d-flex align-items-center justify-content-center"
