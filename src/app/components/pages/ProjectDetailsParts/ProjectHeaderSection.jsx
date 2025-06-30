@@ -11,6 +11,7 @@ const ProjectHeaderSection = ({
 }) => {
   // Map API data to camelCase for UI
   const mappedData = {
+    
     name: projectData?.name || projectData?.project_name || "",
     minPrice: projectData?.minPrice ?? projectData?.min_price ?? "",
     maxPrice: projectData?.maxPrice ?? projectData?.max_price ?? "",
