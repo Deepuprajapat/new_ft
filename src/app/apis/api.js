@@ -2,16 +2,18 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 // const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
 
-//let BASE_URL = process.env.REACT_APP_BASE_URL;
-//let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
-// const BASE_URL="https://api.investmango.com"
+let BASE_URL = process.env.REACT_APP_BASE_URL;
+let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
+let BASE_URL2 = process.env.REACT_APP_BASE_URL2;
+// const BASE_URL="https://api.i  nvestmango.com"
 
- const BASE_URL="http://localhost:8282"
-const BASE_URL1="https://api.virtualintelligence.co.in"
+//  const BASE_URL="http://localhost:8282"
+// const BASE_URL1="https://api.virtualintelligence.co.in"
 
 
 console.log("BASE_URL", BASE_URL);
-console.log("BASE_URL1", BASE_URL1);  
+console.log("BASE_URL1", BASE_URL1); 
+console.log("BASE_URL2", BASE_URL2); 
 
 // if (process.env.REACT_APP_ENV === "production") {
 //   BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -166,7 +168,7 @@ export const getAllProject = async (filters = {}) => {
 export const getAllProjectsByUrlName = async (urlName, navigate) => {
   try {
     // Always use your test URL for now
-    const res = await axios.get("http://localhost:8080/v1/api/projects/00328ce57bbc14b3");
+    const res = await axios.get( `${BASE_URL2}/v1/api/projects/00328ce57bbc14b3`);
     return res.data.data || {};
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
@@ -179,8 +181,7 @@ export const getAllProjectsByUrlName = async (urlName, navigate) => {
 //patch
 export const patchProjectByTestUrl = async (patchData) => {
   try {
-    const res = await axios.patch(
-      "http://localhost:8080/v1/api/projects/00328ce57bbc14b3", // <-- use 8888
+    const res = await axios.patch(`${BASE_URL2}/v1/api/projects/00328ce57bbc14b3`, // <-- use 8888
       patchData,
       {
         headers: {

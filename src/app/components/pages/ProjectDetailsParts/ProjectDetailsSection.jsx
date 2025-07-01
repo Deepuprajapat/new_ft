@@ -558,8 +558,8 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={editData?.web_cards.project_details.type.value || ''}
-                      onChange={(e) => handleInputChange('configurationsType.propertyType', e.target.value)}
+                      value={editData?.web_cards?.project_details?.type?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.type.value', e.target.value)}
                       maxLength={500}
                     />
                   ) : (
@@ -573,10 +573,10 @@ const ProjectDetailsSection = ({
                     >
                       {AddProjectButton
                         ? '-- --'
-                        : (projectData?.web_cards.project_details.type?.value &&
-                          projectData.web_cards.project_details.type?.value
+                        : (projectData?.web_cards?.project_details?.type?.value &&
+                          projectData?.web_cards?.project_details?.type?.value
                             .toLowerCase()
-                            .replace(/^\w/, (c) => c.toUpperCase()))}
+                            .replace(/^[\w]/, (c) => c.toUpperCase()))}
                     </p>
                   )}
                 </div>
