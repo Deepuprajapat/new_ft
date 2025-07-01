@@ -20,11 +20,13 @@ const SitePlanSection = ({
   const fileInputRef = useRef(null);
   const [hovered, setHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [editDescription, setEditDescription] = useState(projectData?.web_cards?.site_plan?.description || '');
 
-  // Reset imgError when backend image changes or edit mode toggles
+  // Reset imgError and description when backend image or edit mode changes
   useEffect(() => {
     setImgError(false);
-  }, [isSitePlanEditing, projectData?.web_cards?.site_plan?.image]);
+    setEditDescription(projectData?.web_cards?.site_plan?.description || '');
+  }, [isSitePlanEditing, projectData?.web_cards?.site_plan?.image, projectData?.web_cards?.site_plan?.description]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -45,8 +47,8 @@ const SitePlanSection = ({
         ...projectData.web_cards,
         site_plan: {
           ...projectData.web_cards?.site_plan,
-          image: siteplanImgUrl,
-          html_content: siteplanParaHtml
+          image: siteplanImgUrl || projectData?.web_cards?.site_plan?.image || '',
+          description: editDescription
         }
       }
     };
@@ -58,8 +60,7 @@ const SitePlanSection = ({
   const getSitePlanImageSrc = () => {
     if (isSitePlanEditing && siteplanImgUrl && siteplanImgUrl.trim() !== '') return siteplanImgUrl;
     const img = projectData?.web_cards?.site_plan?.image || imageSrc;
-    if (img && (img.startsWith('http') || img.startsWith('/'))) return img;
-    if (img) return '/' + img;
+    if (img) return img;
     return '';
   };
 
@@ -120,37 +121,29 @@ const SitePlanSection = ({
       </h2>
       <div className="row">
         <div className="col-12">
-          <div
-            className="mb-4 px-3"
-            style={{
-              fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-              outline: isSitePlanEditing ? "1px solid #2067d1" : "none",
-              background: isSitePlanEditing ? "#f8faff" : "transparent",
-              // borderRadius: "4px",
-              padding: isSitePlanEditing ? "8px" : "0",
-              // minHeight: "40px",
-            }}
-            contentEditable={isSitePlanEditing}
-            suppressContentEditableWarning={true}
-            onInput={(e) => setSiteplanParaHtml(e.currentTarget.innerHTML)}
-            dangerouslySetInnerHTML={{
-              __html: isSitePlanEditing
-                ? siteplanParaHtml
-                : projectData?.web_cards?.site_plan?.html_content || "",
-            }}
-          />
-          {/* Site Plan Description */}
-          {projectData?.web_cards?.site_plan?.description && (
-            <div
-              className="mb-3 px-3"
-              style={{
-                fontSize: window.innerWidth <= 768 ? "12px" : "15px",
-                color: "#333",
-                fontWeight: 500,
-              }}
-            >
-              {projectData.web_cards.site_plan.description}
-            </div>
+          {/* Site Plan Description (edit mode) */}
+          {isSitePlanEditing ? (
+            <textarea
+              className="form-control mb-3 px-3"
+              style={{ fontSize: window.innerWidth <= 768 ? "12px" : "15px" }}
+              value={editDescription}
+              onChange={e => setEditDescription(e.target.value)}
+              placeholder="Enter site plan description..."
+              rows={3}
+            />
+          ) : (
+            projectData?.web_cards?.site_plan?.description && (
+              <div
+                className="mb-3 px-3"
+                style={{
+                  fontSize: window.innerWidth <= 768 ? "12px" : "15px",
+                  color: "#333",
+                  fontWeight: 500,
+                }}
+              >
+                {projectData.web_cards.site_plan.description}
+              </div>
+            )
           )}
           <div className="position-relative px-3">
             <div
@@ -176,7 +169,7 @@ const SitePlanSection = ({
                   <img
                     className="img-fluid"
                     id="zoom-image"
-                    alt={`${projectData?.name ? projectData.name + ' ' : ''}Site Plan`}
+                    alt="Site Plan"
                     src={getSitePlanImageSrc()}
                     loading="lazy"
                     fetchpriority="high"
@@ -352,7 +345,7 @@ const SitePlanSection = ({
           >
             <img
               src={getSitePlanImageSrc()}
-              alt={`${projectData?.name ? projectData.name + ' ' : ''}Site Plan`}
+              alt="Site Plan"
               loading="lazy"
               style={{
                 width: "100%",

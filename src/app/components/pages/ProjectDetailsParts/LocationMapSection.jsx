@@ -98,24 +98,25 @@ const LocationMapSection = ({
               </div>
             )}
             {/* Show locationMapHtml only if it has content or editing is on */}
-            {(isLocationEditing || (projectData?.locationMap && projectData.locationMap.trim() !== "")) && (
+            {(isLocationEditing || (projectData?.locationMap && projectData.locationMap.trim() !== "")) && !isLocationEditing && (
               <div
                 className="mb-4 px-3"
                 style={{
                   fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                  outline: isLocationEditing ? "1px solid #2067d1" : "none",
-                  background: isLocationEditing ? "#f8faff" : "transparent",
+                  outline: "none",
+                  background: "transparent",
                   borderRadius: "4px",
-                  padding: isLocationEditing ? "8px" : "0",
+                  padding: "0",
                   minHeight: "40px",
                 }}
-                contentEditable={isLocationEditing}
-                suppressContentEditableWarning={true}
-                onInput={e => setLocationMapHtml(e.currentTarget.innerHTML)}
                 dangerouslySetInnerHTML={{
-                  __html: isLocationEditing ? locationMapHtml : (projectData?.locationMap || "")
+                  __html: projectData?.locationMap || ""
                 }}
               />
+            )}
+            {/* Only show the editable div if editing is on */}
+            {isLocationEditing && (
+              <></>
             )}
             <div className="position-relative mt-3">
               <div

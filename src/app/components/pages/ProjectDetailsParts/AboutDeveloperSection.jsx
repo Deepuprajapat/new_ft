@@ -51,6 +51,7 @@ const AboutDeveloperSection = ({
       establishedYear: developerDetails?.establishedYear || "",
       totalProjects: developerDetails?.totalProjects || "",
       about: developerDetails?.about || "",
+      address: developerDetails?.address || "",
     });
     setIsDeveloperEditing(false);
   };
