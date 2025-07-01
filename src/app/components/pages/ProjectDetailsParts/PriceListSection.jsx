@@ -71,9 +71,16 @@ const PriceListSection = ({
   projectData,
   formatPrice,
   showEdit,
+  handleSave,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [priceList, setPriceList] = useState(projectData?.floorplans || []);
+  const [priceList, setPriceList] = useState(
+    projectData?.web_cards?.price_list?.product_configurations?.map(item => ({
+      title: item.configuration_name || '',
+      size: item.size || '',
+      price: item.price || ''
+    })) || []
+  );
   const [isPriceEditing, setIsPriceEditing] = useState(false);
   const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
   const [newPlan, setNewPlan] = useState({
@@ -83,7 +90,13 @@ const PriceListSection = ({
   });
 
   useEffect(() => {
-    setPriceList(projectData?.floorplans || []);
+    setPriceList(
+      projectData?.web_cards?.price_list?.product_configurations?.map(item => ({
+        title: item.configuration_name || '',
+        size: item.size || '',
+        price: item.price || ''
+      })) || []
+    );
     setPriceListPara(projectData?.priceListPara || "");
   }, [projectData]);
 
@@ -115,9 +128,26 @@ const PriceListSection = ({
     setPriceList(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSave = () => {
+  const handleSaveChanges = () => {
+    // Map UI fields back to backend structure
+    const updatedProductConfigurations = priceList.map(item => ({
+      configuration_name: item.title,
+      size: item.size,
+      price: item.price
+    }));
+    const updatedData = {
+      ...projectData,
+      web_cards: {
+        ...projectData.web_cards,
+        price_list: {
+          ...projectData.web_cards?.price_list,
+          product_configurations: updatedProductConfigurations,
+          description: priceListPara
+        }
+      }
+    };
+    handleSave(updatedData);
     setIsEditing(false);
-    // Optionally: send priceList to API here
   };
 
   const handleCancel = () => {
@@ -146,7 +176,7 @@ const priceListDescription = projectData?.web_cards?.price_list?.description || 
       <button
         className="btn btn-success btn-sm"
         style={{  backgroundColor: "white", color: "#2067d1", border: "1px solid #2067d1", fontWeight: "bold"}}
-        onClick={handleSave}
+        onClick={handleSaveChanges}
       >
         Save
       </button>

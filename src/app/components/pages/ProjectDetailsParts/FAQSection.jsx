@@ -21,7 +21,7 @@ function cleanQuestion(question) {
     : { number: null, text: question.trim() };
 }
 
-const FAQSection = ({ projectData  , showEdit}) => {
+const FAQSection = ({ projectData  , showEdit , handleSave }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [faqs, setFaqs] = useState([]);
@@ -52,8 +52,20 @@ const FAQSection = ({ projectData  , showEdit}) => {
     );
   };
 
-  const handleSave = () => {
-    setFaqs(editFaqs);
+  const handleSaveChanges = () => {
+    const updatedData = {
+      ...projectData,
+      faqs: editFaqs,
+      web_cards: {
+        ...projectData.web_cards,
+        faq: {
+          ...projectData.web_cards?.faq,
+          faqs: editFaqs
+        },
+        faqs: editFaqs // <-- ensure faqs are also updated at web_cards.faqs for robust mapping
+      }
+    };
+    handleSave(updatedData);
     setIsEditing(false);
   };
 
@@ -114,7 +126,7 @@ const FAQSection = ({ projectData  , showEdit}) => {
                     color: "#2067d1",
                     fontWeight: "bold",
                   }}
-                  onClick={handleSave}
+                  onClick={handleSaveChanges}
                 >
                   Save
                 </button>
@@ -168,18 +180,23 @@ const FAQSection = ({ projectData  , showEdit}) => {
                 }
               >
                 {isEditing ? (
-                  <input
+                  <textarea
                     className="form-control me-2"
                     style={{ fontWeight: "bold", fontSize: "inherit" }}
                     value={faq.question || faq.text || ""}
-                    placeholder="Question"
+                    placeholder="Question (HTML allowed)"
+                    rows={2}
                     onChange={(e) =>
                       handleFaqChange(index, "question", e.target.value)
                     }
                   />
                 ) : (
                   <span className="fw-bold">
-                    {faq.text || faq.question}
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(faq.question || faq.text)
+                      }}
+                    />
                   </span>
                 )}
                 <span style={{ display: "flex", alignItems: "center" }}>

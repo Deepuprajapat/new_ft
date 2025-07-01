@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 
@@ -15,9 +15,18 @@ const SitePlanSection = ({
   openModal,
   closeModal,
   showEdit,
+  handleSave,
 }) => {
   const fileInputRef = useRef(null);
   const [hovered, setHovered] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [editDescription, setEditDescription] = useState(projectData?.web_cards?.site_plan?.description || '');
+
+  // Reset imgError and description when backend image or edit mode changes
+  useEffect(() => {
+    setImgError(false);
+    setEditDescription(projectData?.web_cards?.site_plan?.description || '');
+  }, [isSitePlanEditing, projectData?.web_cards?.site_plan?.image, projectData?.web_cards?.site_plan?.description]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -30,6 +39,30 @@ const SitePlanSection = ({
   };
 
   const handleCancel = () => setIsSitePlanEditing(false);
+
+  const handleSaveChanges = () => {
+    const updatedData = {
+      ...projectData,
+      web_cards: {
+        ...projectData.web_cards,
+        site_plan: {
+          ...projectData.web_cards?.site_plan,
+          image: siteplanImgUrl || projectData?.web_cards?.site_plan?.image || '',
+          description: editDescription
+        }
+      }
+    };
+    handleSave(updatedData);
+    setIsSitePlanEditing(false);
+  };
+
+  // Helper to normalize image path
+  const getSitePlanImageSrc = () => {
+    if (isSitePlanEditing && siteplanImgUrl && siteplanImgUrl.trim() !== '') return siteplanImgUrl;
+    const img = projectData?.web_cards?.site_plan?.image || imageSrc;
+    if (img) return img;
+    return '';
+  };
 
   return (
     <div className="bg-white rounded-3 mb-4" id="siteplan">
@@ -45,7 +78,7 @@ const SitePlanSection = ({
           borderRadius: "4px",
         }}
       >
-        {projectData?.name} Site Plan
+        {(projectData?.name ? projectData.name + ' ' : '') + 'Site Plan'}
         {showEdit && (
           <span style={{ cursor: "pointer", marginLeft: "12px" }}>
             {isSitePlanEditing ? (
@@ -58,7 +91,7 @@ const SitePlanSection = ({
                     border: "1px solid #2067d1",
                     fontWeight: "bold",
                   }}
-                  onClick={() => setIsSitePlanEditing(false)}
+                  onClick={handleSaveChanges}
                 >
                   Save
                 </button>
@@ -88,25 +121,30 @@ const SitePlanSection = ({
       </h2>
       <div className="row">
         <div className="col-12">
-          <div
-            className="mb-4 px-3"
-            style={{
-              fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-              outline: isSitePlanEditing ? "1px solid #2067d1" : "none",
-              background: isSitePlanEditing ? "#f8faff" : "transparent",
-              // borderRadius: "4px",
-              padding: isSitePlanEditing ? "8px" : "0",
-              // minHeight: "40px",
-            }}
-            contentEditable={isSitePlanEditing}
-            suppressContentEditableWarning={true}
-            onInput={(e) => setSiteplanParaHtml(e.currentTarget.innerHTML)}
-            dangerouslySetInnerHTML={{
-              __html: isSitePlanEditing
-                ? siteplanParaHtml
-                : projectData?.web_cards?.site_plan?.html_content || "",
-            }}
-          />
+          {/* Site Plan Description (edit mode) */}
+          {isSitePlanEditing ? (
+            <textarea
+              className="form-control mb-3 px-3"
+              style={{ fontSize: window.innerWidth <= 768 ? "12px" : "15px" }}
+              value={editDescription}
+              onChange={e => setEditDescription(e.target.value)}
+              placeholder="Enter site plan description..."
+              rows={3}
+            />
+          ) : (
+            projectData?.web_cards?.site_plan?.description && (
+              <div
+                className="mb-3 px-3"
+                style={{
+                  fontSize: window.innerWidth <= 768 ? "12px" : "15px",
+                  color: "#333",
+                  fontWeight: 500,
+                }}
+              >
+                {projectData.web_cards.site_plan.description}
+              </div>
+            )
+          )}
           <div className="position-relative px-3">
             <div
               className="position-relative"
@@ -118,64 +156,58 @@ const SitePlanSection = ({
               <div
                 id="image-container"
                 style={{
-                    width: "100vw", // full viewport width
-  
-                  position: "relative",
-                  width: "100%",
-                  height: "100%",
-                  overflow: "hidden",
+                    width: "100vw",
+                    position: "relative",
+                    width: "100%",
+                    height: "100%",
+                    overflow: "hidden",
                 }}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
               >
-
-                <img
-                  className="img-fluid"
-                  id="zoom-image"
-                  alt={`${projectData?.name} Site Plan`}
-                  src={isSitePlanEditing ? siteplanImgUrl : imageSrc}
-                  loading="lazy"
-                  fetchpriority="high"
-                  style={{
-                    transform: "scale(1) translate(0px, 0px)",
-                    transition: "transform 0.3s ease-in-out, filter 0.3s",
-                    position: "absolute",
-                    maxWidth: "97%",
-                    maxHeight: "100%",
-                    cursor: isSitePlanEditing ? "pointer" : "grab",
-                    zIndex: 1,
-                    filter: isSitePlanEditing && hovered ? "blur(4px)" : "none",
-                  }}
-                  onClick={
-                    isSitePlanEditing
-                      ? () => fileInputRef.current.click()
-                      : openModal
-                  }
-                />
-               <img
-  className="img-fluid"
-  id="zoom-image"
-  alt={`${projectData?.name} Site Plan`}
-  src={isSitePlanEditing ? siteplanImgUrl : projectData?.web_cards?.site_plan?.image || imageSrc}
-  loading="lazy"
-  fetchpriority="high"
-  style={{
-    width: "120%",
-    height: "100%",
-
-    transition: "transform 0.3s ease-in-out, filter 0.3s",
-    // position: "absolute", // isko hata dein
-    cursor: isSitePlanEditing ? "pointer" : "grab",
-    zIndex: 1,
-    filter: isSitePlanEditing && hovered ? "blur(4px)" : "none",
-  }}
-  onClick={
-    isSitePlanEditing
-      ? () => fileInputRef.current.click()
-      : openModal
-  }
-/>
-
+                {getSitePlanImageSrc() && !imgError ? (
+                  <img
+                    className="img-fluid"
+                    id="zoom-image"
+                    alt="Site Plan"
+                    src={getSitePlanImageSrc()}
+                    loading="lazy"
+                    fetchpriority="high"
+                    style={{
+                      width: "120%",
+                      height: "100%",
+                      transition: "transform 0.3s ease-in-out, filter 0.3s",
+                      cursor: isSitePlanEditing ? "pointer" : "grab",
+                      zIndex: 1,
+                      filter: isSitePlanEditing && hovered ? "blur(4px)" : "none",
+                    }}
+                    onClick={
+                      isSitePlanEditing
+                        ? () => fileInputRef.current.click()
+                        : openModal
+                    }
+                    onError={() => {
+                      setImgError(true);
+                      console.error('Site plan image failed to load:', getSitePlanImageSrc());
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "#f8faff",
+                      color: "#888",
+                      fontWeight: 600,
+                      fontSize: "18px",
+                    }}
+                  >
+                    No site plan image available
+                  </div>
+                )}
                 {isSitePlanEditing && hovered && (
                   <div
                     className="position-absolute d-flex align-items-center justify-content-center"
@@ -312,8 +344,8 @@ const SitePlanSection = ({
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={isSitePlanEditing ? siteplanImgUrl : projectData?.web_cards?.site_plan?.image || imageSrc}
-              alt={`${projectData?.name} Site Plan`}
+              src={getSitePlanImageSrc()}
+              alt="Site Plan"
               loading="lazy"
               style={{
                 width: "100%",

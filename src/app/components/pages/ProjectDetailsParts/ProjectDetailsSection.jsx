@@ -15,23 +15,22 @@ import {
 
 const ProjectDetailsSection = ({
   projectData,
-  setProjectData,
   AddProjectButton,
   showEdit,
+  handleSave
 }) => {
   // Local state for editing
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
 
-  // Start editing: copy data
   const handleEdit = () => {
     setEditData(JSON.parse(JSON.stringify(projectData)));
     setIsEditing(true);
   };
 
   // Save: update main data
-  const handleSave = () => {
-    setProjectData(editData);
+  const handleSaver = () => {
+    handleSave(editData);
     setIsEditing(false);
   };
 
@@ -56,14 +55,14 @@ const ProjectDetailsSection = ({
     });
   };
 
-    // const handleArrayInputChange = (field, value) => {
-    //   const arrayValue = value.split(',').map(item => item.trim());
-    //   setProjectData(prev => ({
-    //     ...prev,
-    //     [field]: arrayValue
-    //   }));
-    // };
-   
+  // const handleArrayInputChange = (field, value) => {
+  //   const arrayValue = value.split(',').map(item => item.trim());
+  //   setProjectData(prev => ({
+  //     ...prev,
+  //     [field]: arrayValue
+  //   }));
+  // };
+
   //   const getSizeRange = () => {
   //       if (!projectData?.floorplans || projectData.floorplans.length === 0) {
   //         return "Size not available";
@@ -105,40 +104,40 @@ const ProjectDetailsSection = ({
         >
           <span>Project Details</span>
           {showEdit && (
-          <span style={{ cursor: "pointer", marginRight: "12px" }}>
-            {isEditing ? (
-              <>
-                <button
-                  className="btn btn-success btn-sm"
-                  style={{ backgroundColor: "white", color: "#2067d1", fontWeight: 'bold' }}
-                  onClick={handleSave}
+            <span style={{ cursor: "pointer", marginRight: "12px" }}>
+              {isEditing ? (
+                <>
+                  <button
+                    className="btn btn-success btn-sm"
+                    style={{ backgroundColor: "white", color: "#2067d1", fontWeight: 'bold' }}
+                    onClick={handleSaver}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width: "auto" }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <span
+                  onClick={handleEdit}
+                  style={{
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                  }}
                 >
-                  Save
-                </button>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width:"auto"}}
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <span
-                onClick={handleEdit}
-                style={{
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                }}
-              >
-                <img
-                  src="/images/edit-icon.svg"
-                  alt="Edit"
-                  fill="true"
-                  style={{ width: "18px", height: "18px" }}
-                />
-              </span>
+                  <img
+                    src="/images/edit-icon.svg"
+                    alt="Edit"
+                    fill="true"
+                    style={{ width: "18px", height: "18px" }}
+                  />
+                </span>
               )}
             </span>
           )}
@@ -481,7 +480,7 @@ const ProjectDetailsSection = ({
                         fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {projectData?.web_cards?.project_details?.total_floors?.value || '-- --'}
+                      {projectData?.web_cards?.project_details?.total_floor?.value || '-- --'}
                     </p>
                   )}
                 </div>
@@ -527,7 +526,7 @@ const ProjectDetailsSection = ({
                         fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {projectData?.web_cards?.project_details?.project_status?.value || '-- --'}
+                      {projectData?.status || '-- --'}
                     </p>
                   )}
                 </div>
@@ -559,8 +558,8 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={editData?.configurationsType?.propertyType || ''}
-                      onChange={(e) => handleInputChange('configurationsType.propertyType', e.target.value)}
+                      value={editData?.web_cards?.project_details?.type?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.type.value', e.target.value)}
                       maxLength={500}
                     />
                   ) : (
@@ -574,10 +573,10 @@ const ProjectDetailsSection = ({
                     >
                       {AddProjectButton
                         ? '-- --'
-                        : (projectData?.configurationsType?.propertyType &&
-                          projectData.configurationsType.propertyType
+                        : (projectData?.web_cards?.project_details?.type?.value &&
+                          projectData?.web_cards?.project_details?.type?.value
                             .toLowerCase()
-                            .replace(/^\w/, (c) => c.toUpperCase()))}
+                            .replace(/^[\w]/, (c) => c.toUpperCase()))}
                     </p>
                   )}
                 </div>
@@ -609,13 +608,20 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={editData?.configurations?.join(', ') || ''}
-                      onChange={(e) =>
-                        setEditData(prev => ({
-                          ...prev,
-                          configurations: e.target.value.split(',').map(item => item.trim())
-                        }))
-                      }
+                      value={(() => {
+                        const val = editData?.web_cards?.project_details?.configuration?.value;
+                        if (!val) return '';
+                        try {
+                          const arr = JSON.parse(val);
+                          return Array.isArray(arr) ? arr.join(', ') : '';
+                        } catch {
+                          return '';
+                        }
+                      })()}
+                      onChange={e => {
+                        const arr = e.target.value.split(',').map(item => item.trim()).filter(Boolean);
+                        handleInputChange('web_cards.project_details.configuration.value', JSON.stringify(arr));
+                      }}
                       placeholder="1BHK, 2BHK, 3BHK, 4BHK"
                       maxLength={500}
                     />
@@ -630,11 +636,16 @@ const ProjectDetailsSection = ({
                     >
                       {AddProjectButton
                         ? '-- --'
-                        : (projectData?.configurations
-                          ?.map((item) => item.toUpperCase())
-                          ?.filter((value, index, self) => self.indexOf(value) === index)
-                          ?.sort((a, b) => parseFloat(a) - parseFloat(b))
-                          ?.join(", "))}
+                        : (() => {
+                            const val = projectData?.web_cards?.project_details?.configuration?.value;
+                            if (!val) return '-- --';
+                            try {
+                              const arr = JSON.parse(val);
+                              return Array.isArray(arr) ? arr.join(', ') : '-- --';
+                            } catch {
+                              return '-- --';
+                            }
+                          })()}
                     </p>
                   )}
                 </div>

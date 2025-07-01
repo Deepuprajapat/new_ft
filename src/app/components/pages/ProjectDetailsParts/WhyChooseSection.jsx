@@ -8,17 +8,21 @@ const WhyChooseSection = ({
   showSitePopup,
   closeSitePopup,
   showEdit,
+  handleSave,
 }) => {
   const [isEditing, setIsEditing] = useState(false); 
 
   const handleCancel = () => setIsEditing(false);
-
-  // Create an array of 6 USPs, filling empty slots with empty strings
+  // Map USPs for display and editing
+  const uspRawList = projectData?.web_cards?.why_to_choose?.usp_list || [];
   const displayUSPs = Array(6).fill("").map((_, index) =>
-  projectData?.web_cards?.why_to_choose?.usp_list?.[index]?.description || ""
-);
+    typeof uspRawList[index] === 'string' ? uspRawList[index] : (uspRawList[index]?.description || "")
+  );
   const handleEdit = () => setIsEditing(true);
-  const handleSave = () => setIsEditing(false);
+  const handleSaveChanges = () => {
+    handleSave(projectData); // Send updated data to parent component
+    setIsEditing(false);
+  };
 
   // Map why_to_choose.image_urls to images array for UI compatibility
   const images = projectData?.web_cards?.why_to_choose?.image_urls?.length
@@ -27,6 +31,7 @@ const WhyChooseSection = ({
       caption: `Image ${idx + 1}`,
     }))
   : [];
+
 
   return (
     <div
@@ -57,7 +62,7 @@ const WhyChooseSection = ({
                           color: "#2067d1",
                           fontWeight: "bold",
                         }}
-                        onClick={handleSave}
+                        onClick={handleSaveChanges}
                       >
                         Save
                       </button>
@@ -200,7 +205,7 @@ const WhyChooseSection = ({
                                     ...projectData.web_cards,
                                     why_to_choose: {
                                       ...projectData.web_cards?.why_to_choose,
-                                      usp_list: updatedUSPs.map(desc => ({ description: desc }))
+                                      usp_list: updatedUSPs
                                     }
                                   }
                                 });

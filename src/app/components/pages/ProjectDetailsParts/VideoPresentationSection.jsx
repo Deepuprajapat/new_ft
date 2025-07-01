@@ -9,17 +9,40 @@ const VideoPresentationSection = ({
   updateVideoUrl,
   removeVideo,
   addNewVideo,
-  saveVideoChanges,
   showEdit,
+  handleSave,
 }) => {
   // Always keep videoPara in sync with API/projectData when not editing
-  const [videoPara, setVideoPara] = useState(projectData?.videoPara || '');
- const handleCancel = () => setIsVideoEditing(false);
+  const [videoPara, setVideoPara] = useState(projectData?.web_cards?.video_presentation?.description || projectData?.videoPara || '');
+  const [videoUrl, setVideoUrl] = useState(projectData?.web_cards?.video_presentation?.url || '');
+  const handleCancel = () => setIsVideoEditing(false);
+
   useEffect(() => {
     if (!isVideoEditing) {
-      setVideoPara(projectData?.videoPara || '');
+      setVideoPara(projectData?.web_cards?.video_presentation?.description || projectData?.videoPara || '');
+      setVideoUrl(projectData?.web_cards?.video_presentation?.url || '');
     }
-  }, [isVideoEditing, projectData?.videoPara]);
+  }, [isVideoEditing, projectData?.web_cards?.video_presentation?.description, projectData?.videoPara, projectData?.web_cards?.video_presentation?.url]);
+
+  const handleSaveChanges = () => {
+    const updatedData = {
+      ...projectData,
+      videoPara: videoPara,
+      web_cards: {
+        ...(projectData.web_cards || {}),
+        video_presentation: {
+          ...(projectData.web_cards?.video_presentation || {}),
+          description: videoPara,
+          url: videoUrl,
+        },
+      },
+    };
+    handleSave(updatedData);
+    setIsVideoEditing(false);
+  };
+
+  // Get video URL from backend (single string)
+  const videoPresentationUrl = projectData?.web_cards?.video_presentation?.url || '';
 
   return (
     <div
@@ -51,7 +74,7 @@ const VideoPresentationSection = ({
                   padding: "2px 10px",
                   fontSize: "14px",
                 }}
-                onClick={saveVideoChanges}
+                onClick={handleSaveChanges}
               >
                 Save
               </button>
@@ -82,173 +105,132 @@ const VideoPresentationSection = ({
           )}
         </h2>
         <div className="px-3">
-          {/* Show video description from API if available */}
-          {projectData?.web_cards?.video_presentation?.description && (
-            <div
-              style={{
-                fontSize: window.innerWidth <= 768 ? "13px" : "15px",
-                color: "#333",
-                fontWeight: 500,
-                marginBottom: "12px"
-              }}
-            >
-              {projectData.web_cards.video_presentation.description}
-            </div>
-          )}
-          <div className="mb-3 mb-md-5">
-            {isVideoEditing ? (
+          {/* Video description: show textarea in place when editing, otherwise show text */}
+          {isVideoEditing ? (
+            <>
               <textarea
-                className="form-control"
+                className="form-control mb-3"
                 value={videoPara}
                 onChange={e => setVideoPara(e.target.value)}
                 rows={3}
                 style={{
-                  fontSize: window.innerWidth <= 768 ? "14px" : "16px",
+                  fontSize: window.innerWidth <= 768 ? "13px" : "15px",
+                  color: "#333",
+                  fontWeight: 500,
+                  marginBottom: "12px",
                   background: "#f8faff",
                   borderRadius: "4px",
                   padding: "8px",
                   minHeight: "40px",
                 }}
+                placeholder="Enter video description..."
               />
-            ) : (
-              <div
-                style={{
-                  fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                  background: "transparent",
-                  borderRadius: "4px",
-                  minHeight: "40px",
-                }}
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(projectData?.videoPara),
-                }}
-              />
-            )}
-          </div>
-          <div className="d-flex flex-column">
-            {isVideoEditing ? (
-              <>
-                {editableVideos.map((videoUrl, index) => (
-                  <div key={index} className="mb-3">
-                    <div style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
-                      <input
-                        type="text"
-                        placeholder="Enter YouTube video ID (e.g., dQw4w9WgXcQ)"
-                        value={videoUrl}
-                        onChange={(e) => updateVideoUrl(index, e.target.value)}
-                        style={{
-                          border: "1px solid #ddd",
-                          borderRadius: "4px",
-                          padding: "8px 12px",
-                          fontSize: "14px",
-                          flex: 1,
-                          background: "#f8faff",
-                          marginRight: "8px",
-                        }}
-                      />
-                      <button
-                        onClick={() => removeVideo(index)}
-                        style={{
-                          border: "none",
-                          background: "#dc3545",
-                          color: "white",
-                          borderRadius: "4px",
-                          padding: "8px 12px",
-                          fontSize: "12px",
-                          cursor: "pointer",
-                          width:"auto"
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                    {videoUrl.trim() !== "" && (
-                      <div className="ratio ratio-16x9">
-                        <iframe
-                          src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                          title={`${projectData?.name} Video Presentation ${index + 1}`}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          style={{
-                            border: "none",
-                            borderRadius: "8px",
-                          }}
-                        ></iframe>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                <div style={{ textAlign: "center", marginTop: "16px" }}>
-                  {/* <button
-                    onClick={addNewVideo}
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+                <input
+                  type="text"
+                  className="form-control mb-0"
+                  value={videoUrl}
+                  onChange={e => setVideoUrl(e.target.value)}
+                  placeholder="Enter YouTube video link or ID"
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? "13px" : "15px",
+                    color: "#333",
+                    fontWeight: 500,
+                    background: "#f8faff",
+                    borderRadius: "4px",
+                    padding: "8px",
+                    minHeight: "40px",
+                    display: 'inline-block',
+                    width: 'calc(100% - 90px)',
+                    marginRight: '8px',
+                  }}
+                />
+                <button
+                  onClick={() => setVideoUrl('')}
+                  style={{
+                    border: "none",
+                    background: "#dc3545",
+                    color: "white",
+                    borderRadius: "4px",
+                    padding: "8px 12px",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                    width: "70px",
+                    verticalAlign: 'top',
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+              {videoUrl.trim() !== '' && (
+                <div className="ratio ratio-16x9 mb-3">
+                  <iframe
+                    src={videoUrl.startsWith('http')
+                      ? videoUrl
+                      : `https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
+                    title={`${projectData?.name} Video Presentation`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
                     style={{
-                      border: "1px solid #2067d1",
-                      background: "#f8faff",
-                      color: "#2067d1",
-                      borderRadius: "4px",
-                      padding: "8px 16px",
-                      fontSize: "14px",
-                      cursor: "pointer",
-                      marginRight: "8px",
-                      width:"auto"
-                    }}
-                  >
-                    + Add Video
-                  </button> */}
-                  <div style={{ marginTop: "12px", fontSize: "12px", color: "#666" }}>
-                    <strong>How to get YouTube video ID:</strong>
-                    <br />
-                    From URL: https://www.youtube.com/watch?v=
-                    <strong>dQw4w9WgXcQ</strong>
-                    <br />
-                    Use only the ID part: <strong>dQw4w9WgXcQ</strong>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                {projectData?.videos &&
-                projectData.videos.length > 0 &&
-                projectData.videos.some((videoUrl) => videoUrl.trim() !== "") ? (
-                  projectData.videos.map(
-                    (videoUrl, index) =>
-                      videoUrl.trim() !== "" && (
-                        <div key={index} className="ratio ratio-16x9 mb-3">
-                          <iframe
-                            src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                            title={`${projectData?.name} Video Presentation ${index + 1}`}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            style={{
-                              border: "none",
-                              borderRadius: "8px",
-                            }}
-                          ></iframe>
-                        </div>
-                      )
-                  )
-                ) : (
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "160px",
-                      backgroundImage: "url('/images/investmango-youtube-banner.webp')",
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
+                      border: "none",
                       borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#fff",
-                      fontSize: "20px",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      backgroundColor: "#f0f0f0",
                     }}
-                  ></div>
-                )}
-              </>
-            )}
-          </div>
+                  ></iframe>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {projectData?.web_cards?.video_presentation?.description && (
+                <div
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? "13px" : "15px",
+                    color: "#333",
+                    fontWeight: 500,
+                    marginBottom: "12px"
+                  }}
+                  // Only render plain text, strip HTML tags
+                  >
+                  {DOMPurify.sanitize(projectData.web_cards.video_presentation.description, {ALLOWED_TAGS: []})}
+                </div>
+              )}
+              {videoPresentationUrl && videoPresentationUrl.trim() !== '' ? (
+                <div className="ratio ratio-16x9 mb-3">
+                  <iframe
+                    src={videoPresentationUrl.startsWith('http')
+                      ? videoPresentationUrl
+                      : `https://www.youtube.com/embed/${videoPresentationUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
+                    title={`${projectData?.name} Video Presentation`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{
+                      border: "none",
+                      borderRadius: "8px",
+                    }}
+                  ></iframe>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "160px",
+                    backgroundImage: "url('/images/investmango-youtube-banner.webp')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                    fontSize: "20px",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    backgroundColor: "#f0f0f0",
+                  }}
+                ></div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
