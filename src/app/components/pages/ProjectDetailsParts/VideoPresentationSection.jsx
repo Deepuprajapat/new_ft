@@ -46,6 +46,9 @@ const VideoPresentationSection = ({
     setIsVideoEditing(false);
   };
 
+  // Get video URL from backend (single string)
+  const videoPresentationUrl = projectData?.web_cards?.video_presentation?.url || '';
+
   return (
     <div
       className="mb-4"
@@ -231,26 +234,21 @@ const VideoPresentationSection = ({
               </>
             ) : (
               <>
-                {projectData?.videos &&
-                projectData.videos.length > 0 &&
-                projectData.videos.some((videoUrl) => videoUrl.trim() !== "") ? (
-                  projectData.videos.map(
-                    (videoUrl, index) =>
-                      videoUrl.trim() !== "" && (
-                        <div key={index} className="ratio ratio-16x9 mb-3">
-                          <iframe
-                            src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                            title={`${projectData?.name} Video Presentation ${index + 1}`}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            style={{
-                              border: "none",
-                              borderRadius: "8px",
-                            }}
-                          ></iframe>
-                        </div>
-                      )
-                  )
+                {videoPresentationUrl && videoPresentationUrl.trim() !== '' ? (
+                  <div className="ratio ratio-16x9 mb-3">
+                    <iframe
+                      src={videoPresentationUrl.startsWith('http')
+                        ? videoPresentationUrl
+                        : `https://www.youtube.com/embed/${videoPresentationUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
+                      title={`${projectData?.name} Video Presentation`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      style={{
+                        border: "none",
+                        borderRadius: "8px",
+                      }}
+                    ></iframe>
+                  </div>
                 ) : (
                   <div
                     style={{

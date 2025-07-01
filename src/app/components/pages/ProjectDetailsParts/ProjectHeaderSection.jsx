@@ -15,8 +15,12 @@ const ProjectHeaderSection = ({
     name: projectData?.name || projectData?.project_name || "",
     minPrice: projectData?.minPrice ?? projectData?.min_price ?? "",
     maxPrice: projectData?.maxPrice ?? projectData?.max_price ?? "",
-    developerName: projectData?.developerName || projectData?.developer_name || "",
-    shortAddress: projectData?.shortAddress || projectData?.short_address || "",
+    // developerName: projectData?.developerName || projectData?.web_cards.about.contact_details.name || "",
+    developerName: projectData?.web_cards?.about?.contact_details?.name 
+    ?? projectData?.web_cards?.about?.contact_details?.name 
+    ?? "",
+
+    shortAddress: projectData?.shortAddress || projectData?.location_info?.short_address || "",
     city: projectData?.city || "",
     locality: projectData?.locality || "",
     reraDetails: projectData?.reraDetails || projectData?.rera_details || [],
@@ -89,14 +93,33 @@ const ProjectHeaderSection = ({
   const handleSaveAll = () => {
   const updatedData = {};
 
-  if (editName !== mappedData.name) updatedData.name = editName;
-  if (editDeveloperName !== mappedData.developerName) updatedData.developerName = editDeveloperName;
+  // Use backend keys as per your JSON
+  if (editName !== mappedData.name) updatedData.project_name = editName;
   if (minPrice !== mappedData.minPrice) updatedData.min_price = minPrice;
   if (maxPrice !== mappedData.maxPrice) updatedData.max_price = maxPrice;
   if (editCity !== mappedData.city) updatedData.city = editCity;
   if (editLocality !== mappedData.locality) updatedData.locality = editLocality;
+  // For short address, use short_address
+  if (
+    mappedData.shortAddress !== (projectData.short_address || projectData.location_info?.short_address)
+  ) {
+    updatedData.short_address = mappedData.shortAddress;
+  }
+  // Developer name at correct nested path
+  if (editDeveloperName !== mappedData.developerName) {
+    updatedData.web_cards = {
+      ...(projectData.web_cards || {}),
+      about: {
+        ...(projectData.web_cards?.about || {}),
+        contact_details: {
+          ...(projectData.web_cards?.about?.contact_details || {}),
+          name: editDeveloperName,
+        },
+      },
+    };
+  }
 
-  // ...other fields...
+  // ...other fields as per your JSON if needed...
 
   if (Object.keys(updatedData).length > 0) {
     handleSave(updatedData);

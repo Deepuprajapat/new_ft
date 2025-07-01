@@ -55,12 +55,12 @@ const FAQSection = ({ projectData  , showEdit , handleSave }) => {
   const handleSaveChanges = () => {
     const updatedData = {
       ...projectData,
-      faqs: faqs,
+      faqs: editFaqs,
       web_cards: {
         ...projectData.web_cards,
         faq: {
           ...projectData.web_cards?.faq,
-          faqs: faqs
+          faqs: editFaqs
         }
       }
     };
@@ -179,18 +179,23 @@ const FAQSection = ({ projectData  , showEdit , handleSave }) => {
                 }
               >
                 {isEditing ? (
-                  <input
+                  <textarea
                     className="form-control me-2"
                     style={{ fontWeight: "bold", fontSize: "inherit" }}
                     value={faq.question || faq.text || ""}
-                    placeholder="Question"
+                    placeholder="Question (HTML allowed)"
+                    rows={2}
                     onChange={(e) =>
                       handleFaqChange(index, "question", e.target.value)
                     }
                   />
                 ) : (
                   <span className="fw-bold">
-                    {faq.text || faq.question}
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(faq.question || faq.text)
+                      }}
+                    />
                   </span>
                 )}
                 <span style={{ display: "flex", alignItems: "center" }}>

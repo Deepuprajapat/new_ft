@@ -13,9 +13,11 @@ const WhyChooseSection = ({
   const [isEditing, setIsEditing] = useState(false); 
 
   const handleCancel = () => setIsEditing(false);
+  // Map USPs for display and editing
+  const uspRawList = projectData?.web_cards?.why_to_choose?.usp_list || [];
   const displayUSPs = Array(6).fill("").map((_, index) =>
-  projectData?.web_cards?.why_to_choose?.usp_list?.[index]?.description || ""
-);
+    typeof uspRawList[index] === 'string' ? uspRawList[index] : (uspRawList[index]?.description || "")
+  );
   const handleEdit = () => setIsEditing(true);
   const handleSaveChanges = () => {
     handleSave(projectData); // Send updated data to parent component
@@ -203,7 +205,7 @@ const WhyChooseSection = ({
                                     ...projectData.web_cards,
                                     why_to_choose: {
                                       ...projectData.web_cards?.why_to_choose,
-                                      usp_list: updatedUSPs.map(desc => ({ description: desc }))
+                                      usp_list: updatedUSPs
                                     }
                                   }
                                 });

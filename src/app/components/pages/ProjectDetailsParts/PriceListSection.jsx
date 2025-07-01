@@ -74,7 +74,13 @@ const PriceListSection = ({
   handleSave,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [priceList, setPriceList] = useState(projectData?.floorplans || []);
+  const [priceList, setPriceList] = useState(
+    projectData?.web_cards?.price_list?.product_configurations?.map(item => ({
+      title: item.configuration_name || '',
+      size: item.size || '',
+      price: item.price || ''
+    })) || []
+  );
   const [isPriceEditing, setIsPriceEditing] = useState(false);
   const [priceListPara, setPriceListPara] = useState(projectData?.priceListPara || "");
   const [newPlan, setNewPlan] = useState({
@@ -84,7 +90,13 @@ const PriceListSection = ({
   });
 
   useEffect(() => {
-    setPriceList(projectData?.floorplans || []);
+    setPriceList(
+      projectData?.web_cards?.price_list?.product_configurations?.map(item => ({
+        title: item.configuration_name || '',
+        size: item.size || '',
+        price: item.price || ''
+      })) || []
+    );
     setPriceListPara(projectData?.priceListPara || "");
   }, [projectData]);
 
@@ -117,20 +129,24 @@ const PriceListSection = ({
   };
 
   const handleSaveChanges = () => {
-    // Create updated project data with new price list and description
+    // Map UI fields back to backend structure
+    const updatedProductConfigurations = priceList.map(item => ({
+      configuration_name: item.title,
+      size: item.size,
+      price: item.price
+    }));
     const updatedData = {
       ...projectData,
-      floorplans: priceList,
-      priceListPara: priceListPara,
       web_cards: {
         ...projectData.web_cards,
         price_list: {
           ...projectData.web_cards?.price_list,
+          product_configurations: updatedProductConfigurations,
           description: priceListPara
         }
       }
     };
-    handleSave(updatedData); // Send updated data to parent component
+    handleSave(updatedData);
     setIsEditing(false);
   };
 

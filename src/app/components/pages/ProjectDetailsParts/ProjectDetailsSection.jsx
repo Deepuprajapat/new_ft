@@ -480,7 +480,7 @@ const ProjectDetailsSection = ({
                         fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {projectData?.web_cards?.project_details?.total_floors?.value || '-- --'}
+                      {projectData?.web_cards?.project_details?.total_floor?.value || '-- --'}
                     </p>
                   )}
                 </div>
@@ -526,7 +526,7 @@ const ProjectDetailsSection = ({
                         fontWeight: window.innerWidth <= 768 ? "400" : "800",
                       }}
                     >
-                      {projectData?.web_cards?.project_details?.project_status?.value || '-- --'}
+                      {projectData?.status || '-- --'}
                     </p>
                   )}
                 </div>
@@ -558,7 +558,7 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={editData?.configurationsType?.propertyType || ''}
+                      value={editData?.web_cards.project_details.type.value || ''}
                       onChange={(e) => handleInputChange('configurationsType.propertyType', e.target.value)}
                       maxLength={500}
                     />
@@ -573,8 +573,8 @@ const ProjectDetailsSection = ({
                     >
                       {AddProjectButton
                         ? '-- --'
-                        : (projectData?.configurationsType?.propertyType &&
-                          projectData.configurationsType.propertyType
+                        : (projectData?.web_cards.project_details.type?.value &&
+                          projectData.web_cards.project_details.type?.value
                             .toLowerCase()
                             .replace(/^\w/, (c) => c.toUpperCase()))}
                     </p>
@@ -608,13 +608,20 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={editData?.configurations?.join(', ') || ''}
-                      onChange={(e) =>
-                        setEditData(prev => ({
-                          ...prev,
-                          configurations: e.target.value.split(',').map(item => item.trim())
-                        }))
-                      }
+                      value={(() => {
+                        const val = editData?.web_cards?.project_details?.configuration?.value;
+                        if (!val) return '';
+                        try {
+                          const arr = JSON.parse(val);
+                          return Array.isArray(arr) ? arr.join(', ') : '';
+                        } catch {
+                          return '';
+                        }
+                      })()}
+                      onChange={e => {
+                        const arr = e.target.value.split(',').map(item => item.trim()).filter(Boolean);
+                        handleInputChange('web_cards.project_details.configuration.value', JSON.stringify(arr));
+                      }}
                       placeholder="1BHK, 2BHK, 3BHK, 4BHK"
                       maxLength={500}
                     />
@@ -629,11 +636,16 @@ const ProjectDetailsSection = ({
                     >
                       {AddProjectButton
                         ? '-- --'
-                        : (projectData?.configurations
-                          ?.map((item) => item.toUpperCase())
-                          ?.filter((value, index, self) => self.indexOf(value) === index)
-                          ?.sort((a, b) => parseFloat(a) - parseFloat(b))
-                          ?.join(", "))}
+                        : (() => {
+                            const val = projectData?.web_cards?.project_details?.configuration?.value;
+                            if (!val) return '-- --';
+                            try {
+                              const arr = JSON.parse(val);
+                              return Array.isArray(arr) ? arr.join(', ') : '-- --';
+                            } catch {
+                              return '-- --';
+                            }
+                          })()}
                     </p>
                   )}
                 </div>
