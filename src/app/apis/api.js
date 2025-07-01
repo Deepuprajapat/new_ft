@@ -168,7 +168,7 @@ export const getAllProject = async (filters = {}) => {
 export const getAllProjectsByUrlName = async (urlName, navigate) => {
   try {
     // Always use your test URL for now
-    const res = await axios.get( `${BASE_URL2}/v1/api/projects/00328ce57bbc14b3`);
+    const res = await axios.get( `/v1/api/projects/00328ce57bbc14b3`);
     return res.data.data || {};
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
@@ -181,7 +181,7 @@ export const getAllProjectsByUrlName = async (urlName, navigate) => {
 //patch
 export const patchProjectByTestUrl = async (patchData) => {
   try {
-    const res = await axios.patch(`${BASE_URL2}/v1/api/projects/00328ce57bbc14b3`, // <-- use 8888
+    const res = await axios.patch(`/v1/api/projects/00328ce57bbc14b3`, // <-- use 8888
       patchData,
       {
         headers: {
