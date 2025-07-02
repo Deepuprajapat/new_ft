@@ -678,3 +678,15 @@ export const patchProjectDetails = async (projectId, patchData) => {
     throw error;
   }
 };
+
+// Get all locations
+export const getAllLocations = async () => {
+  try {
+    const res = await axios.get('/v1/api/locations');
+    return res.data?.data || [];
+    console.log("Locations fetched successfully:", res.data?.data);
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    return [];
+  }
+};

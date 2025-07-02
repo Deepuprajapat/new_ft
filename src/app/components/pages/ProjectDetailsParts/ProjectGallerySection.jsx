@@ -145,11 +145,13 @@ const ProjectGallerySection = ({
   setShowFullScreen,
   setCurrentImageIndex,
   showEdit,
+  handleSave: handleSaveProp,
 }) => {
   const [hoveredImageIndex, setHoveredImageIndex] = useState(null);
   const [localImages, setLocalImages] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [loadingImg, setLoadingImg] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null); // <-- Add this line
 
   // Initialize localImages with projectData.web_cards.images (skip first image)
   useEffect(() => {
@@ -169,35 +171,68 @@ const ProjectGallerySection = ({
   }, [projectData]);
 
   const handleEdit = () => setIsEditing(true);
-  const handleSave = () => setIsEditing(false);
+  const handleSave = () => {
+    // Save images to backend structure (web_cards.images)
+    const mainImage = projectData?.web_cards?.images?.[0] || "";
+    const imagesArray = [mainImage, ...imageSlots.map(img => img.imageUrl || "")];
+    setProjectData({
+      ...projectData,
+      web_cards: {
+        ...projectData.web_cards,
+        images: imagesArray
+      }
+    });
+    setIsEditing(false);
+    // Call parent handleSave if provided
+    if (typeof handleSaveProp === 'function') {
+      handleSaveProp({
+        web_cards: {
+          ...projectData.web_cards,
+          images: imagesArray
+        }
+      });
+    }
+  };
   const handleCancel = () => {
     setLocalImages(projectData?.images || []);
     setIsEditing(false);
   };
 
+  // Only call handleSave when an image is selected/uploaded or reordered (not on every localImages change)
   const handleImageUpload = (index, event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const newImages = [...localImages];
-        
-        // Ensure the array has enough slots
         while (newImages.length <= index) {
           newImages.push({});
         }
-        
         newImages[index] = {
           ...newImages[index],
           imageUrl: e.target.result,
           caption: file.name,
         };
-        
         setLocalImages(newImages);
+        // Prepare the new images array for web_cards.images (main + others)
+        const mainImage = projectData?.web_cards?.images?.[0] || "";
+        const imagesForWebCards = [mainImage, ...newImages.map(img => img.imageUrl || "")];
         setProjectData({
           ...projectData,
-          images: newImages,
+          web_cards: {
+            ...projectData.web_cards,
+            images: imagesForWebCards
+          }
         });
+        // Call handleSave only after image is selected/uploaded
+        if (typeof handleSaveProp === 'function') {
+          handleSaveProp({
+            web_cards: {
+              ...projectData.web_cards,
+              images: imagesForWebCards
+            }
+          });
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -225,10 +260,25 @@ const ProjectGallerySection = ({
       if (oldIndex !== -1 && newIndex !== -1) {
         const newImages = arrayMove([...localImages], oldIndex, newIndex);
         setLocalImages(newImages);
+        // Prepare the new images array for web_cards.images (main + others)
+        const mainImage = projectData?.web_cards?.images?.[0] || "";
+        const imagesForWebCards = [mainImage, ...newImages.map(img => img.imageUrl || "")];
         setProjectData({
           ...projectData,
-          images: newImages,
+          web_cards: {
+            ...projectData.web_cards,
+            images: imagesForWebCards
+          }
         });
+        // Call handleSave only after drag/drop
+        if (typeof handleSaveProp === 'function') {
+          handleSaveProp({
+            web_cards: {
+              ...projectData.web_cards,
+              images: imagesForWebCards
+            }
+          });
+        }
       }
     } catch (error) {
       console.error('Error during drag and drop:', error);

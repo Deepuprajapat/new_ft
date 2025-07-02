@@ -1,6 +1,6 @@
 
 
-const show = false
+const show = true
 const navItems = [
     { label: 'Home', path: '/' },
     {
