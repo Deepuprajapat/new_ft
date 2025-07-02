@@ -885,6 +885,7 @@ const ProjectDetails = () => {
             setShowFullScreen={setShowFullScreen}
             setCurrentImageIndex={setCurrentImageIndex}
             showEdit={showEdit}
+            handleSave={handleSave}
           />
 
           {/* Fullscreen Image Modal */}
