@@ -9,19 +9,26 @@ const BlogSection = ({ isSwiper }) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const response = await getAllBlog();
-        setBlogs(response.content || []);
-      } catch (error) {
-        console.error("Error fetching blogs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBlogs();
-  }, []);
+useEffect(() => {
+  const fetchBlogs = async () => {
+    try {
+      const response = await getAllBlog();
+
+      // Sort by created_at in descending order
+      const sortedBlogs = (response || []).sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+
+      setBlogs(sortedBlogs);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchBlogs();
+}, []);
+
 
   if (loading) {
     return (
@@ -62,7 +69,7 @@ const BlogCard = ({ blog, stripHtml, formatDate }) => (
   <div className="itemm">
     <a href={`/blogs/${blog.blogUrl}`}>
       <img
-        src={blog?.images[0] || "path/to/default-image.jpg"}
+        src={blog?.image || "path/to/default-image.jpg"}
         alt={blog.alt || "Blog Image"}
         loading="lazy"
         style={{ width: "100%", height: "250px" }}
@@ -70,11 +77,11 @@ const BlogCard = ({ blog, stripHtml, formatDate }) => (
         fetchpriority="high"
       />
     </a>
-    <p className="title">{blog.headings}</p>
-    <small style={{ color: "#666a6f" }}>Date - {formatDate(blog.createdDate)}</small>
+    <p className="title">{blog.title}</p>
+    <small style={{ color: "#666a6f" }}>Date - {formatDate(blog.created_at)}</small>
     <p className="des">{stripHtml(blog.description).slice(0, 100)} . . .</p>
     <hr />
-    <a href={`/blogs/${blog.blogUrl}`} className="theme-btn">
+    <a href={`/blogs/${blog.blog_Url}`} className="theme-btn">
       Read More
     </a>
   </div>

@@ -56,7 +56,7 @@ const Blogs = () => {
     const fetchRecentPosts = async () => {
       try {
         const response = await getAllBlog(0, 20); // Fetch top 20 highlights
-        setRecentPosts(response.content || []);
+        setRecentPosts(response || []);
       } catch (error) {
         console.error("Error fetching recent posts:", error);
       }
@@ -161,7 +161,7 @@ const Blogs = () => {
                           <p id="blog-title">{blogData.headings}</p>
                           <small>
                             Date -
-                            {new Date(blogData.createdDate).toLocaleDateString(
+                            {new Date(blogData.created_at).toLocaleDateString(
                               "en-GB",
                               {
                                 day: "2-digit",
@@ -174,7 +174,7 @@ const Blogs = () => {
                         <div>
                           <img
                             className="img-fluid blog-image"
-                            src={blogData.images[0] || ""}
+                            src={blogData.image || ""}
                             alt={blogData.alt || "Blog Image"}
                             loading="lazy"
                           />

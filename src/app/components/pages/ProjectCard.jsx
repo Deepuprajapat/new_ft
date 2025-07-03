@@ -37,7 +37,7 @@ const ProjectCard = ({ project }) => {
   return (
     <div className="card-im">
       <a
-        href={project.url}
+        href={project.canonical}
         target="_blank"
         rel="noopener noreferrer"
       >
