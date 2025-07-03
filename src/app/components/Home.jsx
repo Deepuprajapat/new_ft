@@ -27,8 +27,8 @@ const Head = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
-      const response = await getAllProject({ isPriority: true });
-      setProjects(response.content || []);
+      const response = await getAllProject({ is_priority: true });
+      setProjects(response || []);
       setLoading(false);
     };
     fetchProjects();

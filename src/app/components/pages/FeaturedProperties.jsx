@@ -10,11 +10,11 @@ const FeaturedProperties = () => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const response = await getAllProject({ isDeleted: false });
+        const response = await getAllProject({ });
         // const filteredProjects = response.content?.filter(project => project.isFeatured && project.isPremium) || [];
         const filteredProjects =
-        response.content?.filter(
-          (project) => project.isFeatured || project.isPremium
+        response.filter(
+          (project) => project.is_priority || project.is_premium
         ) || [];
         setProjects(filteredProjects);
       } catch (error) {
