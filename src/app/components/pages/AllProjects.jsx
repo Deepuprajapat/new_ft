@@ -48,16 +48,15 @@ const AllProjects = () => {
     // Extract keyword if no standard key-value pairs are present
     if (
       ![...searchParams.keys()].some((key) =>
-        ["locationId", "location", "propertyType", "search"].includes(key)
+        [ "city", "propertyType", "search"].includes(key)
       )
     ) {
       keyword = [...searchParams.keys()][0];
     }
-    console.log(searchParams.get("search"),"search")
 
     return {
-      cityId: searchParams.get("locationId"),
-      locationName: searchParams.get("location"),
+      // cityId: searchParams.get("locationId"),
+      city: searchParams.get("city"),
       propertyType: searchParams.get("propertyType"),
       search: searchParams.get("search"),
       configurations: searchParams.get("configurations"),
@@ -69,7 +68,7 @@ const AllProjects = () => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const { cityId, propertyType, search, keyword  } = getQueryParams();
+        const { city, propertyType, search, keyword  } = getQueryParams();
         const allowedConfigurations = [
           "1BHK", "1.5BHK", "2BHK", "2.5BHK", "3BHK", "3.5BHK",
           "4BHK", "4.5BHK", "5BHK", "5.5BHK", "6BHK",
@@ -86,12 +85,12 @@ const AllProjects = () => {
         let filters = {
           isDeleted: false,
           ...(isValidConfiguration && { configurations: search }), // Only add if valid
-          ...(cityId && { cityId }),
+          ...(city && { city }),
           ...(propertyType && { type: propertyType }),
         };
 
-        let data = await getAllProject(filters); // Fetch all projects first
-        let filteredProjects = data.content || [];
+        let data = await getAllProject(filters); 
+        let filteredProjects = data || [];
 
         // If a keyword exists, try fetching specific projects using it
         if (keyword) {
@@ -176,8 +175,8 @@ const AllProjects = () => {
       <section className="main-body">
         <div className="container">
           <h1 className="project-title">
-            {getQueryParams().locationName
-              ? `Projects In ${capitalizeWords(getQueryParams().locationName)}`
+            {getQueryParams().city
+              ? `Projects In ${capitalizeWords(getQueryParams().city)}`
               : "All Projects"}
           </h1>
           <p>
@@ -185,8 +184,8 @@ const AllProjects = () => {
               Home
             </a>{" "}
             /
-            {getQueryParams().locationName
-              ? ` ${capitalizeWords(getQueryParams().locationName)}`
+            {getQueryParams().city
+              ? ` ${capitalizeWords(getQueryParams().city)}`
               : " All Projects"}
             {getQueryParams().propertyType &&
               ` / ${capitalizeWords(getQueryParams().propertyType)}`}

@@ -4,6 +4,8 @@ import React from "react";
 import "../styles/css/home.css"; // Link to the updated CSS file
 
 const ProjectCard = ({ project }) => {
+  // console.log("ProjectCard", project);
+
   const defaultImage = "http://localhost:3000/img/building_soon.jpg"; // Placeholder image
   // const navigate = useNavigate();
   const handleMoreDetails = (url) => {
@@ -15,10 +17,16 @@ const ProjectCard = ({ project }) => {
   };
 
   // Extract floorplan sizes
-  const floorplanSizes =
-    project.floorplans?.map((floorplan) => floorplan.size) || [];
-  const minSize = floorplanSizes.length ? Math.min(...floorplanSizes) : null;
-  const maxSize = floorplanSizes.length ? Math.max(...floorplanSizes) : null;
+  // const floorplanSizes =
+  //   project.floorplans?.map((floorplan) => floorplan.size) || [];
+  // const minSize = floorplanSizes.length ? Math.min(...floorplanSizes) : null;
+  // const maxSize = floorplanSizes.length ? Math.max(...floorplanSizes) : null;
+
+  const sizeRange = project.sizes?.match(/\d+/g); // Extract all numbers from the string
+
+  const minSize = sizeRange && sizeRange.length ? parseInt(sizeRange[0]) : null;
+  const maxSize = sizeRange && sizeRange.length > 1 ? parseInt(sizeRange[1]) : minSize;
+
 
   const validPrices = project.floorplans
     ?.filter((floorplan) => floorplan.price && floorplan.price > 1.5) // Exclude falsy values (0, "", null) and <= 1.5
@@ -33,20 +41,20 @@ const ProjectCard = ({ project }) => {
         target="_blank"
         rel="noopener noreferrer"
       >
-       
-       {project.isPremium && <span className="premium-tag">Premium</span>}
+
+        {project.is_premium && <span className="premium-tag">Premium</span>}
         <img
           alt={project.name}
-          src={(project.images && project.images[2]?.imageUrl) || defaultImage}
+          src={(project.images && project.images[2]) || defaultImage}
           loading="lazy"
           className="project-card-image"
         />
-       
-        <p className="project-card-title">{project.name}</p>
+
+        <p className="project-card-title">{project.project_name}</p>
       </a>
       <p className="project-card-location">
         <i className="fas fa-map-marker-alt"></i>{" "}
-        {project.shortAddress}
+        {project.short_address}
       </p>
       <p className="project-card-details">
         <span>
@@ -60,48 +68,56 @@ const ProjectCard = ({ project }) => {
         <span>
           <i className="fa fa-bed" aria-hidden="true"></i>{" "}
           <span>
-            {Array.isArray(project.configurations) &&
-            project.configurations.length > 0
+            {project.configuration
               ? (() => {
-                  // Separate BHK configurations
-                  const bhkConfigs = project.configurations
-                    .filter((config) => /\d+BHK/.test(config)) // Match numeric BHK configurations
-                    .map((config) => parseFloat(config)) // Extract numeric part (e.g., 2 from 2BHK)
-                    .filter((num) => !isNaN(num)); // Ensure valid numbers only
+                let configArray = [];
 
-                  // Find unique configurations
-                  const otherConfigs = project.configurations.filter(
-                    (config) => !/\d+BHK/.test(config) // Exclude BHK configurations
-                  );
+                // Parse the string into an array
+                try {
+                  configArray = JSON.parse(project.configuration);
+                } catch (err) {
+                  console.error("Invalid configuration format:", project.configuration);
+                }
 
-                  // Prepare BHK output
-                  let bhkOutput = null;
-                  if (bhkConfigs.length > 0) {
-                    const minBHK = Math.min(...bhkConfigs);
-                    const maxBHK = Math.max(...bhkConfigs);
-                    bhkOutput =
-                      minBHK === maxBHK
-                        ? `${minBHK}BHK`
-                        : `${minBHK}BHK, ${maxBHK}BHK`;
-                  }
+                if (!Array.isArray(configArray) || configArray.length === 0) {
+                  return "Property Type";
+                }
 
-                  // Prepare other configurations output
-                  const otherOutput =
-                    otherConfigs.length > 1
-                      ? `${otherConfigs[0]}, ${
-                          otherConfigs[otherConfigs.length - 1]
-                        }`
-                      : otherConfigs[0] || null;
+                // Separate BHK configurations
+                const bhkConfigs = configArray
+                  .filter((config) => /\d+BHK/.test(config)) // Match BHKs
+                  .map((config) => parseFloat(config)) // Extract the number
+                  .filter((num) => !isNaN(num));
 
-                  // Combine outputs
-                  const combinedOutput = [bhkOutput, otherOutput]
-                    .filter(Boolean)
-                    .join(", ");
+                const otherConfigs = configArray.filter(
+                  (config) => !/\d+BHK/.test(config)
+                );
 
-                  return combinedOutput || "Property Type"; // Fallback if no configurations exist
-                })()
+                // Prepare BHK output
+                let bhkOutput = null;
+                if (bhkConfigs.length > 0) {
+                  const minBHK = Math.min(...bhkConfigs);
+                  const maxBHK = Math.max(...bhkConfigs);
+                  bhkOutput =
+                    minBHK === maxBHK ? `${minBHK}BHK` : `${minBHK}BHK, ${maxBHK}BHK`;
+                }
+
+                // Prepare other configurations output
+                const otherOutput =
+                  otherConfigs.length > 1
+                    ? `${otherConfigs[0]}, ${otherConfigs[otherConfigs.length - 1]}`
+                    : otherConfigs[0] || null;
+
+                // Combine outputs
+                const combinedOutput = [bhkOutput, otherOutput]
+                  .filter(Boolean)
+                  .join(", ");
+
+                return combinedOutput || "Property Type";
+              })()
               : "Property Type"}
           </span>
+
         </span>
       </p>
       <div className="project-card-footer">
@@ -109,16 +125,16 @@ const ProjectCard = ({ project }) => {
           Start from{" "}
           <b>
             ₹
-            {minPrice
-              ? minPrice >= 10000000
-                ? parseFloat((minPrice / 10000000).toFixed(2)) + " Cr"
-                : parseFloat((minPrice / 100000).toFixed(2)) + " Lakh"
+            {project.min_price && project.min_price > 0
+              ? project.min_price >= 10000000
+                ? parseFloat((project.min_price / 10000000).toFixed(2)) + " Cr"
+                : parseFloat((project.min_price / 100000).toFixed(2)) + " Lakh"
               : " "}
           </b>
         </p>
 
         <button
-          onClick={() => handleMoreDetails(project.url)}
+          onClick={() => handleMoreDetails(project.canonical)}
           className="project-card-details-btn"
         >
           more details

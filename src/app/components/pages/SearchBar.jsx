@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useRef  } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { getAllProject, getAllLocalities } from "../../apis/api";
@@ -10,30 +10,19 @@ const SearchBar = () => {
   const [propertyType, setPropertyType] = useState("");
   const [projectSuggestions, setProjectSuggestions] = useState([]);
   const [localities, setLocalities] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false); // Track if suggestions should be shown
+  const [showSuggestions, setShowSuggestions] = useState(false); 
   const navigate = useNavigate();
   // const searchRef = useRef(null); // Ref for search input
 
 
   // Fetch localities when the component mounts
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchLocalities = async () => {
       const data = await getAllLocalities();
       setLocalities(data);
     };
     fetchLocalities();
   }, []);
-
-  // useEffect(() => {
-  //   function handleClickOutside(event) {
-  //     if (searchRef.current && !searchRef.current.contains(event.target)) {
-  //       setShowSuggestions(false);
-  //     }
-  //   }
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => document.removeEventListener("mousedown", handleClickOutside);
-  // }, []);
-  
 
   // Handle Location Change
   const handleLocationChange = (e) => {
@@ -48,11 +37,11 @@ const SearchBar = () => {
   };
 
   // Close suggestions on ESC key
-const handleKeyDown = (e) => {
-  if (e.key === "Escape") {
-    setShowSuggestions(false);
-  }
-};
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      setShowSuggestions(false);
+    }
+  };
 
   const debouncedSearch = debounce(async (query) => {
     if (query.trim() === "") {
@@ -61,7 +50,8 @@ const handleKeyDown = (e) => {
     }
     console.log("Query", query);
     const response = await getAllProject({ name: query });
-    setProjectSuggestions(response.content || []);
+    console.log("Response", response);
+    setProjectSuggestions(response || []);
     setShowSuggestions(true); // Show suggestions when data is fetched
   }, 500);
 
@@ -79,7 +69,7 @@ const handleKeyDown = (e) => {
     if (searchQuery) {
       console.log("Search Query", searchQuery);
       const matchedProject = projectSuggestions.find(
-        (project) => project.name.toLowerCase() === searchQuery.toLowerCase()
+        (project) => project.project_name.toLowerCase() === searchQuery.toLowerCase()
       );
 
       if (matchedProject) {
@@ -92,19 +82,11 @@ const handleKeyDown = (e) => {
 
     // Include the location in the URL
     if (location) {
-      console.log("Location", location);
-      const selectedCity = localities.find(
-        (city) => city.id === parseInt(location)
-      );
-      if (selectedCity) {
-        const formattedLocationName = selectedCity.name
-          .toLowerCase()
-          .replace(/\s+/g, "-");
-        queryParams.push(
-          `location=${formattedLocationName}&locationId=${selectedCity.id}`
-        );
-      }
+      console.log("Location", location);  
+      const formattedLocationName = location.toLowerCase().replace(/\s+/g, "-");
+      queryParams.push(`city=${formattedLocationName}`);
     }
+
 
     // Include the property type in the URL
     if (propertyType) {
@@ -132,30 +114,25 @@ const handleKeyDown = (e) => {
               className="form-control"
               aria-label="Location"
               value={location}
-              onChange={handleLocationChange}
+              onChange={(e) => setLocation(e.target.value)}
             >
               <option value="">Location--</option>
-              {localities
-                .map((city) => ({
-                  ...city,
-                  name: city.name.toUpperCase(), // Convert name to uppercase
-                }))
-                // .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
-                .map((city) => (
-                  <option
-                    key={city.id}
-                    value={city.id}
-                    style={{ fontSize: "13px", color: "#000" }}
-                  >
-                    {city.name}
-                  </option>
-                ))}
+              {localities.map((city) => (
+                <option
+                  key={city.city}
+                  value={city.city}
+                  style={{ fontSize: "13px", color: "#000" }}
+                >
+                  {city.city}
+                </option>
+              ))}
             </select>
           </div>
         </div>
+
         <div className="form-group">
           <input
-          //  ref={searchRef} // Attach ref to input
+            //  ref={searchRef} // Attach ref to input
             className="form-control"
             type="text"
             name="search"
@@ -170,11 +147,11 @@ const handleKeyDown = (e) => {
             <ul className="suggestions-list">
               {projectSuggestions.map((project) => (
                 <li
-                  key={project.id}
+                  key={project.project_id}
                   className="suggestion-item"
                   onClick={() => handleSuggestionClick(project)}
                 >
-                  {project.name}
+                  {project.project_name}{" "}
                 </li>
               ))}
             </ul>

@@ -329,8 +329,8 @@ p {
   border-radius: 5px;
   position: absolute;
   top:20px;
-  left: 35px;
-  font-size: 10px;
+  /* left: 35px; */
+  font-size: 15px;
   text-transform: uppercase;
   /* z-index: 10; */
 }
