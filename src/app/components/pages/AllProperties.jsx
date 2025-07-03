@@ -67,8 +67,8 @@ const PropertyListing = () => {
       selectedConfiguration || "",
       selectedLocality || ""
     );
-    setProperties(data.content);
-    setTotalPages(data.totalPages);
+    setProperties(data.data?.data || []);
+    setTotalPages(data.data?.pagination?.total_pages || 1);
   };
 
   const handleNext = () => {
@@ -302,140 +302,119 @@ const PropertyListing = () => {
                     paddingRight: "10px", // Avoid scrollbar overlapping content
                   }}
                 >
-                  {properties.length === 0 ? (
+                  {Array.isArray(properties) && properties.length === 0 ? (
                     <div className="alert alert-info" role="alert">
                       No properties found.
                     </div>
                   ) : (
-                    <>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "10px", // Adds spacing between cards
-                        }}
-                      >
-                        {properties.map((property) => (
-                          <div
-                            className="card mb-3"
-                            style={{
-                              maxWidth: "100%",
-                              borderRadius: "10px",
-                              padding: "10px",
-                              boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
-                            }}
-                            key={property.id}
-                          >
-                            <div className="row g-0">
-                              <div className="col-md-4">
-                                <a href={`/propertyforsale/${property?.url}`}>
-                                  <img
-                                    className="img-fluid"
-                                    alt={property.propertyName}
-                                    src={
-                                      property.images &&
-                                      property.images.length > 0
-                                        ? property.images[0].startsWith("http")
+                    Array.isArray(properties) && properties.length > 0 && (
+                      <>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "10px", // Adds spacing between cards
+                          }}
+                        >
+                          {properties.map((property) => (
+                            <div
+                              className="card mb-3"
+                              style={{
+                                maxWidth: "100%",
+                                borderRadius: "10px",
+                                padding: "10px",
+                                boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
+                              }}
+                              key={property.id}
+                            >
+                              <div className="row g-0">
+                                <div className="col-md-4">
+                                  <a href={`/propertyforsale/${property?.id}`}>
+                                    <img
+                                      className="img-fluid"
+                                      alt={property.name}
+                                      src={
+                                        property.images && property.images.length > 0
                                           ? property.images[0]
-                                          : `${BASE_URL}/${property.images[0]}`
-                                        : "default-image.jpg"
-                                    }
-                                    loading="lazy"
-                                    style={{
-                                      maxWidth: "100%",
-                                      borderRadius: "10px",
-                                      height: "220px",
-                                      objectFit: "cover",
-                                      padding: "5px",
-                                    }}
-                                  />
-                                </a>
-                              </div>
-                              <div className="col-md-8">
-                                <div
-                                  className="card-body"
-                                  style={{ fontSize: "smaller" }}
-                                >
-                                  <div className="d-flex justify-content-between align-items-center">
-                                    <p className="card-title">
-                                      <b> ₹{formatPrice(property?.price)}</b>
-                                    </p>
-                                  </div>
-
-                                  <h6 className="card-text">
-                                    {property?.propertyName}
-                                    <br />
-                                    <span
+                                          : "default-image.jpg"
+                                      }
+                                      loading="lazy"
                                       style={{
-                                        fontSize: "11px",
-                                        color: "#a1a1a1",
+                                        maxWidth: "100%",
+                                        borderRadius: "10px",
+                                        height: "220px",
+                                        objectFit: "cover",
+                                        padding: "5px",
+                                      }}
+                                    />
+                                  </a>
+                                </div>
+                                <div className="col-md-8">
+                                  <div
+                                    className="card-body"
+                                    style={{ fontSize: "smaller" }}
+                                  >
+                                    <div className="d-flex justify-content-between align-items-center">
+                                      <p className="card-title">
+                                        <b>{property.name}</b>
+                                      </p>
+                                    </div>
+
+                                    <h6 className="card-text">
+                                      {property.name}
+                                      <br />
+                                      <span
+                                        style={{
+                                          fontSize: "11px",
+                                          color: "#a1a1a1",
+                                        }}
+                                      >
+                                        BY {property.developer_name}
+                                      </span>
+                                    </h6>
+                                    <div
+                                      className="property-info"
+                                      style={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: "10px",
                                       }}
                                     >
-                                      BY {property?.developerName}
-                                    </span>
-                                  </h6>
-                                  <div
-                                    className="property-info"
-                                    style={{
-                                      display: "flex",
-                                      flexWrap: "wrap",
-                                      gap: "10px",
-                                    }}
-                                  >
-                                    <div style={{ flex: "1 1 30%" }}>
-                                      <i className="fas fa-home"></i> Built-up
-                                      Area
-                                      <br />
-                                      <strong>{property?.builtupArea}</strong>
+                                      <div style={{ flex: "1 1 30%" }}>
+                                        <i className="fas fa-home"></i> Built-up Area
+                                        <br />
+                                        <strong>{property.built_up_area}</strong>
+                                      </div>
+                                      <div style={{ flex: "1 1 30%" }}>
+                                        <i className="far fa-calendar-alt"></i> Possession Status
+                                        <br />
+                                        <strong>{property.possession_status}</strong>
+                                      </div>
+                                      <div style={{ flex: "1 1 30%" }}>
+                                        <i className="fas fa-compass"></i> Facing
+                                        <br />
+                                        <strong>{property.facing}</strong>
+                                        <div style={{ marginTop: 4 }}>
+                                          <i className="fas fa-map-marker-alt"></i> Location
+                                          <br />
+                                          <strong>{property.location}</strong>
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div style={{ flex: "1 1 30%" }}>
-                                      <i className="far fa-calendar-alt"></i>{" "}
-                                      Possession Date
-                                      <br />
-                                      <strong>{property?.possessionDate}</strong>
-                                    </div>
-                                    <div style={{ flex: "1 1 30%" }}>
-                                      <i className="fas fa-tools"></i>{" "}
-                                      Construction Status
-                                      <br />
-                                      <strong>
-                                        {property?.possessionStatus}
-                                      </strong>
-                                    </div>
-                                    <div style={{ flex: "1 1 30%" }}>
-                                      <i className="fas fa-layer-group"></i> Unit
-                                      Available
-                                      <br />
-                                      <strong>{property?.floors}</strong>
-                                    </div>
-                                    <div style={{ flex: "1 1 30%" }}>
-                                      <i className="fas fa-compass"></i> Facing
-                                      <br />
-                                      <strong>{property?.facing}</strong>
-                                    </div>
-                                    <div style={{ flex: "1 1 30%" }}>
-                                      <i className="fas fa-map-marker-alt"></i>{" "}
-                                      Location
-                                      <br />
-                                      <strong>{property?.propertyAddress}</strong>
-                                    </div>
+                                    <button
+                                      onClick={() => handleMoreDetail(property?.id)}
+                                      className="theme-btn"
+                                    >
+                                      Contact Details
+                                    </button>
                                   </div>
-                                  <button
-                                    onClick={() =>
-                                      handleMoreDetail(property?.url)
-                                    }
-                                    className="theme-btn"
-                                  >
-                                    Contact Details
-                                  </button>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                      {/* Pagination Controls */}
-                    </>
+                          ))}
+                        </div>
+                      </>
+                    )
                   )}
                 </div>
 
