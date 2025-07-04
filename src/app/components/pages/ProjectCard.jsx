@@ -134,7 +134,7 @@ const ProjectCard = ({ project }) => {
         </p>
 
         <button
-          onClick={() => handleMoreDetails(project.canonical)}
+          onClick={() => handleMoreDetails(project.project_id)}
           className="project-card-details-btn"
         >
           more details

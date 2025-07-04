@@ -7,7 +7,7 @@ import {
   getAllGenericKeywords,
   getGenericKeywordByPath,
   getAllCityForMobile,
-  // getAllProjectsByUrlName,
+   getAllProjectsByUrlName,
 } from "../apis/api";
 import { useNavigate } from "react-router-dom";
 

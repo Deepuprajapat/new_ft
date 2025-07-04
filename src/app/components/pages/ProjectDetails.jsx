@@ -11,7 +11,7 @@ import {
   verifyOTP,
   resendOTP,
   getReraInfoByProjectId,
-  patchProjectByTestUrl
+  patchProjectByTestUrl,
   // getLeadByPhone,
   // saveLead,
 } from "../../apis/api";
@@ -45,8 +45,8 @@ const ProjectDetails = () => {
   const [developerId, setDeveloperId] = useState("");
   const [projectId, setProjectId] = useState("");
   const [developerDetails, setDeveloperDetails] = useState(null);
-  // const { urlName } = useParams();
-  const urlName = '8ca4e2ce-4bda-4510-89dc-6e20dc52fb20';
+  const { urlName } = useParams();
+  // const urlName = '8ca4e2ce-4bda-4510-89dc-6e20dc52fb20';
   const [activeFilter, setActiveFilter] = useState("all");
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);

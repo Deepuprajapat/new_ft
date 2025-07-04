@@ -1,6 +1,5 @@
-import LocationMapSection from "./PropertyDetailParts/LocationMapSection";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import {
   getPropertyByUrlName,
@@ -26,6 +25,7 @@ import "react-multi-carousel/lib/styles.css";
 import Swal from "sweetalert2";
 import { Helmet } from "react-helmet";
 import ProjectPropertyDetails from "./PropertyDetailParts/ProjectPropertyDetails";
+import PropertyHeaderSection from "./PropertyHeaderSection";
 import WhyToChooseSection from "./PropertyDetailParts/WhyToChooseSection";
 import FloorPlanSection from "./PropertyDetailParts/FloorPlanSection";
 import AboutDeveloperSection from "./PropertyDetailParts/AboutDeveloperSection";
@@ -36,6 +36,7 @@ import PropertyListSection from "./PropertyDetailParts/PropertyListSection";
 const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
 
 const PropertyDetails = () => {
+  const location = useLocation();
   const { urlName } = useParams(); // Get urlName from route params
   const [property, setProperty] = useState(null);
   const [expandedIndex, setExpandedIndex] = useState(null); // To track which FAQ is expanded
@@ -188,17 +189,37 @@ const PropertyDetails = () => {
   }, [timer, otpSent]);
 
   useEffect(() => {
-    const fetchProperty = async () => {
-      if (urlName) {
+    // If propertyData is passed from navigation, use it to set property state
+    if (location.state && Object.keys(location.state).length > 0) {
+      // Map the incoming propertyData to the property state format
+      const propertyData = location.state;
+      setProperty({
+        property_name: propertyData.projectName || '',
+        name: propertyData.projectName || '',
+        projectId: propertyData.projectId || '',
+        propertyType: propertyData.propertyType || '',
+        ageOfProperty: propertyData.ageOfProperty || '',
+        floorNo: propertyData.floorNo || '',
+        configuration: propertyData.configuration || '',
+        facing: propertyData.facing || '',
+        furnishing: propertyData.furnishing || '',
+        balconyCount: propertyData.balconyCount || '',
+        bedroomCount: propertyData.bedroomCount || '',
+        coveredParking: propertyData.coveredParking || '',
+        // You can add more fields here as needed
+      });
+       console.log("propertyDatadsj", propertyData)
+    } else if (urlName) {
+      const fetchProperty = async () => {
         const data = await getPropertyByUrlName(urlName);
         setProperty(data.data);
         console.log("datayhdsj", data.data);
-      }
-    };
-    fetchProperty();
-  }, [urlName]);
+      };
+      fetchProperty();
+    }
+  }, [location.state, urlName]);
 
-  if (!property) return <div>Loading...</div>; // Show a loading message while fetching
+  // if (!property) return <div>Loading...</div>; // Show a loading message while fetching
 
   // Process amenities to match the format of amenities.json
   const processAmenities = () => {
@@ -305,8 +326,30 @@ const PropertyDetails = () => {
 //   };
 // }, [navInitialPosition]); // Ensure dependencies are correctly set
 
+// PATCH handlers for each section (like ProjectPropertyDetails handleSave)
+const onSaveProjectDetails = (changedData) => {
+  setProperty(prev => ({ ...prev, ...changedData }));
+  // TODO: Call patchPropertyDetails API here if needed
+};
+
+const onSaveWhyToChoose = (changedData) => {
+  setProperty(prev => ({ ...prev, ...changedData }));
+  // TODO: Call patchPropertyDetails API here if needed
+};
+
+// const onSaveFloorPlan = (changedData) => {
+//   setProperty(prev => ({ ...prev, ...changedData }));
+//   // TODO: Call patchPropertyDetails API here if needed
+// };
+
+const onSaveAboutDeveloper = (changedData) => {
+  setProperty(prev => ({ ...prev, ...changedData }));
+  // TODO: Call patchPropertyDetails API here if needed
+};
+
 const onSaveKnowAbout = (aboutHtml) => {
   setProperty(prev => ({ ...prev, about: aboutHtml }));
+  // TODO: Call patchPropertyDetails API here if needed
 };
 
 const onSaveAmenities = (newPropertyAmenities, newAmenitiesPara) => {
@@ -315,6 +358,7 @@ const onSaveAmenities = (newPropertyAmenities, newAmenitiesPara) => {
     propertyAmenities: newPropertyAmenities,
     amenitiesPara: newAmenitiesPara,
   }));
+  // TODO: Call patchPropertyDetails API here if needed
 };
 
 const onSaveVideo = ({ videoPara, propertyVideo }) => {
@@ -323,6 +367,7 @@ const onSaveVideo = ({ videoPara, propertyVideo }) => {
     videoPara,
     propertyVideo,
   }));
+  // TODO: Call patchPropertyDetails API here if needed
 };
 
   return (
@@ -702,266 +747,15 @@ const onSaveVideo = ({ videoPara, propertyVideo }) => {
           </div>
         </div>
 
-        {/* Section 1 */}
-        <section
-          className="container-fluid"
-          style={{
-            width: window.innerWidth <= 768 ? "90%" : "95%",
-            margin: "0 auto",
-          }}
-        >
-          <div>
-            <div className="d-flex flex-column flex-md-row justify-content-between">
-              {/* Left Section */}
-              <div className="col-12 col-md-6 p-0 p-md-0">
-                {/* Upper Section */}
-                <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start mb-2 mt-2 mt-md-3">
-                  <div className="mb-2 mb-md-0 me-md-3 text-center text-md-start" style={{    maxWidth: '90px',
-    border: '1px solid grey',
-    height: '66px'}}>
-                    <img
-                      src={property?.projectLogo || "defaultLogo.jpg"}
-                      alt={property?.projectLogo || "Project Logo"}
-                      loading="lazy"
-                      className="img-fluid"
-                      style={{
-                        maxWidth: "80px",
-                        height: '64px'
-                      }}
-                    />
-                  </div>
-                  <div className="text-center text-md-start">
-                    <h1
-                      className="h3 mb-0 text-center text-md-start"
-                      style={{ fontSize: "20px" }}
-                    >
-                      {property?.name || "Property Name"}
-                    </h1>
-                    <p className="mb-0" style={{ fontSize: "11px" }}>
-                      {property?.propertyAddress || "Property Address"}
-                    </p>
-                    <span style={{ fontSize: "13px" }}>
-                      By{" "}
-                      <a
-                        // href={property?.developerLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {property?.developerName || "Developer Name"}
-                      </a>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Lower Section - Buttons */}
-                <div className="d-flex flex-wrap justify-content-center justify-content-md-start position-relative">
-                  <span
-                    className="badge bg-primary"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#2067d1",
-                    }}
-                    onMouseEnter={() => setShowReraDetails(true)}
-                  >
-                    Rera
-                  </span>
-                  {showReraDetails && (
-                    <div
-                      onMouseEnter={() => setIsReraDetailHovered(true)}
-                      onMouseLe ave={() => {
-                        setIsReraDetailHovered(false);
-                        setShowReraDetails(false);
-                      }}
-                      style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
-                        zIndex: 1000,
-                        backgroundColor: "white",
-                        padding: "10px",
-                        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                        borderRadius: "4px",
-                        minWidth: "300px",
-                        maxWidth: "90vw",
-                      }}
-                    >
-                      <div className="d-flex justify-content-between align-items-center mb-0">
-                        <h6
-                          className="m-0"
-                          style={{ fontWeight: 700, fontSize: "14px" }}
-                        >
-                          Rera Detail
-                        </h6>
-                        <i
-                          className="fa fa-close"
-                          style={{ fontSize: "15px", cursor: "pointer" }}
-                          onClick={() => {
-                            setShowReraDetails(false);
-                            setIsReraDetailHovered(false);
-                          }}
-                        />
-                      </div>
-                      <div className="table-responsive">
-                        <table className="w-100">
-                          <thead>
-                            <tr>
-                              <th
-                                style={{
-                                  width: "45%",
-                                  textAlign: "left",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "11px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                Phase
-                              </th>
-                              <th
-                                style={{
-                                  width: "34%",
-                                  textAlign: "left",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "11px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                Status
-                              </th>
-                              <th
-                                style={{
-                                  width: "40%",
-                                  textAlign: "left",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "11px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                Rera Number
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td
-                                style={{ fontSize: "11px", padding: "8px 0" }}
-                              ></td>
-                              <td
-                                style={{ fontSize: "11px", padding: "8px 0" }}
-                              >
-                                {property?.status}
-                              </td>
-                              <td
-                                style={{ fontSize: "11px", padding: "8px 0" }}
-                              >
-                                {property?.reraLink}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-                  <span
-                    className="badge text-dark"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#f0f0f0",
-                      fontWeight: "300",
-                    }}
-                  >
-                    No Brokerage
-                  </span>
-                  <span
-                    className="badge text-dark"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#f0f0f0",
-                      fontWeight: "300",
-                    }}
-                  >
-                    Floor Plans Available
-                  </span>
-                  <span
-                    className="badge text-dark"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#f0f0f0",
-                      fontWeight: "300",
-                    }}
-                  >
-                    Top Amenities
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Section */}
-              <div
-                className="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-2 mt-md-2 p-0 p-md-0"
-                style={{ boxShadow: "none", border: "none" }}
-              >
-                <p
-                  className="mb-1 fw-bold text-black text-center text-md-end mt-2 mt-md-4"
-                  style={{ fontSize: "20px" }}
-                >
-                  Starting from
-                </p>
-                <h2
-                  className="h2 mb-0 fw-bold text-center text-md-end"
-                  style={{ fontSize: "25px", fontWeight: "800" }}
-                >
-                  ₹{formatPrice(property?.price || "0")}
-                </h2>
-                <button
-                  id="BookBtn2"
-                  className="theme-btn"
-                  style={{ display: "inline-block" }}
-                  onClick={handleDownloadBrochure}
-                >
-                  Contact to Our Expert
-                </button>
-
-                  {/* Dialog Popup Trigger */}
-                  <BrochurePopupDialog
-                      open={showPopup}
-                      onClose={closePopup}
-                      projectName={property?.propertyName || "Invest Mango"}
-                      brochure={property?.brochure}
-                    />
-              </div>
-            </div>
-          </div>
-          <div className="">
-            <hr />
-          </div>
-        </section>
+        {/* Section 1 - Property Header */}
+        <PropertyHeaderSection
+          property={property}
+          formatPrice={formatPrice}
+          handleDownloadBrochure={handleDownloadBrochure}
+          showPopup={showPopup}
+          closePopup={closePopup}
+          BrochurePopupDialog={BrochurePopupDialog}
+        />
 
         {/* Section 2 */}
         <section
@@ -979,7 +773,20 @@ const onSaveVideo = ({ videoPara, propertyVideo }) => {
                 id="overview"
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
-               <ProjectPropertyDetails property={property} />
+                <ProjectPropertyDetails 
+                  property={property}
+                  onSave={onSaveProjectDetails}
+                  // Pass all relevant property fields as props for display
+                  propertyType={property?.propertyType}
+                  ageOfProperty={property?.ageOfProperty}
+                  floorNo={property?.floorNo}
+                  configuration={property?.configuration}
+                  facing={property?.facing}
+                  furnishing={property?.furnishing}
+                  balconyCount={property?.balconyCount}
+                  bedroomCount={property?.bedroomCount}
+                  coveredParking={property?.coveredParking}
+                />
               </div>
 
               {/* connect to out expert for mobile view*/}
@@ -1293,21 +1100,22 @@ const onSaveVideo = ({ videoPara, propertyVideo }) => {
               )}
 
               {/* Why to choose */}
-              <WhyToChooseSection property={property} />
+              <WhyToChooseSection property={property} onSave={onSaveWhyToChoose} />
 
               {/* Floor Plan */}
               <FloorPlanSection
                 property={property}
-                activeFilter={activeFilter}
-                setActiveFilter={setActiveFilter}
-                handleImageClick={handleImageClick}
-                showImagePopup={showImagePopup}
-                selectedImage={selectedImage}
-                closeImagePopup={closeImagePopup}
-                handleDownloadFloorPlan={handleDownloadFloorPlan}
-                showFloorPlanPopup={showFloorPlanPopup}
-                closeFloorPlanPopup={closeFloorPlanPopup}
-                formatPrice={formatPrice}
+                // activeFilter={activeFilter}
+                // setActiveFilter={setActiveFilter}
+                // handleImageClick={handleImageClick}
+                // showImagePopup={showImagePopup}
+                // selectedImage={selectedImage}
+                // closeImagePopup={closeImagePopup}
+                // handleDownloadFloorPlan={handleDownloadFloorPlan}
+                // showFloorPlanPopup={showFloorPlanPopup}
+                // closeFloorPlanPopup={closeFloorPlanPopup}
+                // formatPrice={formatPrice}
+                //onSave={onSaveFloorPlan}
               />
 
              
@@ -1320,13 +1128,57 @@ const onSaveVideo = ({ videoPara, propertyVideo }) => {
               />
 
               {/* Amenities */}
-              <AmenitiesSection property={property} processAmenities={processAmenities} onSave={onSaveAmenities} />
+              <AmenitiesSection
+                property={property}
+                processAmenities={processAmenities}
+                onSave={onSaveAmenities}
+              />
 
               {/* video presentation */}
               <VideoSection property={property} onSave={onSaveVideo} />
 
               {/* Location Map */}
-              <LocationMapSection property={property} />
+              <div className="bg-white rounded-3 mb-4" id="location">
+                <h2
+                  className="mb-4"
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? "16px" : "18px",
+                    color: "#000000",
+                    fontWeight: "bold",
+                    textAlign: "left",
+                    backgroundColor: "#2067d1",
+                    padding: "8px 12px",
+                    borderRadius: "4px",
+                    color: "#ffffff",
+                  }}
+                >
+                  {property?.name} Location Map
+                </h2>
+                <div className="row">
+                  <div className="col-12">
+                    <div className="position-relative">
+                      <div
+                        style={{
+                          position: "absolute",
+                          width: "80%",
+                          height: "100%",
+                          background: "#f22a2a00",
+                          zIndex: 1,
+                        }}
+                      ></div>
+                      <iframe
+                        title="Location"
+                        src={property?.locationMap}
+                        width="100%"
+                        height="300"
+                        style={{ border: 0 }}
+                        allowFullScreen=""
+                        loading="lazy"
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </section>
 
             <section className="col-md-4 mb-4">

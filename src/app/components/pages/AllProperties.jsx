@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Select from "react-select";
-import { getAllFloor, getAllLocalities, getAllProperties } from "../../apis/api";
+import {
+  getAllFloor,
+  getAllLocalities,
+  getAllProperties,
+  getAllProjectsByUrlName,
+  getAllProjectsByType,
+  saveProperty,
+} from "../../apis/api";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
@@ -22,12 +29,7 @@ const PropertyListing = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedType, setSelectedType] = useState(""); // "COMMERCIAL" or "RESIDENTIAL"
-  const [projects, setProjects] = useState([
-    "ACE Divino",
-    "ATS Greens",
-    "Supertech Eco Village",
-    // ...add more projects as needed
-  ]);
+  const [projects, setProjects] = useState([]); // Start with empty, only fill from API
   const [selectedProject, setSelectedProject] = useState("");
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
@@ -134,10 +136,16 @@ const PropertyListing = () => {
   const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images";
 
   // Handler for property type selection
-  const handleTypeSelect = (type) => {
+  const handleTypeSelect = async (type) => {
     setSelectedType(type);
     setShowAddModal(false);
-    setShowDetailsModal(true); // Directly open details modal
+    try {
+      const projectsList = await getAllProjectsByType(type);
+      setProjects(projectsList);
+    } catch (e) {
+      setProjects([]);
+    }
+    setShowDetailsModal(true);
   };
 
   // Handler for closing details modal
@@ -148,9 +156,32 @@ const PropertyListing = () => {
   };
 
   // Handler for confirm
-  const handleConfirm = () => {
-    setShowDetailsModal(false);
-    navigate(`/propertyforsale/${selectedProject}`);
+  const handleConfirm = async () => {
+    // Find the selected project name
+    const selectedProjectObj = projects.find((proj) => proj.project_id === selectedProject);
+    const projectName = selectedProjectObj ? selectedProjectObj.project_name : '';
+    // Gather all modal field values as per required API JSON
+    const propertyData = {
+      project_id: selectedProject, // project_id
+      name: projectName, // name
+      property_type: propertyType, // property_type
+      age_of_property: ageOfProperty, // age_of_property
+      floor_number: floorNo, // floor_number
+      facing: facing, // facing
+      furnishing: furnishing, // furnishing
+      balcony_count: balconyCount, // balcony_count
+      bedrooms_count: bedroomCount, // bedrooms_count
+      covered_parking: coveredParking, // covered_parking
+    };
+
+    try {
+      await saveProperty(propertyData);
+      setShowDetailsModal(false);
+      // Pass data to PropertyDetails page via state
+      navigate(`/propertyforsale/`, { state: propertyData });
+    } catch (error) {
+      alert('Error saving property: ' + error.message);
+    }
   };
 
   return (
@@ -769,10 +800,12 @@ const PropertyListing = () => {
               </span>
             </div>
             <Select
-              options={projects.map((proj) => ({ value: proj, label: proj }))}
+              options={projects.map((proj) => ({ value: proj.project_id, label: proj.project_name }))}
               value={
                 selectedProject
-                  ? { value: selectedProject, label: selectedProject }
+                  ? projects.find((proj) => proj.project_id === selectedProject)
+                    ? { value: selectedProject, label: (projects.find((proj) => proj.project_id === selectedProject).project_name) }
+                    : null
                   : null
               }
               onChange={(option) => setSelectedProject(option ? option.value : "")}
@@ -824,7 +857,9 @@ const PropertyListing = () => {
             </div>
             <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>Floor No.</div>
+                <div style={{ fontWeight: 500, marginBottom: 4 }}>
+                  Floor No.
+                </div>
                 <input
                   type="text"
                   value={floorNo}
@@ -952,33 +987,43 @@ const PropertyListing = () => {
                   }}
                 />
               </div>
-              <div style={{ flex: 1 }}></div>
+              <button
+                onClick={handleConfirm}
+                style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  border: "none",
+                  borderRadius: 8,
+                  background: "#2067d1",
+                  marginTop:"29px",
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: 16,
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  minWidth: 0,
+                  maxWidth: "100%",
+                  height: "40px",
+                  boxShadow: "0 2px 8px rgba(32,103,209,0.10)",
+                  marginLeft: 12
+                }}
+              >
+                Confirm
+              </button>
             </div>
-            <button
-              onClick={handleConfirm}
-              style={{
-                width: "100%",
-                background: "#2067d1",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: 18,
-                border: "none",
-                borderRadius: 8,
-                justifyContent: "center",
-                cursor: "pointer",
-              }}
-            >
-              Confirm
-            </button>
+
+            {/* AddProject Modal */}
+            {showAddProjectModal && (
+              <AddProject
+                show={showAddProjectModal}
+                handleClose={() => setShowAddProjectModal(false)}
+              />
+            )}
           </div>
         </div>
       )}
-
-      {/* AddProject Modal */}
-    {  <AddProject
-        show={showAddProjectModal}
-        handleClose={() => setShowAddProjectModal(false)}
-      />}
     </>
   );
 };
