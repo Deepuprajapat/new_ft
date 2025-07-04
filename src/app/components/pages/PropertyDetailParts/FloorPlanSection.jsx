@@ -15,7 +15,8 @@ const FloorPlanSection = ({
   handleDownloadFloorPlan,
   showFloorPlanPopup,
   closeFloorPlanPopup,
-  formatPrice
+  formatPrice,
+  onSave
 }) => {
   const [editMode, setEditMode] = useState(false);
   const [editable2D, setEditable2D] = useState(property?.floorImage2D || "");
@@ -23,11 +24,6 @@ const FloorPlanSection = ({
   const [editable2DTitle, setEditable2DTitle] = useState("2D Floor Plan");
   const [editable3DTitle, setEditable3DTitle] = useState("3D Floor Plan");
   const fileInputRefs = [useRef(), useRef()];
-
-  // Extract floor_plan from web_cards if present
-  const floorPlanData = property?.web_cards?.floor_plan || property?.floor_plan;
-  const floorPlanProducts = floorPlanData?.products || [];
-  const floorPlanDescription = floorPlanData?.description || "";
 
   const handleEdit = () => {
     setEditable2D(property?.floorImage2D || "");
@@ -45,7 +41,16 @@ const FloorPlanSection = ({
 
   const handleSave = () => {
     setEditMode(false);
-    // Optionally: call a prop to update parent state or backend
+    if (typeof onSave === 'function') {
+      onSave({
+        floorImage2D: editable2D,
+        floorImage3D: editable3D,
+        floorPlanTitles: {
+          twoD: editable2DTitle,
+          threeD: editable3DTitle
+        }
+      });
+    }
   };
 
   const handleImageUpload = (index, file) => {
@@ -101,43 +106,13 @@ const FloorPlanSection = ({
             )}
           </span>
         </h4>
+        {/* Floor Plan Title/Description from property_floor_plan */}
+        {property?.web_cards?.property_floor_plan?.title && (
+          <div className="px-3 pb-2" style={{fontSize: window.innerWidth <= 768 ? '12px' : '15px', color: '#222', fontWeight: 500}}>
+            {property.web_cards.property_floor_plan.title}
+          </div>
+        )}
         <div className="px-3">
-          {/* Floor Plan Products Table (from web_cards) */}
-          {floorPlanProducts.length > 0 && (
-            <div className="mb-4">
-              {floorPlanDescription && (
-                <div className="mb-2" dangerouslySetInnerHTML={{ __html: floorPlanDescription }} />
-              )}
-              <div className="table-responsive">
-                <table className="table table-bordered align-middle">
-                  <thead className="table-light">
-                    <tr>
-                      <th>Type</th>
-                      <th>Area (sqft)</th>
-                      <th>Price</th>
-                      <th>Image</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {floorPlanProducts.map((prod, idx) => (
-                      <tr key={idx}>
-                        <td>{prod.title || prod.flat_type}</td>
-                        <td>{prod.building_area}</td>
-                        <td>{formatPrice ? formatPrice(prod.price) : prod.price}</td>
-                        <td>
-                          {prod.image && (
-                            <a href={prod.image} target="_blank" rel="noopener noreferrer">
-                              <img src={prod.image} alt={prod.title} style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px", border: "1px solid #ddd" }} />
-                            </a>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
           {/* Toggle Buttons for 2D & 3D Floor Plans */}
           <div className="d-flex gap-2 mb-3">
             <button
@@ -182,106 +157,129 @@ const FloorPlanSection = ({
             itemClass="carousel-item-padding-40-px"
             style={{ width: "60%", margin: "0 auto" }}
           >
-            {images
-              .filter((plan, idx) =>
-                (activeFilter === "2D" && idx === 0) ||
-                (activeFilter === "3D" && idx === 1) ||
-                activeFilter !== "2D" && activeFilter !== "3D"
-              )
-              .map((plan, index) => (
-                <div key={index} className="px-2 d-flex justify-content-center">
-                  <div
-                    className="card border-0"
-                    style={{
-                      width: "80%",
-                      maxWidth: window.innerWidth <= 768 ? "80%" : "auto",
-                    }}
-                  >
-                    <div className="card-body p-3 text-center">
-                      {editMode ? (
-                        <>
-                          <input
-                            type="text"
-                            className="form-control mb-2"
-                            value={index === 0 ? editable2DTitle : editable3DTitle}
-                            onChange={e => index === 0 ? setEditable2DTitle(e.target.value) : setEditable3DTitle(e.target.value)}
-                            placeholder={`Title for ${index === 0 ? "2D" : "3D"} Floor Plan`}
-                          />
-                          <input
-                            type="text"
-                            className="form-control mb-2"
-                            value={index === 0 ? editable2D : editable3D}
-                            onChange={e => index === 0 ? setEditable2D(e.target.value) : setEditable3D(e.target.value)}
-                            placeholder={`Image URL for ${index === 0 ? "2D" : "3D"} Floor Plan`}
-                          />
-                          <div className="mb-2">
-                            <label className="form-label">Image</label>
-                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                              <img src={index === 0 ? editable2D : editable3D} alt={plan.title} style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px", border: "1px solid #ddd", cursor: "pointer" }} onClick={() => fileInputRefs[index].current?.click()} />
-                              <input type="file" accept="image/*" ref={fileInputRefs[index]} style={{ display: "none" }} onChange={e => handleImageUpload(index, e.target.files[0])} />
-                              <button className="btn btn-outline-secondary btn-sm" type="button" onClick={() => fileInputRefs[index].current?.click()}>Upload</button>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <p
-                            className="mb-3"
-                            style={{
-                              fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                              fontWeight: "600",
-                            }}
-                          >
-                            {plan.title}
-                          </p>
-                          <img
-                            src={plan.imageUrl}
-                            alt={plan.title}
-                            loading="lazy"
-                            className="img-fluid mb-3"
-                            style={{
-                              width: "100%",
-                              maxHeight: "300px",
-                              objectFit: "contain",
-                              borderRadius: "5px",
-                            }}
-                            onClick={() => handleImageClick(plan.imageUrl)}
-                          />
-                        </>
-                      )}
-                      <div className="d-flex flex-column gap-2 align-items-center">
-                        <a
-                          href="tel:+918595189189"
-                          className="btn btn-primary w-100"
-                          style={{
-                            fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                            backgroundColor: "#2067d1",
-                          }}
-                        >
-                          Talk to our Expert
-                        </a>
-                        <button
-                          onClick={handleDownloadFloorPlan}
-                          className="btn btn-outline-primary w-100"
-                          style={{
-                            fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                            margin: "0px",
-                          }}
-                        >
-                          Download Floor Plan
-                        </button>
-                        {/* Floor Plan Dialog Popup */}
-                        <BrochurePopupDialog
-                          open={showFloorPlanPopup}
-                          onClose={closeFloorPlanPopup}
-                          projectName={property?.propertyName || "Invest Mango"}
-                          brochure={property?.brochure}
-                        />
+            {/* If web_cards.property_floor_plan.plans exists, show those images */}
+            {property?.web_cards?.property_floor_plan?.plans?.length > 0
+              ? property.web_cards.property_floor_plan.plans.map((plan, idx) => (
+                  <div key={idx} className="px-2 d-flex justify-content-center">
+                    <div className="card border-0" style={{ width: "80%", maxWidth: window.innerWidth <= 768 ? "80%" : "auto" }}>
+                      <div className="card-body p-3 text-center">
+                        <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? "14px" : "16px", fontWeight: "600" }}>
+                          {plan.title || `Floor Plan ${idx + 1}`}
+                        </p>
+                        {/* 2D Floor Plan */}
+                        {plan["2D"] && (
+                          <>
+                            <div style={{ fontSize: "12px", fontWeight: 500, marginBottom: 4 }}>2D Floor Plan</div>
+                            <img
+                              src={plan["2D"]}
+                              alt={`2D Floor Plan ${idx + 1}`}
+                              loading="lazy"
+                              className="img-fluid mb-3"
+                              style={{ width: "100%", maxHeight: "300px", objectFit: "contain", borderRadius: "5px" }}
+                              onClick={() => handleImageClick(plan["2D"])}
+                            />
+                          </>
+                        )}
+                        {/* 3D Floor Plan */}
+                        {plan["3D"] && (
+                          <>
+                            <div style={{ fontSize: "12px", fontWeight: 500, marginBottom: 4 }}>3D Floor Plan</div>
+                            <img
+                              src={plan["3D"]}
+                              alt={`3D Floor Plan ${idx + 1}`}
+                              loading="lazy"
+                              className="img-fluid mb-3"
+                              style={{ width: "100%", maxHeight: "300px", objectFit: "contain", borderRadius: "5px" }}
+                              onClick={() => handleImageClick(plan["3D"])}
+                            />
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              : images
+                  .filter((plan, idx) =>
+                    (activeFilter === "2D" && idx === 0) ||
+                    (activeFilter === "3D" && idx === 1) ||
+                    activeFilter !== "2D" && activeFilter !== "3D"
+                  )
+                  .map((plan, index) => (
+                    <div key={index} className="px-2 d-flex justify-content-center">
+                      <div className="card border-0"
+                        style={{ width: "80%", maxWidth: window.innerWidth <= 768 ? "80%" : "auto" }}
+                      >
+                        <div className="card-body p-3 text-center">
+                          {editMode ? (
+                            <>
+                              <input
+                                type="text"
+                                className="form-control mb-2"
+                                value={index === 0 ? editable2DTitle : editable3DTitle}
+                                onChange={e => index === 0 ? setEditable2DTitle(e.target.value) : setEditable3DTitle(e.target.value)}
+                                placeholder={`Title for ${index === 0 ? "2D" : "3D"} Floor Plan`}
+                              />
+                              <input
+                                type="text"
+                                className="form-control mb-2"
+                                value={index === 0 ? editable2D : editable3D}
+                                onChange={e => index === 0 ? setEditable2D(e.target.value) : setEditable3D(e.target.value)}
+                                placeholder={`Image URL for ${index === 0 ? "2D" : "3D"} Floor Plan`}
+                              />
+                              <div className="mb-2">
+                                <label className="form-label">Image</label>
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                  <img src={index === 0 ? editable2D : editable3D} alt={plan.title} style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px", border: "1px solid #ddd", cursor: "pointer" }} onClick={() => fileInputRefs[index].current?.click()} />
+                                  <input type="file" accept="image/*" ref={fileInputRefs[index]} style={{ display: "none" }} onChange={e => handleImageUpload(index, e.target.files[0])} />
+                                  <button className="btn btn-outline-secondary btn-sm" type="button" onClick={() => fileInputRefs[index].current?.click()}>Upload</button>
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <p
+                                className="mb-3"
+                                style={{ fontSize: window.innerWidth <= 768 ? "14px" : "16px", fontWeight: "600" }}
+                              >
+                                {plan.title}
+                              </p>
+                              <img
+                                src={plan.imageUrl}
+                                alt={plan.title}
+                                loading="lazy"
+                                className="img-fluid mb-3"
+                                style={{ width: "100%", maxHeight: "300px", objectFit: "contain", borderRadius: "5px" }}
+                                onClick={() => handleImageClick(plan.imageUrl)}
+                              />
+                            </>
+                          )}
+                          <div className="d-flex flex-column gap-2 align-items-center">
+                            <a
+                              href="tel:+918595189189"
+                              className="btn btn-primary w-100"
+                              style={{ fontSize: window.innerWidth <= 768 ? "12px" : "14px", backgroundColor: "#2067d1" }}
+                            >
+                              Talk to our Expert
+                            </a>
+                            <button
+                              onClick={handleDownloadFloorPlan}
+                              className="btn btn-outline-primary w-100"
+                              style={{ fontSize: window.innerWidth <= 768 ? "12px" : "14px", margin: "0px" }}
+                            >
+                              Download Floor Plan
+                            </button>
+                            {/* Floor Plan Dialog Popup */}
+                            <BrochurePopupDialog
+                              open={showFloorPlanPopup}
+                              onClose={closeFloorPlanPopup}
+                              projectName={property?.propertyName || "Invest Mango"}
+                              brochure={property?.brochure}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
           </Carousel>
           {/* Image Popup Modal */}
           {showImagePopup && (

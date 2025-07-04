@@ -1,3 +1,5 @@
+
+
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 // const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
@@ -165,10 +167,25 @@ export const getAllProject = async (filters = {}) => {
 };
 
 //  get all project by urlname
+// Get all projects by type (for modal project list)
+export const getAllProjectsByType = async (type) => {
+  try {
+    const url = `${BASE_URL2}/v1/api/projects`;
+    const params = {};
+    if (type) params.type = type;
+    const res = await axios.get(url, { params });
+    return res.data.data || [];
+  } catch (error) {
+    console.error("Error fetching projects by type:", error);
+    return [];
+  }
+};
+
+// Get single project by urlName (for details page)
 export const getAllProjectsByUrlName = async (urlName, navigate) => {
   try {
-    // Always use your test URL for now
-    const res = await axios.get( `/v1/api/projects/00328ce57bbc14b3`);
+    const url = `${BASE_URL2}/v1/api/projects/${urlName}`;
+    const res = await axios.get(url);
     return res.data.data || {};
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
@@ -179,9 +196,9 @@ export const getAllProjectsByUrlName = async (urlName, navigate) => {
   }
 };
 //patch
-export const patchProjectByTestUrl = async (patchData) => {
+export const patchProjectByTestUrl = async (urlName,patchData) => {
   try {
-    const res = await axios.patch(`/v1/api/projects/00328ce57bbc14b3`, // <-- use 8888
+    const res = await axios.patch(`/v1/api/projects/${urlName}`, // <-- use 8888
       patchData,
       {
         headers: {
@@ -347,31 +364,24 @@ export const submitHiringForm = async (formData) => {
 
 export const getAllLocalities = async () => {
   try {
-    const response = await axios.get(`${BASE_URL2}/v1/api/locations`);
-    const localities = response.data.data || [];
-    // Filter out entries with 'unknown' city
+    const response = await axios.get(`${BASE_URL}/locality/get/all`);
+    const localities = response.data || []; // Default to an empty array if no data
+    // Filter out localities with 'unknown' or 'UNKNOWN' in the city name or any other relevant fields
     const filteredLocalities = localities.filter(
-      (locality) =>
-        locality.city &&
-        locality.city.toLowerCase() !== "unknown"
+      (locality) => locality.city.name.toLowerCase() !== "unknown"
     );
-    // Create a unique set of cities
-    const uniqueCitiesMap = new Map();
-    filteredLocalities.forEach((locality) => {
-      if (!uniqueCitiesMap.has(locality.city)) {
-        uniqueCitiesMap.set(locality.city, {
-          id: locality.id, // optional
-          city: locality.city,
-        });
-      }
-    });
-    return Array.from(uniqueCitiesMap.values());
+    // Map filtered localities to extract city details and ensure uniqueness
+    const uniqueCities = Array.from(
+      new Map(
+        filteredLocalities.map((locality) => [locality.city.id, locality.city])
+      ).values()
+    );
+    return uniqueCities; // Returns an array of { id, name } objects
   } catch (error) {
     console.error("Error fetching localities:", error);
     return [];
   }
 };
-
 
 export const getAllLocalitiess = async () => {
   try {
@@ -681,5 +691,45 @@ export const getAllLocations = async () => {
   } catch (error) {
     console.error('Error fetching locations:', error);
     return [];
+  }
+};
+
+// ...existing code...
+// PATCH property details by property_id (keep at the end)
+export const patchPropertyDetails = async (propertyId, patchData) => {
+  try {
+    const token = localStorage.getItem("x-auth-token");
+    const res = await axios.patch(
+      `${BASE_URL2}/v1/api/properties/${propertyId}`,
+      patchData,
+      {
+        headers: {
+          "x-auth-token": `${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching property details:", error);
+    throw error;
+  }
+};
+// Save property to API
+export const saveProperty = async (propertyData) => {
+  try {
+    const res = await axios.post(
+      'http://localhost:8080/v1/api/properties',
+      propertyData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error('Error saving property:', error);
+    throw error;
   }
 };

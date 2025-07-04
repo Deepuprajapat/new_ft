@@ -1,22 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
 const WhyToChooseSection = ({ property, onSave }) => {
   const [editMode, setEditMode] = useState(false);
-  let whyChoose = property?.web_cards?.why_choose_us || property?.why_choose_us;
-  if (!whyChoose) {
-    whyChoose = {
-      image_urls: property?.images || [],
-      usp_list: property?.usp || []
-    };
-  }
-  const [editableUsp, setEditableUsp] = useState(whyChoose.usp_list ? [...whyChoose.usp_list] : []);
-
-  // Keep editableUsp in sync with prop changes
-  useEffect(() => {
-    setEditableUsp(whyChoose.usp_list ? [...whyChoose.usp_list] : []);
-  }, [whyChoose.usp_list]);
+  // Support new structure: property.web_cards.why_choose_us.usp_list and image_urls
+  const uspList = property?.web_cards?.why_choose_us?.usp_list || [];
+  const imageUrls = property?.web_cards?.why_choose_us?.image_urls || [];
+  const [editableUsp, setEditableUsp] = useState([...uspList]);
 
   const handleUspChange = (idx, value) => {
     setEditableUsp((prev) => {
@@ -28,18 +19,23 @@ const WhyToChooseSection = ({ property, onSave }) => {
 
   const handleSave = () => {
     setEditMode(false);
-    if (onSave) onSave({
-      ...property,
-      why_choose_us: {
-        ...whyChoose,
-        usp_list: editableUsp
-      }
-    });
+    if (onSave) {
+      onSave({
+        ...property,
+        web_cards: {
+          ...property.web_cards,
+          why_choose_us: {
+            ...property.web_cards?.why_choose_us,
+            usp_list: editableUsp,
+          },
+        },
+      });
+    }
   };
 
   const handleCancel = () => {
     setEditMode(false);
-    setEditableUsp(whyChoose.usp_list ? [...whyChoose.usp_list] : []);
+    setEditableUsp([...uspList]);
   };
 
   return (
@@ -94,18 +90,18 @@ const WhyToChooseSection = ({ property, onSave }) => {
               <div className="row">
                 <div className="col-md-6">
                   <div className="row g-1">
-                    {/* Show only the first image from why_choose_us.image_urls */}
-                    {whyChoose.image_urls && whyChoose.image_urls.length > 0 && (
+                    {/* First row with single image */}
+                    {imageUrls[0] && (
                       <div className="col-12 mb-1">
                         <a
-                          href={whyChoose.image_urls[0]}
+                          href={imageUrls[0]}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="d-block"
                         >
                           <img
-                            alt="Project Image 1"
-                            src={whyChoose.image_urls[0]}
+                            alt={"Project Image 1"}
+                            src={imageUrls[0]}
                             loading="lazy"
                             className="img-fluid rounded w-100"
                             style={{
@@ -153,8 +149,7 @@ const WhyToChooseSection = ({ property, onSave }) => {
                             </div>
                           </div>
                         ))
-                      : whyChoose.usp_list &&
-                        whyChoose.usp_list.map((usp, idx) => (
+                      : uspList.map((usp, idx) => (
                           <div className="col-6" key={idx}>
                             <div className="d-flex align-items-start">
                               <img
@@ -190,4 +185,4 @@ const WhyToChooseSection = ({ property, onSave }) => {
   );
 };
 
-export default WhyToChooseSection;
+export default WhyToChooseSection; 

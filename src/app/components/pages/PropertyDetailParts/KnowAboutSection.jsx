@@ -27,8 +27,10 @@ const KnowAboutSection = ({ property, showFullDescription, setShowFullDescriptio
   };
 
   const handleSave = () => {
-    if (onSave) onSave(aboutHtml);
     setIsAboutEditing(false);
+    if (typeof onSave === 'function') {
+      onSave(aboutHtml);
+    }
   };
 
   const handleCancel = () => {

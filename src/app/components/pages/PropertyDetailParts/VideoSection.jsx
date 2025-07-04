@@ -31,8 +31,28 @@ const VideoSection = ({ property, onSave }) => {
     // eslint-disable-next-line
   }, [isEditing, property]);
 
+
+  // Utility to get only changed fields for video section
+  const getChangedFields = (original, edited) => {
+    const changed = {};
+    if ((original.videoPara || "") !== (edited.videoPara || "")) {
+      changed.videoPara = edited.videoPara;
+    }
+    // Compare propertyVideo arrays
+    const origVideos = Array.isArray(original.propertyVideo) ? original.propertyVideo.filter(v => v.trim() !== "") : [];
+    const editVideos = Array.isArray(edited.propertyVideo) ? edited.propertyVideo.filter(v => v.trim() !== "") : [];
+    if (origVideos.length !== editVideos.length || origVideos.some((v, i) => v !== editVideos[i])) {
+      changed.propertyVideo = editVideos;
+    }
+    return changed;
+  };
+
   const handleSave = () => {
-    if (onSave) onSave({ videoPara, propertyVideo: videos.filter(v => v.trim() !== "") });
+    const edited = { videoPara, propertyVideo: videos.filter(v => v.trim() !== "") };
+    const changedFields = getChangedFields(property, edited);
+    if (onSave && Object.keys(changedFields).length > 0) {
+      onSave(changedFields);
+    }
     setIsEditing(false);
   };
 
