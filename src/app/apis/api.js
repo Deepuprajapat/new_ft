@@ -169,7 +169,7 @@ export const getAllProjectsByType = async (type) => {
 };
 
 // Get single project by urlName (for details page)
-export const getAllProjectsByUrlName = async (urlName, navigate) => {
+export const getAllProjectsByUrlName = async (Projectid, navigate) => {
   try {
     const url = `${BASE_URL}/projects/${urlName}`;
     const res = await axios.get(url);
@@ -184,6 +184,7 @@ export const getAllProjectsByUrlName = async (urlName, navigate) => {
 };
 //patch
 export const patchProjectByTestUrl = async (urlName,patchData) => {
+  
   try {
     const res = await axios.patch(`/projects/${urlName}`, // <-- use 8888
       patchData,
@@ -541,14 +542,14 @@ export const getAllCities = async () => {
   } 
 }
 
-export const getAllProperties = async (page, pageSize, propertyType, configuration, locality) => {
+export const getAllProperties = async (page, pageSize, type, configuration, locality) => {
   const params = {
     isDeleted: 'false',
     page: page,
     size: pageSize,
   };
 
-  if (propertyType) params.propertyType = propertyType;
+  if (type) params.type = type;
   if (configuration) params.configurationName = configuration;
   if (locality) params.cityId = locality;
 

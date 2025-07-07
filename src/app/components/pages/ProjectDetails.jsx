@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import PopupDialog from "./CommanPopup";
 import { useOutletContext } from "react-router-dom";
@@ -46,6 +46,9 @@ const ProjectDetails = () => {
   const [projectId, setProjectId] = useState("");
   const [developerDetails, setDeveloperDetails] = useState(null);
   const { urlName } = useParams();
+  const location = useLocation();
+  // Get projectId from navigation state if available
+  const projectIdFromNav = location.state?.projectId;
   // const urlName = '8ca4e2ce-4bda-4510-89dc-6e20dc52fb20';
   const [activeFilter, setActiveFilter] = useState("all");
   const [showMobileNav, setShowMobileNav] = useState(false);
@@ -169,7 +172,7 @@ const ProjectDetails = () => {
     setIsEditing(!isEditing);
   };
  const handleSave = async (updatedData) => {
-  // Log the updated data received from child component
+  // Log the updated data received from child componentpatchProjectByTestUrl
   console.log('Updated data received from child:', updatedData);
 
   // Update the projectData with the new values from child component
@@ -185,7 +188,7 @@ const ProjectDetails = () => {
 
   // Call PATCH API with the updated data
   try {
-    const response = await patchProjectByTestUrl(newData);
+    const response = await patchProjectByTestUrl(projectIdFromNav,newData);
     console.log("Patch API response:", response);
   } catch (error) {
     console.error("Error saving project data:", error);
@@ -316,7 +319,7 @@ const ProjectDetails = () => {
     const fetchData = async () => {
       if (urlName) {
         try {
-          const data = await getAllProjectsByUrlName(urlName, navigate);
+          const data = await getAllProjectsByUrlName(projectIdFromNav, navigate);
           if (data) {
             setProjectData(data);
             setDeveloperId(data.developerId);

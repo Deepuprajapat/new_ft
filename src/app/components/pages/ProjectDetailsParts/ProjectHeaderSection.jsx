@@ -106,10 +106,8 @@ const ProjectHeaderSection = ({
   useEffect(() => {
     getAllLocations().then((data) => {
       setLocations(data);
-      // Extract unique cities
       const uniqueCities = Array.from(new Set(data.map(loc => loc.city)));
       setCities(uniqueCities.map((city, idx) => ({ id: idx + 1, name: city })));
-      // Map city to its localities
       const cityLocalityMap = {};
       uniqueCities.forEach(city => {
         cityLocalityMap[city] = data.filter(loc => loc.city === city).map(loc => loc.locality_name);
