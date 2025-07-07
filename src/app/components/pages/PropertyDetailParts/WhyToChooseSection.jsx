@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
@@ -8,6 +8,11 @@ const WhyToChooseSection = ({ property, onSave }) => {
   const uspList = property?.web_cards?.why_choose_us?.usp_list || [];
   const imageUrls = property?.web_cards?.why_choose_us?.image_urls || [];
   const [editableUsp, setEditableUsp] = useState([...uspList]);
+
+  // Sync editableUsp with uspList when property changes
+  useEffect(() => {
+    setEditableUsp([...uspList]);
+  }, [uspList]);
 
   const handleUspChange = (idx, value) => {
     setEditableUsp((prev) => {
@@ -25,7 +30,7 @@ const WhyToChooseSection = ({ property, onSave }) => {
         web_cards: {
           ...property.web_cards,
           why_choose_us: {
-            ...property.web_cards?.why_choose_us,
+            image_urls: imageUrls,
             usp_list: editableUsp,
           },
         },
