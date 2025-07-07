@@ -1,19 +1,17 @@
 // ProjectCard.js
 import React from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/css/home.css"; // Link to the updated CSS file
 
 const ProjectCard = ({ project }) => {
-  // console.log("ProjectCard", project);
+  console.log("ProjectCard", project);
 
   const defaultImage = "http://localhost:3000/img/building_soon.jpg"; // Placeholder image
-  // const navigate = useNavigate();
-  const handleMoreDetails = (url) => {
-    window.open(
-      `/${url.toLowerCase().replace(/\s+/g, "-")}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+  const navigate = useNavigate();
+  // Navigate to the project URL and pass projectId in state, so only the URL is shown in the address bar
+  const handleMoreDetails = (url, projectId) => {
+    const cleanUrl = `/${url.toLowerCase().replace(/\s+/g, "-")}`;
+    navigate(cleanUrl, { state: { projectId } });
   };
 
   // Extract floorplan sizes
@@ -23,6 +21,7 @@ const ProjectCard = ({ project }) => {
   // const maxSize = floorplanSizes.length ? Math.max(...floorplanSizes) : null;
 
   const sizeRange = project.sizes?.match(/\d+/g); // Extract all numbers from the string
+  console.log(project.canonical,"canonical URL");
 
   const minSize = sizeRange && sizeRange.length ? parseInt(sizeRange[0]) : null;
   const maxSize = sizeRange && sizeRange.length > 1 ? parseInt(sizeRange[1]) : minSize;
@@ -132,9 +131,8 @@ const ProjectCard = ({ project }) => {
               : " "}
           </b>
         </p>
-
         <button
-          onClick={() => handleMoreDetails(project.project_id)}
+          onClick={() => handleMoreDetails(project.canonical, project.project_id)}
           className="project-card-details-btn"
         >
           more details

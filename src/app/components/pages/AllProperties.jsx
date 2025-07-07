@@ -3,9 +3,9 @@ import { Helmet } from "react-helmet";
 import Select from "react-select";
 import {
   getAllFloor,
-  getAllLocalities,
+  getAllLocations,
   getAllProperties,
-  getAllProjectsByUrlName,
+
   getAllProjectsByType,
   saveProperty,
 } from "../../apis/api";
@@ -106,7 +106,7 @@ const PropertyListing = () => {
           setConfigurations(uniqueConfigurations);
         }
 
-        const response = await getAllLocalities();
+        const response = await getAllLocations();
         setLocalities(response);
       } catch (error) {
         console.error("Error fetching property data:", error);
@@ -271,11 +271,18 @@ const PropertyListing = () => {
                       }}
                     >
                       <option value="">All Localities</option>
-                      {localities.map((city) => (
-                        <option key={city.id} value={city.id}>
-                          {city.name.toUpperCase()} {/* Convert to uppercase */}
-                        </option>
-                      ))}
+                      {/* Remove duplicate cities in dropdown */}
+                      {Array.from(new Set(localities.map(loc => loc.city ? loc.city.toUpperCase() : '')))
+                        .filter(city => city)
+                        .map((city, idx) => {
+                          // Find the first locality with this city to get its id
+                          const firstLoc = localities.find(loc => (loc.city ? loc.city.toUpperCase() : '') === city);
+                          return (
+                            <option key={firstLoc.id} value={firstLoc.id}>
+                              {city}
+                            </option>
+                          );
+                        })}
                     </select>
 
                     {/* Reset Button with Refresh Icon */}

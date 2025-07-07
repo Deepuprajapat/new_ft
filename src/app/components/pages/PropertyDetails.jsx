@@ -3,6 +3,7 @@ import { useParams, useLocation } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import {
   getPropertyByUrlName,
+  patchPropertyDetails,
   sendOTP,
   verifyOTP,
   resendOTP,
@@ -327,9 +328,30 @@ const PropertyDetails = () => {
 // }, [navInitialPosition]); // Ensure dependencies are correctly set
 
 // PATCH handlers for each section (like ProjectPropertyDetails handleSave)
-const onSaveProjectDetails = (changedData) => {
-  setProperty(prev => ({ ...prev, ...changedData }));
-  // TODO: Call patchPropertyDetails API here if needed
+const onSaveProjectDetails = async (updatedData) => {
+  // Update local state
+  let newData = property;
+  if (updatedData) {
+    newData = {
+      ...property,
+      ...updatedData
+    };
+    setProperty(newData);
+  }
+
+  // Call PATCH API
+  try {
+    const propertyId = property?.projectId || property?._id;
+    if (propertyId) {
+      await patchPropertyDetails(propertyId, newData);
+      Swal.fire("Success", "Property details updated!", "success");
+    } else {
+      Swal.fire("Error", "Property ID not found!", "error");
+    }
+  } catch (error) {
+    Swal.fire("Error", "Failed to update property details.", "error");
+    console.error(error);
+  }
 };
 
 const onSaveWhyToChoose = (changedData) => {
