@@ -26,7 +26,7 @@ import "react-multi-carousel/lib/styles.css";
 import Swal from "sweetalert2";
 import { Helmet } from "react-helmet";
 import ProjectPropertyDetails from "./PropertyDetailParts/ProjectPropertyDetails";
-import PropertyHeaderSection from "./PropertyHeaderSection";
+import PropertyHeaderSection from "./PropertyDetailParts/PropertyHeaderSection";
 import WhyToChooseSection from "./PropertyDetailParts/WhyToChooseSection";
 import FloorPlanSection from "./PropertyDetailParts/FloorPlanSection";
 import AboutDeveloperSection from "./PropertyDetailParts/AboutDeveloperSection";
@@ -277,86 +277,38 @@ const PropertyDetails = () => {
     setExpandedIndex(index === expandedIndex ? null : index);
   };
 
-  // const getLeastPriceOfFloorPlan = (floorPlan) => {
-  //   if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
-  //     return 0;
-  //   }
-  //   const sortedFloorPlan = [...floorPlan].sort((a, b) => a.price - b.price);
-  //   return sortedFloorPlan[0].price;
-  // };
 
-  // const getHighestPriceOfFloorPlan = (floorPlan) => {
-  //   if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
-  //     return 0;
-  //   }
-  //   const sortedFloorPlan = [...floorPlan].sort((a, b) => b.price - a.price);
-  //   return sortedFloorPlan[0].price;
-  // };
-// useEffect(() => {
-//   const handleScroll = () => {
-//     const sections = [
-//       "overview",
-//       "about",
-//       "floor",
-//       "amenities",
-//       "video",
-//       "location"
-//     ];
-
-//     if (navInitialPosition !== null) {
-//       const scrollPosition = window.scrollY;
-//       setIsNavFixed(scrollPosition >= navInitialPosition);
-//     }
-
-//     for (const section of sections) {
-//       const element = document.getElementById(section);
-//       if (element) {
-//         const rect = element.getBoundingClientRect();
-//         if (rect.top <= 100 && rect.bottom >= 100) {
-//           setActiveSection(section);
-//           break;
-//         }
-//       }
-//     }
-//   };
-
-//   window.addEventListener("scroll", handleScroll);
-  
-//   return () => {
-//     window.removeEventListener("scroll", handleScroll);
-//   };
-// }, [navInitialPosition]); // Ensure dependencies are correctly set
-
-// PATCH handlers for each section (like ProjectPropertyDetails handleSave)
-const onSaveProjectDetails = async (updatedData) => {
-  // Update local state
-  let newData = property;
-  if (updatedData) {
-    newData = {
-      ...property,
-      ...updatedData
-    };
-    setProperty(newData);
-  }
-
-  // Call PATCH API
+const onSaveProjectDetails = async (newData) => {
+  setProperty(newData);
   try {
-    const propertyId = property?.projectId || property?._id;
-    if (propertyId) {
-      await patchPropertyDetails(propertyId, newData);
-      Swal.fire("Success", "Property details updated!", "success");
+  
+    if (urlName) {
+      const response = await patchPropertyDetails(urlName, newData);
+      console.log("Patch API response:", response);
     } else {
-      Swal.fire("Error", "Property ID not found!", "error");
+      console.error("Property ID not found!");
     }
   } catch (error) {
-    Swal.fire("Error", "Failed to update property details.", "error");
-    console.error(error);
+    console.error("Error saving property data:", error);
   }
 };
 
-const onSaveWhyToChoose = (changedData) => {
-  setProperty(prev => ({ ...prev, ...changedData }));
-  // TODO: Call patchPropertyDetails API here if needed
+const onSaveWhyToChoose = async (changedData) => {
+  setProperty(prev => {
+    const merged = {
+      ...prev,
+      web_cards: {
+        ...prev.web_cards,
+        ...changedData.web_cards,
+      },
+      ...changedData,
+    };
+    // Update backend
+    if (urlName) {
+      patchPropertyDetails(urlName, merged);
+    }
+    return merged;
+  });
 };
 
 // const onSaveFloorPlan = (changedData) => {
@@ -369,9 +321,24 @@ const onSaveAboutDeveloper = (changedData) => {
   // TODO: Call patchPropertyDetails API here if needed
 };
 
-const onSaveKnowAbout = (aboutHtml) => {
-  setProperty(prev => ({ ...prev, about: aboutHtml }));
-  // TODO: Call patchPropertyDetails API here if needed
+const onSaveKnowAbout = async (aboutHtml) => {
+  setProperty(prev => {
+    const merged = {
+      ...prev,
+      web_cards: {
+        ...prev.web_cards,
+        know_about: {
+          ...(prev.web_cards?.know_about || {}),
+          description: aboutHtml,
+        },
+      },
+    };
+    // Update backend
+    if (urlName) {
+      patchPropertyDetails(urlName, merged);
+    }
+    return merged;
+  });
 };
 
 const onSaveAmenities = (newPropertyAmenities, newAmenitiesPara) => {
@@ -383,13 +350,26 @@ const onSaveAmenities = (newPropertyAmenities, newAmenitiesPara) => {
   // TODO: Call patchPropertyDetails API here if needed
 };
 
-const onSaveVideo = ({ videoPara, propertyVideo }) => {
-  setProperty(prev => ({
-    ...prev,
-    videoPara,
-    propertyVideo,
-  }));
-  // TODO: Call patchPropertyDetails API here if needed
+const onSaveVideo = async ({ videoPara, propertyVideo }) => {
+  setProperty(prev => {
+    const merged = {
+      ...prev,
+      videoPara,
+      propertyVideo,
+      web_cards: {
+        ...prev.web_cards,
+        video_presentation: {
+          ...(prev.web_cards?.video_presentation || {}),
+          title: JSON.stringify([videoPara]),
+          video_url: JSON.stringify(propertyVideo),
+        },
+      },
+    };
+    if (urlName) {
+      patchPropertyDetails(urlName, merged);
+    }
+    return merged;
+  });
 };
 
   return (
@@ -777,6 +757,7 @@ const onSaveVideo = ({ videoPara, propertyVideo }) => {
           showPopup={showPopup}
           closePopup={closePopup}
           BrochurePopupDialog={BrochurePopupDialog}
+          onSave={onSaveProjectDetails}
         />
 
         {/* Section 2 */}

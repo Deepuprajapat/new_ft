@@ -4,9 +4,15 @@ const VideoSection = ({ property, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   // Prefer web_cards.video_presentation if present
   const videoPresentation = property?.web_cards?.video_presentation || property?.video_presentation || {};
-  const videoParaInit = property?.videoPara || videoPresentation.title || "";
-  let videoUrlsInit = property?.propertyVideo && property.propertyVideo.length > 0 ? [...property.propertyVideo] : [];
-  if ((!videoUrlsInit || videoUrlsInit.length === 0) && videoPresentation.video_url) {
+  const videoParaInit = videoPresentation.description || property?.videoPara || videoPresentation.title || "";
+  let videoUrlsInit = [];
+  if (videoPresentation.url) {
+    if (Array.isArray(videoPresentation.url)) {
+      videoUrlsInit = videoPresentation.url;
+    } else if (typeof videoPresentation.url === 'string') {
+      videoUrlsInit = [videoPresentation.url];
+    }
+  } else if (videoPresentation.video_url) {
     if (Array.isArray(videoPresentation.video_url)) {
       videoUrlsInit = videoPresentation.video_url;
     } else if (typeof videoPresentation.video_url === 'string') {
@@ -18,6 +24,8 @@ const VideoSection = ({ property, onSave }) => {
         videoUrlsInit = [videoPresentation.video_url];
       }
     }
+  } else if (property?.propertyVideo && property.propertyVideo.length > 0) {
+    videoUrlsInit = [...property.propertyVideo];
   }
   if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
   const [videoPara, setVideoPara] = useState(videoParaInit);
@@ -201,8 +209,8 @@ const VideoSection = ({ property, onSave }) => {
             </>
           ) : (
             <>
-              {/* Show video title/description from videoPara or videoPresentation.title */}
-              {(videoPara || videoPresentation.title) && (
+              {/* Show video description from videoPara, videoPresentation.description, or videoPresentation.title */}
+              {(videoPara || videoPresentation.description || videoPresentation.title) && (
                 <div
                   style={{
                     fontSize: window.innerWidth <= 768 ? "13px" : "15px",
@@ -211,7 +219,7 @@ const VideoSection = ({ property, onSave }) => {
                     marginBottom: "12px"
                   }}
                 >
-                  {videoPara || videoPresentation.title}
+                  {videoPara || videoPresentation.description || videoPresentation.title}
                 </div>
               )}
               <div className="d-flex flex-column">
