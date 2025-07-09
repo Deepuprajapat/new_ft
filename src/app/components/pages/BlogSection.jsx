@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import { sliderSettings } from "../../../utils/common";
 import { getAllBlog } from "../../apis/api";
@@ -67,7 +68,7 @@ useEffect(() => {
 
 const BlogCard = ({ blog, stripHtml, formatDate }) => (
   <div className="itemm">
-    <a href={`/blogs/${blog.blogUrl}`}>
+    <Link to={`/blogs/${blog.blogUrl}`} state={{ blogId: blog.id }}>
       <img
         src={blog?.image || "path/to/default-image.jpg"}
         alt={blog.alt || "Blog Image"}
@@ -76,14 +77,14 @@ const BlogCard = ({ blog, stripHtml, formatDate }) => (
         className="img-fluid"
         fetchpriority="high"
       />
-    </a>
+    </Link>
     <p className="title">{blog.title}</p>
     <small style={{ color: "#666a6f" }}>Date - {formatDate(blog.created_at)}</small>
     <p className="des">{stripHtml(blog.description).slice(0, 100)} . . .</p>
     <hr />
-    <a href={`/blogs/${blog.blog_Url}`} className="theme-btn">
+    <Link to={`/blogs/${blog.blog_url}`} state={{ blogId: blog.id }} className="theme-btn">
       Read More
-    </a>
+    </Link>
   </div>
 );
 
