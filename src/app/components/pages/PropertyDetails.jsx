@@ -70,7 +70,7 @@ const PropertyDetails = () => {
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);
-    setShowImagePopup(true); // Open the popup with the clicked image
+    setShowImagePopup(true); 
   };
 
   const closeImagePopup = () => {
@@ -108,7 +108,7 @@ const PropertyDetails = () => {
 
   // Handle OTP input change
   const handleOtpChange = (e) => setOtp(e.target.value);
-
+  
   // Simulate sending OTP API
   const sendOtp = async () => {
     if (!formData.usermobile || formData.usermobile.length !== 10) {
@@ -164,7 +164,7 @@ const PropertyDetails = () => {
       setOtpVerified(false);
     }
   };
-
+  console.log("usjsfhewkj",urlName)
   // Resend OTP logic
   const resendOtp = async () => {
     try {
@@ -190,27 +190,7 @@ const PropertyDetails = () => {
   }, [timer, otpSent]);
 
   useEffect(() => {
-    // If propertyData is passed from navigation, use it to set property state
-    if (location.state && Object.keys(location.state).length > 0) {
-      // Map the incoming propertyData to the property state format
-      const propertyData = location.state;
-      setProperty({
-        property_name: propertyData.projectName || '',
-        name: propertyData.projectName || '',
-        projectId: propertyData.projectId || '',
-        propertyType: propertyData.propertyType || '',
-        ageOfProperty: propertyData.ageOfProperty || '',
-        floorNo: propertyData.floorNo || '',
-        configuration: propertyData.configuration || '',
-        facing: propertyData.facing || '',
-        furnishing: propertyData.furnishing || '',
-        balconyCount: propertyData.balconyCount || '',
-        bedroomCount: propertyData.bedroomCount || '',
-        coveredParking: propertyData.coveredParking || '',
-        // You can add more fields here as needed
-      });
-       console.log("propertyDatadsj", propertyData)
-    } else if (urlName) {
+    if (urlName) {
       const fetchProperty = async () => {
         const data = await getPropertyByUrlName(urlName);
         setProperty(data.data);
@@ -218,11 +198,10 @@ const PropertyDetails = () => {
       };
       fetchProperty();
     }
-  }, [location.state, urlName]);
+  }, [urlName]);
 
-  // if (!property) return <div>Loading...</div>; // Show a loading message while fetching
+  console.log(property, "propertyuiehuiew" )
 
-  // Process amenities to match the format of amenities.json
   const processAmenities = () => {
     if (!property?.propertyAmenities) return [];
 
@@ -779,7 +758,6 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                 <ProjectPropertyDetails 
                   property={property}
                   onSave={onSaveProjectDetails}
-                  // Pass all relevant property fields as props for display
                   propertyType={property?.propertyType}
                   ageOfProperty={property?.ageOfProperty}
                   floorNo={property?.floorNo}

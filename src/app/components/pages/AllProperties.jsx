@@ -47,7 +47,7 @@ const PropertyListing = () => {
   const [coveredParking, setCoveredParking] = useState("");
 
   const pageSize = 10; // Number of items per page
-
+  const [projectId, setProjectId] = useState("");
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
@@ -175,10 +175,11 @@ const PropertyListing = () => {
     };
 
     try {
-      await saveProperty(propertyData);
-      setShowDetailsModal(false);
-      // Pass data to PropertyDetails page via state
-      navigate(`/propertyforsale/`, { state: propertyData });
+    const response = await saveProperty(propertyData);
+    setShowDetailsModal(false);
+    const propertyId = response?.data?.property_id;
+    setProjectId(selectedProject);
+      navigate(`/propertyforsale/${propertyId}`, { state: propertyData,  projectId: selectedProject  });
     } catch (error) {
       alert('Error saving property: ' + error.message);
     }

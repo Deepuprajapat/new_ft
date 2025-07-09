@@ -141,7 +141,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                   />
                 ) : (
                   <h1 className="h3 mb-0 text-center text-md-start" style={{ fontSize: "20px" }}>
-                    {property?.name || "Property Name"}
+                    {property?.name || property?.projectName || "propert name"}
                     <button
                       className="btn btn-light btn-sm ms-2"
                       onClick={handleEdit}
