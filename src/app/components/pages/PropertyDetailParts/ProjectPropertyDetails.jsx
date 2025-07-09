@@ -31,23 +31,23 @@ const renderedFields = [
   // configurationTypeName is handled separately
 ];
 
-const ProjectPropertyDetails = ({ property, onSave }) => {
-  const [editMode, setEditMode] = useState(false);
-  
-  // State for editable property
-  const [editableProperty, setEditableProperty] = useState({ ...property });
+const ProjectPropertyDetails = ({ property, onSave , ageOfProperty}) => {
+  const [editMode, setEditMode] = useState(false)
+  console.log(property , "propertyprop")
+  console.log(ageOfProperty, "age of proprt")
+  const editProperty = property
 
-  // Helper to get value from all possible sources (modal/appended/API)
+  const [editableProperty, setEditableProperty] = useState({ ...editProperty });
+
   const getDetailValue = (field) => {
-    // Try editableProperty.web_cards.property_details[field].value
     const nested = editableProperty?.web_cards?.property_details?.[field]?.value;
     if (nested !== undefined && nested !== null && nested !== "") return nested;
-
-    // Try direct property fields (camelCase and snake_case)
+    
     if (editableProperty[field] !== undefined && editableProperty[field] !== null && editableProperty[field] !== "") return editableProperty[field];
 
-    // Try common alternate keys for some fields
+
     const altKeys = {
+      built_up_area:["built_up_area"],
       size: ["size"],
       floor_number: ["floor_number", "floorNo"],
       possession_status: ["possession_status", "possessionStatus"],
@@ -60,6 +60,7 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
       facing: ["facing"],
       rera_number: ["rera_number"],
     };
+    console.log(altKeys,"altkeys")
     if (altKeys[field]) {
       for (const key of altKeys[field]) {
         if (editableProperty[key] !== undefined && editableProperty[key] !== null && editableProperty[key] !== "") return editableProperty[key];
@@ -107,7 +108,7 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
 
   const handleCancel = () => {
     setEditMode(false);
-    setEditableProperty({ ...property });
+    setEditableProperty({ ...editProperty });
   };
 
   return (
@@ -161,7 +162,8 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
                     <input type="text" name="built_up_area" value={getDetailValue("built_up_area")}
                       onChange={handleChange} className="form-control" />
                   ) : (
-                    <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px", fontWeight: window.innerWidth <= 768 ? "400" : "800" }}>{property?.web_cards?.property_details?.built_up_area?.value}</p>
+                    <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px", fontWeight: window.innerWidth <= 768 ? "400" : "800" }}>
+                      {property?.web_cards?.property_details?.built_up_area?.value || property?.built_up_area  }</p>
                   )}
                 </div>
               </div>
@@ -210,7 +212,7 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
                     />
                   ) : (
                     <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>
-                      {property?.configuration?.configurationType?.configurationTypeName}
+                      {property?.configuration?.configurationType?.configurationTypeName || property?.configuration}
                     </p>
                   )}
                 </div>
@@ -225,7 +227,7 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
                   {editMode ? (
                     <input type="text" name="possession_status" value={getDetailValue("possession_status") || property?.possessionStatus || property?.possession_status || ""} onChange={handleChange} className="form-control" />
                   ) : (
-                    <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>{property?.web_cards?.property_details?.possession_status?.value || property?.possessionStatus || property?.possession_status || ""}</p>
+                    <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>{property?.web_cards?.property_details?.possession_status?.value || property?.possessionStatus || ""}</p>
                   )}
                 </div>
               </div>
@@ -279,7 +281,7 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
                 <div className="text-center text-md-start">
                   <small style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "11px" : "15px", fontWeight: "600" }}>Type</small>
                   {editMode ? (
-                    <input type="text" name="property_type" value={getDetailValue("property_type") || property?.property_type || ""} onChange={handleChange} className="form-control" />
+                    <input type="text" name="property_type" value={getDetailValue("property_type") || property?.propertyType || ""} onChange={handleChange} className="form-control" />
                   ) : (
                     <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>
                       {property?.web_cards?.property_details?.property_type?.value || property?.property_type || ""}
@@ -297,7 +299,8 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
                   {editMode ? (
                     <input type="text" name="age_of_property" value={getDetailValue("age_of_property")} onChange={handleChange} className="form-control" />
                   ) : (
-                    <p className="mb-0 fw-normal fw-md-bolder text-break" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>{property?.web_cards?.property_details?.age_of_property?.value}</p>
+                    <p className="mb-0 fw-normal fw-md-bolder text-break" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>
+                      {property?.web_cards?.property_details?.age_of_property?.value || property?.ageOfProperty}</p>
                   )}
                 </div>
               </div>
@@ -312,10 +315,7 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
                     <input type="text" name="furnishing_type" value={getDetailValue("furnishing_type")} onChange={handleChange} className="form-control" />
                   ) : (
                     <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>
-                      {property?.web_cards?.property_details?.furnishing_type?.value
-                        ?.toLowerCase()
-                        ?.replace(/_/g, " ")
-                        ?.replace(/\b\w/g, (char) => char.toUpperCase())}
+                      {property?.web_cards?.property_details?.furnishing_type?.value || property?.furnishing}
                     </p>
                   )}
                 </div>
@@ -330,7 +330,7 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
                   {editMode ? (
                     <input type="text" name="facing" value={getDetailValue("facing")} onChange={handleChange} className="form-control" />
                   ) : (
-                    <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>{property?.web_cards?.property_details?.facing?.value}</p>
+                    <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>{property?.web_cards?.property_details?.facing?.value || property?.facing}</p>
                   )}
                 </div>
               </div>
@@ -344,7 +344,7 @@ const ProjectPropertyDetails = ({ property, onSave }) => {
                   {editMode ? (
                     <input type="text" name="rera_number" value={getDetailValue("rera_number")} onChange={handleChange} className="form-control" />
                   ) : (
-                    <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>{property?.web_cards?.property_details?.rera_number?.value}</p>
+                    <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>{property?.web_cards?.property_details?.rera_number?.value }</p>
                   )}
                 </div>
               </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { getAllDeveloper } from '../../../../apis/api';
 import { useNavigate } from 'react-router-dom';
+import { createnewproject, getAllProjectsByUrlName } from '../../../../apis/api';
 
 const AddProject = ({ show, handleClose, onSubmit }) => {
   const navigate = useNavigate();
@@ -9,27 +10,60 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
     project_name: '',
     project_url: '',
     project_type: '',
-    locality: '',
     project_city: '',
     developer_id: '',
+    locality: '',
   });
+
   const [developers, setDevelopers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [developersLoading, setDevelopersLoading] = useState(false);
+  const [projectData, setProjectData] = useState(null);
+
+  const localityOptions = [
+    { value: 'sector 61', label: 'Sector 61' },
+    { value: 'sector 62', label: 'Sector 62' },
+    { value: 'sector 63', label: 'Sector 63' },
+  ];
+
+  const cityOptions = [
+    { value: 'DELHI', label: 'Delhi' },
+    { value: 'NOIDA', label: 'Noida' },
+    { value: 'GURGAON', label: 'Gurgaon' },
+  ];
 
   useEffect(() => {
-    fetchDevelopers();
-  }, []);
+    if (show) { // Only fetch when modal is shown
+      fetchDevelopers();
+    }
+  }, [show]);
 
   const fetchDevelopers = async () => {
+    setDevelopersLoading(true);
     try {
       const response = await getAllDeveloper();
-      if (response && response.data) {
-        setDevelopers(response.data);
+      console.log("Full API response: ", response);
+      
+      // Based on your API structure: {data: Array(10), pagination: {...}}
+      const devs = response?.data?.data?.data || [];
+      
+      console.log("Processed developers: ", devs);
+      
+      // Ensure it's an array and has valid data
+      if (Array.isArray(devs) && devs.length > 0) {
+        setDevelopers(devs);
+        setError('');
+      } else {
+        setDevelopers([]);
+        setError('No developers found');
       }
     } catch (err) {
       setError('Failed to fetch developers');
+      setDevelopers([]);
       console.error('Error fetching developers:', err);
+    } finally {
+      setDevelopersLoading(false);
     }
   };
 
@@ -45,23 +79,52 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // await onSubmit(formData);
-      handleClose();
-      setFormData({
-        projectName: '',
-        projectUrl: '',
-        projectType: '',
-        developerId: ''
-      });
-      // Navigate to ProjectDetails
-      navigate('/ProjectDetails', { replace: true });
-    } catch (err) {
+      // 1. Create the project
+      const response = await createnewproject(formData);
+      const projectId = response.data?.project_id;
+
+      if (projectId) {
+        // 2. Get project details by ID to fetch canonical
+        console.log(projectId, "jbrigr")
+        const propertyResponse = await getAllProjectsByUrlName(projectId);
+        console.log("propertyResponse", propertyResponse);
+        console.log(propertyResponse.meta_info.canonical, "cc")
+
+        // Store the project data in state
+        setProjectData(propertyResponse);
+
+        const canonical = propertyResponse.meta_info.canonical
+        handleClose();
+        setFormData({
+          project_name: '',
+          project_url: '',
+          project_type: '',
+          project_city: '',
+          developer_id: '',
+          locality: '',
+        });
+
+        // 4. Navigate to the canonical URL with project data
+        if (canonical) {
+          navigate(`/${canonical}`, { state: { projectData: propertyResponse } });
+        } else {
+          navigate('/ProjectDetails', { state: { projectData: propertyResponse } });
+        }
+      } else {
+        alert("Project created, but no project ID returned.");
+      }
+    } catch (error) {
       setError('Failed to add project');
-      console.error('Error adding project:', err);
+      console.error('Error adding project:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  // Debug logging
+  console.log("Developers in render:", developers);
+  console.log("Developers length:", developers.length);
+  console.log("Developers loading:", developersLoading);
 
   return (
     <Modal show={show} onHide={handleClose} centered>
@@ -120,8 +183,11 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
               value={formData.developer_id}
               onChange={handleChange}
               required
+              disabled={developersLoading}
             >
-              <option value="">Select Developer</option>
+              <option value="">
+                {developersLoading ? 'Loading developers...' : 'Select Developer'}
+              </option>
               {developers.map((developer) => (
                 <option key={developer.id} value={developer.id}>
                   {developer.name}
@@ -130,11 +196,48 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
             </Form.Select>
           </Form.Group>
 
+          <Form.Group className="mb-3">
+            <Form.Label>Locality</Form.Label>
+            <Form.Select
+              name="locality"
+              value={formData.locality}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Locality</option>
+              {localityOptions.map((loc) => (
+                <option key={loc.value} value={loc.value}>{loc.label}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Project City</Form.Label>
+            <Form.Select
+              name="project_city"
+              value={formData.project_city}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select City</option>
+              {cityOptions.map((city) => (
+                <option key={city.value} value={city.value}>{city.label}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+
           <div className="d-flex justify-content-end gap-2">
+            <Button
+              variant="secondary"
+              onClick={handleClose}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
             <Button
               variant="primary"
               type="submit"
-              disabled={loading}
+              disabled={loading || developersLoading}
             >
               {loading ? 'Adding...' : 'Add Project'}
             </Button>
@@ -145,4 +248,4 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
   );
 };
 
-export default AddProject;   
+export default AddProject;

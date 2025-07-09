@@ -72,7 +72,7 @@ export const getAllLocality = async () => {
 
 export const getAllDeveloper = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/developer/get/all`, {
+    const res = await axios.get(`${BASE_URL2}/v1/api/developers`, {
       headers: {
         "x-auth-token": `${token}`,
       },
@@ -182,6 +182,7 @@ export const getAllProjectsByUrlName = async (Projectid, navigate) => {
     return {};
   }
 };
+
 //patch
 export const patchProjectByTestUrl = async (urlName,patchData) => {
   
@@ -687,6 +688,7 @@ export const getAllLocations = async () => {
 export const patchPropertyDetails = async (propertyId, patchData) => {
   try {
     const token = localStorage.getItem("x-auth-token");
+   
     const res = await axios.patch(
       `${BASE_URL}/properties/${propertyId}`,
       patchData,
@@ -709,6 +711,23 @@ export const saveProperty = async (propertyData) => {
     const res = await axios.post(
       'http://localhost:8080/properties',
       propertyData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error('Error saving property:', error);
+    throw error;
+  }
+};
+
+export const createnewproject = async (projectdata) => {
+  try {
+    const res = await axios.post('http://localhost:8080/v1/api/projects',
+      projectdata,
       {
         headers: {
           'Content-Type': 'application/json',
