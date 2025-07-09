@@ -247,3 +247,17 @@ button a {
 .phoneButton:hover {
   background-color: #0056b3;
 }
+
+@media (min-width: 481px) and (max-width: 1024px) {
+  .phoneButton {
+    width: 120px !important;
+    font-size: 13px !important;
+    margin-left: 10px !important;
+    padding: 6px 4px !important;
+  }
+  .phoneButton a {
+    font-size: 13px !important;
+    word-break: break-all;
+    padding: 0 !important;
+  }
+}
