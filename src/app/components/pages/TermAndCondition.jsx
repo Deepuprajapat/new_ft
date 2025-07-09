@@ -3,8 +3,7 @@ import React from "react";
 const TermAndCondition = () => {
   return (
     <div
-      className="max-w-4xl mx-auto px-4 py-10
-text-gray-800"
+      className="max-w-4xl px-4 py-10 text-gray-800 ml-5"
     >
       <h1
         className="text-3xl

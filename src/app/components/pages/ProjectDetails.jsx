@@ -46,17 +46,17 @@ const parseFlexibleDate = (dateStr) => {
   if (!isNaN(trimmed)) {
     return new Date(Number(trimmed));
   }
-  // Handle "Month Year" or "Month, Year" format
-  if (/^[a-zA-Z]+,?\s+\d{4}$/.test(trimmed)) {
-    const parts = trimmed.replace(',', '').split(/\s+/);
-    const monthName = parts[0];
-    const year = parts[1];
-    const monthIndex = new Date(Date.parse(monthName + " 1, 2000")).getMonth();
-    return new Date(parseInt(year), monthIndex, 1);
+  // Handle "Month Year" or "Month,Year" or "Month, Year" format (Safari/iPhone friendly)
+  const monthYearMatch = trimmed.match(/^([a-zA-Z]+),?\s*(\d{4})$/);
+  if (monthYearMatch) {
+    const monthName = monthYearMatch[1];
+    const year = monthYearMatch[2];
+    // Use a fixed day to avoid Safari issues
+    return new Date(`${monthName} 1, ${year}`);
   }
   // Handle YYYY-MM-DD format
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-    return new Date(trimmed + 'T00:00:00');
+    return new Date(trimmed.replace(/-/g, "/") + "T00:00:00");
   }
   // Handle other formats by converting dashes to slashes (Safari-friendly)
   const safariDate = trimmed.replace(/-/g, "/");
@@ -85,7 +85,7 @@ const ProjectDetails = () => {
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
 
   const navigate = useNavigate();
-
+  console.log(projectData, "project")
   // Store initial nav position on mount
   useEffect(() => {
     const navElement = document.getElementById("navigation-section");
@@ -320,7 +320,6 @@ const ProjectDetails = () => {
       return;
     }
 
-
     if (!formData.usermobile || formData.usermobile.length !== 10) {
       setError("Please enter a valid 10-digit phone number.");
       return;
@@ -475,7 +474,6 @@ const ProjectDetails = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [navInitialPosition]);
 
-
   useEffect(() => {
     const scrollToHash = () => {
       const hash = window.location.hash;
@@ -613,15 +611,13 @@ const ProjectDetails = () => {
     Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
       ? sortedFaqs
       : defaultFaqs.map((faq) => ({
-        question: injectProjectData(faq.question, projectData),
-        answer: injectProjectData(faq.answer, projectData),
-      }));
-
+          question: injectProjectData(faq.question, projectData),
+          answer: injectProjectData(faq.answer, projectData),
+        }));
 
   const validPaymentPlans = projectData?.paymentPlans?.filter(
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   );
-
 
   return (
     <>
@@ -697,7 +693,7 @@ const ProjectDetails = () => {
                             data-toggle="lightbox"
                             data-gallery="gallery"
                             className="d-flex align-items-center justify-content-center w-100 h-100"
-                            onClick={e => {
+                            onClick={(e) => {
                               e.preventDefault();
                               setShowFullScreen(true);
                               setCurrentImageIndex(idx);
@@ -738,7 +734,7 @@ const ProjectDetails = () => {
                               data-toggle="lightbox"
                               data-gallery="gallery"
                               className="d-flex align-items-center justify-content-center w-100 h-100"
-                              onClick={e => {
+                              onClick={(e) => {
                                 e.preventDefault();
                                 setShowFullScreen(true);
                                 setCurrentImageIndex(0);
@@ -749,7 +745,10 @@ const ProjectDetails = () => {
                                 src={projectData?.images[0]?.imageUrl}
                                 loading="lazy"
                                 className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
-                                style={{ objectFit: "cover", cursor: "pointer" }}
+                                style={{
+                                  objectFit: "cover",
+                                  cursor: "pointer",
+                                }}
                                 fetchpriority="high"
                               />
                             </a>
@@ -760,7 +759,7 @@ const ProjectDetails = () => {
                       <div className="col-12 col-md-6 p-0">
                         <div className="row g-0 h-100">
                           {[1, 2, 3, 4].map(
-                            index =>
+                            (index) =>
                               projectData?.images[index] && (
                                 <div
                                   key={index}
@@ -772,7 +771,7 @@ const ProjectDetails = () => {
                                     data-toggle="lightbox"
                                     data-gallery="gallery"
                                     className="d-block h-100"
-                                    onClick={e => {
+                                    onClick={(e) => {
                                       e.preventDefault();
                                       setShowFullScreen(true);
                                       setCurrentImageIndex(index);
@@ -780,7 +779,8 @@ const ProjectDetails = () => {
                                   >
                                     <img
                                       alt={
-                                        projectData?.images[index]?.caption || "Image"
+                                        projectData?.images[index]?.caption ||
+                                        "Image"
                                       }
                                       src={projectData?.images[index]?.imageUrl}
                                       loading="lazy"
@@ -909,8 +909,9 @@ const ProjectDetails = () => {
                 <li key={item} className="mx-1">
                   <a
                     href={`#${item}`}
-                    className={`text-white text-decoration-none ${activeSection === item ? "fw-bold" : ""
-                      }`}
+                    className={`text-white text-decoration-none ${
+                      activeSection === item ? "fw-bold" : ""
+                    }`}
                     style={{
                       fontWeight: activeSection === item ? "bold" : "400",
                       textDecoration:
@@ -1146,7 +1147,7 @@ const ProjectDetails = () => {
                       cursor: "pointer",
                     }}
                     onMouseEnter={() => setShowReraDetails(true)}
-                  // onMouseLeave={() => setShowReraDetails(false)}
+                    // onMouseLeave={() => setShowReraDetails(false)}
                   >
                     Rera
                   </span>
@@ -1408,7 +1409,11 @@ const ProjectDetails = () => {
                   {formatPrice(
                     getHighestPriceOfFloorPlan(projectData?.floorplans)
                   )}
+                  <span style={{ color: "#000000", fontSize: "18px", marginLeft: "4px" }}>*</span>
                 </h2>
+                <div style={{ fontSize: "12px", color: "#888", marginTop: "2px" }}>
+                  *Prices are subject to change and may fluctuate.
+                </div>
               </div>
             </div>
           </div>
@@ -1535,16 +1540,16 @@ const ProjectDetails = () => {
                               }}
                             >
                               {projectData?.floorplans &&
-                                projectData.floorplans.length > 0
+                              projectData.floorplans.length > 0
                                 ? `${Math.min(
-                                  ...projectData.floorplans.map(
-                                    (fp) => fp.size
-                                  )
-                                )} - ${Math.max(
-                                  ...projectData.floorplans.map(
-                                    (fp) => fp.size
-                                  )
-                                )} Sq. Ft.`
+                                    ...projectData.floorplans.map(
+                                      (fp) => fp.size
+                                    )
+                                  )} - ${Math.max(
+                                    ...projectData.floorplans.map(
+                                      (fp) => fp.size
+                                    )
+                                  )} Sq. Ft.`
                                 : "Size not available"}
                             </p>
                           </div>
@@ -1619,18 +1624,23 @@ const ProjectDetails = () => {
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.launchDate?.toLowerCase().includes("coming")
+                              {projectData?.launchDate
+                                ?.toLowerCase()
+                                .includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.launchDate
-                                  ? (() => {
-                                    const dateObj = parseFlexibleDate(projectData.launchDate);
-                                    if (!dateObj || isNaN(dateObj.getTime())) return "-";
+                                ? (() => {
+                                    const dateObj = parseFlexibleDate(
+                                      projectData.launchDate
+                                    );
+                                    if (!dateObj || isNaN(dateObj.getTime()))
+                                      return "-";
                                     return dateObj.toLocaleDateString("en-US", {
                                       year: "numeric",
                                       month: "long",
                                     });
                                   })()
-                                  : "-"}
+                                : "-"}
                             </p>
                           </div>
                         </div>
@@ -1667,18 +1677,23 @@ const ProjectDetails = () => {
                                 marginTop: "2px",
                               }}
                             >
-                              {projectData?.possessionDate?.toLowerCase().includes("coming")
+                              {projectData?.possessionDate
+                                ?.toLowerCase()
+                                .includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.possessionDate
-                                  ? (() => {
-                                    const dateObj = parseFlexibleDate(projectData.possessionDate);
-                                    if (!dateObj || isNaN(dateObj.getTime())) return "-";
+                                ? (() => {
+                                    const dateObj = parseFlexibleDate(
+                                      projectData.possessionDate
+                                    );
+                                    if (!dateObj || isNaN(dateObj.getTime()))
+                                      return "-";
                                     return dateObj.toLocaleDateString("en-US", {
                                       year: "numeric",
                                       month: "long",
                                     });
                                   })()
-                                  : "-"}
+                                : "-"}
                             </p>
                           </div>
                         </div>
@@ -2337,9 +2352,10 @@ const ProjectDetails = () => {
                               />
                               <div className="col-12 mt-2">
                                 <a
-                                  href={`tel:+91${projectData?.locality?.city
-                                    ?.phoneNumber?.[0] || "8595189189"
-                                    }`}
+                                  href={`tel:+91${
+                                    projectData?.locality?.city
+                                      ?.phoneNumber?.[0] || "8595189189"
+                                  }`}
                                   className="btn w-100 py-1"
                                   style={{
                                     backgroundColor: "#fff",
@@ -2530,8 +2546,9 @@ const ProjectDetails = () => {
                     <div className="d-flex gap-2 mb-3">
                       <button
                         onClick={() => setActiveFilter("all")}
-                        className={`btn ${activeFilter === "all" ? "btn-primary" : ""
-                          }`}
+                        className={`btn ${
+                          activeFilter === "all" ? "btn-primary" : ""
+                        }`}
                         style={{
                           border: "2px solid #000",
                           borderRadius: "15px",
@@ -2556,8 +2573,9 @@ const ProjectDetails = () => {
                           <button
                             key={index}
                             onClick={() => setActiveFilter(config)}
-                            className={`btn ${activeFilter === config ? "btn-primary" : ""
-                              }`}
+                            className={`btn ${
+                              activeFilter === config ? "btn-primary" : ""
+                            }`}
                             style={{
                               border: "2px solid #000",
                               borderRadius: "15px",
@@ -2650,8 +2668,8 @@ const ProjectDetails = () => {
                                 <img
                                   src={
                                     plan.imageUrl &&
-                                      plan.imageUrl !== BASE_URL &&
-                                      plan.imageUrl !== ""
+                                    plan.imageUrl !== BASE_URL &&
+                                    plan.imageUrl !== ""
                                       ? plan.imageUrl
                                       : "/images/Floor.png" // Fallback image in other cases
                                   }
@@ -2717,9 +2735,10 @@ const ProjectDetails = () => {
                                 </div>
                                 <div className="d-flex flex-column gap-2 align-items-center">
                                   <a
-                                    href={`tel:+91${projectData?.locality?.city
-                                      ?.phoneNumber?.[0] || "8595189189"
-                                      }`}
+                                    href={`tel:+91${
+                                      projectData?.locality?.city
+                                        ?.phoneNumber?.[0] || "8595189189"
+                                    }`}
                                     className="btn btn-primary w-100"
                                     style={{
                                       fontSize:
@@ -2790,8 +2809,8 @@ const ProjectDetails = () => {
                           <img
                             src={
                               selectedImage &&
-                                selectedImage !== BASE_URL &&
-                                selectedImage !== ""
+                              selectedImage !== BASE_URL &&
+                              selectedImage !== ""
                                 ? selectedImage
                                 : "/images/Floor.png" // Fallback image when no image is available
                             }
@@ -2953,7 +2972,7 @@ const ProjectDetails = () => {
                                 zIndex: 1,
                               }}
                             >
-                              Price
+                              Price 
                             </th>
                           </tr>
                         </thead>
@@ -3012,6 +3031,9 @@ const ProjectDetails = () => {
                               ))}
                         </tbody>
                       </table>
+                      <div style={{ fontSize: "12px", color: "#888", marginTop: "2px" }}>
+                        *Prices are subject to change and may fluctuate.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -3031,14 +3053,16 @@ const ProjectDetails = () => {
               >
                 Get Free Consultation for this property. Call us at:{" "}
                 <a
-                  href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
+                  href={`tel:+91${
+                    projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595189189"
-                    }`}
+                  }`}
                   style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
-                  {`+91-${projectData?.locality?.city?.phoneNumber?.[0] ||
+                  {`+91-${
+                    projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595-189-189"
-                    }`}
+                  }`}
                 </a>
               </div>
               {/* Payment Plan */}
@@ -3248,10 +3272,10 @@ const ProjectDetails = () => {
 
                     <div className="d-flex flex-column">
                       {projectData?.videos &&
-                        projectData.videos.length > 0 &&
-                        projectData.videos.some(
-                          (videoUrl) => videoUrl.trim() !== ""
-                        ) ? (
+                      projectData.videos.length > 0 &&
+                      projectData.videos.some(
+                        (videoUrl) => videoUrl.trim() !== ""
+                      ) ? (
                         projectData.videos.map(
                           (videoUrl, index) =>
                             videoUrl.trim() !== "" && ( // Ignore empty strings
@@ -3261,8 +3285,9 @@ const ProjectDetails = () => {
                               >
                                 <iframe
                                   src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                                  title={`${projectData?.name
-                                    } Video Presentation ${index + 1}`}
+                                  title={`${
+                                    projectData?.name
+                                  } Video Presentation ${index + 1}`}
                                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                   allowFullScreen
                                   style={{
@@ -3472,8 +3497,9 @@ const ProjectDetails = () => {
 
                             // Only allow movement if zoomed in
                             if (scale > 1) {
-                              img.style.transform = `scale(${scale}) translate(${translateX + deltaX
-                                }px, ${translateY + deltaY}px)`;
+                              img.style.transform = `scale(${scale}) translate(${
+                                translateX + deltaX
+                              }px, ${translateY + deltaY}px)`;
                             }
                           };
 
@@ -3483,16 +3509,10 @@ const ProjectDetails = () => {
                               "mousemove",
                               onMouseMove
                             );
-                            document.removeEventListener(
-                              "mouseup",
-                              onMouseUp
-                            );
+                            document.removeEventListener("mouseup", onMouseUp);
                           };
 
-                          document.addEventListener(
-                            "mousemove",
-                            onMouseMove
-                          );
+                          document.addEventListener("mousemove", onMouseMove);
                           document.addEventListener("mouseup", onMouseUp);
                         }}
                       />
@@ -3678,7 +3698,8 @@ const ProjectDetails = () => {
                           src={developerDetails?.logo}
                           className="img-fluid me-3"
                           alt={developerDetails?.altLogo}
-                          loading="lazy"p
+                          loading="lazy"
+                          p
                           style={{ maxWidth: "90px", border: "1px solid grey" }}
                           fetchpriority="high"
                         />
@@ -3711,16 +3732,16 @@ const ProjectDetails = () => {
                                 __html:
                                   expandedIndex === "about"
                                     ? developerDetails.about
-                                      .replace(
-                                        /<ul>/g,
-                                        '<ul style="padding-left: 20px; margin-top: 10px;">'
-                                      )
-                                      .replace(
-                                        /<li>/g,
-                                        '<li style="font-size: 1em; color: #666;">'
-                                      ) // Adds inline styles to <li>
+                                        .replace(
+                                          /<ul>/g,
+                                          '<ul style="padding-left: 20px; margin-top: 10px;">'
+                                        )
+                                        .replace(
+                                          /<li>/g,
+                                          '<li style="font-size: 1em; color: #666;">'
+                                        ) // Adds inline styles to <li>
                                     : developerDetails.about.substring(0, 150) +
-                                    "...",
+                                      "...",
                               }}
                             />
                             <button
@@ -3768,9 +3789,10 @@ const ProjectDetails = () => {
                         <br />
                         <b>Phone:</b>{" "}
                         <a
-                          href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
+                          href={`tel:+91${
+                            projectData?.locality?.city?.phoneNumber?.[0] ||
                             "8595189189"
-                            }`}
+                          }`}
                           style={{
                             textDecoration: "none",
                             color: "#2067d1",
@@ -3794,7 +3816,7 @@ const ProjectDetails = () => {
                               ? handleDownloadBrochuree
                               : handleDownloadBrochure
                           } // Use the correct handler based on screen size
-                        // onClick={handleDownloadBrochure}
+                          // onClick={handleDownloadBrochure}
                         >
                           Click Here
                         </span>
@@ -3914,7 +3936,7 @@ const ProjectDetails = () => {
                           }}
                         >
                           {allSimilarProjects &&
-                            allSimilarProjects.length > 0 ? (
+                          allSimilarProjects.length > 0 ? (
                             allSimilarProjects.map((project, index) => (
                               <div key={index} className="px-2">
                                 <div className="similar_projects_item">
@@ -3989,13 +4011,14 @@ const ProjectDetails = () => {
                                           ></i>
                                           Size Info:{" "}
                                           {project?.configurations &&
-                                            project.configurations.length > 0
-                                            ? `${Math.min(
-                                              ...project.configurations.map(
-                                                (config) => parseInt(config)
-                                              )
-                                            ) + "BHK"
-                                            }`
+                                          project.configurations.length > 0
+                                            ? `${
+                                                Math.min(
+                                                  ...project.configurations.map(
+                                                    (config) => parseInt(config)
+                                                  )
+                                                ) + "BHK"
+                                              }`
                                             : ""}
                                         </p>
                                       )}
