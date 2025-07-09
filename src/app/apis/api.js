@@ -564,11 +564,11 @@ export const getAllProperties = async (page, pageSize, type, configuration, loca
   };
 
   if (type) params.type = type;
-  if (configuration) params.configurationName = configuration;
-  if (locality) params.cityId = locality;
+  if (configuration) params.configuration = configuration; // changed key
+  if (locality) params.city = locality; // changed key
 
   const response = await axios.get(`${BASE_URL2}/v1/api/properties`, { params });
-  return response.data; // Return the full object
+  return response;
 };
 
 
@@ -687,7 +687,7 @@ export const patchProjectDetails = async (projectId, patchData) => {
 // Get all locations
 export const getAllLocations = async () => {
   try {
-    const res = await axios.get('/v1/api/locations');
+    const res = await axios.get(`${BASE_URL2}/v1/api/locations`);
     return res.data?.data || [];
     console.log("Locations fetched successfully:", res.data?.data);
   } catch (error) {
@@ -721,8 +721,7 @@ export const patchPropertyDetails = async (propertyId, patchData) => {
 // Save property to API
 export const saveProperty = async (propertyData) => {
   try {
-    const res = await axios.post(
-      'http://localhost:8080/v1/api/properties',
+    const res = await axios.post(`${BASE_URL2}/v1/api/properties`,
       propertyData,
       {
         headers: {
@@ -739,7 +738,7 @@ export const saveProperty = async (propertyData) => {
 
 export const createnewproject = async (projectdata) => {
   try {
-    const res = await axios.post('http://localhost:8080/v1/api/projects',
+    const res = await axios.post(`${BASE_URL2}/v1/api/projects`,
       projectdata,
       {
         headers: {

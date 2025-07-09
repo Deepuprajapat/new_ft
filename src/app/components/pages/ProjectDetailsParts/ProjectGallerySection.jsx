@@ -153,14 +153,27 @@ const ProjectGallerySection = ({
   const [loadingImg, setLoadingImg] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null); // <-- Add this line
 
+  const IMAGE_BASE_URL = "https://image.investmango.com/project/venkatesh-laurel/";
+
+  function getDisplayUrl(img) {
+    if (!img?.imageUrl) return DUMMY_IMAGE_PATH;
+    if (img.imageUrl.startsWith("blob:") || img.imageUrl.startsWith("data:")) {
+      return img.imageUrl; // Local preview for new uploads
+    }
+    if (!img.imageUrl.startsWith("http")) {
+      return IMAGE_BASE_URL + img.imageUrl; // For file names from DB
+    }
+    return img.imageUrl;
+  }
+
   // Initialize localImages with projectData.web_cards.images (skip first image)
   useEffect(() => {
     // Skip the first image (index 0)
     const images =
       projectData?.web_cards?.images?.length > 1
-        ? projectData.web_cards.images.slice(1).map((url, idx) => ({
-            imageUrl: url,
-            caption: `Image ${idx + 2}`,
+        ? projectData.web_cards.images.slice(1).map((fileName, idx) => ({
+            imageUrl: fileName, // Just the file name
+            caption: fileName,
           }))
         : [];
     setLocalImages(images);
@@ -172,7 +185,6 @@ const ProjectGallerySection = ({
 
   const handleEdit = () => setIsEditing(true);
   const handleSave = () => {
-    // Save images to backend structure (web_cards.images)
     const mainImage = projectData?.web_cards?.images?.[0] || "";
     const imagesArray = [mainImage, ...imageSlots.map(img => img.imageUrl || "")];
     setProjectData({
@@ -202,39 +214,38 @@ const ProjectGallerySection = ({
   const handleImageUpload = (index, event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const newImages = [...localImages];
-        while (newImages.length <= index) {
-          newImages.push({});
+      const newImages = [...localImages];
+      while (newImages.length <= index) {
+        newImages.push({});
+      }
+      newImages[index] = {
+        ...newImages[index],
+        imageUrl: URL.createObjectURL(file), // For preview
+        caption: file.name,                  // For saving
+      };
+      setLocalImages(newImages);
+
+      // Save only file names
+      const mainImage = projectData?.web_cards?.images?.[0] || "";
+      const imagesForWebCards = [
+        mainImage,
+        ...newImages.map(img => img.caption || "")
+      ];
+      setProjectData({
+        ...projectData,
+        web_cards: {
+          ...projectData.web_cards,
+          images: imagesForWebCards
         }
-        newImages[index] = {
-          ...newImages[index],
-          imageUrl: e.target.result,
-          caption: file.name,
-        };
-        setLocalImages(newImages);
-        // Prepare the new images array for web_cards.images (main + others)
-        const mainImage = projectData?.web_cards?.images?.[0] || "";
-        const imagesForWebCards = [mainImage, ...newImages.map(img => img.imageUrl || "")];
-        setProjectData({
-          ...projectData,
+      });
+      if (typeof handleSaveProp === 'function') {
+        handleSaveProp({
           web_cards: {
             ...projectData.web_cards,
             images: imagesForWebCards
           }
         });
-        // Call handleSave only after image is selected/uploaded
-        if (typeof handleSaveProp === 'function') {
-          handleSaveProp({
-            web_cards: {
-              ...projectData.web_cards,
-              images: imagesForWebCards
-            }
-          });
-        }
-      };
-      reader.readAsDataURL(file);
+      }
     }
   };
 

@@ -48,12 +48,13 @@ const PropertyListing = () => {
 
   const pageSize = 10; // Number of items per page
   const [projectId, setProjectId] = useState("");
+  const [allConfigurations, setAllConfigurations] = useState([]);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
   useEffect(() => {
-    fetchProperties(currentPage);
+    fetchProperties(currentPage); 
   }, [
     currentPage,
     selectedPropertyType,
@@ -62,14 +63,17 @@ const PropertyListing = () => {
   ]);
 
   const fetchProperties = async (page) => {
+    const configParam = selectedConfiguration ? selectedConfiguration.replace(/\s+/g, '') : "";
+    const cityParam = selectedLocality || "";
+
     const data = await getAllProperties(
       page,
       pageSize,
       selectedPropertyType || "",
-      selectedConfiguration || "",
-      selectedLocality || ""
+      configParam,
+      cityParam
     );
-    setProperties(data.data?.data || []);
+    setProperties(Array.isArray(data.data?.data?.data) ? data.data.data.data : []);
     setTotalPages(data.data?.pagination?.total_pages || 1);
   };
 
@@ -108,6 +112,12 @@ const PropertyListing = () => {
 
         const response = await getAllLocations();
         setLocalities(response);
+
+        // Fetch all properties to get all configurations
+        const allProps = await getAllProperties(0, 1000, "", "", "");
+        const allConfigs = Array.from(new Set(allProps.data?.data?.data?.map(p => p.configurations))).filter(Boolean);
+        setAllConfigurations(allConfigs);
+
       } catch (error) {
         console.error("Error fetching property data:", error);
       }
@@ -251,7 +261,7 @@ const PropertyListing = () => {
                       }}
                     >
                       <option value="">All Configurations</option>
-                      {configurations.map((config) => (
+                      {allConfigurations.map((config) => (
                         <option key={config} value={config}>
                           {config}
                         </option>
@@ -275,15 +285,11 @@ const PropertyListing = () => {
                       {/* Remove duplicate cities in dropdown */}
                       {Array.from(new Set(localities.map(loc => loc.city ? loc.city.toUpperCase() : '')))
                         .filter(city => city)
-                        .map((city, idx) => {
-                          // Find the first locality with this city to get its id
-                          const firstLoc = localities.find(loc => (loc.city ? loc.city.toUpperCase() : '') === city);
-                          return (
-                            <option key={firstLoc.id} value={firstLoc.id}>
-                              {city}
-                            </option>
-                          );
-                        })}
+                        .map((city, idx) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
                     </select>
 
                     {/* Reset Button with Refresh Icon */}
