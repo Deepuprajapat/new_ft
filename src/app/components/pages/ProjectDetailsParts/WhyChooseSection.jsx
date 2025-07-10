@@ -191,8 +191,7 @@ const WhyChooseSection = ({
                           />
 
                           {isEditing ? (
-                            <input
-                              type="text"
+                            <textarea
                               className="form-control form-control-sm"
                               value={usp}
                               placeholder={`Enter USP ${idx + 1}`}
@@ -222,9 +221,14 @@ const WhyChooseSection = ({
                                 lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",
                                 color: usp ? "inherit" : "#6c757d",
                               }}
-                            >
-                              {usp || `USP ${idx + 1}`}
-                            </span>
+                              dangerouslySetInnerHTML={{
+                                __html: (usp || `USP ${idx + 1}`)
+                                  .replace(/\\r\\n/g, "\n")
+                                  .replace(/\\n/g, "\n")
+                                  .replace(/\\r/g, "\r")
+                                  .replace(/(\r\n|\n|\r)/g, "<br />")
+                              }}
+                            />
                           )}
                         </div>
                       </div>

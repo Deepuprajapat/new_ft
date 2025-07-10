@@ -1,42 +1,47 @@
 import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 
+const PaymentPlanSection = ({ projectData, showEdit, handleSave }) => {
+  const getPaymentPlansFromData = (data) => {
+    return data?.web_cards?.payment_plans?.plans?.map(plan => ({
+      planName: plan.name,
+      details: plan.details,
+    })) || data?.paymentPlans || [];
+  };
 
-const PaymentPlanSection = ({ projectData, showEdit , handleSave }) => {
+  const getPaymentDescriptionFromData = (data) => {
+    return data?.web_cards?.payment_plans?.description || data?.paymentPara || "";
+  };
 
   const [localPaymentPlans, setLocalPaymentPlans] = useState(
-    projectData?.paymentPlans || []
+    getPaymentPlansFromData(projectData)
   );
   const [localPaymentPara, setLocalPaymentPara] = useState(
-    projectData?.paymentPara || ""
+    getPaymentDescriptionFromData(projectData)
   );
   const [isPaymentEditing, setIsPaymentEditing] = useState(false);
-  // Sync with projectData when not editing
+
   useEffect(() => {
     if (!isPaymentEditing) {
-      setLocalPaymentPlans(projectData?.paymentPlans || []);
-      setLocalPaymentPara(projectData?.paymentPara || "");
+      setLocalPaymentPlans(getPaymentPlansFromData(projectData));
+      setLocalPaymentPara(getPaymentDescriptionFromData(projectData));
     }
   }, [projectData, isPaymentEditing]);
 
-  // Update a payment plan row
   const updatePaymentPlan = (index, field, value) => {
     setLocalPaymentPlans((prev) =>
       prev.map((plan, i) => (i === index ? { ...plan, [field]: value } : plan))
     );
   };
 
-  // Remove a payment plan row
   const removePaymentPlan = (index) => {
     setLocalPaymentPlans((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Add a new payment plan row
   const addNewPaymentPlan = () => {
     setLocalPaymentPlans((prev) => [...prev, { planName: "", details: "" }]);
   };
 
-  // Save changes
   const handleSaveChanges = () => {
     const updatedData = {
       ...projectData,
@@ -44,31 +49,32 @@ const PaymentPlanSection = ({ projectData, showEdit , handleSave }) => {
       paymentPara: localPaymentPara,
       web_cards: {
         ...projectData.web_cards,
-        payment_plan: {
-          ...projectData.web_cards?.payment_plan,
-          description: localPaymentPara
+        payment_plans: {
+          ...projectData.web_cards?.payment_plans,
+          description: localPaymentPara,
+          plans: localPaymentPlans.map(plan => ({
+            name: plan.planName,
+            details: plan.details,
+          }))
         }
       }
     };
+    console.log("Saving payment plan:", updatedData);
     handleSave(updatedData);
     setIsPaymentEditing(false);
   };
 
-  // Cancel editing and reset changes
   const handleCancel = () => {
-    setLocalPaymentPlans(projectData?.paymentPlans || []);
-    setLocalPaymentPara(projectData?.paymentPara || "");
+    setLocalPaymentPlans(getPaymentPlansFromData(projectData));
+    setLocalPaymentPara(getPaymentDescriptionFromData(projectData));
     setIsPaymentEditing(false);
   };
 
   const validPaymentPlans = (
-    isPaymentEditing ? localPaymentPlans : projectData?.paymentPlans
+    isPaymentEditing ? localPaymentPlans : getPaymentPlansFromData(projectData)
   )?.filter(
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   );
-
-  // Only hide if not editing AND no plans at all
-  if (!isPaymentEditing && !validPaymentPlans?.length) return null;
 
   return (
     <div
@@ -99,6 +105,7 @@ const PaymentPlanSection = ({ projectData, showEdit , handleSave }) => {
                       fontWeight: "bold",
                       padding: "2px 10px",
                       fontSize: "14px",
+                      marginRight: "8px",
                     }}
                     onClick={handleSaveChanges}
                   >
@@ -144,7 +151,7 @@ const PaymentPlanSection = ({ projectData, showEdit , handleSave }) => {
             onInput={(e) => setLocalPaymentPara(e.currentTarget.innerHTML)}
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(
-                isPaymentEditing ? localPaymentPara : projectData?.paymentPara
+                isPaymentEditing ? localPaymentPara : getPaymentDescriptionFromData(projectData)
               ),
             }}
           />
@@ -233,20 +240,16 @@ const PaymentPlanSection = ({ projectData, showEdit , handleSave }) => {
                         </td>
                         <td>
                           <img
-                            src="/images/delete1.png" // update this path as needed
-                            onClick={() =>
-                              setLocalPaymentPlans((prev) =>
-                                prev.filter((_, i) => i !== index)
-                              )
-                            }
+                            src="/images/delete1.png"
+                            onClick={() => removePaymentPlan(index)}
                             style={{
                               padding: "4px",
                               width: "30px",
-                              marginTop: "10px", // adjust size as needed
-                              height: "30px", // adjust size as needed
+                              marginTop: "10px",
+                              height: "30px",
                               verticalAlign: "middle",
                               cursor: "pointer",
-                              marginLeft: "10px", // optional spacing
+                              marginLeft: "10px",
                             }}
                           />
                         </td>

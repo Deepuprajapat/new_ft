@@ -50,7 +50,7 @@ const router = createBrowserRouter([
       { path: "/developerPage", element: <DeveloperPage /> },
       { path: "/:urlName", element: <ProjectDetails /> },
       { path: "/propertyforsale", element: <PropertyDetails /> },
-      { path: "/propertyforsale/:urlName", element: <PropertyDetails /> },
+      { path: "/propertyforsale/:id", element: <PropertyDetails /> },
       { path: "/featuredProperties", element: <FeaturedProperties /> },
       { path: "/thankYou", element: <ThankYouPage /> },
       { path: "*", element: <NotFound /> }, // Not Found route

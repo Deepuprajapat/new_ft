@@ -2,51 +2,66 @@ import React, { useState, useEffect } from "react";
 
 const VideoSection = ({ property, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
+
+  // Extract video ID from full URL or return raw ID
+  const extractVideoId = (url) => {
+    if (!url) return "";
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.hostname.includes("youtu.be")) {
+        return urlObj.pathname.slice(1);
+      }
+      if (urlObj.hostname.includes("youtube.com")) {
+        return urlObj.searchParams.get("v");
+      }
+    } catch {
+      return url; // Assume it's already an ID
+    }
+    return url;
+  };
+
   // Prefer web_cards.video_presentation if present
   const videoPresentation = property?.web_cards?.video_presentation || property?.video_presentation || {};
-  const videoParaInit = videoPresentation.description || property?.videoPara || videoPresentation.title || "";
+  const videoParaInit = property?.web_cards?.video_presentation?.description || property?.videoPara || videoPresentation.title || "";
+console.log("fhudfhiuhu",videoParaInit)
   let videoUrlsInit = [];
-  if (videoPresentation.url) {
-    if (Array.isArray(videoPresentation.url)) {
-      videoUrlsInit = videoPresentation.url;
-    } else if (typeof videoPresentation.url === 'string') {
-      videoUrlsInit = [videoPresentation.url];
+
+if (Array.isArray(videoPresentation.urls)) {
+  videoUrlsInit = videoPresentation.urls;
+} else if (videoPresentation.url) {
+  videoUrlsInit = Array.isArray(videoPresentation.url)
+    ? videoPresentation.url
+    : [videoPresentation.url];
+} else if (videoPresentation.video_url) {
+  if (Array.isArray(videoPresentation.video_url)) {
+    videoUrlsInit = videoPresentation.video_url;
+  } else if (typeof videoPresentation.video_url === "string") {
+    try {
+      const parsed = JSON.parse(videoPresentation.video_url);
+      videoUrlsInit = Array.isArray(parsed) ? parsed : [videoPresentation.video_url];
+    } catch {
+      videoUrlsInit = [videoPresentation.video_url];
     }
-  } else if (videoPresentation.video_url) {
-    if (Array.isArray(videoPresentation.video_url)) {
-      videoUrlsInit = videoPresentation.video_url;
-    } else if (typeof videoPresentation.video_url === 'string') {
-      try {
-        const parsed = JSON.parse(videoPresentation.video_url);
-        if (Array.isArray(parsed)) videoUrlsInit = parsed;
-        else videoUrlsInit = [videoPresentation.video_url];
-      } catch {
-        videoUrlsInit = [videoPresentation.video_url];
-      }
-    }
-  } else if (property?.propertyVideo && property.propertyVideo.length > 0) {
-    videoUrlsInit = [...property.propertyVideo];
   }
-  if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
+} else if (property?.propertyVideo?.length > 0) {
+  videoUrlsInit = [...property.propertyVideo];
+}
+
+if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
+
   const [videoPara, setVideoPara] = useState(videoParaInit);
   const [videos, setVideos] = useState(videoUrlsInit);
 
   useEffect(() => {
-    if (!isEditing) {
-      setVideoPara(videoParaInit);
-      setVideos(videoUrlsInit);
-    }
-    // eslint-disable-next-line
-  }, [isEditing, property]);
+    setVideoPara(videoParaInit);
+    setVideos(videoUrlsInit);
+  }, [property]);
 
-
-  // Utility to get only changed fields for video section
   const getChangedFields = (original, edited) => {
     const changed = {};
     if ((original.videoPara || "") !== (edited.videoPara || "")) {
       changed.videoPara = edited.videoPara;
     }
-    // Compare propertyVideo arrays
     const origVideos = Array.isArray(original.propertyVideo) ? original.propertyVideo.filter(v => v.trim() !== "") : [];
     const editVideos = Array.isArray(edited.propertyVideo) ? edited.propertyVideo.filter(v => v.trim() !== "") : [];
     if (origVideos.length !== editVideos.length || origVideos.some((v, i) => v !== editVideos[i])) {
@@ -67,7 +82,7 @@ const VideoSection = ({ property, onSave }) => {
   const handleCancel = () => {
     setIsEditing(false);
     setVideoPara(property?.videoPara || "");
-    setVideos(property?.propertyVideo && property.propertyVideo.length > 0 ? [...property.propertyVideo] : [""]);
+    setVideos(property?.propertyVideo?.length > 0 ? [...property.propertyVideo] : [""]);
   };
 
   const handleVideoChange = (index, value) => {
@@ -83,11 +98,7 @@ const VideoSection = ({ property, onSave }) => {
   };
 
   return (
-    <div
-      className="mb-4"
-      id="video"
-      style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-    >
+    <div className="mb-4" id="video" style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
       <div className="p-0 pb-2">
         <h4
           className="mb-3 py-2 fw-bold text-white ps-3 d-flex justify-content-between align-items-center"
@@ -97,20 +108,33 @@ const VideoSection = ({ property, onSave }) => {
             borderRadius: "4px 4px 0 0",
           }}
         >
-          Video Presentation of {property && property?.propertyName}
+          Video Presentation 
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isEditing ? (
               <>
                 <button
                   className="btn btn-success btn-sm"
-                  style={{ backgroundColor: "white", color: "#2067d1", border: "1px solid #2067d1", fontWeight: "bold", padding: "2px 10px", fontSize: "14px" }}
+                  style={{
+                    backgroundColor: "white",
+                    color: "#2067d1",
+                    border: "1px solid #2067d1",
+                    fontWeight: "bold",
+                    padding: "2px 10px",
+                    fontSize: "14px",
+                  }}
                   onClick={handleSave}
                 >
                   Save
                 </button>
                 <button
                   className="btn btn-secondary btn-sm"
-                  style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width: "auto" }}
+                  style={{
+                    marginLeft: 8,
+                    backgroundColor: "#6c757d",
+                    color: "white",
+                    fontWeight: "bold",
+                    width: "auto",
+                  }}
                   onClick={handleCancel}
                 >
                   Cancel
@@ -195,7 +219,7 @@ const VideoSection = ({ property, onSave }) => {
               {videos.filter(v => v.trim() !== "").map((videoUrl, index) => (
                 <div key={index} className="ratio ratio-16x9 mb-3">
                   <iframe
-                    src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
+                    src={`https://www.youtube.com/embed/${extractVideoId(videoUrl)}?rel=0&modestbranding=1&origin=${window.location.origin}`}
                     title={`${property?.propertyName} Video Presentation ${index + 1}`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -209,7 +233,6 @@ const VideoSection = ({ property, onSave }) => {
             </>
           ) : (
             <>
-              {/* Show video description from videoPara, videoPresentation.description, or videoPresentation.title */}
               {(videoPara || videoPresentation.description || videoPresentation.title) && (
                 <div
                   style={{
@@ -223,11 +246,11 @@ const VideoSection = ({ property, onSave }) => {
                 </div>
               )}
               <div className="d-flex flex-column">
-                {videos && videos.filter(v => v.trim() !== "").length > 0 ? (
+                {videos.filter(v => v.trim() !== "").length > 0 ? (
                   videos.filter(v => v.trim() !== "").map((videoUrl, index) => (
                     <div key={index} className="ratio ratio-16x9 mb-3">
                       <iframe
-                        src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
+                        src={`https://www.youtube.com/embed/${extractVideoId(videoUrl)}?rel=0&modestbranding=1&origin=${window.location.origin}`}
                         title={`${property?.propertyName} Video Presentation ${index + 1}`}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
@@ -243,8 +266,7 @@ const VideoSection = ({ property, onSave }) => {
                     style={{
                       width: "100%",
                       height: "160px",
-                      backgroundImage:
-                        "url('/images/investmango-youtube-banner.webp')",
+                      backgroundImage: "url('/images/investmango-youtube-banner.webp')",
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       borderRadius: "8px",
@@ -270,4 +292,4 @@ const VideoSection = ({ property, onSave }) => {
   );
 };
 
-export default VideoSection; 
+export default VideoSection;

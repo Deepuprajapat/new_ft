@@ -12,17 +12,29 @@ const VideoPresentationSection = ({
   showEdit,
   handleSave,
 }) => {
-  // Always keep videoPara in sync with API/projectData when not editing
   const [videoPara, setVideoPara] = useState(projectData?.web_cards?.video_presentation?.description || projectData?.videoPara || '');
-  const [videoUrl, setVideoUrl] = useState(projectData?.web_cards?.video_presentation?.url || '');
+  
+  const getVideoUrlFromData = (data) => {
+    const videoPresentation = data?.web_cards?.video_presentation;
+    if (videoPresentation?.url) {
+      return videoPresentation.url;
+    }
+    if (videoPresentation?.urls && Array.isArray(videoPresentation.urls) && videoPresentation.urls.length > 0) {
+      return videoPresentation.urls[0];
+    }
+    return '';
+  };
+
+  const [videoUrl, setVideoUrl] = useState(getVideoUrlFromData(projectData));
+  
   const handleCancel = () => setIsVideoEditing(false);
 
   useEffect(() => {
     if (!isVideoEditing) {
       setVideoPara(projectData?.web_cards?.video_presentation?.description || projectData?.videoPara || '');
-      setVideoUrl(projectData?.web_cards?.video_presentation?.url || '');
+      setVideoUrl(getVideoUrlFromData(projectData));
     }
-  }, [isVideoEditing, projectData?.web_cards?.video_presentation?.description, projectData?.videoPara, projectData?.web_cards?.video_presentation?.url]);
+  }, [isVideoEditing, projectData?.web_cards?.video_presentation?.description, projectData?.videoPara, projectData?.web_cards?.video_presentation?.url, projectData?.web_cards?.video_presentation?.urls]);
 
   const handleSaveChanges = () => {
     const updatedData = {
@@ -34,6 +46,7 @@ const VideoPresentationSection = ({
           ...(projectData.web_cards?.video_presentation || {}),
           description: videoPara,
           url: videoUrl,
+          urls: videoUrl ? [videoUrl] : [],
         },
       },
     };
@@ -41,8 +54,29 @@ const VideoPresentationSection = ({
     setIsVideoEditing(false);
   };
 
-  // Get video URL from backend (single string)
-  const videoPresentationUrl = projectData?.web_cards?.video_presentation?.url || '';
+  const videoPresentationUrl = getVideoUrlFromData(projectData);
+
+  const getEmbedUrl = (urlOrId) => {
+    if (!urlOrId || urlOrId.trim() === '') return '';
+    
+    if (urlOrId.startsWith('http')) {
+      return urlOrId;
+    }
+    
+    let videoId = urlOrId;
+    
+    if (urlOrId.includes('youtube.com/watch?v=')) {
+      videoId = urlOrId.split('v=')[1].split('&')[0];
+    }
+    else if (urlOrId.includes('youtu.be/')) {
+      videoId = urlOrId.split('youtu.be/')[1].split('?')[0];
+    }
+    else if (urlOrId.includes('youtube.com/embed/')) {
+      videoId = urlOrId.split('embed/')[1].split('?')[0];
+    }
+    
+    return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&origin=${window.location.origin}`;
+  };
 
   return (
     <div
@@ -105,7 +139,6 @@ const VideoPresentationSection = ({
           )}
         </h2>
         <div className="px-3">
-          {/* Video description: show textarea in place when editing, otherwise show text */}
           {isVideoEditing ? (
             <>
               <textarea
@@ -131,7 +164,7 @@ const VideoPresentationSection = ({
                   className="form-control mb-0"
                   value={videoUrl}
                   onChange={e => setVideoUrl(e.target.value)}
-                  placeholder="Enter YouTube video link or ID"
+                  placeholder="Enter YouTube video link or ID (e.g., jFTncG2IZxY)"
                   style={{
                     fontSize: window.innerWidth <= 768 ? "13px" : "15px",
                     color: "#333",
@@ -165,9 +198,7 @@ const VideoPresentationSection = ({
               {videoUrl.trim() !== '' && (
                 <div className="ratio ratio-16x9 mb-3">
                   <iframe
-                    src={videoUrl.startsWith('http')
-                      ? videoUrl
-                      : `https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
+                    src={getEmbedUrl(videoUrl)}
                     title={`${projectData?.name} Video Presentation`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -189,7 +220,6 @@ const VideoPresentationSection = ({
                     fontWeight: 500,
                     marginBottom: "12px"
                   }}
-                  // Only render plain text, strip HTML tags
                   >
                   {DOMPurify.sanitize(projectData.web_cards.video_presentation.description, {ALLOWED_TAGS: []})}
                 </div>
@@ -197,9 +227,7 @@ const VideoPresentationSection = ({
               {videoPresentationUrl && videoPresentationUrl.trim() !== '' ? (
                 <div className="ratio ratio-16x9 mb-3">
                   <iframe
-                    src={videoPresentationUrl.startsWith('http')
-                      ? videoPresentationUrl
-                      : `https://www.youtube.com/embed/${videoPresentationUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
+                    src={getEmbedUrl(videoPresentationUrl)}
                     title={`${projectData?.name} Video Presentation`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen

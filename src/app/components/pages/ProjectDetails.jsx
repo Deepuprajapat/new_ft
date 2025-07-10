@@ -158,6 +158,7 @@ const ProjectDetails = () => {
   //     [field]: value
   //   }));
   // };
+ 
 
   const [expandedIndex, setExpandedIndex] = useState(null);
 
@@ -181,7 +182,8 @@ const ProjectDetails = () => {
 
   // Call PATCH API with the updated data
   try {
-    const response = await patchProjectByTestUrl(projectIdFromNav,newData);
+    const projectId = projectIdFromNav || projectDataFromState?.project_id;
+    const response = await patchProjectByTestUrl(projectId,newData);
     console.log("Patch API response:", response);
   } catch (error) {
     console.error("Error saving project data:", error);
@@ -189,6 +191,7 @@ const ProjectDetails = () => {
 
   setIsEditing(false);
 };
+ 
 
 
   const handleInputChange = (field, value) => {
@@ -287,7 +290,6 @@ const ProjectDetails = () => {
             setProjectData(data);
             setDeveloperId(data.developerId);
             setProjectId(data.id);
-  
             if (Array.isArray(data.schema) && data.schema.length > 0) {
               const parsedSchemas = data.schema
                 .map((schemaStr) => {
@@ -318,7 +320,19 @@ const ProjectDetails = () => {
     fetchData();
   }, [urlName, navigate]);
   
+  useEffect(() => {
+    const Pid = projectDataFromState?.project_id;
+    console.log(projectIdFromNav, Pid, "pppp");
+  
+    // If both are missing, navigate to 404
+    if (!Pid && !projectIdFromNav) {
+      navigate("/404", { replace: true });
+    }
+  }, [projectIdFromNav, projectDataFromState, navigate]);
+  
+  
 
+  
   useEffect(() => {
     if (projectData) {
       const fetchAllProject = async () => {

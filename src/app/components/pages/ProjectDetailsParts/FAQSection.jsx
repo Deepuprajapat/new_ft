@@ -15,6 +15,10 @@ function isValidFaq(faq) {
 }
 
 function cleanQuestion(question) {
+  if (typeof question !== "string") {
+    return { number: null, text: "" }; // or handle however you want
+  }
+
   const match = question.match(/^(\d+)[.\s\t]+(.*)/);
   return match
     ? { number: parseInt(match[1]), text: match[2] }

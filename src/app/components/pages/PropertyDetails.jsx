@@ -38,7 +38,7 @@ const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
 
 const PropertyDetails = () => {
   const location = useLocation();
-  const { urlName } = useParams(); // Get urlName from route params
+  const { id } = useParams(); // Get id from route params
   const [property, setProperty] = useState(null);
   const [expandedIndex, setExpandedIndex] = useState(null); // To track which FAQ is expanded
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -164,7 +164,7 @@ const PropertyDetails = () => {
       setOtpVerified(false);
     }
   };
-  console.log("usjsfhewkj",urlName)
+  console.log("usjsfhewkj",id)
   // Resend OTP logic
   const resendOtp = async () => {
     try {
@@ -190,15 +190,15 @@ const PropertyDetails = () => {
   }, [timer, otpSent]);
 
   useEffect(() => {
-    if (urlName) {
+    if (id) {
       const fetchProperty = async () => {
-        const data = await getPropertyByUrlName(urlName);
+        const data = await getPropertyByUrlName(id);
         setProperty(data.data);
         console.log("datayhdsj", data.data);
       };
       fetchProperty();
     }
-  }, [urlName]);
+  }, [id]);
 
   console.log(property, "propertyuiehuiew" )
 
@@ -261,8 +261,8 @@ const onSaveProjectDetails = async (newData) => {
   setProperty(newData);
   try {
   
-    if (urlName) {
-      const response = await patchPropertyDetails(urlName, newData);
+    if (id) {
+      const response = await patchPropertyDetails(id, newData);
       console.log("Patch API response:", response);
     } else {
       console.error("Property ID not found!");
@@ -283,8 +283,8 @@ const onSaveWhyToChoose = async (changedData) => {
       ...changedData,
     };
     // Update backend
-    if (urlName) {
-      patchPropertyDetails(urlName, merged);
+    if (id) {
+      patchPropertyDetails(id, merged);
     }
     return merged;
   });
@@ -313,8 +313,8 @@ const onSaveKnowAbout = async (aboutHtml) => {
       },
     };
     // Update backend
-    if (urlName) {
-      patchPropertyDetails(urlName, merged);
+    if (id) {
+      patchPropertyDetails(id, merged);
     }
     return merged;
   });
@@ -344,8 +344,8 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
         },
       },
     };
-    if (urlName) {
-      patchPropertyDetails(urlName, merged);
+    if (id) {
+      patchPropertyDetails(id, merged);
     }
     return merged;
   });
@@ -1110,7 +1110,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
 
               {/* Amenities */}
               <AmenitiesSection
-                property={property}
+              property={property}
                 processAmenities={processAmenities}
                 onSave={onSaveAmenities}
               />

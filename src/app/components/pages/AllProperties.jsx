@@ -135,9 +135,9 @@ const PropertyListing = () => {
     return price.toLocaleString(); // For smaller values, format with commas
   };
 
-  const handleMoreDetail = (url) => {
+  const handleMoreDetail = (id) => {
     window.open(
-      `/propertyforsale/${url.toLowerCase().replace(/\s+/g, "-")}`,
+      `/propertyforsale/${id.toLowerCase().replace(/\s+/g, "-")}`,
       "_blank",
       "noopener,noreferrer"
     );
@@ -447,7 +447,7 @@ const PropertyListing = () => {
                                       </div>
                                     </div>
                                     <button
-                                      onClick={() => handleMoreDetail(property?.id)}
+                                      onClick={() => handleMoreDetail(property?.id,property?.meta_info?.canonical)}
                                       className="theme-btn"
                                     >
                                       Contact Details

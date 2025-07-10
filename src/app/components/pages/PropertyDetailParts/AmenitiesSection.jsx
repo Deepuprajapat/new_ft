@@ -1,6 +1,20 @@
 import React from "react";
 
-const AmenitiesSection = ({ property, processAmenities }) => (
+// Helper function to process amenities from web_cards.amenities
+const processAmenities = (property) => {
+  const raw = property?.web_cards?.amenities?.categories_with_amenities || {};
+  return Object.keys(raw).map((categoryKey) => ({
+    name: categoryKey.toLowerCase(),
+    assets: raw[categoryKey].map(item => ({
+      name: item.value
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase()),
+      icon: item.icon,
+    })),
+  }));
+};
+
+const AmenitiesSection = ({ property }) => (
   <div
     className="mb-4"
     id="amenities"
@@ -22,10 +36,10 @@ const AmenitiesSection = ({ property, processAmenities }) => (
           className="mb-3"
           style={{ fontSize: window.innerWidth <= 768 ? "12px" : "16px" }}
         >
-          {property?.amenitiesPara ? (
+          {property?.web_cards?.amenities?.description ? (
             <div
               dangerouslySetInnerHTML={{
-                __html: property.amenitiesPara,
+                __html: property.web_cards.amenities.description,
               }}
             />
           ) : (
@@ -34,11 +48,12 @@ const AmenitiesSection = ({ property, processAmenities }) => (
             </p>
           )}
         </p>
+
         <div
           className="inner-item"
           style={{ height: "400px", overflowY: "auto", overflowX: "hidden" }}
         >
-          {processAmenities()?.map((category, categoryIndex) => (
+          {processAmenities(property)?.map((category, categoryIndex) => (
             <div key={categoryIndex}>
               <p
                 className="fw-bolder mb-3"
@@ -65,7 +80,11 @@ const AmenitiesSection = ({ property, processAmenities }) => (
                         src={amenity.icon}
                         alt={amenity.name}
                         loading="lazy"
-                        style={{ width: "35px", height: "35px", marginRight: "16px" }}
+                        style={{
+                          width: "35px",
+                          height: "35px",
+                          marginRight: "16px",
+                        }}
                       />
                       {amenity.name}
                     </div>
@@ -80,4 +99,4 @@ const AmenitiesSection = ({ property, processAmenities }) => (
   </div>
 );
 
-export default AmenitiesSection; 
+export default AmenitiesSection;
