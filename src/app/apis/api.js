@@ -14,15 +14,14 @@ console.log("SECONDARY_URL", SECONDARY_URL);
 
 let token = "";
 
-export const login = async (userName, password) => {
+export const login = async (email, password) => {
   try {
     const response = await axios.post(`${BASE_URL}/auth/generate-token`, {
-      userName,
+      email,
       password,
     });
-    token = response.data.token;
+    token = response.data.data.access_token;
     localStorage.setItem("authToken", token);
-    localStorage.setItem("userName", userName);
     return token;
   } catch (error) {
     console.error("Login failed:", error);
