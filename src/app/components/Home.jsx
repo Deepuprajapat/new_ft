@@ -1,6 +1,5 @@
 // src/components/Head.js
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../components/styles/css/style.css";
 import "../components/styles/css/Head.css";
@@ -20,14 +19,10 @@ import "./Home.css";
 import SearchBar from "./pages/SearchBar"; // Import the SearchBar component
 import { Helmet } from "react-helmet";
 import Loading from "./Loader";
-import { getAuthToken, isAuthenticated } from "../utils/cookieUtils";
-import AuthNavbar from "./AuthNavbar";
 
 const Head = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userToken, setUserToken] = useState(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -38,32 +33,6 @@ const Head = () => {
     };
     fetchProjects();
   }, []);
-
-  // Check authentication status on component mount
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = getAuthToken();
-      const authenticated = isAuthenticated();
-      
-      setIsLoggedIn(authenticated);
-      setUserToken(token);
-      
-      if (authenticated) {
-        console.log('User is authenticated with token:', token);
-        // You can use the token here for authenticated API calls
-      } else {
-        console.log('User is not authenticated');
-      }
-    };
-    
-    checkAuth();
-  }, []);
-
-  const handleLogout = () => {
-    // Update state
-    setIsLoggedIn(false);
-    setUserToken(null);
-  };
 
   const swiperRef = useRef(null);
 
@@ -116,10 +85,9 @@ const Head = () => {
           name="keyword"
         />
       </Helmet>
-      
-      <AuthNavbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
-      
       <section className="main-body">
+        {/* Render the SearchBar Component */}
+        {/*  */}
         <div className="main-slider">
           <div className="form-top-home">
             <div className="container">

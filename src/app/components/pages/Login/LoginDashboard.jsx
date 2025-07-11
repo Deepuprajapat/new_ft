@@ -1,48 +1,20 @@
 import React, { useState } from 'react';
-import { login } from '../../../apis/api';
-import { useNavigate } from 'react-router-dom';
-import { setCookie } from '../../../utils/cookieUtils';
 
 const LoginDashboard = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    
     // Simple validation
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
     }
-    
-    setIsLoading(true);
     setError('');
-    
-    try {
-      console.log(email , password , "password")
-      const token = await login(email, password);
-      console.log('Login successful, token:', token);
-      
-      // Set token in cookie using utility function
-      setCookie('authToken', token, 7);
-      
-      // Also store in localStorage as backup
-      localStorage.setItem('authToken', token);
-      
-      console.log('Token stored in cookie and localStorage');
-      
-      navigate('/');         // Redirect to home
-  window.location.reload()
-    } catch (error) {
-      console.error('Login failed:', error);
-      setError('Invalid email or password. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Add your login logic here
+    alert('Logged in!');
   };
 
   return (
@@ -150,9 +122,8 @@ const LoginDashboard = () => {
           <button
             type="submit"
             className="btn btn-primary w-100"
-            disabled={isLoading}
             style={{
-              background: isLoading ? '#cccccc' : '#2067d1',
+              background: '#2067d1',
               border: 'none',
               borderRadius: '12px',
               fontWeight: 600,
@@ -161,23 +132,18 @@ const LoginDashboard = () => {
               height: '54px',
               marginTop: '16px',
               boxShadow: '0 4px 16px rgba(56, 69, 89, 0.13)',
-              transition: 'background 0.2s, box-shadow 0.2s',
-              cursor: isLoading ? 'not-allowed' : 'pointer'
+              transition: 'background 0.2s, box-shadow 0.2s'
             }}
             onMouseOver={e => {
-              if (!isLoading) {
-                e.target.style.background = '#1857b0';
-                e.target.style.boxShadow = '0 8px 24px rgba(32,103,209,0.18)';
-              }
+              e.target.style.background = '#1857b0';
+              e.target.style.boxShadow = '0 8px 24px rgba(32,103,209,0.18)';
             }}
             onMouseOut={e => {
-              if (!isLoading) {
-                e.target.style.background = '#2067d1';
-                e.target.style.boxShadow = '0 4px 16px rgba(32,103,209,0.13)';
-              }
+              e.target.style.background = '#2067d1';
+              e.target.style.boxShadow = '0 4px 16px rgba(32,103,209,0.13)';
             }}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            Login
           </button>
         </form>
       </div>
