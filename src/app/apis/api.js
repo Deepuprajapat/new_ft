@@ -3,26 +3,13 @@ import { useNavigate } from "react-router-dom";
 // const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
 
 let BASE_URL = process.env.REACT_APP_BASE_URL;
-let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
-let BASE_URL2 = process.env.REACT_APP_BASE_URL2;
-// const BASE_URL="https://api.i  nvestmango.com"
+let SECONDARY_URL = process.env.REACT_APP_SECONDARY_URL
 
-//  const BASE_URL="http://localhost:8282"
-// const BASE_URL1="https://api.virtualintelligence.co.in"
 
 
 console.log("BASE_URL", BASE_URL);
-console.log("BASE_URL1", BASE_URL1); 
-console.log("BASE_URL2", BASE_URL2); 
+console.log("SECONDARY_URL", SECONDARY_URL); 
 
-// if (process.env.REACT_APP_ENV === "production") {
-//   BASE_URL = process.env.REACT_APP_BASE_URL;
-// }
-
-// if (process.env.REACT_APP_ENV === "production") {
-//   BASE_URL1 = process.env.REACT_APP_BASE_URL1;
-// }
-// const BASE_URL1 = "https://api.virtualintelligence.co.in";
 let token = "";
 
 export const login = async (userName, password) => {
@@ -138,7 +125,6 @@ export const getAllProject = async (filters = {}) => {
     type,
     // configurations
   } = filters;
-
   try {
     const params = {
       // ...(page !== undefined && { page }),
@@ -153,10 +139,10 @@ export const getAllProject = async (filters = {}) => {
       ...(location_id && { location_id }),
       ...(name && { name }),
       ...(type && { type: type.toUpperCase() }),
-      // ...(configurations && { configurations }), 
+      // ...(configurations && { configurations }),
     };
-    // console.log(`${BASE_URL2}/v1/api/projects`)
-    const res = await axios.get(`${BASE_URL2}/v1/api/projects`, { params });
+    // console.log(`${BASE_URL}/v1/api/projects`)
+    const res = await axios.get(`${BASE_URL}/projects`, { params });
     //  console.log("Fetched Projects:", res.data.data);
     return res.data.data;
   } catch (error) {
@@ -166,10 +152,25 @@ export const getAllProject = async (filters = {}) => {
 };
 
 //  get all project by urlname
+// Get all projects by type (for modal project list)
+export const getAllProjectsByType = async (type) => {
+  try {
+    const url = `${BASE_URL}/projects`;
+    const params = {};
+    if (type) params.type = type;
+    const res = await axios.get(url, { params });
+    return res.data.data || [];
+  } catch (error) {
+    console.error("Error fetching projects by type:", error);
+    return [];
+  }
+};
+
+// Get single project by urlName (for details page)
 export const getAllProjectsByUrlName = async (urlName, navigate) => {
   try {
-    // Always use your test URL for now
-    const res = await axios.get( `/v1/api/projects/00328ce57bbc14b3`);
+    const url = `${BASE_URL}/projects/${urlName}`;
+    const res = await axios.get(url);
     return res.data.data || {};
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
@@ -180,9 +181,9 @@ export const getAllProjectsByUrlName = async (urlName, navigate) => {
   }
 };
 //patch
-export const patchProjectByTestUrl = async (patchData) => {
+export const patchProjectByTestUrl = async (urlName,patchData) => {
   try {
-    const res = await axios.patch(`/v1/api/projects/00328ce57bbc14b3`, // <-- use 8888
+    const res = await axios.patch(`/projects/${urlName}`, // <-- use 8888
       patchData,
       {
         headers: {
@@ -222,16 +223,17 @@ export const getAllFloor = async (params = {}) => {
   }
 };
 
-export const getAllBlog = async () => {
+export const getAllBlog = async (page = 0, size = 500) => {
   try {
-    const res = await axios.get(`${BASE_URL2}/v1/api/blogs`);
-    return res.data.data.blogs; // ✅ Correct path to access blogs
+    const res = await axios.get(
+      `${BASE_URL}/blogs/get/all?isDeleted=false&page=${page}&size=${size}`
+    );
+    return res.data;
   } catch (error) {
     console.error("Error fetching Blogs:", error);
-    return []; // Return an empty array for consistency
+    return { content: [] };
   }
 };
-
 
 export const getAllDevelopers = async () => {
   try {
@@ -295,7 +297,7 @@ export const fetchTestimonials = async () => {
 
 export const fetchAllVacancies = async () => {
   try {
-    const response = await fetch(`${BASE_URL1}/get/all/vacancies?isActive=true&page=0&size=100`, {
+    const response = await fetch(`${SECONDARY_URL}/get/all/vacancies?isActive=true&page=0&size=100`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -326,7 +328,7 @@ export const fetchAllVacancies = async () => {
 // Function to submit hiring form data
 export const submitHiringForm = async (formData) => {
   try {
-    const response = await fetch(`${BASE_URL1}/user/save/hiring/by/ai`, {
+    const response = await fetch(`${SECONDARY_URL}/user/save/hiring/by/ai`, {
       method: "POST",
       body: formData,
     });
@@ -347,28 +349,19 @@ export const submitHiringForm = async (formData) => {
 
 export const getAllLocalities = async () => {
   try {
-    const response = await axios.get(`${BASE_URL2}/v1/api/locations`);
-    const localities = response.data.data || [];
-
-    // Filter out entries with 'unknown' city
+    const response = await axios.get(`${BASE_URL}/locality/get/all`);
+    const localities = response.data || []; // Default to an empty array if no data
+    // Filter out localities with 'unknown' or 'UNKNOWN' in the city name or any other relevant fields
     const filteredLocalities = localities.filter(
-      (locality) =>
-        locality.city &&
-        locality.city.toLowerCase() !== "unknown"
+      (locality) => locality.city.name.toLowerCase() !== "unknown"
     );
-
-    // Create a unique set of cities
-    const uniqueCitiesMap = new Map();
-    filteredLocalities.forEach((locality) => {
-      if (!uniqueCitiesMap.has(locality.city)) {
-        uniqueCitiesMap.set(locality.city, {
-          id: locality.id, // optional
-          city: locality.city,
-        });
-      }
-    });
-
-    return Array.from(uniqueCitiesMap.values());
+    // Map filtered localities to extract city details and ensure uniqueness
+    const uniqueCities = Array.from(
+      new Map(
+        filteredLocalities.map((locality) => [locality.city.id, locality.city])
+      ).values()
+    );
+    return uniqueCities; // Returns an array of { id, name } objects
   } catch (error) {
     console.error("Error fetching localities:", error);
     return [];
@@ -547,32 +540,18 @@ export const getAllCities = async () => {
 }
 
 export const getAllProperties = async (page, pageSize, propertyType, configuration, locality) => {
-
-  const url = new URL(`${BASE_URL}/property/get/all`);
   const params = {
     isDeleted: 'false',
     page: page,
     size: pageSize,
   };
 
-  if (propertyType) {
-    params.propertyType = propertyType;
-  }
+  if (propertyType) params.propertyType = propertyType;
+  if (configuration) params.configurationName = configuration;
+  if (locality) params.cityId = locality;
 
-  // Only add configuration if it's provided
-  if (configuration) {
-    params.configurationName = configuration;
-  }
-
-  // Only add locality if it's provided
-  if (locality) {
-    params.cityId = locality;
-  }
-  Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-  
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
+  const response = await axios.get(`${BASE_URL}/properties`, { params });
+  return response.data; // Return the full object
 };
 
 
@@ -631,7 +610,7 @@ export const getAllProperties = async (page, pageSize, propertyType, configurati
 
 export const getPropertyByUrlName = async (urlName) => {
   try {
-    const res = await axios.get(`${BASE_URL}/property/get/by/url/${urlName}`);
+    const res = await axios.get(`${BASE_URL}/properties/${urlName}`);
     return res.data || {}; // Ensures that if the response body is empty, we return an empty object
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
@@ -684,6 +663,58 @@ export const patchProjectDetails = async (projectId, patchData) => {
     return res.data;
   } catch (error) {
     console.error("Error patching project details:", error);
+    throw error;
+  }
+};
+
+// Get all locations
+export const getAllLocations = async () => {
+  try {
+    const res = await axios.get('/locations');
+    return res.data?.data || [];
+    console.log("Locations fetched successfully:", res.data?.data);
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    return [];
+  }
+};
+
+// ...existing code...
+// PATCH property details by property_id (keep at the end)
+export const patchPropertyDetails = async (propertyId, patchData) => {
+  try {
+    const token = localStorage.getItem("x-auth-token");
+    const res = await axios.patch(
+      `${BASE_URL}/properties/${propertyId}`,
+      patchData,
+      {
+        headers: {
+          "x-auth-token": `${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching property details:", error);
+    throw error;
+  }
+};
+// Save property to API
+export const saveProperty = async (propertyData) => {
+  try {
+    const res = await axios.post(
+      'http://localhost:8080/properties',
+      propertyData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error('Error saving property:', error);
     throw error;
   }
 };
