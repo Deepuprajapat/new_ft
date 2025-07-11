@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
+import { getAllLocations } from "../../../apis/api";
+
 const ProjectHeaderSection = ({
   projectData,
   formatPrice,
@@ -49,6 +51,15 @@ const ProjectHeaderSection = ({
   const [editDeveloperName, setEditDeveloperName] = useState(mappedData.developerName);
   const [editCity, setEditCity] = useState(mappedData.city);
   const [editLocality, setEditLocality] = useState(mappedData.locality);
+  // Add state for editing short address
+  const [editShortAddress, setEditShortAddress] = useState(mappedData.shortAddress);
+
+  // State for dynamic locations
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedLocality, setSelectedLocality] = useState("");
+  const [locations, setLocations] = useState([]);
+  const [cities, setCities] = useState([]); // [{city: 'NOIDA', ...}]
+  const [localities, setLocalities] = useState({}); // {city: [locality, ...]}
 
   function getLeastPriceOfFloorPlan(floorPlan) {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
@@ -86,46 +97,80 @@ const ProjectHeaderSection = ({
       setEditDeveloperName(mappedData?.developerName ?? "");
       setEditCity(mappedData?.city ?? "");
       setEditLocality(mappedData?.locality ?? "");
+      setEditShortAddress(mappedData?.shortAddress ?? "");
     }
     // eslint-disable-next-line
   }, [isEditing]);
 
+  // Fetch locations on mount
+  useEffect(() => {
+    getAllLocations().then((data) => {
+      setLocations(data);
+      const uniqueCities = Array.from(new Set(data.map(loc => loc.city)));
+      setCities(uniqueCities.map((city, idx) => ({ id: idx + 1, name: city })));
+      const cityLocalityMap = {};
+      uniqueCities.forEach(city => {
+        cityLocalityMap[city] = data.filter(loc => loc.city === city).map(loc => loc.locality_name);
+      });
+      setLocalities(cityLocalityMap);
+    });
+  }, []);
+
+  // When selectedCity changes, update selectedLocality to first available locality for that city
+  useEffect(() => {
+    if (selectedCity && localities[selectedCity] && localities[selectedCity].length > 0) {
+      setSelectedLocality(localities[selectedCity][0]);
+    } else {
+      setSelectedLocality("");
+    }
+  }, [selectedCity, localities]);
+
   const handleSaveAll = () => {
-  const updatedData = {};
+    const updatedData = {};
 
-  // Use backend keys as per your JSON
-  if (editName !== mappedData.name) updatedData.project_name = editName;
-  if (minPrice !== mappedData.minPrice) updatedData.min_price = minPrice;
-  if (maxPrice !== mappedData.maxPrice) updatedData.max_price = maxPrice;
-  if (editCity !== mappedData.city) updatedData.city = editCity;
-  if (editLocality !== mappedData.locality) updatedData.locality = editLocality;
-  // For short address, use short_address
-  if (
-    mappedData.shortAddress !== (projectData.short_address || projectData.location_info?.short_address)
-  ) {
-    updatedData.short_address = mappedData.shortAddress;
-  }
-  // Developer name at correct nested path
-  if (editDeveloperName !== mappedData.developerName) {
-    updatedData.web_cards = {
-      ...(projectData.web_cards || {}),
-      about: {
-        ...(projectData.web_cards?.about || {}),
-        contact_details: {
-          ...(projectData.web_cards?.about?.contact_details || {}),
-          name: editDeveloperName,
-        },
-      },
+    // Use backend keys as per your JSON
+    if (editName !== mappedData.name) updatedData.project_name = editName;
+    if (minPrice !== mappedData.minPrice) updatedData.min_price = minPrice;
+    if (maxPrice !== mappedData.maxPrice) updatedData.max_price = maxPrice;
+    if (editCity !== mappedData.city) updatedData.city = editCity;
+    if (editLocality !== mappedData.locality) updatedData.locality = editLocality;
+    // Always update location_info with latest values
+    // Use selectedCity/selectedLocality if set, else fallback to editCity/editLocality
+    const cityToSave = selectedCity || editCity;
+    const localityToSave = selectedLocality || editLocality;
+    let appendedShortAddress = '';
+    if (localityToSave) appendedShortAddress += localityToSave;
+    if (cityToSave) appendedShortAddress += (appendedShortAddress ? ', ' : '') + cityToSave;
+    updatedData.location_info = {
+      ...(projectData.location_info || {}),
+      short_address: appendedShortAddress,
+      city: cityToSave,
+      locality: localityToSave
     };
-  }
+    // Also update editCity/editLocality state so UI stays in sync
+    setEditCity(cityToSave);
+    setEditLocality(localityToSave);
+    // Developer name at correct nested path
+    if (editDeveloperName !== mappedData.developerName) {
+      updatedData.web_cards = {
+        ...(projectData.web_cards || {}),
+        about: {
+          ...(projectData.web_cards?.about || {}),
+          contact_details: {
+            ...(projectData.web_cards?.about?.contact_details || {}),
+            name: editDeveloperName,
+          },
+        },
+      };
+    }
 
-  // ...other fields as per your JSON if needed...
+    // ...other fields as per your JSON if needed...
 
-  if (Object.keys(updatedData).length > 0) {
-    handleSave(updatedData);
-  }
-  setIsEditing(false);
-};
+    if (Object.keys(updatedData).length > 0) {
+      handleSave(updatedData);
+    }
+    setIsEditing(false);
+  };
 
   // Handle image upload and preview
   const handleImageChange = (e) => {
@@ -139,28 +184,14 @@ const ProjectHeaderSection = ({
     }
   };
 
-  // Dummy data for now
-  const cities = [
-    { id: 1, name: "Noida" },
-    { id: 2, name: "Gurgaon" },
-    { id: 3, name: "Greater Noida" },
-  ];
-
-  const localities = {
-    1: ["Sector 150", "Sector 76", "Sector 137"],
-    2: ["DLF Phase 1", "Sohna Road", "Golf Course Road"],
-    3: ["Pari Chowk", "Omega 1", "Alpha 2"],
-  };
-
-  // Add these states inside your component
-  const [selectedCity, setSelectedCity] = useState(cities[0].id);
-  const [selectedLocality, setSelectedLocality] = useState(localities[cities[0].id][0]);
+  // (moved selectedCity/selectedLocality up to avoid ReferenceError)
 
   // Filter cities and localities based on search
   const filteredCities = cities.filter(city =>
     city.name.toLowerCase().includes(searchCity.toLowerCase())
   );
 
+  // Always use city name as key for localities
   const filteredLocalities = (localities[selectedCity] || []).filter(locality =>
     locality.toLowerCase().includes(searchLocality.toLowerCase())
   );
@@ -297,8 +328,11 @@ const ProjectHeaderSection = ({
                         style={{ marginLeft: 8, backgroundColor: "#6c757d", color: "white", fontWeight: "bold", width: "70px" }}
                         type="button"
                         onClick={() => {
-                          setSelectedCity(cities[0].id);
-                          setSelectedLocality(localities[cities[0].id][0]);
+                          // Reset to first city and its first locality (by name)
+                          if (cities.length > 0) {
+                            setSelectedCity(cities[0].name);
+                            setSelectedLocality((localities[cities[0].name] && localities[cities[0].name][0]) || "");
+                          }
                           setMinPrice(
                             mappedData?.minPrice ??
                             getLeastPriceOfFloorPlan(mappedData?.floorplans?.filter(plan => plan.price > 1)) ??
@@ -329,11 +363,20 @@ const ProjectHeaderSection = ({
                         }}
                       >
                         <i className="fas fa-map-marker-alt"></i>
-                        {mappedData?.locality && mappedData?.city
-                          ? `${mappedData.locality}, ${mappedData.city}`
+                        {editLocality && editCity
+                          ? `${editLocality}, ${editCity}`
                           : "Select Location"}
                       </button>
                     </div>
+                    {/* Short Address Edit Field */}
+                    <input
+                      type="text"
+                      className="form-control form-control-sm mb-2"
+                      value={editShortAddress}
+                      onChange={e => setEditShortAddress(e.target.value)}
+                      placeholder="Short Address"
+                      style={{ fontSize: "13px", display: "inline-block", maxWidth: 300 }}
+                    />
 
                     {/* Location Selection Modal */}
                     {showLocationModal && (
@@ -468,18 +511,18 @@ const ProjectHeaderSection = ({
                                           padding: "14px 18px",
                                           fontSize: "15px",
                                           color: "#333",
-                                          backgroundColor: selectedCity === city.id ? "#f0f7ff" : "white",
+                                          backgroundColor: selectedCity === city.name ? "#f0f7ff" : "white",
                                           borderBottom: "1px solid #f5f5f5",
                                           transition: "all 0.2s"
                                         }}
                                         onClick={() => {
-                                          setSelectedCity(city.id);
+                                          setSelectedCity(city.name);
                                           setSearchCity(city.name);
-                                          setSelectedLocality(localities[city.id]?.[0] || "");
+                                          setSelectedLocality((localities[city.name] && localities[city.name][0]) || "");
                                           setShowCityDropdown(false);
                                         }}
-                                        onMouseOver={(e) => e.target.style.backgroundColor = selectedCity === city.id ? "#f0f7ff" : "#f8f9fa"}
-                                        onMouseOut={(e) => e.target.style.backgroundColor = selectedCity === city.id ? "#f0f7ff" : "white"}
+                                        onMouseOver={(e) => e.target.style.backgroundColor = selectedCity === city.name ? "#f0f7ff" : "#f8f9fa"}
+                                        onMouseOut={(e) => e.target.style.backgroundColor = selectedCity === city.name ? "#f0f7ff" : "white"}
                                       >
                                         {city.name}
                                       </div>
@@ -495,11 +538,11 @@ const ProjectHeaderSection = ({
                                           borderTop: "1px solid #f5f5f5"
                                         }}
                                         onClick={() => {
-                                          const newCityId = Math.max(...cities.map(c => c.id), 0) + 1;
-                                          const newCity = { id: newCityId, name: searchCity };
-                                          cities.push(newCity);
-                                          localities[newCityId] = [];
-                                          setSelectedCity(newCityId);
+                                          // Add new city by name
+                                          const newCity = { id: cities.length + 1, name: searchCity };
+                                          setCities([...cities, newCity]);
+                                          setLocalities({ ...localities, [searchCity]: [] });
+                                          setSelectedCity(searchCity);
                                           setSearchCity(searchCity);
                                           setShowCityDropdown(false);
                                         }}
@@ -609,10 +652,11 @@ const ProjectHeaderSection = ({
                                           borderTop: "1px solid #f5f5f5"
                                         }}
                                         onClick={() => {
-                                          if (!localities[selectedCity]) {
-                                            localities[selectedCity] = [];
-                                          }
-                                          localities[selectedCity].push(searchLocality);
+                                          // Add new locality to selected city (by name)
+                                          setLocalities({
+                                            ...localities,
+                                            [selectedCity]: [...(localities[selectedCity] || []), searchLocality]
+                                          });
                                           setSelectedLocality(searchLocality);
                                           setSearchLocality(searchLocality);
                                           setShowLocalityDropdown(false);
@@ -641,18 +685,11 @@ const ProjectHeaderSection = ({
                             <button
                               className="btn btn-primary w-100 responsive-modal-btn"
                               onClick={() => {
-                                // Get city name - either from selected city or search text
-                                const selectedCityObj = cities.find(c => c.id === selectedCity);
-                                const cityName = selectedCityObj ? selectedCityObj.name : searchCity;
-
-                                // Get locality - either selected or search text
+                                // Use selectedCity as city name
+                                const cityName = selectedCity || searchCity;
                                 const localityName = selectedLocality || searchLocality;
-
-                                // Update both city and locality
-                                handleInputChange("city", cityName);
-                                handleInputChange("locality", localityName);
-
-                                // Close modal and reset states
+                                setEditCity(cityName);
+                                setEditLocality(localityName);
                                 setShowLocationModal(false);
                                 setSearchCity("");
                                 setSearchLocality("");

@@ -1,3 +1,5 @@
+
+
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 // const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
@@ -69,7 +71,7 @@ export const getAllLocality = async () => {
 
 export const getAllDeveloper = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/developer/get/all`, {
+    const res = await axios.get(`${BASE_URL2}/v1/api/developers`, {
       headers: {
         "x-auth-token": `${token}`,
       },
@@ -166,7 +168,7 @@ export const getAllProjectsByType = async (type) => {
 };
 
 // Get single project by urlName (for details page)
-export const getAllProjectsByUrlName = async (urlName, navigate) => {
+export const getAllProjectsByUrlName = async (Projectid, navigate) => {
   try {
     const url = `${BASE_URL}/projects/${urlName}`;
     const res = await axios.get(url);
@@ -179,8 +181,10 @@ export const getAllProjectsByUrlName = async (urlName, navigate) => {
     return {};
   }
 };
+
 //patch
 export const patchProjectByTestUrl = async (urlName,patchData) => {
+  
   try {
     const res = await axios.patch(`/projects/${urlName}`, // <-- use 8888
       patchData,
@@ -538,16 +542,16 @@ export const getAllCities = async () => {
   } 
 }
 
-export const getAllProperties = async (page, pageSize, propertyType, configuration, locality) => {
+export const getAllProperties = async (page, pageSize, type, configuration, locality) => {
   const params = {
     isDeleted: 'false',
     page: page,
     size: pageSize,
   };
 
-  if (propertyType) params.propertyType = propertyType;
-  if (configuration) params.configurationName = configuration;
-  if (locality) params.cityId = locality;
+  if (type) params.type = type;
+  if (configuration) params.configuration = configuration; // changed key
+  if (locality) params.city = locality; // changed key
 
   const response = await axios.get(`${BASE_URL}/properties`, { params });
   return response.data; // Return the full object
@@ -683,6 +687,7 @@ export const getAllLocations = async () => {
 export const patchPropertyDetails = async (propertyId, patchData) => {
   try {
     const token = localStorage.getItem("x-auth-token");
+   
     const res = await axios.patch(
       `${BASE_URL}/properties/${propertyId}`,
       patchData,
@@ -702,9 +707,25 @@ export const patchPropertyDetails = async (propertyId, patchData) => {
 // Save property to API
 export const saveProperty = async (propertyData) => {
   try {
-    const res = await axios.post(
-      'http://localhost:8080/properties',
+    const res = await axios.post(`${BASE_URL2}/v1/api/properties`,
       propertyData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error('Error saving property:', error);
+    throw error;
+  }
+};
+
+export const createnewproject = async (projectdata) => {
+  try {
+    const res = await axios.post(`${BASE_URL2}/v1/api/projects`,
+      projectdata,
       {
         headers: {
           'Content-Type': 'application/json',

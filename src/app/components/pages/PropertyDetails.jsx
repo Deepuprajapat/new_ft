@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import {
   getPropertyByUrlName,
+  patchPropertyDetails,
   sendOTP,
   verifyOTP,
   resendOTP,
@@ -24,10 +25,19 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import Swal from "sweetalert2";
 import { Helmet } from "react-helmet";
-
+import ProjectPropertyDetails from "./PropertyDetailParts/ProjectPropertyDetails";
+import PropertyHeaderSection from "./PropertyDetailParts/PropertyHeaderSection";
+import WhyToChooseSection from "./PropertyDetailParts/WhyToChooseSection";
+import FloorPlanSection from "./PropertyDetailParts/FloorPlanSection";
+import AboutDeveloperSection from "./PropertyDetailParts/AboutDeveloperSection";
+import AmenitiesSection from "./PropertyDetailParts/AmenitiesSection";
+import VideoSection from "./PropertyDetailParts/VideoSection";
+import KnowAboutSection from "./PropertyDetailParts/KnowAboutSection";
+import PropertyListSection from "./PropertyDetailParts/PropertyListSection";
 const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
 
 const PropertyDetails = () => {
+  const location = useLocation();
   const { urlName } = useParams(); // Get urlName from route params
   const [property, setProperty] = useState(null);
   const [expandedIndex, setExpandedIndex] = useState(null); // To track which FAQ is expanded
@@ -60,7 +70,7 @@ const PropertyDetails = () => {
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);
-    setShowImagePopup(true); // Open the popup with the clicked image
+    setShowImagePopup(true); 
   };
 
   const closeImagePopup = () => {
@@ -98,7 +108,7 @@ const PropertyDetails = () => {
 
   // Handle OTP input change
   const handleOtpChange = (e) => setOtp(e.target.value);
-
+  
   // Simulate sending OTP API
   const sendOtp = async () => {
     if (!formData.usermobile || formData.usermobile.length !== 10) {
@@ -154,7 +164,7 @@ const PropertyDetails = () => {
       setOtpVerified(false);
     }
   };
-
+  console.log("usjsfhewkj",urlName)
   // Resend OTP logic
   const resendOtp = async () => {
     try {
@@ -180,19 +190,18 @@ const PropertyDetails = () => {
   }, [timer, otpSent]);
 
   useEffect(() => {
-    const fetchProperty = async () => {
-      if (urlName) {
+    if (urlName) {
+      const fetchProperty = async () => {
         const data = await getPropertyByUrlName(urlName);
-        setProperty(data);
-      }
-    };
-
-    fetchProperty();
+        setProperty(data.data);
+        console.log("datayhdsj", data.data);
+      };
+      fetchProperty();
+    }
   }, [urlName]);
 
-  if (!property) return <div>Loading...</div>; // Show a loading message while fetching
+  console.log(property, "propertyuiehuiew" )
 
-  // Process amenities to match the format of amenities.json
   const processAmenities = () => {
     if (!property?.propertyAmenities) return [];
 
@@ -247,56 +256,100 @@ const PropertyDetails = () => {
     setExpandedIndex(index === expandedIndex ? null : index);
   };
 
-  // const getLeastPriceOfFloorPlan = (floorPlan) => {
-  //   if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
-  //     return 0;
-  //   }
-  //   const sortedFloorPlan = [...floorPlan].sort((a, b) => a.price - b.price);
-  //   return sortedFloorPlan[0].price;
-  // };
 
-  // const getHighestPriceOfFloorPlan = (floorPlan) => {
-  //   if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
-  //     return 0;
-  //   }
-  //   const sortedFloorPlan = [...floorPlan].sort((a, b) => b.price - a.price);
-  //   return sortedFloorPlan[0].price;
-  // };
-// useEffect(() => {
-//   const handleScroll = () => {
-//     const sections = [
-//       "overview",
-//       "about",
-//       "floor",
-//       "amenities",
-//       "video",
-//       "location"
-//     ];
-
-//     if (navInitialPosition !== null) {
-//       const scrollPosition = window.scrollY;
-//       setIsNavFixed(scrollPosition >= navInitialPosition);
-//     }
-
-//     for (const section of sections) {
-//       const element = document.getElementById(section);
-//       if (element) {
-//         const rect = element.getBoundingClientRect();
-//         if (rect.top <= 100 && rect.bottom >= 100) {
-//           setActiveSection(section);
-//           break;
-//         }
-//       }
-//     }
-//   };
-
-//   window.addEventListener("scroll", handleScroll);
+const onSaveProjectDetails = async (newData) => {
+  setProperty(newData);
+  try {
   
-//   return () => {
-//     window.removeEventListener("scroll", handleScroll);
-//   };
-// }, [navInitialPosition]); // Ensure dependencies are correctly set
+    if (urlName) {
+      const response = await patchPropertyDetails(urlName, newData);
+      console.log("Patch API response:", response);
+    } else {
+      console.error("Property ID not found!");
+    }
+  } catch (error) {
+    console.error("Error saving property data:", error);
+  }
+};
 
+const onSaveWhyToChoose = async (changedData) => {
+  setProperty(prev => {
+    const merged = {
+      ...prev,
+      web_cards: {
+        ...prev.web_cards,
+        ...changedData.web_cards,
+      },
+      ...changedData,
+    };
+    // Update backend
+    if (urlName) {
+      patchPropertyDetails(urlName, merged);
+    }
+    return merged;
+  });
+};
+
+// const onSaveFloorPlan = (changedData) => {
+//   setProperty(prev => ({ ...prev, ...changedData }));
+//   // TODO: Call patchPropertyDetails API here if needed
+// };
+
+const onSaveAboutDeveloper = (changedData) => {
+  setProperty(prev => ({ ...prev, ...changedData }));
+  // TODO: Call patchPropertyDetails API here if needed
+};
+
+const onSaveKnowAbout = async (aboutHtml) => {
+  setProperty(prev => {
+    const merged = {
+      ...prev,
+      web_cards: {
+        ...prev.web_cards,
+        know_about: {
+          ...(prev.web_cards?.know_about || {}),
+          description: aboutHtml,
+        },
+      },
+    };
+    // Update backend
+    if (urlName) {
+      patchPropertyDetails(urlName, merged);
+    }
+    return merged;
+  });
+};
+
+const onSaveAmenities = (newPropertyAmenities, newAmenitiesPara) => {
+  setProperty(prev => ({
+    ...prev,
+    propertyAmenities: newPropertyAmenities,
+    amenitiesPara: newAmenitiesPara,
+  }));
+  // TODO: Call patchPropertyDetails API here if needed
+};
+
+const onSaveVideo = async ({ videoPara, propertyVideo }) => {
+  setProperty(prev => {
+    const merged = {
+      ...prev,
+      videoPara,
+      propertyVideo,
+      web_cards: {
+        ...prev.web_cards,
+        video_presentation: {
+          ...(prev.web_cards?.video_presentation || {}),
+          title: JSON.stringify([videoPara]),
+          video_url: JSON.stringify(propertyVideo),
+        },
+      },
+    };
+    if (urlName) {
+      patchPropertyDetails(urlName, merged);
+    }
+    return merged;
+  });
+};
 
   return (
     <>
@@ -330,78 +383,71 @@ const PropertyDetails = () => {
         <div className="container-fluid p-0 mb-0 w-100">
           {/* Gallery Section */}
           <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
-            {property && property.images && property.images.length > 0 && (
+            {property && property.property_images && property.property_images.length > 0 && (
               <>
                 {/* Main Image - Full width on mobile, half width on desktop */}
                 <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
-                  {property?.images[0] && (
-                    <div
-                      className="h-100 d-flex align-items-center justify-content-center"
-                      style={{ minHeight: "184px", maxHeight: "700px" }}
+                  <div
+                    className="h-100 d-flex align-items-center justify-content-center"
+                    style={{ minHeight: "184px", maxHeight: "700px" }}
+                  >
+                    <a
+                      href={property.property_images[0]}
+                      data-toggle="lightbox"
+                      data-gallery="gallery"
+                      className="d-flex align-items-center justify-content-center w-100 h-100"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowFullScreen(true);
+                        setCurrentImageIndex(0);
+                      }}
                     >
-                      <a
-                        href={property?.images[0]}
-                        data-toggle="lightbox"
-                        data-gallery="gallery"
-                        className="d-flex align-items-center justify-content-center w-100 h-100"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setShowFullScreen(true);
-                          setCurrentImageIndex(0);
-                        }}
-                      >
-                        <img
-                          alt={property?.images[0]?.category || "Image"}
-                          src={property?.images[0]}
-                          loading="lazy"
-                          className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
-                          style={{ objectFit: "cover", cursor: "pointer" }}
-                          fetchpriority="high"
-                        />
-                      </a>
-                    </div>
-                  )}
+                      <img
+                        alt={`Gallery Image 1`}
+                        src={property.property_images[0]}
+                        loading="lazy"
+                        className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
+                        style={{ objectFit: "cover", cursor: "pointer" }}
+                        fetchpriority="high"
+                      />
+                    </a>
+                  </div>
                 </div>
 
                 {/* Additional Images Grid */}
                 <div className="col-12 col-md-6 p-0">
                   <div className="row g-0 h-100">
-                    {[1, 2, 3, 4].map(
-                      (index) =>
-                        property?.images[index] && (
-                          <div
-                            key={index}
-                            className="col-3 col-md-6"
-                            style={{ height: "270px" }}
-                          >
-                            <a
-                              href={property?.images[index]}
-                              data-toggle="lightbox"
-                              data-gallery="gallery"
-                              className="d-block h-100"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setShowFullScreen(true);
-                                setCurrentImageIndex(index);
-                              }}
-                            >
-                              <img
-                                alt={
-                                  property?.images[index]?.category || "Image"
-                                }
-                                src={property?.images[index]}
-                                loading="lazy"
-                                className="w-100 h-100 rounded-0"
-                                style={{
-                                  objectFit: "cover",
-                                  cursor: "pointer",
-                                }}
-                                fetchpriority="high"
-                              />
-                            </a>
-                          </div>
-                        )
-                    )}
+                    {property.property_images.slice(1, 5).map((img, index) => (
+                      <div
+                        key={index + 1}
+                        className="col-3 col-md-6"
+                        style={{ height: "270px" }}
+                      >
+                        <a
+                          href={img}
+                          data-toggle="lightbox"
+                          data-gallery="gallery"
+                          className="d-block h-100"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setShowFullScreen(true);
+                            setCurrentImageIndex(index + 1);
+                          }}
+                        >
+                          <img
+                            alt={`Gallery Image ${index + 2}`}
+                            src={img}
+                            loading="lazy"
+                            className="w-100 h-100 rounded-0"
+                            style={{
+                              objectFit: "cover",
+                              cursor: "pointer",
+                            }}
+                            fetchpriority="high"
+                          />
+                        </a>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </>
@@ -409,7 +455,7 @@ const PropertyDetails = () => {
           </div>
 
           {/* Fullscreen Image Modal */}
-          {showFullScreen && property?.images && (
+          {showFullScreen && property?.property_images && (
             <div
               className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
               style={{
@@ -424,9 +470,9 @@ const PropertyDetails = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <img
-                  src={property?.images[currentImageIndex]}
+                  src={property?.property_images[currentImageIndex]}
                   alt={
-                    property?.images[currentImageIndex]?.category ||
+                    property?.property_images[currentImageIndex]?.category ||
                     "Full Screen Image"
                   }
                   loading="lazy"
@@ -437,7 +483,7 @@ const PropertyDetails = () => {
                   className="position-absolute top-50 start-0 translate-middle-y rounded-circle"
                   onClick={() =>
                     setCurrentImageIndex((prev) =>
-                      prev === 0 ? property?.images?.length - 1 : prev - 1
+                      prev === 0 ? property?.property_images?.length - 1 : prev - 1
                     )
                   }
                   style={{
@@ -454,7 +500,7 @@ const PropertyDetails = () => {
                   className="position-absolute top-50 end-0 translate-middle-y rounded-circle"
                   onClick={() =>
                     setCurrentImageIndex((prev) =>
-                      prev === property?.images?.length - 1 ? 0 : prev + 1
+                      prev === property?.property_images?.length - 1 ? 0 : prev + 1
                     )
                   }
                   style={{
@@ -682,266 +728,16 @@ const PropertyDetails = () => {
           </div>
         </div>
 
-        {/* Section 1 */}
-        <section
-          className="container-fluid"
-          style={{
-            width: window.innerWidth <= 768 ? "90%" : "95%",
-            margin: "0 auto",
-          }}
-        >
-          <div>
-            <div className="d-flex flex-column flex-md-row justify-content-between">
-              {/* Left Section */}
-              <div className="col-12 col-md-6 p-0 p-md-0">
-                {/* Upper Section */}
-                <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start mb-2 mt-2 mt-md-3">
-                  <div className="mb-2 mb-md-0 me-md-3 text-center text-md-start" style={{    maxWidth: '90px',
-    border: '1px solid grey',
-    height: '66px'}}>
-                    <img
-                      src={property?.projectLogo || "defaultLogo.jpg"}
-                      alt={property?.projectLogo || "Project Logo"}
-                      loading="lazy"
-                      className="img-fluid"
-                      style={{
-                        maxWidth: "80px",
-                        height: '64px'
-                      }}
-                    />
-                  </div>
-                  <div className="text-center text-md-start">
-                    <h1
-                      className="h3 mb-0 text-center text-md-start"
-                      style={{ fontSize: "20px" }}
-                    >
-                      {property?.propertyName || "Property Name"}
-                    </h1>
-                    <p className="mb-0" style={{ fontSize: "11px" }}>
-                      {property?.propertyAddress || "Property Address"}
-                    </p>
-                    <span style={{ fontSize: "13px" }}>
-                      By{" "}
-                      <a
-                        // href={property?.developerLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {property?.developerName || "Developer Name"}
-                      </a>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Lower Section - Buttons */}
-                <div className="d-flex flex-wrap justify-content-center justify-content-md-start position-relative">
-                  <span
-                    className="badge bg-primary"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#2067d1",
-                    }}
-                    onMouseEnter={() => setShowReraDetails(true)}
-                  >
-                    Rera
-                  </span>
-                  {showReraDetails && (
-                    <div
-                      onMouseEnter={() => setIsReraDetailHovered(true)}
-                      onMouseLeave={() => {
-                        setIsReraDetailHovered(false);
-                        setShowReraDetails(false);
-                      }}
-                      style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
-                        zIndex: 1000,
-                        backgroundColor: "white",
-                        padding: "10px",
-                        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                        borderRadius: "4px",
-                        minWidth: "300px",
-                        maxWidth: "90vw",
-                      }}
-                    >
-                      <div className="d-flex justify-content-between align-items-center mb-0">
-                        <h6
-                          className="m-0"
-                          style={{ fontWeight: 700, fontSize: "14px" }}
-                        >
-                          Rera Detail
-                        </h6>
-                        <i
-                          className="fa fa-close"
-                          style={{ fontSize: "15px", cursor: "pointer" }}
-                          onClick={() => {
-                            setShowReraDetails(false);
-                            setIsReraDetailHovered(false);
-                          }}
-                        />
-                      </div>
-                      <div className="table-responsive">
-                        <table className="w-100">
-                          <thead>
-                            <tr>
-                              <th
-                                style={{
-                                  width: "45%",
-                                  textAlign: "left",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "11px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                Phase
-                              </th>
-                              <th
-                                style={{
-                                  width: "34%",
-                                  textAlign: "left",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "11px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                Status
-                              </th>
-                              <th
-                                style={{
-                                  width: "40%",
-                                  textAlign: "left",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "11px",
-                                  color: "black",
-                                  fontWeight: 500,
-                                  border: "none",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                Rera Number
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td
-                                style={{ fontSize: "11px", padding: "8px 0" }}
-                              ></td>
-                              <td
-                                style={{ fontSize: "11px", padding: "8px 0" }}
-                              >
-                                {property?.status}
-                              </td>
-                              <td
-                                style={{ fontSize: "11px", padding: "8px 0" }}
-                              >
-                                {property?.reraLink}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-                  <span
-                    className="badge text-dark"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#f0f0f0",
-                      fontWeight: "300",
-                    }}
-                  >
-                    No Brokerage
-                  </span>
-                  <span
-                    className="badge text-dark"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#f0f0f0",
-                      fontWeight: "300",
-                    }}
-                  >
-                    Floor Plans Available
-                  </span>
-                  <span
-                    className="badge text-dark"
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "10px",
-                      marginRight: "3px",
-                      marginBottom: "3px",
-                      borderRadius: "0",
-                      backgroundColor: "#f0f0f0",
-                      fontWeight: "300",
-                    }}
-                  >
-                    Top Amenities
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Section */}
-              <div
-                className="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-2 mt-md-2 p-0 p-md-0"
-                style={{ boxShadow: "none", border: "none" }}
-              >
-                <p
-                  className="mb-1 fw-bold text-black text-center text-md-end mt-2 mt-md-4"
-                  style={{ fontSize: "20px" }}
-                >
-                  Starting from
-                </p>
-                <h2
-                  className="h2 mb-0 fw-bold text-center text-md-end"
-                  style={{ fontSize: "25px", fontWeight: "800" }}
-                >
-                  ₹{formatPrice(property?.price || "0")}
-                </h2>
-                <button
-                  id="BookBtn2"
-                  className="theme-btn"
-                  style={{ display: "inline-block" }}
-                  onClick={handleDownloadBrochure}
-                >
-                  Contact to Our Expert
-                </button>
-
-                  {/* Dialog Popup Trigger */}
-                  <BrochurePopupDialog
-                      open={showPopup}
-                      onClose={closePopup}
-                      projectName={property?.propertyName || "Invest Mango"}
-                      brochure={property?.brochure}
-                    />
-              </div>
-            </div>
-          </div>
-          <div className="">
-            <hr />
-          </div>
-        </section>
+        {/* Section 1 - Property Header */}
+        <PropertyHeaderSection
+          property={property}
+          formatPrice={formatPrice}
+          handleDownloadBrochure={handleDownloadBrochure}
+          showPopup={showPopup}
+          closePopup={closePopup}
+          BrochurePopupDialog={BrochurePopupDialog}
+          onSave={onSaveProjectDetails}
+        />
 
         {/* Section 2 */}
         <section
@@ -959,517 +755,19 @@ const PropertyDetails = () => {
                 id="overview"
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
-                <div className="p-0 pb-2">
-                  <h4
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    Property Details
-                  </h4>
-                  <div className="px-3">
-                    <div className="row g-3 mb-0 mb-md-4">
-                      <div className="col-6 col-md-4 mt-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faExpandArrowsAlt}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Built Up Area
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                                fontWeight:
-                                  window.innerWidth <= 768 ? "400" : "800",
-                              }}
-                            >
-                              {property?.builtupArea}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faRulerCombined}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Sizes
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                                fontWeight:
-                                  window.innerWidth <= 768 ? "400" : "800",
-                              }}
-                            >
-                              {property?.size}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faBuilding}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Floor No
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {property?.floors}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faCalendarAlt}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Configurations
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {
-                                property?.configuration.configurationType
-                                  .configurationTypeName
-                              }
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faKey}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Possession Status
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {property?.possessionStatus}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faBuilding}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Balcony
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {property?.balcony || ""}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faParking}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Covered Parking
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {property?.coveredParking}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faBed}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Bedrooms
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {property?.bedrooms}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faCity}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Type
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {
-                                property?.configuration?.configurationType
-                                  ?.configurationTypeName
-                              }
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faCalendarAlt}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Age of Property
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder text-break"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {property?.ageOfProperty}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faCouch}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Furnishing
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {property?.furnishingType
-                                ?.toLowerCase() // Convert to lowercase
-                                ?.replace(/_/g, " ") // Replace underscores with spaces
-                                ?.replace(/\b\w/g, (char) =>
-                                  char.toUpperCase()
-                                  )}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faFlag}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              Facing
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {property?.facing}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-6 col-md-4 mt-2 mt-md-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                          <FontAwesomeIcon
-                            icon={faKey}
-                            className="mb-2 mb-md-0 me-md-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "20px",
-                              color: "#2067d1",
-                            }}
-                          />
-                          <div className="text-center text-md-start">
-                            <small
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "11px" : "15px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              RERA Number.
-                            </small>
-                            <p
-                              className="mb-0 fw-normal fw-md-bolder"
-                              style={{
-                                color: "#000",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {property?.rera}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ProjectPropertyDetails 
+                  property={property}
+                  onSave={onSaveProjectDetails}
+                  propertyType={property?.propertyType}
+                  ageOfProperty={property?.ageOfProperty}
+                  floorNo={property?.floorNo}
+                  configuration={property?.configuration}
+                  facing={property?.facing}
+                  furnishing={property?.furnishing}
+                  balconyCount={property?.balconyCount}
+                  bedroomCount={property?.bedroomCount}
+                  coveredParking={property?.coveredParking}
+                />
               </div>
 
               {/* connect to out expert for mobile view*/}
@@ -1520,63 +818,6 @@ const PropertyDetails = () => {
                               // value={formData.dial_code}
                               onChange={handleChange}
                             >
-                              <option value="91">+91</option>
-                              <option value="61">+61</option>
-                              <option value="852">+852</option>
-                              <option value="968">+968</option>
-                              <option value="974">+974</option>
-                              <option value="65">+65</option>
-                              <option value="971">+971</option>
-                              <option value="44">+44</option>
-                              <option value="1">+1</option>
-                              <option value="27">+27</option>
-                              <option value="60">+60</option>
-                              <option value="64">+64</option>
-                              <option value="66">+66</option>
-                              <option value="966">+966</option>
-                              <option value="31">+31</option>
-                              <option value="973">+973</option>
-                              <option value="54">+54</option>
-                              <option value="43">+43</option>
-                              <option value="880">+880</option>
-                              <option value="32">+32</option>
-                              <option value="55">+55</option>
-                              <option value="86">+86</option>
-                              <option value="385">+385</option>
-                              <option value="42">+42</option>
-                              <option value="45">+45</option>
-                              <option value="1809">+1809</option>
-                              <option value="20">+20</option>
-                              <option value="358">+358</option>
-                              <option value="679">+679</option>
-                              <option value="33">+33</option>
-                              <option value="49">+49</option>
-                              <option value="30">+30</option>
-                              <option value="592">+592</option>
-                              <option value="36">+36</option>
-                              <option value="62">+62</option>
-                              <option value="353">+353</option>
-                              <option value="972">+972</option>
-                              <option value="39">+39</option>
-                              <option value="81">+81</option>
-                              <option value="962">+962</option>
-                              <option value="82">+82</option>
-                              <option value="965">+965</option>
-                              <option value="853">+853</option>
-                              <option value="52">+52</option>
-                              <option value="212">+212</option>
-                              <option value="47">+47</option>
-                              <option value="48">+48</option>
-                              <option value="351">+351</option>
-                              <option value="40">+40</option>
-                              <option value="7">+7</option>
-                              <option value="34">+34</option>
-                              <option value="46">+46</option>
-                              <option value="41">+41</option>
-                              <option value="1868">+1868</option>
-                              <option value="216">+216</option>
-                              <option value="90">+90</option>
-                              <option value="84">+84</option>
                               <option value="91">+91</option>
                               <option value="61">+61</option>
                               <option value="852">+852</option>
@@ -1840,628 +1081,42 @@ const PropertyDetails = () => {
               )}
 
               {/* Why to choose */}
-              <div
-                className="mb-4"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-                id="why-choose"
-              >
-                <div className="">
-                  <div className="">
-                    <div className="">
-                      <h4
-                        className="mb-0  py-2 fw-bold text-white ps-3"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                          backgroundColor: "#2067d1",
-                          borderRadius: "4px 4px 0 0",
-                        }}
-                      >
-                        Why to choose {property?.propertyName}?
-                      </h4>
-                      <div
-                        className="px-3"
-                        style={{
-                          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                          borderRadius: "4px",
-                          padding: "20px",
-                        }}
-                      >
-                        <div className="row">
-                          <div className="col-md-6">
-                            <div className="row g-1">
-                              {/* First row with single image */}
-                              {property?.images && property?.images[0] && (
-                                <div className="col-12 mb-1">
-                                  <a
-                                    href={property?.images[0]}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="d-block"
-                                  >
-                                    <img
-                                      alt={
-                                        property?.images[0].caption ||
-                                        "Project Image 1"
-                                      }
-                                      src={property?.images[0]}
-                                      loading="lazy"
-                                      className="img-fluid rounded w-100"
-                                      style={{
-                                        height:
-                                          window.innerWidth <= 768
-                                            ? "200px"
-                                            : "230px",
-                                        objectFit: "cover",
-                                        borderRadius: "16px",
-                                      }}
-                                      fetchpriority="high"
-                                    />
-                                  </a>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="col-md-6">
-                            <div
-                              className="row g-4"
-                              style={{
-                                marginTop:
-                                  window.innerWidth <= 768 ? "5px" : "0",
-                              }}
-                            >
-                              {property?.usp &&
-                                property?.usp?.map((usp, idx) => (
-                                  <div className="col-6" key={idx}>
-                                    <div className="d-flex align-items-start">
-                                      <img
-                                        className="me-2"
-                                        src="/images/usp-icon.svg"
-                                        loading="lazy"
-                                        style={{
-                                          height:
-                                            window.innerWidth <= 768
-                                              ? "24px"
-                                              : "30px",
-                                          marginTop:
-                                            window.innerWidth <= 768
-                                              ? "2px"
-                                              : "0",
-                                        }}
-                                        fetchpriority="high"
-                                        alt={`USP Icon ${idx + 1}`}
-                                      />
-                                      <span
-                                        style={{
-                                          fontSize:
-                                            window.innerWidth <= 768
-                                              ? "10px"
-                                              : "14px",
-                                          lineHeight:
-                                            window.innerWidth <= 768
-                                              ? "1.2"
-                                              : "normal",
-                                        }}
-                                      >
-                                        {usp}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <WhyToChooseSection property={property} onSave={onSaveWhyToChoose} />
 
               {/* Floor Plan */}
-              <div
-                className="mb-4"
-                id="floor"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h4
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    {property?.propertyName} Floor Plan
-                  </h4>
-                  <div className="px-3">
-                    {/* Toggle Buttons for 2D & 3D Floor Plans */}
-                    <div className="d-flex gap-2 mb-3">
-                      <button
-                        onClick={() => setActiveFilter("2D")}
-                        className={`btn ${
-                          activeFilter === "2D" ? "btn-primary" : ""
-                        }`}
-                        style={{
-                          border: "2px solid #000",
-                          borderRadius: "15px",
-                          padding:
-                            window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
-                          fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-                          fontWeight: "600",
-                          backgroundColor:
-                            activeFilter === "2D" ? "rgb(32, 103, 209)" : "",
-                        }}
-                      >
-                        2D Floor Plan
-                      </button>
-                      <button
-                        onClick={() => setActiveFilter("3D")}
-                        className={`btn ${
-                          activeFilter === "3D" ? "btn-primary" : ""
-                        }`}
-                        style={{
-                          border: "2px solid #000",
-                          borderRadius: "15px",
-                          padding:
-                            window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
-                          fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-                          fontWeight: "600",
-                          backgroundColor:
-                            activeFilter === "3D" ? "rgb(32, 103, 209)" : "",
-                        }}
-                      >
-                        3D Floor Plan
-                      </button>
-                    </div>
+              <FloorPlanSection
+                property={property}
+                // activeFilter={activeFilter}
+                // setActiveFilter={setActiveFilter}
+                // handleImageClick={handleImageClick}
+                // showImagePopup={showImagePopup}
+                // selectedImage={selectedImage}
+                // closeImagePopup={closeImagePopup}
+                // handleDownloadFloorPlan={handleDownloadFloorPlan}
+                // showFloorPlanPopup={showFloorPlanPopup}
+                // closeFloorPlanPopup={closeFloorPlanPopup}
+                // formatPrice={formatPrice}
+                //onSave={onSaveFloorPlan}
+              />
 
-                    {/* Floor Plan Carousel */}
-                    <Carousel
-                      responsive={{
-                        superLargeDesktop: {
-                          breakpoint: { max: 4000, min: 3000 },
-                          items: 3,
-                        },
-                        desktop: {
-                          breakpoint: { max: 3000, min: 1024 },
-                          items: 2,
-                        },
-                        tablet: {
-                          breakpoint: { max: 1024, min: 464 },
-                          items: 1,
-                        },
-                        mobile: { breakpoint: { max: 464, min: 0 }, items: 1 },
-                      }}
-                      infinite={true}
-                      containerClass="carousel-container"
-                      itemClass="carousel-item-padding-40-px"
-                      style={{ width: "60%", margin: "0 auto" }}
-                    >
-                      {(() => {
-                        const defaultImage =
-                          process.env.PUBLIC_URL +
-                          "/images/coming_soon_floor.jpg";
-
-                        const isValidImage = (imageUrl) =>
-                          imageUrl?.includes("/images/img/")
-                            ? imageUrl
-                            : defaultImage;
-
-                        const images = [
-                          {
-                            title: "2D Floor Plan",
-                            imageUrl: isValidImage(property?.floorImage2D),
-                          },
-                          {
-                            title: "3D Floor Plan",
-                            imageUrl: isValidImage(property?.floorImage3D),
-                          },
-                        ];
-
-                        return images.map((plan, index) => (
-                          <div
-                            key={index}
-                            className="px-2 d-flex justify-content-center"
-                          >
-                            <div
-                              className="card border-0"
-                              style={{
-                                width: "80%",
-                                maxWidth:
-                                  window.innerWidth <= 768 ? "80%" : "auto",
-                              }}
-                            >
-                              <div className="card-body p-3 text-center">
-                                <p
-                                  className="mb-3"
-                                  style={{
-                                    fontSize:
-                                      window.innerWidth <= 768
-                                        ? "14px"
-                                        : "16px",
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  {plan.title}
-                                </p>
-                                <img
-                                  src={plan.imageUrl}
-                                  alt={plan.title}
-                                  loading="lazy"
-                                  className="img-fluid mb-3"
-                                  style={{
-                                    width: "100%",
-                                    maxHeight: "300px",
-                                    objectFit: "contain",
-                                    borderRadius: "5px",
-                                  }}
-                                  onClick={() =>
-                                    handleImageClick(plan.imageUrl)
-                                  }
-                                />
-                                <div className="d-flex flex-column gap-2 align-items-center">
-                                  <a
-                                    href="tel:+918595189189"
-                                    className="btn btn-primary w-100"
-                                    style={{
-                                      fontSize:
-                                        window.innerWidth <= 768
-                                          ? "12px"
-                                          : "14px",
-                                      backgroundColor: "#2067d1",
-                                    }}
-                                  >
-                                    Talk to our Expert
-                                  </a>
-                                  <button
-                                    onClick={handleDownloadFloorPlan}
-                                    className="btn btn-outline-primary w-100"
-                                    style={{
-                                      fontSize:
-                                        window.innerWidth <= 768
-                                          ? "12px"
-                                          : "14px",
-                                      margin: "0px",
-                                    }}
-                                  >
-                                    Download Floor Plan
-                                  </button>
-                                  {/* Floor Plan Dialog Popup */}
-
-                                  <BrochurePopupDialog
-                                    open={showFloorPlanPopup}
-                                    onClose={closeFloorPlanPopup}
-                                    projectName={
-                                      property?.propertyName || "Invest Mango"
-                                    }
-                                    brochure={property?.brochure}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ));
-                      })()}
-                    </Carousel>
-
-                    {/* Image Popup Modal */}
-                    {showImagePopup && (
-                      <div
-                        className="image-popup-modal"
-                        style={{
-                          position: "fixed",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          backgroundColor: "rgba(0, 0, 0, 0.7)",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          zIndex: 1000,
-                        }}
-                      >
-                        <div
-                          className="image-popup-content"
-                          style={{
-                            position: "relative",
-                            maxWidth: "50%",
-                          }}
-                        >
-                          <img
-                            src={selectedImage}
-                            alt="Floor Plan"
-                            loading="lazy"
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              borderRadius: "8px",
-                            }}
-                          />
-                          <button
-                            onClick={closeImagePopup}
-                            style={{
-                              position: "absolute",
-                              top: "10px",
-                              right: "10px",
-                              backgroundColor: "rgba(0, 0, 0, 0.5)",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "50%",
-                              padding: "10px",
-                              cursor: "pointer",
-                              fontSize: "20px",
-                            }}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
+             
               {/* Know About */}
-              <div
-                className="mb-4"
-                id="about"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h4
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    Know About {property?.propertyName}
-                  </h4>
-                  <div className="px-3">
-                    <div
-                      className="position-relative overflow-hidden"
-                      style={{
-                        maxHeight: showFullDescription ? "none" : "100px",
-                      }}
-                    >
-                      <div
-                        className={
-                          !showFullDescription
-                            ? "position-absolute w-100 h-100"
-                            : ""
-                        }
-                        style={{
-                          background: !showFullDescription
-                            ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)"
-                            : "none",
-                          top: 0,
-                          left: 0,
-                        }}
-                      ></div>
-                      <div
-                        className="mb-3"
-                        style={{
-                          fontSize: window.innerWidth <= 768 ? "12px" : "15px", // Adjust font size for smaller screens
-                          fontFamily: "'Roboto', sans-serif", // Use imported Google font here
-                          lineHeight: "1.5", // Improve readability with line-height adjustment
-                          letterSpacing: "0.4px", // Slight letter spacing for better clarity
-                        }}
-                      >
-                        {property?.about && (
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: property.about,
-                            }}
-                          />
-                        )}
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-link text-decoration-none p-0 mt-2"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setShowFullDescription(!showFullDescription);
-                      }}
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                        color: "black", // Default color is black
-                        display: "block", // Makes the button a block element
-                        margin: "0 auto", // Centers the button horizontally
-                        textAlign: "center", // Center-aligns text inside the button
-                        cursor: "pointer", // Changes cursor on hover
-                        padding: "0", // Removes any default padding
-                      }}
-                      onMouseEnter={(e) => (e.target.style.color = "#2067d1")} // Changes color on hover
-                      onMouseLeave={(e) => (e.target.style.color = "black")} // Resets color after hover
-                    >
-                      {showFullDescription ? "Show Less" : "Read More"}
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <KnowAboutSection
+                property={property}
+                showFullDescription={showFullDescription}
+                setShowFullDescription={setShowFullDescription}
+                onSave={onSaveKnowAbout}
+              />
 
               {/* Amenities */}
-              <div
-                className="mb-4"
-                id="amenities"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h4
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    {property?.propertyName} Amenities
-                  </h4>
-                  <div className="px-3">
-                    <p
-                      className="mb-3"
-                      style={{
-                        fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-                      }}
-                    >
-                      {property?.amenitiesPara ? (
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: property.amenitiesPara,
-                          }}
-                        />
-                      ) : (
-                        <p>
-                          World class amenities are there in{" "}
-                          {property?.propertyName} for the residents to enjoy a
-                          luxurious lifestyle. Know in detail about the
-                          amenities in the list below.
-                        </p>
-                      )}
-                    </p>
-
-                    <div
-                      className="inner-item"
-                      style={{
-                        height: "400px",
-                        overflowY: "auto",
-                        overflowX: "hidden",
-                      }}
-                    >
-                      {processAmenities()?.map((category, categoryIndex) => (
-                        <div key={categoryIndex}>
-                          <p
-                            className="fw-bolder mb-3"
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "14px" : "16px",
-                              color: "#2067d1",
-                              fontWeight: "1000",
-                            }}
-                          >
-                            {category.name.charAt(0).toUpperCase() +
-                              category.name.slice(1)}
-                          </p>
-                          <div className="row g-4 mb-5">
-                            {category.assets?.map((amenity, index) => (
-                              <div key={index} className="col-6 col-md-3">
-                                <div
-                                  className="d-flex align-items-center"
-                                  style={{
-                                    fontSize:
-                                      window.innerWidth <= 768
-                                        ? "11px"
-                                        : "14px",
-                                    marginBottom: "16px",
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  <img
-                                    src={amenity.icon}
-                                    alt={amenity.name}
-                                    loading="lazy"
-                                    style={{
-                                      width: "35px",
-                                      height: "35px",
-                                      marginRight: "16px",
-                                    }}
-                                  />
-                                  {amenity.name}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <AmenitiesSection
+                property={property}
+                processAmenities={processAmenities}
+                onSave={onSaveAmenities}
+              />
 
               {/* video presentation */}
-              <div
-                className="mb-4"
-                id="video"
-                style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
-              >
-                <div className="p-0 pb-2">
-                  <h4
-                    className="mb-3 py-2 fw-bold text-white ps-3"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "16px" : "18px",
-                      backgroundColor: "#2067d1",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    Video Presentation of {property && property?.propertyName}
-                  </h4>
-                  <div className="px-3">
-                    {/* <p
-                    className="mb-3 mb-md-5"
-                    style={{
-                      fontSize: window.innerWidth <= 768 ? "14px" : "16px",
-                    }}
-                  >
-                    {property?.videoPara ? (
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: property.videoPara,
-                        }}
-                      />
-                    ) : (
-                      `VIDEO PRESENTATION OF ${property?.propertyName}`
-                    )}
-                  </p> */}
-
-                    <div className="d-flex flex-column">
-                      {property?.propertyVideo &&
-                      property.propertyVideo.length > 0 ? (
-                        property.propertyVideo?.map((videoUrl, index) => (
-                          <div key={index} className="ratio ratio-16x9 mb-3">
-                            <iframe
-                              src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                              title={`${
-                                property?.propertyName
-                              } Video Presentation ${index + 1}`}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              style={{
-                                border: "none",
-                                borderRadius: "8px",
-                              }}
-                            ></iframe>
-                          </div>
-                        ))
-                      ) : (
-                        <div
-                          style={{
-                            width: "100%",
-                            height: "160px",
-                            backgroundImage:
-                              "url('/images/investmango-youtube-banner.webp')",
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            borderRadius: "8px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#fff",
-                            fontSize: "20px",
-                            fontWeight: "bold",
-                            textAlign: "center",
-                            backgroundColor: "#f0f0f0",
-                          }}
-                        >
-                          {/* No Videos Available */}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <VideoSection property={property} onSave={onSaveVideo} />
 
               {/* Location Map */}
               <div className="bg-white rounded-3 mb-4" id="location">

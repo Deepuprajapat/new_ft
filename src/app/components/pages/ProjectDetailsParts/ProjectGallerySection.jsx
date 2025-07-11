@@ -145,20 +145,35 @@ const ProjectGallerySection = ({
   setShowFullScreen,
   setCurrentImageIndex,
   showEdit,
+  handleSave: handleSaveProp,
 }) => {
   const [hoveredImageIndex, setHoveredImageIndex] = useState(null);
   const [localImages, setLocalImages] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [loadingImg, setLoadingImg] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null); // <-- Add this line
+
+  const IMAGE_BASE_URL = "https://image.investmango.com/project/venkatesh-laurel/";
+
+  function getDisplayUrl(img) {
+    if (!img?.imageUrl) return DUMMY_IMAGE_PATH;
+    if (img.imageUrl.startsWith("blob:") || img.imageUrl.startsWith("data:")) {
+      return img.imageUrl; // Local preview for new uploads
+    }
+    if (!img.imageUrl.startsWith("http")) {
+      return IMAGE_BASE_URL + img.imageUrl; // For file names from DB
+    }
+    return img.imageUrl;
+  }
 
   // Initialize localImages with projectData.web_cards.images (skip first image)
   useEffect(() => {
     // Skip the first image (index 0)
     const images =
       projectData?.web_cards?.images?.length > 1
-        ? projectData.web_cards.images.slice(1).map((url, idx) => ({
-            imageUrl: url,
-            caption: `Image ${idx + 2}`,
+        ? projectData.web_cards.images.slice(1).map((fileName, idx) => ({
+            imageUrl: fileName, // Just the file name
+            caption: fileName,
           }))
         : [];
     setLocalImages(images);
@@ -169,37 +184,68 @@ const ProjectGallerySection = ({
   }, [projectData]);
 
   const handleEdit = () => setIsEditing(true);
-  const handleSave = () => setIsEditing(false);
+  const handleSave = () => {
+    const mainImage = projectData?.web_cards?.images?.[0] || "";
+    const imagesArray = [mainImage, ...imageSlots.map(img => img.imageUrl || "")];
+    setProjectData({
+      ...projectData,
+      web_cards: {
+        ...projectData.web_cards,
+        images: imagesArray
+      }
+    });
+    setIsEditing(false);
+    // Call parent handleSave if provided
+    if (typeof handleSaveProp === 'function') {
+      handleSaveProp({
+        web_cards: {
+          ...projectData.web_cards,
+          images: imagesArray
+        }
+      });
+    }
+  };
   const handleCancel = () => {
     setLocalImages(projectData?.images || []);
     setIsEditing(false);
   };
 
+  // Only call handleSave when an image is selected/uploaded or reordered (not on every localImages change)
   const handleImageUpload = (index, event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const newImages = [...localImages];
-        
-        // Ensure the array has enough slots
-        while (newImages.length <= index) {
-          newImages.push({});
-        }
-        
-        newImages[index] = {
-          ...newImages[index],
-          imageUrl: e.target.result,
-          caption: file.name,
-        };
-        
-        setLocalImages(newImages);
-        setProjectData({
-          ...projectData,
-          images: newImages,
-        });
+      const newImages = [...localImages];
+      while (newImages.length <= index) {
+        newImages.push({});
+      }
+      newImages[index] = {
+        ...newImages[index],
+        imageUrl: URL.createObjectURL(file), // For preview
+        caption: file.name,                  // For saving
       };
-      reader.readAsDataURL(file);
+      setLocalImages(newImages);
+
+      // Save only file names
+      const mainImage = projectData?.web_cards?.images?.[0] || "";
+      const imagesForWebCards = [
+        mainImage,
+        ...newImages.map(img => img.caption || "")
+      ];
+      setProjectData({
+        ...projectData,
+        web_cards: {
+          ...projectData.web_cards,
+          images: imagesForWebCards
+        }
+      });
+      if (typeof handleSaveProp === 'function') {
+        handleSaveProp({
+          web_cards: {
+            ...projectData.web_cards,
+            images: imagesForWebCards
+          }
+        });
+      }
     }
   };
 
@@ -225,10 +271,25 @@ const ProjectGallerySection = ({
       if (oldIndex !== -1 && newIndex !== -1) {
         const newImages = arrayMove([...localImages], oldIndex, newIndex);
         setLocalImages(newImages);
+        // Prepare the new images array for web_cards.images (main + others)
+        const mainImage = projectData?.web_cards?.images?.[0] || "";
+        const imagesForWebCards = [mainImage, ...newImages.map(img => img.imageUrl || "")];
         setProjectData({
           ...projectData,
-          images: newImages,
+          web_cards: {
+            ...projectData.web_cards,
+            images: imagesForWebCards
+          }
         });
+        // Call handleSave only after drag/drop
+        if (typeof handleSaveProp === 'function') {
+          handleSaveProp({
+            web_cards: {
+              ...projectData.web_cards,
+              images: imagesForWebCards
+            }
+          });
+        }
       }
     } catch (error) {
       console.error('Error during drag and drop:', error);

@@ -1,5 +1,6 @@
 
 
+<<<<<<< HEAD
 // Check if user is authenticated by looking for token in cookie or localStorage
 const getAuthToken = () => {
   // Try to get token from cookie first
@@ -12,6 +13,9 @@ const getAuthToken = () => {
 };
 
 const show = !!getAuthToken();
+=======
+const show = true
+>>>>>>> 5f91f8a3b4ab86d7def0d32cb1d7a07a71d4c4a6
 const navItems = [
     { label: 'Home', path: '/' },
     {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import PopupDialog from "./CommanPopup";
 import { useOutletContext } from "react-router-dom";
@@ -11,7 +11,7 @@ import {
   verifyOTP,
   resendOTP,
   getReraInfoByProjectId,
-  patchProjectByTestUrl
+  patchProjectByTestUrl,
   // getLeadByPhone,
   // saveLead,
 } from "../../apis/api";
@@ -56,8 +56,11 @@ const ProjectDetails = () => {
   const [developerId, setDeveloperId] = useState("");
   const [projectId, setProjectId] = useState("");
   const [developerDetails, setDeveloperDetails] = useState(null);
-  // const { urlName } = useParams();
-  const urlName = '8ca4e2ce-4bda-4510-89dc-6e20dc52fb20';
+  const { urlName } = useParams();
+  const location = useLocation();
+  // Get projectId from navigation state if available
+  const projectIdFromNav = location.state?.projectId;
+  // const urlName = '8ca4e2ce-4bda-4510-89dc-6e20dc52fb20';
   const [activeFilter, setActiveFilter] = useState("all");
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -90,19 +93,12 @@ const ProjectDetails = () => {
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [editableAmenities, setEditableAmenities] = useState([]);
   const [reraDetails, setReraDetails] = useState(null);
-
-  // State variables  youtube
   const [isVideoEditing, setIsVideoEditing] = useState(false);
   const [editableVideos, setEditableVideos] = useState([]);
-
-  // ...existing code... location map
-
   const [isLocationEditing, setIsLocationEditing] = useState(false);
   const [locationMapHtml, setLocationMapHtml] = useState(
     projectData?.locationMap || ""
   );
-
-  //  state variable for site plan
   const [isSitePlanEditing, setIsSitePlanEditing] = useState(false);
   const [siteplanParaHtml, setSiteplanParaHtml] = useState(
     projectData?.web_cards?.site_plan?.html_content || ""
@@ -180,7 +176,7 @@ const ProjectDetails = () => {
     setIsEditing(!isEditing);
   };
  const handleSave = async (updatedData) => {
-  // Log the updated data received from child component
+  // Log the updated data received from child componentpatchProjectByTestUrl
   console.log('Updated data received from child:', updatedData);
 
   // Update the projectData with the new values from child component
@@ -196,7 +192,7 @@ const ProjectDetails = () => {
 
   // Call PATCH API with the updated data
   try {
-    const response = await patchProjectByTestUrl(newData);
+    const response = await patchProjectByTestUrl(projectIdFromNav,newData);
     console.log("Patch API response:", response);
   } catch (error) {
     console.error("Error saving project data:", error);
@@ -231,73 +227,17 @@ const ProjectDetails = () => {
     setSiteplanImgUrl(projectData?.web_cards?.site_plan?.image || "");
   }, [projectData]);
 
-  // Keep state in sync with projectData location map and URL
   useEffect(() => {
     setLocationMapHtml(projectData?.locationMap || "");
   }, [projectData]);
 
-  // Initialize editable amenities when editing starts
   useEffect(() => {
     if (isAmenitiesEditing && projectData?.amenities) {
       setEditableAmenities(JSON.parse(JSON.stringify(processAmenities())));
     }
   }, [isAmenitiesEditing]);
 
-  // Functions
-  // const processEditableAmenities = () => {
-  //   return editableAmenities;
-  // };
 
-  // const updateCategoryName = (categoryIndex, newName) => {
-  //   const updated = [...editableAmenities];
-  //   updated[categoryIndex].name = newName;
-  //   setEditableAmenities(updated);
-  // };
-
-  // const updateAmenity = (categoryIndex, amenityIndex, field, value) => {
-  //   const updated = [...editableAmenities];
-  //   updated[categoryIndex].assets[amenityIndex][field] = value;
-  //   setEditableAmenities(updated);
-  // };
-
-  // const removeAmenity = (categoryIndex, amenityIndex) => {
-  //   const updated = [...editableAmenities];
-  //   updated[categoryIndex].assets.splice(amenityIndex, 1);
-  //   setEditableAmenities(updated);
-  // };
-
-  // const addNewAmenity = (categoryIndex) => {
-  //   const updated = [...editableAmenities];
-  //   updated[categoryIndex].assets.push({
-  //     name: 'New Amenity',
-  //     icon: '/images/default-icon.svg'
-  //   });
-  //   setEditableAmenities(updated);
-  // };
-
-  // const removeCategoryAmenities = (categoryIndex) => {
-  //   const updated = editableAmenities.filter((_, index) => index !== categoryIndex);
-  //   setEditableAmenities(updated);
-  // };
-
-  // const addNewCategory = () => {
-  //   const newCategory = {
-  //     name: 'New Category',
-  //     assets: [
-  //       {
-  //         name: 'Sample Amenity',
-  //         icon: '/images/default-icon.svg'
-  //       }
-  //     ]
-  //   };
-  //   setEditableAmenities([...editableAmenities, newCategory]);
-  // };
-
-  // const saveAmenitiesChanges = () => {
-  //   // Save logic here - update projectData or call API
-  //   setIsAmenitiesEditing(false);
-  // };
-  // Functions
   const updatePaymentPlan = (index, field, value) => {
     const updated = [...paymentPlans];
     updated[index] = { ...updated[index], [field]: value };
@@ -314,6 +254,8 @@ const ProjectDetails = () => {
     setIsPaymentEditing(false);
   };
 
+  const projectDataFromState = location.state?.projectData;
+  console.log(projectDataFromState,"projectDataFromState")
 
   // Store initial nav position on mount
   useEffect(() => {
@@ -325,43 +267,68 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (urlName) {
+      if (projectDataFromState) {
+        // Use data from navigation state
+        setProjectData(projectDataFromState);
+        setDeveloperId(projectDataFromState.developerId);
+        setProjectId(projectDataFromState.id);
+  
+        if (Array.isArray(projectDataFromState.schema) && projectDataFromState.schema.length > 0) {
+          const parsedSchemas = projectDataFromState.schema
+            .map((schemaStr) => {
+              try {
+                const scriptContent = schemaStr
+                  .replace(/<script[^>]*>/, "")
+                  .replace(/<\/script>/, "")
+                  .trim();
+                return JSON.parse(scriptContent);
+              } catch (error) {
+                console.error("Error parsing schema JSON:", error);
+                return null;
+              }
+            })
+            .filter(Boolean);
+  
+          setSchemas(parsedSchemas);
+        }
+      } else if (urlName) {
         try {
-          const data = await getAllProjectsByUrlName(urlName, navigate);
+          const data = await getAllProjectsByUrlName(projectIdFromNav, navigate);
           if (data) {
             setProjectData(data);
             setDeveloperId(data.developerId);
             setProjectId(data.id);
+  
             if (Array.isArray(data.schema) && data.schema.length > 0) {
               const parsedSchemas = data.schema
                 .map((schemaStr) => {
                   try {
                     const scriptContent = schemaStr
-                      .replace(/<script[^>]*>/, "") // Remove opening <script> tag
-                      .replace(/<\/script>/, "") // Remove closing </script> tag
+                      .replace(/<script[^>]*>/, "")
+                      .replace(/<\/script>/, "")
                       .trim();
-
                     return JSON.parse(scriptContent);
                   } catch (error) {
                     console.error("Error parsing schema JSON:", error);
-                    return null; // Skip invalid schema
+                    return null;
                   }
                 })
-                .filter(Boolean); // Remove null values if parsing fails
-
+                .filter(Boolean);
+  
               setSchemas(parsedSchemas);
             }
           }
         } catch (error) {
           console.error("Error fetching project data:", error);
         }
-      }
-      else {
-        console.error("No URL name provided");
+      } else {
+        console.error("No project data or URL name provided");
       }
     };
+  
     fetchData();
   }, [urlName, navigate]);
+  
 
   useEffect(() => {
     if (projectData) {
@@ -411,10 +378,10 @@ const ProjectDetails = () => {
 
       try {
         const data = await getReraInfoByProjectId(projectId);
-        setReraDetails(data || []); // Ensures state is always an array
+        setReraDetails(data || []);
       } catch (error) {
         console.error("Error fetching RERA data:", error);
-        setReraDetails([]); // Resets state on error
+        setReraDetails([]); 
       }
     };
     fetchReraInfo();
@@ -896,6 +863,7 @@ const ProjectDetails = () => {
             setShowFullScreen={setShowFullScreen}
             setCurrentImageIndex={setCurrentImageIndex}
             showEdit={showEdit}
+            handleSave={handleSave}
           />
 
           {/* Fullscreen Image Modal */}
