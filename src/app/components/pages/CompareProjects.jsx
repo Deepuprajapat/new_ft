@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllProject, getAllProjectsByID, getAllLocalities } from "../../apis/api";
+import { getAllProject, getAllLocalities } from "../../apis/api";
 import { Helmet } from "react-helmet";
 import jsPDF from "jspdf"; // Import jsPDF
 import "jspdf-autotable";
@@ -103,9 +103,10 @@ const handleCompare = async () => {
   }
 
   try {
-    const promises = selected.map((id) => getAllProjectsByID(id));
-    const results = await Promise.all(promises);
-    const fullProjects = results.map((res) => res?.data).filter(Boolean);
+    // Filter projects from the existing projects state instead of making API calls
+    const fullProjects = projects.filter((project) => 
+      selected.includes(project.project_id)
+    );
     setComparedProjects(fullProjects);
   } catch (error) {
     console.error("Error comparing projects:", error);
