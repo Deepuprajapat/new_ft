@@ -197,7 +197,6 @@ const ProjectDetails = () => {
   } catch (error) {
     console.error("Error saving project data:", error);
   }
-
   setIsEditing(false);
 };
 
@@ -255,7 +254,7 @@ const ProjectDetails = () => {
   };
 
   const projectDataFromState = location.state?.projectData;
-  console.log(projectDataFromState,"projectDataFromState")
+  // console.log(projectDataFromState,"projectDataFromState")
 
   // Store initial nav position on mount
   useEffect(() => {

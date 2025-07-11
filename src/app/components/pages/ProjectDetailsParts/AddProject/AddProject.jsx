@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { getAllDeveloper } from '../../../../apis/api';
+import { getAllDeveloper, getAllLocations } from '../../../../apis/api';
 import { useNavigate } from 'react-router-dom';
 import { createnewproject, getAllProjectsByUrlName } from '../../../../apis/api';
 
@@ -20,12 +20,8 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
   const [error, setError] = useState('');
   const [developersLoading, setDevelopersLoading] = useState(false);
   const [projectData, setProjectData] = useState(null);
-
-  const localityOptions = [
-    { value: 'sector 61', label: 'Sector 61' },
-    { value: 'sector 62', label: 'Sector 62' },
-    { value: 'sector 63', label: 'Sector 63' },
-  ];
+  const [localityOptions, setLocalityOptions] = useState([]);
+  const [localitiesLoading, setLocalitiesLoading] = useState(false);
 
   const cityOptions = [
     { value: 'DELHI', label: 'Delhi' },
@@ -36,6 +32,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
   useEffect(() => {
     if (show) { // Only fetch when modal is shown
       fetchDevelopers();
+      fetchLocalities();
     }
   }, [show]);
 
@@ -46,7 +43,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
       console.log("Full API response: ", response);
       
       // Based on your API structure: {data: Array(10), pagination: {...}}
-      const devs = response?.data?.data?.data || [];
+      const devs = response?.data?.data || [];
       
       console.log("Processed developers: ", devs);
       
@@ -64,6 +61,21 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
       console.error('Error fetching developers:', err);
     } finally {
       setDevelopersLoading(false);
+    }
+  };
+
+  const fetchLocalities = async () => {
+    setLocalitiesLoading(true);
+    try {
+      const response = await getAllLocations();
+      const options = (response || []).map(loc => ({ value: loc.id, label: loc.locality_name }));
+      setLocalityOptions(options);
+    } catch (err) {
+      setLocalityOptions([]);
+      setError('Failed to fetch localities');
+      console.error('Error fetching localities:', err);
+    } finally {
+      setLocalitiesLoading(false);
     }
   };
 
@@ -203,8 +215,9 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
               value={formData.locality}
               onChange={handleChange}
               required
+              disabled={localitiesLoading}
             >
-              <option value="">Select Locality</option>
+              <option value="">{localitiesLoading ? 'Loading localities...' : 'Select Locality'}</option>
               {localityOptions.map((loc) => (
                 <option key={loc.value} value={loc.value}>{loc.label}</option>
               ))}

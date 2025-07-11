@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 let BASE_URL = process.env.REACT_APP_BASE_URL;
 let SECONDARY_URL = process.env.REACT_APP_SECONDARY_URL
 
-
-
 console.log("BASE_URL", BASE_URL);
 console.log("SECONDARY_URL", SECONDARY_URL); 
 
@@ -72,9 +70,6 @@ export const currentUser = async (token) => {
 export const getAllDeveloper = async () => {
   try {
     const res = await axios.get(`${BASE_URL}/developers`, {
-      headers: {
-        "x-auth-token": `${token}`,
-      },
     });
     return res;
   } catch (error) {
@@ -186,14 +181,10 @@ export const getAllProjectsByUrlName = async (Projectid, navigate) => {
 export const patchProjectByTestUrl = async (urlName,patchData) => {
   
   try {
-    const res = await axios.patch(`/projects/${urlName}`, // <-- use 8888
+    const res = await axios.patch(`${BASE_URL}/projects/${urlName}`,
       patchData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
     );
+    console.log(res,"fsfrf")
     return res.data.data || {};
   } catch (error) {
     console.error("Error patching project by test URL:", error);
@@ -673,16 +664,15 @@ export const patchProjectDetails = async (projectId, patchData) => {
 // Get all locations
 export const getAllLocations = async () => {
   try {
-    const res = await axios.get('/locations');
+    const res = await axios.get(`${BASE_URL}/locations`);
+    console.log("Locations fetched successfully:", res.data.data);
     return res.data?.data || [];
-    console.log("Locations fetched successfully:", res.data?.data);
   } catch (error) {
     console.error('Error fetching locations:', error);
     return [];
   }
 };
 
-// ...existing code...
 // PATCH property details by property_id (keep at the end)
 export const patchPropertyDetails = async (propertyId, patchData) => {
   try {
@@ -735,6 +725,24 @@ export const createnewproject = async (projectdata) => {
     return res.data;
   } catch (error) {
     console.error('Error saving property:', error);
+    throw error;
+  }
+};
+export const compareProjectsAPI = async (projectIds) => {
+  try {
+    const response = await fetch("http://localhost:8080/v1/api/projects/compare", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ projectIds }), // :white_check_mark: assuming backend expects "projectIds"
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch compared projects");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error comparing projects:", error);
     throw error;
   }
 };
