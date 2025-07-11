@@ -10,6 +10,7 @@ const ProjectCard = ({ project }) => {
   const navigate = useNavigate();
   // Navigate to the project URL and pass projectId in state, so only the URL is shown in the address bar
   const handleMoreDetails = (url, projectId) => {
+    console.log(url,projectId, "yyyy")
     const cleanUrl = `/${url.toLowerCase().replace(/\s+/g, "-")}`;
     navigate(cleanUrl, { state: { projectId } });
   };

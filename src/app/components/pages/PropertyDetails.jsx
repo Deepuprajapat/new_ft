@@ -190,6 +190,7 @@ const PropertyDetails = () => {
   }, [timer, otpSent]);
 
   useEffect(() => {
+    console.log(urlName , "hyy")
     if (urlName) {
       const fetchProperty = async () => {
         const data = await getPropertyByUrlName(urlName);

@@ -294,6 +294,7 @@ const ProjectDetails = () => {
       } else if (urlName) {
         try {
           const data = await getAllProjectsByUrlName(projectIdFromNav, navigate);
+          console.log(data , "gggg")
           if (data) {
             setProjectData(data);
             setDeveloperId(data.developerId);

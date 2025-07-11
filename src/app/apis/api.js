@@ -55,23 +55,23 @@ export const currentUser = async (token) => {
   }
 };
 
-export const getAllLocality = async () => {
-  try {
-    const res = await axios.get(`${BASE_URL}/locality/get/all`, {
-      headers: {
-        "x-auth-token": `${token}`,
-      },
-    });
-    return res;
-  } catch (error) {
-    console.error("Error Fetching Locality", error);
-    return { content: [] };
-  }
-};
+// export const getAllLocality = async () => {
+//   try {
+//     const res = await axios.get(`${BASE_URL}/locality/get/all`, {
+//       headers: {
+//         "x-auth-token": `${token}`,
+//       },
+//     });
+//     return res;
+//   } catch (error) {
+//     console.error("Error Fetching Locality", error);
+//     return { content: [] };
+//   }
+// };
 
 export const getAllDeveloper = async () => {
   try {
-    const res = await axios.get(`${BASE_URL2}/v1/api/developers`, {
+    const res = await axios.get(`${BASE_URL}/developers`, {
       headers: {
         "x-auth-token": `${token}`,
       },
@@ -170,7 +170,7 @@ export const getAllProjectsByType = async (type) => {
 // Get single project by urlName (for details page)
 export const getAllProjectsByUrlName = async (Projectid, navigate) => {
   try {
-    const url = `${BASE_URL}/projects/${urlName}`;
+    const url = `${BASE_URL}/projects/${Projectid}`;
     const res = await axios.get(url);
     return res.data.data || {};
   } catch (error) {
@@ -554,7 +554,7 @@ export const getAllProperties = async (page, pageSize, type, configuration, loca
   if (locality) params.city = locality; // changed key
 
   const response = await axios.get(`${BASE_URL}/properties`, { params });
-  return response.data; // Return the full object
+  return response.data.data; // Return the full object
 };
 
 
@@ -707,7 +707,7 @@ export const patchPropertyDetails = async (propertyId, patchData) => {
 // Save property to API
 export const saveProperty = async (propertyData) => {
   try {
-    const res = await axios.post(`${BASE_URL2}/v1/api/properties`,
+    const res = await axios.post(`${BASE_URL}/properties`,
       propertyData,
       {
         headers: {
@@ -724,7 +724,7 @@ export const saveProperty = async (propertyData) => {
 
 export const createnewproject = async (projectdata) => {
   try {
-    const res = await axios.post(`${BASE_URL2}/v1/api/projects`,
+    const res = await axios.post(`${BASE_URL}/projects`,
       projectdata,
       {
         headers: {
