@@ -99,8 +99,7 @@ const ProjectHeaderSection = ({
       setEditLocality(mappedData?.locality ?? "");
       setEditShortAddress(mappedData?.shortAddress ?? "");
     }
-    // eslint-disable-next-line
-  }, [isEditing]);
+  }, [isEditing, mappedData]);
 
   // Fetch locations on mount
   useEffect(() => {

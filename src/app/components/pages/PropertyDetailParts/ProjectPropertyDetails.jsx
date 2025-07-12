@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   faExpandArrowsAlt,
   faRulerCombined,
@@ -38,6 +38,13 @@ const ProjectPropertyDetails = ({ property, onSave , ageOfProperty}) => {
   const editProperty = property
 
   const [editableProperty, setEditableProperty] = useState({ ...editProperty });
+
+  // Sync editableProperty with property when property changes or when entering edit mode
+  useEffect(() => {
+    if (editMode && property) {
+      setEditableProperty({ ...property });
+    }
+  }, [editMode, property]);
 
   const getDetailValue = (field) => {
     const nested = editableProperty?.web_cards?.property_details?.[field]?.value;

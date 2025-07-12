@@ -5,20 +5,19 @@ import {
   getAllFloor,
   getAllLocations,
   getAllProperties,
-
   getAllProjectsByType,
   saveProperty,
 } from "../../apis/api";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
-import AddProject from "./ProjectDetailsParts/AddProject/AddProject"; // <-- import your modal
+import AddProject from "./ProjectDetailsParts/AddProject/AddProject";
 
 const PropertyListing = () => {
   const [propertyTypes, setPropertyTypes] = useState([
     "RESIDENTIAL",
     "COMMERCIAL",
-  ]); // Default static values
+  ]);
   const [configurations, setConfigurations] = useState([]);
   const [localities, setLocalities] = useState([]);
   const [selectedPropertyType, setSelectedPropertyType] = useState("");
@@ -27,15 +26,16 @@ const PropertyListing = () => {
   const [properties, setProperties] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedType, setSelectedType] = useState(""); // "COMMERCIAL" or "RESIDENTIAL"
-  const [projects, setProjects] = useState([]); // Start with empty, only fill from API
+  const [selectedType, setSelectedType] = useState("");
+  const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState("");
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const navigate = useNavigate();
 
-  // Add state for all form fields
+  // Form fields state
   const [propertyType, setPropertyType] = useState("");
   const [ageOfProperty, setAgeOfProperty] = useState("");
   const [floorNo, setFloorNo] = useState("");
@@ -46,37 +46,125 @@ const PropertyListing = () => {
   const [bedroomCount, setBedroomCount] = useState("");
   const [coveredParking, setCoveredParking] = useState("");
 
-  const pageSize = 10; // Number of items per page
+  const pageSize = 10;
   const [projectId, setProjectId] = useState("");
   const [allConfigurations, setAllConfigurations] = useState([]);
+
+  const HARDCODED_CONFIGURATIONS = [
+    "1 BHK",
+    "2 BHK",
+    "3 BHK",
+    "4 BHK",
+    "5 BHK",
+    "Studio",
+    "Shop",
+    "Office",
+    "Villa",
+    "Plot"
+  ];
+
+  // Scroll to top when page changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
+  // Fetch properties when filters or page changes
   useEffect(() => {
-    fetchProperties(currentPage); 
-  }, [
-    currentPage,
-    selectedPropertyType,
-    selectedConfiguration,
-    selectedLocality,
-  ]);
+    fetchProperties(currentPage);
+  }, [currentPage, selectedPropertyType, selectedConfiguration, selectedLocality]);
+
+  // Initialize data on component mount
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch locations
+        const locations = await getAllLocations();
+        if (locations && Array.isArray(locations)) {
+          setLocalities(locations);
+        }
+
+        // Fetch all properties to get configurations from API
+        const allPropsResponse = await getAllProperties(0, 1000, "", "", "");
+        let allConfigs = [];
+        if (allPropsResponse?.data?.data && Array.isArray(allPropsResponse.data.data)) {
+          allConfigs = Array.from(
+            new Set(
+              allPropsResponse.data.data
+                .map(p => p.configurations)
+                .filter(Boolean)
+                .map(config => config.trim())
+                .filter(config => config !== "")
+            )
+          );
+        }
+        // If API gives nothing, use hardcoded fallback
+        if (!allConfigs.length) {
+          allConfigs = HARDCODED_CONFIGURATIONS;
+        }
+        setAllConfigurations(allConfigs);
+      } catch (error) {
+        // On error, use hardcoded fallback
+        setAllConfigurations(HARDCODED_CONFIGURATIONS);
+        console.error("Error fetching initial data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
 
   const fetchProperties = async (page) => {
-    const configParam = selectedConfiguration ? selectedConfiguration.replace(/\s+/g, '') : "";
-    const cityParam = selectedLocality || "";
+    try {
+      setLoading(true);
+      
+      // Clean up parameters
+      const configParam = selectedConfiguration 
+        ? selectedConfiguration.replace(/\s+/g, '') 
+        : "";
+      
+      let cityParam = selectedLocality || "";
+      // Convert BANGALORE to Bangalore
+      if (cityParam === "BANGALORE") {
+        cityParam = "Bangalore";
+      }
 
-    const data = await getAllProperties(
-      page,
-      pageSize,
-      selectedPropertyType || "",
-      configParam,
-      cityParam
-    );
-    // setProperties(Array.isArray(data.data?.data?.data) ? data.data.data.data : []);
-    console.log(data.data, "dataa")
-    setProperties(data.data)
-    setTotalPages(data?.pagination?.total_pages || 1);
+      const response = await getAllProperties(
+        page,
+        pageSize,
+        selectedPropertyType || "",
+        configParam,
+        cityParam
+      );
+
+      console.log("Properties response:", response);
+
+      if (response?.data) {
+        // Handle different response structures
+        if (Array.isArray(response.data)) {
+          setProperties(response.data);
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          setProperties(response.data.data);
+        } else {
+          setProperties([]);
+        }
+        
+        // Set pagination info
+        const pagination = response.pagination || response.data?.pagination || {};
+        setTotalPages(pagination.total_pages || Math.ceil((pagination.total || 0) / pageSize) || 1);
+      } else {
+        setProperties([]);
+        setTotalPages(1);
+      }
+    } catch (error) {
+      console.error("Error fetching properties:", error);
+      setProperties([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleNext = () => {
@@ -91,109 +179,115 @@ const PropertyListing = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch all floor plans
-        const floors = await getAllFloor();
-        if (floors.length) {
-          // Extract unique property types and configurations
-          const uniquePropertyTypes = [
-            ...new Set(floors.map((floor) => floor.propertyType.toUpperCase())),
-          ];
-          const uniqueConfigurations = [
-            ...new Set(floors.map((floor) => floor.projectConfigurationName)),
-          ];
+  const handleFilterChange = (filterType, value) => {
+    // Reset to first page when filters change
+    setCurrentPage(0);
+    
+    switch (filterType) {
+      case 'propertyType':
+        setSelectedPropertyType(value);
+        break;
+      case 'configuration':
+        setSelectedConfiguration(value);
+        break;
+      case 'locality':
+        setSelectedLocality(value);
+        break;
+      default:
+        break;
+    }
+  };
 
-          // Merge dynamic types with static values
-          setPropertyTypes((prev) => [
-            ...new Set([...prev, ...uniquePropertyTypes]),
-          ]);
-          setConfigurations(uniqueConfigurations);
-        }
-
-        const response = await getAllLocations();
-        setLocalities(response);
-
-        // Fetch all properties to get all configurations
-        const allProps = await getAllProperties(0, 1000, "", "", "");
-        const allConfigs = Array.from(new Set(allProps.data?.data?.data?.map(p => p.configurations))).filter(Boolean);
-        setAllConfigurations(allConfigs);
-
-      } catch (error) {
-        console.error("Error fetching property data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const handleResetFilters = () => {
+    setSelectedPropertyType("");
+    setSelectedConfiguration("");
+    setSelectedLocality("");
+    setCurrentPage(0);
+  };
 
   const formatPrice = (price) => {
+    if (!price || isNaN(price)) return "N/A";
+    
     if (price >= 10000000) {
       return (price / 10000000).toFixed(2) + " Cr";
     } else if (price >= 100000) {
       return (price / 100000).toFixed(2) + " L";
     }
-    return price.toLocaleString(); // For smaller values, format with commas
+    return price.toLocaleString();
   };
 
-  const handleMoreDetail = (id) => {
-    window.open(
-      `/propertyforsale/${id.toLowerCase().replace(/\s+/g, "-")}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+  const handleMoreDetail = (id, canonical) => {
+    const url = canonical 
+      ? `/propertyforsale/${canonical}` 
+      : `/propertyforsale/${id.toString().toLowerCase().replace(/\s+/g, "-")}`;
+    
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images";
-
-  // Handler for property type selection
   const handleTypeSelect = async (type) => {
     setSelectedType(type);
     setShowAddModal(false);
     try {
       const projectsList = await getAllProjectsByType(type);
-      setProjects(projectsList);
-    } catch (e) {
+      setProjects(Array.isArray(projectsList) ? projectsList : []);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
       setProjects([]);
     }
     setShowDetailsModal(true);
   };
 
-  // Handler for closing details modal
   const handleCloseDetailsModal = () => {
     setShowDetailsModal(false);
     setSelectedProject("");
-    // Optionally reset all fields here
+    // Reset form fields
+    setPropertyType("");
+    setAgeOfProperty("");
+    setFloorNo("");
+    setConfiguration("");
+    setFacing("");
+    setFurnishing("");
+    setBalconyCount("");
+    setBedroomCount("");
+    setCoveredParking("");
   };
 
-  // Handler for confirm
   const handleConfirm = async () => {
-    // Find the selected project name
-    const selectedProjectObj = projects.find((proj) => proj.project_id === selectedProject);
-    const projectName = selectedProjectObj ? selectedProjectObj.project_name : '';
-    // Gather all modal field values as per required API JSON
+    // Validation
+    if (!selectedProject) {
+      alert("Please select a project");
+      return;
+    }
+
+    const selectedProjectObj = projects.find(
+      (proj) => proj.project_id === selectedProject
+    );
+    const projectName = selectedProjectObj ? selectedProjectObj.project_name : "";
+
     const propertyData = {
-      project_id: selectedProject, // project_id
-      name: projectName, // name
-      property_type: propertyType, // property_type
-      age_of_property: ageOfProperty, // age_of_property
-      floor_number: floorNo, // floor_number
-      facing: facing, // facing
-      furnishing: furnishing, // furnishing
-      balcony_count: balconyCount, // balcony_count
-      bedrooms_count: bedroomCount, // bedrooms_count
-      covered_parking: coveredParking, // covered_parking
+      project_id: selectedProject,
+      name: projectName,
+      property_type: "COMMERCIAL",
+      // age_of_property: ageOfProperty,
+      // floor_number: floorNo,
+      // facing: facing,
+      // furnishing: furnishing,
+      // balcony_count: balconyCount,
+      // bedrooms_count: bedroomCount,
+      // covered_parking: coveredParking,
     };
 
     try {
-    const response = await saveProperty(propertyData);
-    setShowDetailsModal(false);
-    const propertyId = response?.data?.property_id;
-    setProjectId(selectedProject);
-      navigate(`/propertyforsale/${propertyId}`, { state: propertyData,  projectId: selectedProject  });
+      const response = await saveProperty(propertyData);
+      setShowDetailsModal(false);
+      const propertyId = response?.data?.property_id;
+      setProjectId(selectedProject);
+      navigate(`/propertyforsale/${propertyId}`, {
+        state: { ...propertyData, projectId: selectedProject },
+      });
     } catch (error) {
-      alert('Error saving property: ' + error.message);
+      console.error("Error saving property:", error);
+      alert("Error saving property: " + (error.message || "Unknown error"));
     }
   };
 
@@ -231,7 +325,7 @@ const PropertyListing = () => {
                     <select
                       name="propertyType"
                       value={selectedPropertyType}
-                      onChange={(e) => setSelectedPropertyType(e.target.value)}
+                      onChange={(e) => handleFilterChange('propertyType', e.target.value)}
                       style={{
                         marginRight: "10px",
                         padding: "8px 12px",
@@ -252,7 +346,7 @@ const PropertyListing = () => {
                     <select
                       name="configuration"
                       value={selectedConfiguration}
-                      onChange={(e) => setSelectedConfiguration(e.target.value)}
+                      onChange={(e) => handleFilterChange('configuration', e.target.value)}
                       style={{
                         marginRight: "10px",
                         padding: "8px 12px",
@@ -273,7 +367,7 @@ const PropertyListing = () => {
                     <select
                       name="locality"
                       value={selectedLocality}
-                      onChange={(e) => setSelectedLocality(e.target.value)}
+                      onChange={(e) => handleFilterChange('locality', e.target.value)}
                       style={{
                         marginRight: "10px",
                         padding: "8px 12px",
@@ -284,23 +378,21 @@ const PropertyListing = () => {
                       }}
                     >
                       <option value="">All Localities</option>
-                      {/* Remove duplicate cities in dropdown */}
-                      {Array.from(new Set(localities.map(loc => loc.city ? loc.city.toUpperCase() : '')))
-                        .filter(city => city)
-                        .map((city, idx) => (
-                          <option key={city} value={city}>
-                            {city}
-                          </option>
-                        ))}
+                      {Array.from(
+                        new Set(
+                          localities
+                            .map((loc) => loc.city ? loc.city.toUpperCase() : "")
+                            .filter(Boolean)
+                        )
+                      ).map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
                     </select>
 
-                    {/* Reset Button with Refresh Icon */}
                     <button
-                      onClick={() => {
-                        setSelectedPropertyType("");
-                        setSelectedConfiguration("");
-                        setSelectedLocality("");
-                      }}
+                      onClick={handleResetFilters}
                       style={{
                         padding: "8px 12px",
                         border: "none",
@@ -318,9 +410,9 @@ const PropertyListing = () => {
                         icon={faSyncAlt}
                         style={{ marginRight: "5px" }}
                       />
+                      Reset
                     </button>
 
-                    {/* Add Property Button */}
                     <button
                       className="btn btn-primary btn-sm"
                       style={{
@@ -344,228 +436,233 @@ const PropertyListing = () => {
                   className="col-md-8 sticky-scroll"
                   style={{
                     maxWidth: "100%",
-                    maxHeight: "80vh", // Set a max height relative to the viewport
-                    overflowY: "auto", // Enable vertical scrolling
-                    paddingRight: "10px", // Avoid scrollbar overlapping content
+                    maxHeight: "80vh",
+                    overflowY: "auto",
+                    paddingRight: "10px",
                   }}
                 >
-                  {Array.isArray(properties) && properties.length === 0 ? (
+                  {loading ? (
+                    <div className="text-center p-4">
+                      <div className="spinner-border" role="status">
+                        <span className="sr-only">Loading...</span>
+                      </div>
+                    </div>
+                  ) : !Array.isArray(properties) || properties.length === 0 ? (
                     <div className="alert alert-info" role="alert">
-                      No properties found.
+                      No properties found. Try adjusting your filters.
                     </div>
                   ) : (
-                    Array.isArray(properties) && properties.length > 0 && (
-                      <>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "10px", // Adds spacing between cards
-                          }}
-                        >
-                          {properties.map((property) => (
-                            <div
-                              className="card mb-3"
-                              style={{
-                                maxWidth: "100%",
-                                borderRadius: "10px",
-                                padding: "10px",
-                                boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
-                              }}
-                              key={property.id}
-                            >
-                              <div className="row g-0">
-                                <div className="col-md-4">
-                                  <a href={`/propertyforsale/${property?.id}`}>
-                                    <img
-                                      className="img-fluid"
-                                      alt={property.name}
-                                      src={
-                                        property.images && property.images.length > 0
-                                          ? property.images[0]
-                                          : "default-image.jpg"
-                                      }
-                                      loading="lazy"
-                                      style={{
-                                        maxWidth: "100%",
-                                        borderRadius: "10px",
-                                        height: "220px",
-                                        objectFit: "cover",
-                                        padding: "5px",
-                                      }}
-                                    />
-                                  </a>
-                                </div>
-                                <div className="col-md-8">
-                                  <div
-                                    className="card-body"
-                                    style={{ fontSize: "smaller" }}
-                                  >
-                                    <div className="d-flex justify-content-between align-items-center">
-                                      <p className="card-title">
-                                        <b>{property.name}</b>
-                                      </p>
-                                    </div>
-
-                                    <h6 className="card-text">
-                                      {property.name}
-                                      <br />
-                                      <span
-                                        style={{
-                                          fontSize: "11px",
-                                          color: "#a1a1a1",
-                                        }}
-                                      >
-                                        BY {property.developer_name}
-                                      </span>
-                                    </h6>
-                                    <div
-                                      className="property-info"
-                                      style={{
-                                        display: "flex",
-                                        flexWrap: "wrap",
-                                        gap: "10px",
-                                      }}
-                                    >
-                                      <div style={{ flex: "1 1 30%" }}>
-                                        <i className="fas fa-home"></i> Built-up Area
-                                        <br />
-                                        <strong>{property.built_up_area}</strong>
-                                      </div>
-                                      <div style={{ flex: "1 1 30%" }}>
-                                        <i className="far fa-calendar-alt"></i> Possession Status
-                                        <br />
-                                        <strong>{property.possession_status}</strong>
-                                      </div>
-                                      <div style={{ flex: "1 1 30%" }}>
-                                        <i className="fas fa-compass"></i> Facing
-                                        <br />
-                                        <strong>{property.facing}</strong>
-                                        <div style={{ marginTop: 4 }}>
-                                          <i className="fas fa-map-marker-alt"></i> Location
-                                          <br />
-                                          <strong>{property.location}</strong>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <button
-                                      onClick={() => handleMoreDetail(property?.id,property?.meta_info?.canonical)}
-                                      className="theme-btn"
-                                    >
-                                      Contact Details
-                                    </button>
+                    <>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                        }}
+                      >
+                        {properties.map((property) => (
+                          <div
+                            className="card mb-3"
+                            style={{
+                              maxWidth: "100%",
+                              borderRadius: "10px",
+                              padding: "10px",
+                              boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
+                            }}
+                            key={property.id}
+                          >
+                            <div className="row g-0">
+                              <div className="col-md-4">
+                                <a href={`/propertyforsale/${property?.id}`}>
+                                  <img
+                                    className="img-fluid"
+                                    alt={property.name || "Property"}
+                                    src={
+                                      property.images && property.images.length > 0
+                                        ? property.images[0]
+                                        : "/default-image.jpg"
+                                    }
+                                    loading="lazy"
+                                    style={{
+                                      maxWidth: "100%",
+                                      borderRadius: "10px",
+                                      height: "220px",
+                                      objectFit: "cover",
+                                      padding: "5px",
+                                    }}
+                                  />
+                                </a>
+                              </div>
+                              <div className="col-md-8">
+                                <div
+                                  className="card-body"
+                                  style={{ fontSize: "smaller" }}
+                                >
+                                  <div className="d-flex justify-content-between align-items-center">
+                                    <p className="card-title">
+                                      <b>{property.name || "Property Name"}</b>
+                                    </p>
                                   </div>
+
+                                  <h6 className="card-text">
+                                    {property.name || "Property Name"}
+                                    <br />
+                                    <span
+                                      style={{
+                                        fontSize: "11px",
+                                        color: "#a1a1a1",
+                                      }}
+                                    >
+                                      BY {property.developer_name || "Developer"}
+                                    </span>
+                                  </h6>
+                                  <div
+                                    className="property-info"
+                                    style={{
+                                      display: "flex",
+                                      flexWrap: "wrap",
+                                      gap: "10px",
+                                    }}
+                                  >
+                                    <div style={{ flex: "1 1 30%" }}>
+                                      <i className="fas fa-home"></i> Built-up Area
+                                      <br />
+                                      <strong>{property.built_up_area || "N/A"}</strong>
+                                    </div>
+                                    <div style={{ flex: "1 1 30%" }}>
+                                      <i className="far fa-calendar-alt"></i> Possession Status
+                                      <br />
+                                      <strong>{property.possession_status || "N/A"}</strong>
+                                    </div>
+                                    <div style={{ flex: "1 1 30%" }}>
+                                      <i className="fas fa-compass"></i> Facing
+                                      <br />
+                                      <strong>{property.facing || "N/A"}</strong>
+                                      <div style={{ marginTop: 4 }}>
+                                        <i className="fas fa-map-marker-alt"></i> Location
+                                        <br />
+                                        <strong>{property.location || "N/A"}</strong>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() =>
+                                      handleMoreDetail(
+                                        property?.id,
+                                        property?.meta_info?.canonical
+                                      )
+                                    }
+                                    className="theme-btn"
+                                  >
+                                    Contact Details
+                                  </button>
                                 </div>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      </>
-                    )
+                          </div>
+                        ))}
+                      </div>
+                    </>
                   )}
                 </div>
 
                 {/* Carousel Section */}
-                <>
-                  <style>
-                    {`
-      @media (max-width: 767px) {
-        #carousel {
-          display: none !important;
-        }
-      }
-    `}
-                  </style>
-
-                  <div className="col-md-4" id="carousel">
-                    <div
-                      className="bord"
+                <div className="col-md-4" id="carousel">
+                  <div
+                    className="bord"
+                    style={{
+                      backgroundColor: "white",
+                      padding: "20px",
+                      borderRadius: "20px",
+                    }}
+                  >
+                    <img
+                      src="images/Image-01.jpg"
+                      className="d-block w-100"
+                      alt="Top Image"
+                      loading="lazy"
                       style={{
-                        backgroundColor: "white",
-                        padding: "20px",
-                        borderRadius: "20px",
+                        borderRadius: "10px",
+                        height: "262px",
+                        marginBottom: "31px",
                       }}
+                    />
+                    <div
+                      id="carouselExampleIndicators"
+                      className="carousel slide"
+                      data-bs-ride="carousel"
                     >
-                      <img
-                        src="images/Image-01.jpg"
-                        className="d-block w-100"
-                        alt="Top Image"
-                        loading="lazy"
-                        style={{
-                          borderRadius: "10px",
-                          height: "262px",
-                          marginBottom: "31px",
-                        }}
-                      />
-                      <div
-                        id="carouselExampleIndicators"
-                        className="carousel slide"
-                        data-bs-ride="carousel"
-                      >
-                        <div className="carousel-inner">
-                          <div className="carousel-item active">
-                            <div className="row">
-                              <div className="col-md-6">
-                                <img
-                                  src="images/Image-02.jpg"
-                                  className="d-block w-100"
-                                  alt="First Slide"
-                                  loading="lazy"
-                                  style={{
-                                    borderRadius: "10px",
-                                    height: "131px",
-                                  }}
-                                />
-                              </div>
-                              <div className="col-md-6">
-                                <img
-                                  src="images/Image-03.jpg"
-                                  className="d-block w-100"
-                                  alt="Second Slide"
-                                  loading="lazy"
-                                  style={{
-                                    borderRadius: "10px",
-                                    height: "131px",
-                                  }}
-                                />
-                              </div>
+                      <div className="carousel-inner">
+                        <div className="carousel-item active">
+                          <div className="row">
+                            <div className="col-md-6">
+                              <img
+                                src="images/Image-02.jpg"
+                                className="d-block w-100"
+                                alt="First Slide"
+                                loading="lazy"
+                                style={{
+                                  borderRadius: "10px",
+                                  height: "131px",
+                                }}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <img
+                                src="images/Image-03.jpg"
+                                className="d-block w-100"
+                                alt="Second Slide"
+                                loading="lazy"
+                                style={{
+                                  borderRadius: "10px",
+                                  height: "131px",
+                                }}
+                              />
                             </div>
                           </div>
-                          {/* Add more carousel items as needed */}
                         </div>
                       </div>
                     </div>
                   </div>
-                </>
+                </div>
 
-                {/* End of Carousel Section */}
-
+                {/* Pagination Controls */}
                 <div
                   className="pagination-controls"
                   style={{
                     display: "flex",
                     justifyContent: "center",
-                    padding: "10px",
+                    alignItems: "center",
+                    padding: "20px",
+                    gap: "10px",
                   }}
                 >
                   <button
                     className="btn btn-primary"
                     onClick={handlePrevious}
-                    disabled={currentPage === 0}
+                    disabled={currentPage === 0 || loading}
+                    style={{
+                      opacity: currentPage === 0 || loading ? 0.5 : 1,
+                      cursor: currentPage === 0 || loading ? "not-allowed" : "pointer",
+                    }}
                   >
-                    <i className="fas fa-chevron-left"></i>{" "}
-                    {/* Left arrow icon */}
+                    <i className="fas fa-chevron-left"></i>
                   </button>
-                  <span className="page-info">
+                  
+                  <span className="page-info" style={{ margin: "0 15px", fontWeight: "bold" }}>
                     Page {currentPage + 1} of {totalPages}
                   </span>
+                  
                   <button
                     className="btn btn-primary"
                     onClick={handleNext}
-                    disabled={currentPage >= totalPages - 1}
+                    disabled={currentPage >= totalPages - 1 || loading}
+                    style={{
+                      opacity: currentPage >= totalPages - 1 || loading ? 0.5 : 1,
+                      cursor: currentPage >= totalPages - 1 || loading ? "not-allowed" : "pointer",
+                    }}
                   >
-                    <i className="fas fa-chevron-right"></i>{" "}
-                    {/* Right arrow icon */}
+                    <i className="fas fa-chevron-right"></i>
                   </button>
                 </div>
               </div>
@@ -574,7 +671,7 @@ const PropertyListing = () => {
         </div>
       </section>
 
-      {/* Modal for Add Property */}
+      {/* Add Property Type Selection Modal */}
       {showAddModal && (
         <div
           style={{
@@ -596,7 +693,7 @@ const PropertyListing = () => {
               background: "#fff",
               borderRadius: "24px",
               padding: "32px",
-              width: "900px", // Increased width for desktop
+              width: "900px",
               maxWidth: "98vw",
               minWidth: "0",
               boxShadow: "0 2px 16px rgba(0,0,0,0.18)",
@@ -639,7 +736,6 @@ const PropertyListing = () => {
                 justifyContent: "center",
               }}
             >
-              {/* Commercial Property Card */}
               <div
                 style={{
                   background: "#eaf6ff",
@@ -684,7 +780,6 @@ const PropertyListing = () => {
                   }}
                 />
               </div>
-              {/* Residential Property Card */}
               <div
                 style={{
                   background: "#ffeaf2",
@@ -734,7 +829,7 @@ const PropertyListing = () => {
         </div>
       )}
 
-      {/* Single Modal: Project Select + Property Details */}
+      {/* Property Details Modal */}
       {showDetailsModal && (
         <div
           style={{
@@ -816,11 +911,19 @@ const PropertyListing = () => {
               </span>
             </div>
             <Select
-              options={projects.map((proj) => ({ value: proj.project_id, label: proj.project_name }))}
+              options={projects.map((proj) => ({
+                value: proj.project_id,
+                label: proj.project_name,
+              }))}
               value={
                 selectedProject
                   ? projects.find((proj) => proj.project_id === selectedProject)
-                    ? { value: selectedProject, label: (projects.find((proj) => proj.project_id === selectedProject).project_name) }
+                    ? {
+                        value: selectedProject,
+                         label: projects.find(
+                          (proj) => proj.project_id === selectedProject
+                        ).project_name,
+                      }
                     : null
                   : null
               }
@@ -832,7 +935,7 @@ const PropertyListing = () => {
                 menu: (base) => ({ ...base, zIndex: 9999 }),
               }}
             />
-            <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
+            {/* <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 500, marginBottom: 4 }}>
                   Property Type
@@ -984,9 +1087,9 @@ const PropertyListing = () => {
                   }}
                 />
               </div>
-            </div>
-            <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
-              <div style={{ flex: 1 }}>
+            </div> */}
+            <div style={{display: "flex", gap: 16, marginBottom: 24, justifyContent: "flex-end"}}>
+              {/* <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 500, marginBottom: 4 }}>
                   Covered Parking
                 </div>
@@ -1002,43 +1105,35 @@ const PropertyListing = () => {
                     border: "1px solid #ccc",
                   }}
                 />
-              </div>
+              </div> */}
               <button
                 onClick={handleConfirm}
                 style={{
-                  flex: 1,
-                  padding: "10px 0",
+                  padding: "10px 20px",
                   border: "none",
                   borderRadius: 8,
                   background: "#2067d1",
-                  marginTop:"29px",
                   color: "#fff",
                   fontWeight: 600,
                   fontSize: 16,
                   cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  minWidth: 0,
-                  maxWidth: "100%",
                   height: "40px",
                   boxShadow: "0 2px 8px rgba(32,103,209,0.10)",
-                  marginLeft: 12
                 }}
               >
                 Confirm
               </button>
             </div>
-
-            {/* AddProject Modal */}
-            {showAddProjectModal && (
-              <AddProject
-                show={showAddProjectModal}
-                handleClose={() => setShowAddProjectModal(false)}
-              />
-            )}
           </div>
         </div>
+      )}
+
+      {/* AddProject Modal - Moved outside details modal */}
+      {showAddProjectModal && (
+        <AddProject
+          show={showAddProjectModal}
+          handleClose={() => setShowAddProjectModal(false)}
+        />
       )}
     </>
   );
