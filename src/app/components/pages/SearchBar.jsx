@@ -14,7 +14,6 @@ const SearchBar = () => {
   const navigate = useNavigate();
   // const searchRef = useRef(null); // Ref for search input
 
-
   // Fetch localities when the component mounts
   useEffect(() => {
     const fetchLocalities = async () => {
@@ -29,7 +28,6 @@ const SearchBar = () => {
     setLocation(e.target.value);
   };
 
-  // Handle Project Name Change with Debounced API Call
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);

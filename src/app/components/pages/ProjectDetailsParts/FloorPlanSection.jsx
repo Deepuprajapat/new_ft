@@ -7,8 +7,6 @@ const BASE_URL = "https://image.investmango.com/images/";
 
 const FloorPlanSection = ({
   projectData,
-  activeFilter,
-  setActiveFilter,
   formatPrice,
   showEdit,
   handleSave,
@@ -17,11 +15,14 @@ const FloorPlanSection = ({
   const [editableFloorPara, setEditableFloorPara] = useState(
     projectData?.floorPara || ""
   );
-  const [editableFloorplans, setEditableFloorplans] = useState([]);
+  const [editableFloorplans, setEditableFloorplans] = useState(
+    projectData?.web_cards?.floor_plan?.products || []
+  );
   const [removeIndex, setRemoveIndex] = useState(null);
   const [showImagePopup, setShowImagePopup] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
+  const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false)
+  const [activeFilter, setActiveFilter] =useState('all');
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);
@@ -43,18 +44,14 @@ const FloorPlanSection = ({
   // For file input refs
   const fileInputRefs = useRef([]);
 
+  // Update editableFloorplans when projectData changes
   useEffect(() => {
-    // if (!isEditing && fetchFloorPlansFromApi) {
-    //   fetchFloorPlansFromApi().then((data) => {
-    //     setEditableFloorplans(data?.floorplans || []);
-    //     setEditableFloorPara(data?.floorPara || "");
-    //   });
-    // } else {
-    //   setEditableFloorPara(projectData?.floorPara || "");
-    //   setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
-    // }
-    // eslint-disable-next-line
-  }, []);
+    if (projectData?.web_cards?.floor_plan?.products) {
+      setEditableFloorplans(projectData.web_cards.floor_plan.products);
+    }
+  }, [projectData]);
+
+
 
   const handleFloorPlanChange = (index, field, value) => {
     const updated = [...editableFloorplans];
@@ -115,15 +112,7 @@ const FloorPlanSection = ({
   };
 
   const handleCancel = async () => {
-    setIsEditing(false);
-    // if (fetchFloorPlansFromApi) {
-    //   const data = await fetchFloorPlansFromApi();
-    //   setEditableFloorplans(data?.floorplans || []);
-    //   setEditableFloorPara(data?.floorPara || "");
-    // } else {
-    //   setEditableFloorPara(projectData?.floorPara || "");
-    //   setEditableFloorplans(projectData?.floorplans ? JSON.parse(JSON.stringify(projectData.floorplans)) : []);
-    // }
+    setIsEditing(false)
   };
 
   // Handle image upload for a floor plan
@@ -140,31 +129,36 @@ const FloorPlanSection = ({
 
   // Filtering logic
   const filteredPlans = isEditing
-    ? editableFloorplans
+    ? JSON.stringify(editableFloorplans)
     : projectData?.web_cards?.floor_plan?.products || [];
+
 
   const filtered = filteredPlans.filter(
     (plan) =>
-      activeFilter === "all" || plan.projectConfigurationName === activeFilter || plan.flat_type === activeFilter // for new API
-     
+      activeFilter === "all" ||
+      plan.title === activeFilter ||
+      plan.flat_type === activeFilter
   );
+
   const sortedPlans = filtered.sort((a, b) => {
     const sizeA = parseFloat(a.building_area || a.size);
     const sizeB = parseFloat(b.building_area || b.size);
-  
     return sizeA - sizeB;
   });
 
   const handleEdit = () => {
     setEditableFloorPara(projectData?.floorPara || "");
-    setEditableFloorplans(
-      projectData?.web_cards?.floor_plan?.products
-        ? JSON.parse(JSON.stringify(projectData.web_cards.floor_plan.products))
-        : []
-    );
+    setEditableFloorplans(projectData?.web_cards?.floor_plan?.products || []);
     setIsEditing(true);
   };
 
+  const filterOptions = [
+    ...new Set(
+      (projectData?.floor_plan?.products || []).map(
+        (plan) => plan.title || plan.flat_type
+      )
+    ),
+  ];
   
   return (
     <div
@@ -275,32 +269,23 @@ const FloorPlanSection = ({
             >
               All
             </button>
-            {projectData?.configurations
-              ?.slice()
-              .sort((a, b) => {
-                const numA = parseFloat(a) || 0;
-                const numB = parseFloat(b) || 0;
-                return numA - numB;
-              })
-              .map((config, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveFilter(config)}
-                  className={`btn ${activeFilter === config ? "btn-primary" : ""
-                    }`}
-                  style={{
-                    border: "2px solid #000",
-                    borderRadius: "15px",
-                    padding: window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
-                    fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-                    fontWeight: "600",
-                    backgroundColor:
-                      activeFilter === config ? "rgb(32, 103, 209)" : "",
-                  }}
-                >
-                  {config}
-                </button>
-              ))}
+            {filterOptions.map((config, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveFilter(config)}
+                className={`btn ${activeFilter === config ? "btn-primary" : ""}`}
+                style={{
+                  border: "2px solid #000",
+                  borderRadius: "15px",
+                  padding: window.innerWidth <= 768 ? "2px 5px" : "5px 15px",
+                  fontSize: window.innerWidth <= 768 ? "10px" : "14px",
+                  fontWeight: "600",
+                  backgroundColor: activeFilter === config ? "rgb(32, 103, 209)" : "",
+                }}
+              >
+                {config}
+              </button>
+            ))}
           </div>
           <Carousel
             responsive={{

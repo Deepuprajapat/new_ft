@@ -8,18 +8,25 @@ const ProjectCard = ({ project }) => {
 
   const defaultImage = "http://localhost:3000/img/building_soon.jpg"; // Placeholder image
   const navigate = useNavigate();
-  // Navigate to the project URL and pass projectId in state, so only the URL is shown in the address bar
-  const handleMoreDetails = (url, projectId) => {
-    console.log(url,projectId, "yyyy")
-    const cleanUrl = `/${url.toLowerCase().replace(/\s+/g, "-")}`;
-    navigate(cleanUrl, { state: { projectId } });
-  };
 
-  // Extract floorplan sizes
-  // const floorplanSizes =
-  //   project.floorplans?.map((floorplan) => floorplan.size) || [];
-  // const minSize = floorplanSizes.length ? Math.min(...floorplanSizes) : null;
-  // const maxSize = floorplanSizes.length ? Math.max(...floorplanSizes) : null;
+  
+  const handleMoreDetails = (url, projectId) => {
+    console.log(url, projectId, "yyyy");
+    const cleanUrl = `/${url.toLowerCase().replace(/\s+/g, "-")}`;
+    const stateData = { projectId };
+    
+    // Fix: Stringify the object before storing
+    console.log("Storing in sessionStorage:", stateData);
+    sessionStorage.setItem('projectState', JSON.stringify(stateData));
+    
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+        newWindow.location.href = cleanUrl;
+    }
+};
+
+   
+ 
 
   const sizeRange = project.sizes?.match(/\d+/g); // Extract all numbers from the string
   console.log(project.canonical,"canonical URL");
@@ -29,19 +36,17 @@ const ProjectCard = ({ project }) => {
 
 
   const validPrices = project.floorplans
-    ?.filter((floorplan) => floorplan.price && floorplan.price > 1.5) // Exclude falsy values (0, "", null) and <= 1.5
+    ?.filter((floorplan) => floorplan.price && floorplan.price > 1.5) 
     .map((floorplan) => floorplan.price);
 
   const minPrice = validPrices?.length ? Math.min(...validPrices) : null;
 
   return (
     <div className="card-im">
-      <a
-        href={project.canonical}
-        target="_blank"
-        rel="noopener noreferrer"
+      <div
+        onClick={() => handleMoreDetails(project.canonical, project.project_id)}
+        style={{ cursor: "pointer" }}
       >
-
         {project.is_premium && <span className="premium-tag">Premium</span>}
         <img
           alt={project.name}
@@ -49,9 +54,8 @@ const ProjectCard = ({ project }) => {
           loading="lazy"
           className="project-card-image"
         />
-
         <p className="project-card-title">{project.project_name}</p>
-      </a>
+      </div>
       <p className="project-card-location">
         <i className="fas fa-map-marker-alt"></i>{" "}
         {project.short_address}
@@ -71,8 +75,6 @@ const ProjectCard = ({ project }) => {
             {project.configuration
               ? (() => {
                 let configArray = [];
-
-                // Parse the string into an array
                 try {
                   configArray = JSON.parse(project.configuration);
                 } catch (err) {
@@ -101,14 +103,11 @@ const ProjectCard = ({ project }) => {
                   bhkOutput =
                     minBHK === maxBHK ? `${minBHK}BHK` : `${minBHK}BHK, ${maxBHK}BHK`;
                 }
-
-                // Prepare other configurations output
                 const otherOutput =
                   otherConfigs.length > 1
                     ? `${otherConfigs[0]}, ${otherConfigs[otherConfigs.length - 1]}`
                     : otherConfigs[0] || null;
 
-                // Combine outputs
                 const combinedOutput = [bhkOutput, otherOutput]
                   .filter(Boolean)
                   .join(", ");
