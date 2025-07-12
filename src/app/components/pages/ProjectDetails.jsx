@@ -39,6 +39,17 @@ const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg";
 
 const ProjectDetails = () => {
+  // Check if user is authenticated by looking for token in cookie or localStorage
+  const getAuthToken = () => {
+    // Try to get token from cookie first
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; authToken=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    
+    // Fallback to localStorage
+    return localStorage.getItem('authToken');
+  };
+
   const [activeSection, setActiveSection] = useState("overview");
   const [projectData, setProjectData] = useState(null);
   const [allSimilarProjects, setAllSimilarProjects] = useState(null);
@@ -188,7 +199,6 @@ const ProjectDetails = () => {
   } catch (error) {
     console.error("Error saving project data:", error);
   }
-
   setIsEditing(false);
 };
  
@@ -247,7 +257,7 @@ const ProjectDetails = () => {
   };
 
   const projectDataFromState = location.state?.projectData;
-  console.log(projectDataFromState,"projectDataFromState")
+  // console.log(projectDataFromState,"projectDataFromState")
 
   // Store initial nav position on mount
   useEffect(() => {
@@ -286,6 +296,7 @@ const ProjectDetails = () => {
       } else if (urlName) {
         try {
           const data = await getAllProjectsByUrlName(projectIdFromNav, navigate);
+          console.log(data , "gggg")
           if (data) {
             setProjectData(data);
             setDeveloperId(data.developerId);
@@ -818,7 +829,7 @@ const ProjectDetails = () => {
 
 
 
-  const [showEdit, setShowEdit] = useState(true);
+  const [showEdit, setShowEdit] = useState(!!getAuthToken());
   return (
     <>
       {projectData && (

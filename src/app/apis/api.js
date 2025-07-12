@@ -5,37 +5,21 @@ import { useNavigate } from "react-router-dom";
 // const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
 
 let BASE_URL = process.env.REACT_APP_BASE_URL;
-let BASE_URL1 = process.env.REACT_APP_BASE_URL1;
-let BASE_URL2 = process.env.REACT_APP_BASE_URL2;
-// const BASE_URL="https://api.i  nvestmango.com"
-
-//  const BASE_URL="http://localhost:8282"
-// const BASE_URL1="https://api.virtualintelligence.co.in"
-
+let SECONDARY_URL = process.env.REACT_APP_SECONDARY_URL
 
 console.log("BASE_URL", BASE_URL);
-console.log("BASE_URL1", BASE_URL1); 
-console.log("BASE_URL2", BASE_URL2); 
+console.log("SECONDARY_URL", SECONDARY_URL); 
 
-// if (process.env.REACT_APP_ENV === "production") {
-//   BASE_URL = process.env.REACT_APP_BASE_URL;
-// }
-
-// if (process.env.REACT_APP_ENV === "production") {
-//   BASE_URL1 = process.env.REACT_APP_BASE_URL1;
-// }
-// const BASE_URL1 = "https://api.virtualintelligence.co.in";
 let token = "";
 
-export const login = async (userName, password) => {
+export const login = async (email, password) => {
   try {
     const response = await axios.post(`${BASE_URL}/auth/generate-token`, {
-      userName,
+      email,
       password,
     });
-    token = response.data.token;
+    token = response.data.data.access_token;
     localStorage.setItem("authToken", token);
-    localStorage.setItem("userName", userName);
     return token;
   } catch (error) {
     console.error("Login failed:", error);
@@ -69,26 +53,23 @@ export const currentUser = async (token) => {
   }
 };
 
-export const getAllLocality = async () => {
-  try {
-    const res = await axios.get(`${BASE_URL}/locality/get/all`, {
-      headers: {
-        "x-auth-token": `${token}`,
-      },
-    });
-    return res;
-  } catch (error) {
-    console.error("Error Fetching Locality", error);
-    return { content: [] };
-  }
-};
+// export const getAllLocality = async () => {
+//   try {
+//     const res = await axios.get(`${BASE_URL}/locality/get/all`, {
+//       headers: {
+//         "x-auth-token": `${token}`,
+//       },
+//     });
+//     return res;
+//   } catch (error) {
+//     console.error("Error Fetching Locality", error);
+//     return { content: [] };
+//   }
+// };
 
 export const getAllDeveloper = async () => {
   try {
-    const res = await axios.get(`${BASE_URL2}/v1/api/developers`, {
-      headers: {
-        "x-auth-token": `${token}`,
-      },
+    const res = await axios.get(`${BASE_URL}/developers`, {
     });
     return res;
   } catch (error) {
@@ -156,8 +137,8 @@ export const getAllProject = async (filters = {}) => {
       ...(type && { type: type.toUpperCase() }),
       // ...(configurations && { configurations }),
     };
-    // console.log(`${BASE_URL2}/v1/api/projects`)
-    const res = await axios.get(`${BASE_URL2}/v1/api/projects`, { params });
+    // console.log(`${BASE_URL}/v1/api/projects`)
+    const res = await axios.get(`${BASE_URL}/projects`, { params });
     //  console.log("Fetched Projects:", res.data.data);
     return res.data.data;
   } catch (error) {
@@ -170,7 +151,7 @@ export const getAllProject = async (filters = {}) => {
 // Get all projects by type (for modal project list)
 export const getAllProjectsByType = async (type) => {
   try {
-    const url = `${BASE_URL2}/v1/api/projects`;
+    const url = `${BASE_URL}/projects`;
     const params = {};
     if (type) params.type = type;
     const res = await axios.get(url, { params });
@@ -184,7 +165,7 @@ export const getAllProjectsByType = async (type) => {
 // Get single project by urlName (for details page)
 export const getAllProjectsByUrlName = async (Projectid, navigate) => {
   try {
-    const url = `${BASE_URL2}/v1/api/projects/${Projectid}`;
+    const url = `${BASE_URL}/projects/${Projectid}`;
     const res = await axios.get(url);
     return res.data.data || {};
   } catch (error) {
@@ -200,14 +181,10 @@ export const getAllProjectsByUrlName = async (Projectid, navigate) => {
 export const patchProjectByTestUrl = async (urlName,patchData) => {
   
   try {
-    const res = await axios.patch(`/v1/api/projects/${urlName}`, // <-- use 8888
+    const res = await axios.patch(`${BASE_URL}/projects/${urlName}`,
       patchData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
     );
+    console.log(res,"fsfrf")
     return res.data.data || {};
   } catch (error) {
     console.error("Error patching project by test URL:", error);
@@ -314,7 +291,7 @@ export const fetchTestimonials = async () => {
 
 export const fetchAllVacancies = async () => {
   try {
-    const response = await fetch(`${BASE_URL1}/get/all/vacancies?isActive=true&page=0&size=100`, {
+    const response = await fetch(`${SECONDARY_URL}/get/all/vacancies?isActive=true&page=0&size=100`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -345,7 +322,7 @@ export const fetchAllVacancies = async () => {
 // Function to submit hiring form data
 export const submitHiringForm = async (formData) => {
   try {
-    const response = await fetch(`${BASE_URL1}/user/save/hiring/by/ai`, {
+    const response = await fetch(`${SECONDARY_URL}/user/save/hiring/by/ai`, {
       method: "POST",
       body: formData,
     });
@@ -567,8 +544,8 @@ export const getAllProperties = async (page, pageSize, type, configuration, loca
   if (configuration) params.configuration = configuration; // changed key
   if (locality) params.city = locality; // changed key
 
-  const response = await axios.get(`${BASE_URL2}/v1/api/properties`, { params });
-  return response;
+  const response = await axios.get(`${BASE_URL}/properties`, { params });
+  return response.data.data; // Return the full object
 };
 
 
@@ -627,7 +604,7 @@ export const getAllProperties = async (page, pageSize, type, configuration, loca
 
 export const getPropertyByUrlName = async (urlName) => {
   try {
-    const res = await axios.get(`${BASE_URL2}/v1/api/properties/${urlName}`);
+    const res = await axios.get(`${BASE_URL}/properties/${urlName}`);
     return res.data || {}; // Ensures that if the response body is empty, we return an empty object
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
@@ -687,23 +664,22 @@ export const patchProjectDetails = async (projectId, patchData) => {
 // Get all locations
 export const getAllLocations = async () => {
   try {
-    const res = await axios.get(`${BASE_URL2}/v1/api/locations`);
+    const res = await axios.get(`${BASE_URL}/locations`);
+    console.log("Locations fetched successfully:", res.data.data);
     return res.data?.data || [];
-    console.log("Locations fetched successfully:", res.data?.data);
   } catch (error) {
     console.error('Error fetching locations:', error);
     return [];
   }
 };
 
-// ...existing code...
 // PATCH property details by property_id (keep at the end)
 export const patchPropertyDetails = async (propertyId, patchData) => {
   try {
     const token = localStorage.getItem("x-auth-token");
    
     const res = await axios.patch(
-      `${BASE_URL2}/v1/api/properties/${propertyId}`,
+      `${BASE_URL}/properties/${propertyId}`,
       patchData,
       {
         headers: {
@@ -721,7 +697,7 @@ export const patchPropertyDetails = async (propertyId, patchData) => {
 // Save property to API
 export const saveProperty = async (propertyData) => {
   try {
-    const res = await axios.post(`${BASE_URL2}/v1/api/properties`,
+    const res = await axios.post(`${BASE_URL}/properties`,
       propertyData,
       {
         headers: {
@@ -738,7 +714,7 @@ export const saveProperty = async (propertyData) => {
 
 export const createnewproject = async (projectdata) => {
   try {
-    const res = await axios.post(`${BASE_URL2}/v1/api/projects`,
+    const res = await axios.post(`${BASE_URL}/projects`,
       projectdata,
       {
         headers: {
@@ -749,6 +725,24 @@ export const createnewproject = async (projectdata) => {
     return res.data;
   } catch (error) {
     console.error('Error saving property:', error);
+    throw error;
+  }
+};
+export const compareProjectsAPI = async (projectIds) => {
+  try {
+    const response = await fetch("http://localhost:8080/v1/api/projects/compare", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ projectIds }), // :white_check_mark: assuming backend expects "projectIds"
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch compared projects");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error comparing projects:", error);
     throw error;
   }
 };

@@ -466,8 +466,8 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={editData?.web_cards?.project_details?.total_floors?.value || ''}
-                      onChange={e => handleInputChange('web_cards.project_details.total_floors.value', e.target.value)}
+                      value={editData?.web_cards?.project_details?.total_floor?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.total_floor.value', e.target.value)}
                       maxLength={500}
                     />
                   ) : (

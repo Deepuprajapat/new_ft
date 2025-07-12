@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getAllProject } from "../../apis/api"; // Assuming this is the API file
 import "../styles/css/video.css";
 import { Helmet } from "react-helmet";
-import Loading from "../Loader"; 
+import Loading from "../Loader";
 
 
 
@@ -16,15 +16,16 @@ const Video = () => {
       const data = await getAllProject({ isDeleted: false });
       console.log("Fetched Projects: ", JSON.stringify(data)); // Log the data to verify the structure
 
-      const sortedProjects = data.content
-        ? data.content
-            .filter(
-              (project) =>
-                project.videos &&
-                project.videos.length > 0 &&
-                project.videos.some((video) => video.trim() !== "") // Ensure videos have valid content
-            )
-            .sort((a, b) => b.videoCount - a.videoCount)
+      const sortedProjects = data
+        ? data
+          .filter(
+            (project) =>
+              project.video_urls &&
+              project.video_urls.length > 0 &&
+              project.video_urls.some((video) => video.trim() !== "")
+
+          )
+          .sort((a, b) => b.videoCount - a.videoCount)
         : [];
 
       setProjects(sortedProjects);
@@ -64,31 +65,31 @@ const Video = () => {
             <div className="listing-home listing-page">
               <div className="listing-slide row">
                 {loading ? (
-                  
+
                   <Loading isFullScreen={false} />
-                
+
                 ) : projects.length > 0 ? (
                   projects.map((project) => {
-                    const floorplanSizes =
-                      project.floorplans?.map((floorplan) => floorplan.size) ||
-                      [];
-                    const minSize = floorplanSizes.length
-                      ? Math.min(...floorplanSizes)
-                      : null;
-                    const maxSize = floorplanSizes.length
-                      ? Math.max(...floorplanSizes)
-                      : null;
+                    // const floorplanSizes =
+                    //   project.floorplans?.map((floorplan) => floorplan.size) ||
+                    //   [];
+                    // const minSize = floorplanSizes.length
+                    //   ? Math.min(...floorplanSizes)
+                    //   : null;
+                    // const maxSize = floorplanSizes.length
+                    //   ? Math.max(...floorplanSizes)
+                    //   : null;
 
-                    const minPrice = project.floorplans?.length
-                      ? Math.min(
-                          ...project.floorplans
-                            .filter((floorplan) => floorplan.price > 1.5) // Exclude prices <= 1.5
-                            .map((floorplan) => floorplan.price)
-                        )
-                      : null;
+                    // const minPrice = project.floorplans?.length
+                    //   ? Math.min(
+                    //     ...project.floorplans
+                    //       .filter((floorplan) => floorplan.price > 1.5) // Exclude prices <= 1.5
+                    //       .map((floorplan) => floorplan.price)
+                    //   )
+                    //   : null;
 
                     return (
-                      <div className="col-md-4" key={project.id}>
+                      <div className="col-md-4" key={project.project_id}>
                         <div
                           className="card-im"
                           style={{
@@ -97,12 +98,13 @@ const Video = () => {
                             marginTop: "10px",
                           }}
                         >
-                          {project.videos && project.videos.length > 0 ? (
+                          {project.video_urls && project.video_urls.length > 0 && project.video_urls[0].trim() !== "" ? (
                             <div className="youtube">
                               <iframe
                                 width="100%"
                                 height="200"
-                                src={`https://www.youtube.com/embed/${project.videos[0]}`}
+                                src={`https://www.youtube.com/embed/${project.video_urls[0]}`}
+
                                 title={project.name}
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
@@ -115,71 +117,63 @@ const Video = () => {
                             className="list_headline_two"
                             style={{ fontSize: "20px" }}
                           >
-                            {project.name}
+                            {project.project_name}
                           </p>
                           <p className="location_im">
                             <i className="fas fa-map-marker-alt"></i>{" "}
-                            {project.shortAddress}
+                            {project.short_address}
                           </p>
                           <h3 className="details">
                             <span>
                               <i className="fas fa-ruler-combined"></i>{" "}
-                              <span>
-                                {minSize && maxSize
-                                  ? `${minSize} To ${maxSize} Sq.ft.`
-                                  : "Size Info"}
-                              </span>
+                              {project.sizes
+                                ? project.sizes.replace(" - ", " To ").replace("sq.ft.", "Sq.ft.")
+                                : "Size Info"}
                             </span>
 
                             <span>
                               <i className="fa fa-bed" aria-hidden="true"></i>{" "}
-                              {Array.isArray(project.configurations) &&
-                              project.configurations.length > 0
-                                ? (() => {
-                                    // Separate BHK configurations
-                                    const bhkConfigs = project.configurations
-                                      .filter((config) => /\d+BHK/.test(config)) // Match numeric BHK configurations
-                                      .map((config) => parseInt(config)) // Extract numeric part (e.g., 2 from 2BHK)
-                                      .filter((num) => !isNaN(num)); // Ensure valid numbers only
+                              {(() => {
+                                let configs = [];
 
-                                    // Find unique configurations
-                                    const otherConfigs =
-                                      project.configurations.filter(
-                                        (config) => !/\d+BHK/.test(config) // Exclude BHK configurations
-                                      );
+                                try {
+                                  configs = JSON.parse(project.configuration || "[]");
+                                } catch (e) {
+                                  console.error("Invalid configuration JSON:", project.configuration);
+                                }
 
-                                    // Prepare BHK output
-                                    let bhkOutput = null;
-                                    if (bhkConfigs.length > 0) {
-                                      const minBHK = Math.min(...bhkConfigs);
-                                      const maxBHK = Math.max(...bhkConfigs);
-                                      bhkOutput =
-                                        minBHK === maxBHK
-                                          ? `${minBHK}BHK`
-                                          : `${minBHK}BHK, ${maxBHK}BHK`;
-                                    }
+                                if (configs.length === 0) return "Property Type";
 
-                                    // Prepare other configurations output
-                                    const otherOutput =
-                                      otherConfigs.length > 1
-                                        ? `${otherConfigs[0]}, ${
-                                            otherConfigs[
-                                              otherConfigs.length - 1
-                                            ]
-                                          }`
-                                        : otherConfigs[0] || null;
+                                // Separate BHK configurations
+                                const bhkConfigs = configs
+                                  .filter((config) => /\d+BHK/.test(config))
+                                  .map((config) => parseInt(config))
+                                  .filter((num) => !isNaN(num));
 
-                                    // Combine outputs
-                                    const combinedOutput = [
-                                      bhkOutput,
-                                      otherOutput,
-                                    ]
-                                      .filter(Boolean)
-                                      .join(", ");
+                                const otherConfigs = configs.filter((config) => !/\d+BHK/.test(config));
 
-                                    return combinedOutput || "Property Type"; // Fallback if no configurations exist
-                                  })()
-                                : "Property Type"}
+                                let bhkOutput = null;
+                                if (bhkConfigs.length > 0) {
+                                  const minBHK = Math.min(...bhkConfigs);
+                                  const maxBHK = Math.max(...bhkConfigs);
+                                  bhkOutput =
+                                    minBHK === maxBHK
+                                      ? `${minBHK}BHK`
+                                      : `${minBHK}BHK, ${maxBHK}BHK`;
+                                }
+
+                                const otherOutput =
+                                  otherConfigs.length > 1
+                                    ? `${otherConfigs[0]}, ${otherConfigs[otherConfigs.length - 1]}`
+                                    : otherConfigs[0] || null;
+
+                                const combinedOutput = [bhkOutput, otherOutput]
+                                  .filter(Boolean)
+                                  .join(", ");
+
+                                return combinedOutput || "Property Type";
+                              })()}
+
                             </span>
                           </h3>
                           <div className="list-footer">
@@ -187,17 +181,14 @@ const Video = () => {
                               Start from{" "}
                               <b>
                                 ₹
-                                {minPrice
-                                  ? minPrice >= 10000000
-                                    ? parseFloat(
-                                        (minPrice / 10000000).toFixed(2)
-                                      ) + " Cr"
-                                    : parseFloat(
-                                        (minPrice / 100000).toFixed(2)
-                                      ) + " Lakh"
+                                {project.min_price
+                                  ? Number(project.min_price) >= 10000000
+                                    ? (Number(project.min_price) / 10000000).toFixed(2) + " Cr"
+                                    : (Number(project.min_price) / 100000).toFixed(2) + " Lakh"
                                   : "N/A"}
                               </b>
                             </p>
+
                             <a
                               href={`tel:+91-8595189189`}
                               target="_blank"

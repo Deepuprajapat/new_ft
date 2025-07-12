@@ -73,8 +73,10 @@ const PropertyListing = () => {
       configParam,
       cityParam
     );
-    setProperties(Array.isArray(data.data?.data?.data) ? data.data.data.data : []);
-    setTotalPages(data.data?.pagination?.total_pages || 1);
+    // setProperties(Array.isArray(data.data?.data?.data) ? data.data.data.data : []);
+    console.log(data.data, "dataa")
+    setProperties(data.data)
+    setTotalPages(data?.pagination?.total_pages || 1);
   };
 
   const handleNext = () => {

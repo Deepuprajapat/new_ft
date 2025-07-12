@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllProject } from "../../apis/api";
+import { getAllProject, getAllLocalities } from "../../apis/api";
 import { Helmet } from "react-helmet";
 import jsPDF from "jspdf"; // Import jsPDF
 import "jspdf-autotable";
@@ -11,9 +11,9 @@ import {
   Menu,
   MenuItem,
   ListItemText,
-  
+
 } from "@mui/material";
-import  ShareIcon from "@mui/icons-material/Share";
+import ShareIcon from "@mui/icons-material/Share";
 import ListIcon from '@mui/icons-material/List';
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -24,6 +24,7 @@ import LeadFormModal from "./LeadFormModal";
 
 const CompareProjects = () => {
   const [projects, setProjects] = useState([]);
+  const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedProjects, setSelectedProjects] = useState(["", "", ""]);
   const [comparedProjects, setComparedProjects] = useState([]);
@@ -42,18 +43,33 @@ const CompareProjects = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const data = await getAllProject();
-      setProjects(data.content);
+      const data = await getAllProject(selectedCity ? { city: selectedCity } : {});
+      setProjects(data || []);
     };
     fetchProjects();
+  }, [selectedCity]); // Re-run when selectedCity changes
+
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      const localCities = await getAllLocalities();
+      setCities(localCities);
+    };
+    fetchCities();
   }, []);
 
-  const handleSelect = (index, value,event) => {
-    // console.log(value,'bbbbbbbbbbbbb')
-    const updatedSelection = [...selectedProjects];
-    updatedSelection[index] = value;
-    setSelectedProjects(updatedSelection);
-  };
+
+
+const handleSelect = (index, value, event) => {
+  const updatedSelection = [...selectedProjects];
+  updatedSelection[index] = value ? value.project_id : "";
+  setSelectedProjects(updatedSelection);
+  console.log("Updated Selected Projects for Compare:", updatedSelection);
+};
+
+
+
+
 
   const formatPriceInCrores = (price) => {
     if (price === 1.5) {
@@ -79,42 +95,26 @@ const CompareProjects = () => {
     }
   };
 
-  const handleCompare = () => {
-    const selected = selectedProjects.filter((projectId) => projectId !== "");
-    // console.log(selected,'aaaaaaaaaaaaa')
-    if (selected.length < 2) {
-      alert("Please select at least 2 projects to compare.");
-    } else {
-      console.log(projects,'projects')
-      // console.log(  projects.filter((project) =>
-      //   selected.includes(project.id.toString())))
-      const selectedData = projects.filter((project) =>
-        // selected.includes(project.id.toString())
-      selected.map(String).includes(String(project.id)) 
-      );
-      console.log(selectedData,'selectedData')
-      setComparedProjects(selectedData);
-    }
-  };
+const handleCompare = async () => {
+  const selected = selectedProjects.filter((projectId) => projectId);
+  if (selected.length < 2) {
+    alert("Please select at least 2 projects to compare.");
+    return;
+  }
 
-  // const handleCompare = () => {
-  //   const selected = selectedProjects.filter((projectId) => projectId !== "");
-  //   console.log(selected, "aaaaaaaaaaaaa");
-  
-  //   if (selected.length < 2) {
-  //     alert("Please select at least 2 projects to compare.");
-  //   } else {
-  //     console.log(projects, "projects");
-  
-  //     // Ensure type consistency when filtering
-  //     const selectedData = projects.filter((project) =>
-  //       selected.map(String).includes(String(project.id)) // Convert both to string
-  //     );
-  
-  //     console.log(selectedData, "selectedData");
-  //     setComparedProjects(selectedData);
-  //   }
-  // };
+  try {
+    // Filter projects from the existing projects state instead of making API calls
+    const fullProjects = projects.filter((project) => 
+      selected.includes(project.project_id)
+    );
+    setComparedProjects(fullProjects);
+  } catch (error) {
+    console.error("Error comparing projects:", error);
+  }
+};
+
+
+
 
   const handleShareClick = (platform) => {
     const url = encodeURIComponent(window.location.href);
@@ -150,18 +150,24 @@ const CompareProjects = () => {
   const renderProjectData = (project, field) => {
     switch (field) {
       case "Image":
-        const image = project.images?.[0]?.imageUrl;
+        const image = project?.web_cards?.images?.[1];
         return image ? (
           <img
-          src={image}
-          alt={project.name}
-          loading="lazy"
-          style={{ width: "300px", height: "300px", borderRadius: "10px", cursor: "pointer" }}
-          onClick={() => window.open(`/${project.url}`, "_blank")}
-        />
+            src={image}
+            alt={project.name}
+            loading="lazy"
+            style={{
+              width: "300px",
+              height: "300px",
+              borderRadius: "10px",
+              cursor: "pointer",
+            }}
+            onClick={() => window.open(`/${project.url}`, "_blank")}
+          />
         ) : (
           "No Image Available"
         );
+
       case "Project Name":
         return project.name;
       case "Total Area":
@@ -241,8 +247,8 @@ const CompareProjects = () => {
       case "Construction Type":
         return project?.status
           ? project.status
-              .replace(/_/g, " ")
-              .replace(/\b\w/g, (char) => char.toUpperCase())
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (char) => char.toUpperCase())
           : "--";
       default:
         return "--";
@@ -283,8 +289,7 @@ const CompareProjects = () => {
             value = project.floorplans
               .map(
                 (config) =>
-                  `${config.title} - ${
-                    config.size
+                  `${config.title} - ${config.size
                   } Sq.ft. - ${formatPriceInCrores(config.price)}`
               )
               .join("\n");
@@ -349,13 +354,12 @@ const CompareProjects = () => {
             field === "Size/Price"
               ? project.floorplans?.length > 0
                 ? project.floorplans
-                    .map(
-                      (config) =>
-                        `${config.title} - ${
-                          config.size
-                        } Sq.ft. - ${formatPriceInCrores(config.price)}`
-                    )
-                    .join("\n")
+                  .map(
+                    (config) =>
+                      `${config.title} - ${config.size
+                      } Sq.ft. - ${formatPriceInCrores(config.price)}`
+                  )
+                  .join("\n")
                 : "No Data Available"
               : renderProjectData(project, field) || "No Data Available";
 
@@ -417,24 +421,24 @@ const CompareProjects = () => {
     setAnchorEl(null);
   };
 
-  const handleCitySelect = (city) => {
-    setSelectedCity(city);
-    setSelectedProjects(["", "", ""]); // Reset selected projects when city changes
+  const handleCitySelect = (value) => {
+    setSelectedCity(value?.city || "");
+    setSelectedProjects(["", "", ""]); // Reset project dropdowns
   };
 
+
+
   // Extract unique cities
-  const cities = [
-    ...new Set(
-      projects.map((project) => project?.locality?.city?.name).filter(Boolean)
-    ),
-  ].sort((a, b) => a.localeCompare(b));
+  // const cities = [
+  //   ...new Set(
+  //     projects.map((project) => project?.locality?.city?.name).filter(Boolean)
+  //   ),
+  // ].sort((a, b) => a.localeCompare(b));
+
 
   // Filter projects based on selected city
-  const filteredProjects = selectedCity
-    ? projects.filter(
-        (project) => project?.locality?.city?.name === selectedCity
-      )
-    : projects;
+  const filteredProjects = projects; // Already filtered by city in API
+
 
   return (
     <>
@@ -466,7 +470,9 @@ const CompareProjects = () => {
           <Autocomplete
             options={cities}
             getOptionLabel={(option) =>
-              option.charAt(0).toUpperCase() + option.slice(1).toLowerCase()
+              typeof option === "string"
+                ? option
+                : option?.city?.charAt(0).toUpperCase() + option?.city?.slice(1).toLowerCase()
             }
             onChange={(event, value) => handleCitySelect(value)}
             renderInput={(params) => (
@@ -483,22 +489,22 @@ const CompareProjects = () => {
             }}
           />
         </div>
-        <div className="d-flex flex-wrap justify-content-center mb-4" style={{gap: '10px'}}>
+        <div className="d-flex flex-wrap justify-content-center mb-4" style={{ gap: '10px' }}>
           {[0, 1, 2].map((index) => (
             <div
               key={index}
               // className="mx-2"
-              style={{ width: window.innerWidth <= 768 ? "100%" : "320px" ,display:'flex',alignItems:'center'}}
+              style={{ width: window.innerWidth <= 768 ? "100%" : "320px", display: 'flex', alignItems: 'center' }}
             >
-             <ListIcon />
+              <ListIcon />
               <Autocomplete
                 options={filteredProjects}
-                getOptionLabel={(option) => option.name}
-                style= {{width:'100%',marginLeft:'10px'}}
+                getOptionLabel={(option) => option.project_name}
+                style={{ width: '100%', marginLeft: '10px' }}
                 onChange={(event, value) =>
-                  handleSelect(index, value ? value.id : "",event)
-                
+                  handleSelect(index, value ? value.project_id : "", event)
                 }
+
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -511,10 +517,10 @@ const CompareProjects = () => {
             </div>
           ))}
 
-        
+
         </div>
         <div className="d-flex flex-wrap justify-content-center mb-4">
-        <button
+          <button
             className="btn mx-2"
             onClick={handleCompare}
             style={{

@@ -5,7 +5,7 @@ import {
   checkPhoneNumberExists,
   submitLead,
 } from "../../apis/api";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "../styles/css/blog.css";
 import swal from "sweetalert";
 import { Helmet } from "react-helmet";
@@ -22,84 +22,94 @@ const Blogs = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { blogUrl } = useParams();
-  const [schema, setSchema] = useState(null); // Store processed schema
-  const navigate = useNavigate(); // For programmatic navigation
+  const location = useLocation();
+  const blogId = location.state?.blogId;
+  const [schema, setSchema] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBlogData = async () => {
-      if (blogUrl) {
-        try {
-          const data = await getAllBlogByUrl(blogUrl);
+      try {
+        let response;
+
+        if (blogUrl) {
+          response = await getAllBlogByUrl(blogUrl);
+        } else if (blogId) {
+          // If we have blogId but no blogUrl, we need to get the blog URL first
+          // For now, we'll try to use the blogId as the URL
+          response = await getAllBlogByUrl(blogId);
+        }
+
+        if (response) {
+          const data = response.data || response;
           setBlogData(data);
-          // Process schema if available
-          // Process schema if available and in correct format
+
           if (Array.isArray(data.schema) && data.schema.length > 0) {
             try {
-              const rawSchema = data.schema[0] // Get first schema entry
-                .replace(/<script[^>]*>/g, "") // Remove opening <script> tag
-                .replace(/<\/script>/g, "") // Remove closing </script> tag
+              const rawSchema = data.schema[0]
+                .replace(/<script[^>]*>/g, "")
+                .replace(/<\/script>/g, "")
                 .trim();
 
-              const parsedSchema = JSON.parse(rawSchema); // Convert string to JSON object
+              const parsedSchema = JSON.parse(rawSchema);
               setSchema(parsedSchema);
             } catch (error) {
               console.error("Error parsing schema JSON:", error);
             }
           }
-        } catch (error) {
-          console.error("Error fetching blog data:", error);
+        } else {
           navigate("*");
         }
+      } catch (error) {
+        console.error("Error fetching blog data:", error);
+        navigate("*");
       }
     };
 
     const fetchRecentPosts = async () => {
       try {
-        const response = await getAllBlog(0, 20); // Fetch top 20 highlights
-        setRecentPosts(response.content || []);
+        const response = await getAllBlog(); // Don't pass 0, 20
+        // Show only 20 most recent posts
+        const top20Posts = (response || []).slice(-20).reverse();
+        setRecentPosts(top20Posts);
       } catch (error) {
         console.error("Error fetching recent posts:", error);
       }
     };
 
+
     fetchBlogData();
     fetchRecentPosts();
-  }, [blogUrl]);
+  }, [blogUrl, blogId]);
 
-  // Function to handle click and navigate
-  const handlePostClick = (postUrl) => {
-    navigate(`/blogs/${postUrl}`);
+  const handlePostClick = (postUrl, postId) => {
+    navigate(`/blogs/${postUrl}`, { state: { blogId: postId } });
   };
 
-  // Handle form changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const metakeywords = blogData?.metaKeywords || [];
-  // Handle form submission with phone validation
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const phoneExists = await checkPhoneNumberExists(formData.usermobile);
       if (phoneExists) {
-        swal(
-          "Oops!",
-          "You are already registered with this phone number.",
-          "error"
-        );
+        swal("Oops!", "You are already registered with this phone number.", "error");
       } else {
         const updatedFormData = {
           ...formData,
-          projectName: ["BlogPage"], // Static field
-          source: "ORGANIC", // Static field
+          projectName: ["BlogPage"],
+          source: "ORGANIC",
         };
         await submitLead(updatedFormData);
         swal("Success!", "Form submitted successfully!", "success").then(() => {
-          navigate("/thankYou"); // Redirect after clicking "OK"
+          navigate("/thankYou");
         });
 
-        // Reset form data
         setFormData({
           username: "",
           useremail: "",
@@ -111,36 +121,48 @@ const Blogs = () => {
       swal("Error", "An error occurred. Please try again.", "error");
     }
   };
+
   return (
     <>
       <Helmet>
         <title>
-          {Array.isArray(blogData?.headings)
-            ? blogData.headings.join(" ")
-            : blogData?.headings || "Default Title"}
+          {blogData?.seo_meta_info?.title ||
+            (Array.isArray(blogData?.blog_content?.title)
+              ? blogData.blog_content.title.join(" ")
+              : blogData?.blog_content?.title) ||
+            "Default Title"}
         </title>
+
         <meta
           name="keywords"
           content={
-            Array.isArray(metakeywords?.length > 0)
-              ? metakeywords?.join(", ")
-              : "default keyword"
+            blogData?.seo_meta_info?.keywords ||
+            (Array.isArray(blogData?.metaKeywords)
+              ? blogData.metaKeywords.join(", ")
+              : "default keyword")
           }
         />
 
         <meta
           name="description"
-          content={blogData?.subHeadings || "Default description"}
+          content={
+            blogData?.seo_meta_info?.description ||
+            blogData?.subHeadings ||
+            "Default description"
+          }
         />
-        {/* {Array.isArray(blogData?.schema)? blogData?.schema.join(" "):blogData?.schema|| "default schema"} */}
-        {/* Inject Schema if available */}
+
         {schema && (
-          <script type="application/ld+json">{JSON.stringify(schema)}</script>
+          <script type="application/ld+json">
+            {JSON.stringify(schema)}
+          </script>
         )}
-        {blogData?.canonical && (
-          <link rel="canonical" href={blogData.canonical} />
+
+        {blogData?.seo_meta_info?.canonical && (
+          <link rel="canonical" href={blogData.seo_meta_info.canonical} />
         )}
       </Helmet>
+
 
       <section className="main-body">
         <div className="main-con">
@@ -150,6 +172,7 @@ const Blogs = () => {
                 className="row d-flex"
                 style={{ justifyContent: "start", alignItems: "flex-start" }}
               >
+                {/* Blog Main Content */}
                 <div
                   className="col-md-8 blog-container"
                   style={{ padding: "25px" }}
@@ -158,10 +181,10 @@ const Blogs = () => {
                     {blogData ? (
                       <>
                         <div className="col-md-12">
-                          <p id="blog-title">{blogData.headings}</p>
+                          <p id="blog-title">{blogData.blog_content.title}</p>
                           <small>
-                            Date -
-                            {new Date(blogData.createdDate).toLocaleDateString(
+                            Date -{" "}
+                            {new Date(blogData?.created_at).toLocaleDateString(
                               "en-GB",
                               {
                                 day: "2-digit",
@@ -174,8 +197,8 @@ const Blogs = () => {
                         <div>
                           <img
                             className="img-fluid blog-image"
-                            src={blogData.images[0] || ""}
-                            alt={blogData.alt || "Blog Image"}
+                            src={blogData.blog_content.image || ""}
+                            alt={blogData.blog_content.image_alt || "Blog Image"}
                             loading="lazy"
                           />
                         </div>
@@ -191,7 +214,7 @@ const Blogs = () => {
                           }}
                           dangerouslySetInnerHTML={{
                             __html: `
-      <style>
+                               <style>
         .content p {
           margin-bottom: 15px;
           font-size: 16px;
@@ -235,10 +258,10 @@ const Blogs = () => {
           object-fit: cover; /* Maintain aspect ratio with cropping if needed */
         }
       </style>
-      ${blogData.description}
-    `,
+                              ${blogData.blog_content.description}
+                            `,
                           }}
-                        ></div>
+                        />
                       </>
                     ) : (
                       <p>Loading blog content...</p>
@@ -246,7 +269,7 @@ const Blogs = () => {
                   </div>
                 </div>
 
-                {/* Recent Posts Section */}
+                {/* ✅ Recent Posts Section */}
                 <div
                   className="recent-posts col-md-4"
                   style={{
@@ -262,31 +285,29 @@ const Blogs = () => {
                   <h2>Recent Posts</h2>
                   <div className="blogs-links">
                     <ul style={{ listStyleType: "none", padding: 0 }}>
-                      {recentPosts
-                        .slice()
-                        .reverse()
-                        .map((post) => (
-                          <li
-                            key={post.id}
+                      {recentPosts.map((post) => (
+                        <li
+                          key={post.id}
+                          onClick={() => handlePostClick(post.blog_url, post.id)}
+                          style={{
+                            // borderBottom: "1px solid rgb(54, 50, 50)",
+                            padding: "7px 0",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <span
                             style={{
-                              borderBottom: "1px solidrgb(54, 50, 50)",
-                              padding: "7px 0",
-                              cursor: "pointer",
+                              color: "black",
+                              fontSize: "15px",
+                              fontWeight: 600,
+                              textDecoration: "none",
                             }}
-                            onClick={() => handlePostClick(post.blogUrl)}
                           >
-                            <span
-                              style={{
-                                color: "black",
-                                fontSize: "15px",
-                                fontWeight: 600,
-                                textDecoration: "none",
-                              }}
-                            >
-                              {post.headings}
-                            </span>
-                          </li>
-                        ))}
+                            {post.title}
+                          </span>
+                        </li>
+                      ))}
+
                     </ul>
                   </div>
                 </div>
@@ -324,7 +345,6 @@ const Blogs = () => {
                     value={formData.usermobile}
                     onChange={handleChange}
                     onInput={(e) => {
-                      // Allow only digits and limit to 10 digits
                       const value = e.target.value
                         .replace(/\D/g, "")
                         .slice(0, 10);

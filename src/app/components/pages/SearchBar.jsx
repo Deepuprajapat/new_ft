@@ -73,7 +73,7 @@ const SearchBar = () => {
       );
 
       if (matchedProject) {
-        navigate(`/${matchedProject.url}`);
+        navigate(`/${matchedProject.canonical}`);
         return; // Exit since we found an exact match
       }
 
@@ -83,7 +83,7 @@ const SearchBar = () => {
     // Include the location in the URL
     if (location) {
       console.log("Location", location);  
-      const formattedLocationName = location.toLowerCase().replace(/\s+/g, "-");
+      const formattedLocationName = location;
       queryParams.push(`city=${formattedLocationName}`);
     }
 
@@ -100,7 +100,7 @@ const SearchBar = () => {
   };
 
   const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion.name);
+    setSearchQuery(suggestion.project_name);
     setShowSuggestions(false); // Hide suggestions after selection
   };
 
