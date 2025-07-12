@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllProject, getAllLocalities } from "../../apis/api";
+import { getAllProject, getAllLocalities, compareProjectsAPI } from "../../apis/api";
 import { Helmet } from "react-helmet";
 import jsPDF from "jspdf"; // Import jsPDF
 import "jspdf-autotable";
@@ -58,18 +58,22 @@ const CompareProjects = () => {
     fetchCities();
   }, []);
 
-
-
-const handleSelect = (index, value, event) => {
-  const updatedSelection = [...selectedProjects];
-  updatedSelection[index] = value ? value.project_id : "";
-  setSelectedProjects(updatedSelection);
-  console.log("Updated Selected Projects for Compare:", updatedSelection);
-};
+  // useEffect(() => {
+  //   const filteredProjects = selectedProjects.filter(id => id && id.trim() !== "");
+  //   if (filteredProjects.length >= 2) {
+  //     handleCompare();
+  //   }
+  // }, [selectedProjects]);
 
 
 
 
+  const handleSelect = (index, value) => {
+    const updatedSelection = [...selectedProjects];
+    updatedSelection[index] = value?.project_id || "";
+    setSelectedProjects(updatedSelection);
+    console.log("Updated Selected Projects for Compare:", updatedSelection);
+  };
 
   const formatPriceInCrores = (price) => {
     if (price === 1.5) {
@@ -95,26 +99,25 @@ const handleSelect = (index, value, event) => {
     }
   };
 
-const handleCompare = async () => {
-  const selected = selectedProjects.filter((projectId) => projectId);
-  if (selected.length < 2) {
-    alert("Please select at least 2 projects to compare.");
-    return;
-  }
+  const handleCompare = async () => {
+    const filteredProjects = selectedProjects.filter(id => id && id.trim() !== "");
 
-  try {
-    // Filter projects from the existing projects state instead of making API calls
-    const fullProjects = projects.filter((project) => 
-      selected.includes(project.project_id)
-    );
-    setComparedProjects(fullProjects);
-  } catch (error) {
-    console.error("Error comparing projects:", error);
-  }
-};
+    if (filteredProjects.length < 2) {
+      alert("Please select at least 2 valid projects to compare.");
+      return;
+    }
 
-
-
+    try {
+      const response = await compareProjectsAPI(filteredProjects); // send only valid IDs
+      if (response?.data?.projects?.length > 0) {
+        setComparedProjects(response.data.projects); // assuming you're setting state here
+      } else {
+        console.warn("No data returned from compare API");
+      }
+    } catch (error) {
+      console.error("Error comparing projects:", error);
+    }
+  };
 
   const handleShareClick = (platform) => {
     const url = encodeURIComponent(window.location.href);
@@ -169,64 +172,127 @@ const handleCompare = async () => {
         );
 
       case "Project Name":
-        return project.name;
+        return project.project_name;
       case "Total Area":
-        return project.area;
+        return project?.web_cards?.project_details?.area?.value || "N/A";
       case "Location":
-        return project.address;
+        return project.location_info.short_address;
       case "No of Unit":
-        return project.units;
+        return project?.web_cards?.project_details?.units?.value;
       case "Possession Date":
-        const possessionDate = project.possessionDate;
-        if (possessionDate === "Coming, Soon") {
-          return possessionDate; // If it's "Coming, Soon", display it as is
-        } else {
-          const date = new Date(possessionDate);
-          return isNaN(date.getTime())
-            ? "Invalid Date"
-            : date.toLocaleDateString(); // Check if it's a valid date
+        const possessionDate = project?.web_cards?.project_details?.possession_date?.value;
+
+        if (!possessionDate) return "N/A";
+
+        if (possessionDate.toLowerCase() === "coming, soon") {
+          return "Coming Soon";
         }
+
+        // If format is like "March,2028", split and return properly
+        const [month, year] = possessionDate.split(",");
+        if (month && year) {
+          return `${month.trim()} ${year.trim()}`;
+        } else {
+          return possessionDate; // fallback
+        }
+
+
+
       case "Size/Price":
-        return (
-          <table className="nested-table">
-            <tbody>
-              {project.floorplans?.length > 0 ? (
-                project.floorplans
-                  .filter((config) => config.price !== 1.5) // Filter out "Sold Out" properties
-                  .map((config, index) => (
-                    <tr key={index}>
-                      <td>{config.projectConfigurationName}</td>
-                      <td>{config.size} Sq.ft.</td>
-                      <td>{formatPriceInCrores(config.price)}</td>
-                    </tr>
-                  ))
-              ) : (
+        const rawConfigurations = project?.web_cards?.project_details?.configuration?.value || null;
+        const floorPlans = project?.web_cards?.floor_plan?.products || [];
+
+        // Parse configurations array
+        let configurations = [];
+        if (rawConfigurations) {
+          try {
+            const parsed = JSON.parse(rawConfigurations);
+            if (Array.isArray(parsed)) {
+              configurations = parsed;
+            } else if (typeof parsed === "string") {
+              configurations = [parsed];
+            }
+          } catch (e) {
+            configurations = [rawConfigurations];
+          }
+        }
+
+        // Sort configurations by number (e.g., 1BHK, 2BHK, etc.)
+        configurations.sort((a, b) => {
+          const numA = parseInt(a);
+          const numB = parseInt(b);
+          return numA - numB;
+        });
+
+        // Match each configuration with floor plan product
+        const rows = configurations.map((config) => {
+          const matchedPlan = floorPlans.find((plan) =>
+            plan.flat_type?.toLowerCase().includes(config.toLowerCase())
+          );
+
+          if (matchedPlan) {
+            return {
+              config,
+              size: matchedPlan.building_area,
+              price: matchedPlan.price,
+            };
+          } else {
+            return {
+              config,
+              size: "N/A",
+              price: "Price on Request",
+            };
+          }
+        });
+
+        // Render Table
+        if (rows.length > 0) {
+          return (
+            <table className="nested-table">
+              <tbody>
+                {rows.map((row, index) => (
+                  <tr key={index}>
+                    <td>{row.config}</td>
+                    <td>{row.size} Sq.ft.</td>
+                    <td>{typeof row.price === "string" ? formatPriceInCrores(row.price) : row.price}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          );
+        } else {
+          return (
+            <table className="nested-table">
+              <tbody>
                 <tr>
                   <td colSpan="3" className="text-center">
                     No Data Available
                   </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        );
+              </tbody>
+            </table>
+          );
+        }
+
+
+
       case "Per Sq.ft. Rate":
         return "N/A"; // Returns area in Sq.ft., or "N/A" if not available
 
       case "Property Type":
-        return project.configurationsType?.propertyType || "N/A";
+        return project?.web_cards?.project_details?.type?.value || "N/A";
       case "Highlights":
-        return project?.usps?.length ? (
+        return Array.isArray(project?.web_cards?.why_to_choose?.usp_list) &&
+          project.web_cards.why_to_choose.usp_list.length > 0 ? (
           <ul
             style={{
               paddingLeft: "15px",
-              margin: "0",
-              // listStylePosition: "inside",
-              fontSize: "13px", // Makes the font smaller
-              fontWeight: "600", // Ensures normal font weight
+              margin: 0,
+              fontSize: "13px",
+              fontWeight: "600",
             }}
           >
-            {project.usps.map((point, index) => (
+            {project.web_cards.why_to_choose.usp_list.map((point, index) => (
               <li key={index} style={{ padding: "5px 0" }}>
                 {point}
               </li>
@@ -236,14 +302,15 @@ const handleCompare = async () => {
           "N/A"
         );
 
+
       case "No. of Towers":
-        return project?.totalTowers || "N/A";
+        return project?.web_cards?.project_details?.total_towers?.value || "N/A";
       case "Total Floors":
-        return project?.totalFloor || "N/A";
+        return project?.web_cards?.project_details?.total_floor?.value || "N/A";
       case "Per Tower Lifts":
         return project?.Lifts || "N/A";
       case "Open Area":
-        return project?.area || "N/A";
+        return project?.web_cards?.project_details?.area?.value || "N/A";
       case "Construction Type":
         return project?.status
           ? project.status
@@ -501,9 +568,8 @@ const handleCompare = async () => {
                 options={filteredProjects}
                 getOptionLabel={(option) => option.project_name}
                 style={{ width: '100%', marginLeft: '10px' }}
-                onChange={(event, value) =>
-                  handleSelect(index, value ? value.project_id : "", event)
-                }
+                onChange={(event, value) => handleSelect(index, value)}
+
 
                 renderInput={(params) => (
                   <TextField
@@ -522,7 +588,7 @@ const handleCompare = async () => {
         <div className="d-flex flex-wrap justify-content-center mb-4">
           <button
             className="btn mx-2"
-            onClick={handleCompare}
+            onClick={handleCompare} // This is now the only place where comparison triggers
             style={{
               backgroundColor: "#2067d1",
               borderColor: "#2067d1",
@@ -532,6 +598,8 @@ const handleCompare = async () => {
           >
             Compare Now
           </button>
+
+
           <div
             className="share-btn"
             onMouseEnter={() => setShowShareOptions(true)}
@@ -571,7 +639,7 @@ const handleCompare = async () => {
                 <tr>
                   <th>Details</th>
                   {comparedProjects.map((project) => (
-                    <th key={project.id}>{project.name}</th>
+                    <th key={project.id}>{project.project_name}</th>
                   ))}
                 </tr>
               </thead>

@@ -53,20 +53,6 @@ export const currentUser = async (token) => {
   }
 };
 
-// export const getAllLocality = async () => {
-//   try {
-//     const res = await axios.get(`${BASE_URL}/locality/get/all`, {
-//       headers: {
-//         "x-auth-token": `${token}`,
-//       },
-//     });
-//     return res;
-//   } catch (error) {
-//     console.error("Error Fetching Locality", error);
-//     return { content: [] };
-//   }
-// };
-
 export const getAllDeveloper = async () => {
   try {
     const res = await axios.get(`${BASE_URL}/developers`, {
@@ -343,19 +329,28 @@ export const submitHiringForm = async (formData) => {
 
 export const getAllLocalities = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/locality/get/all`);
-    const localities = response.data || []; // Default to an empty array if no data
-    // Filter out localities with 'unknown' or 'UNKNOWN' in the city name or any other relevant fields
+    const response = await axios.get(`${BASE_URL}/locations`);
+    const localities = response.data.data || [];
+
+    // Filter out entries with 'unknown' city
     const filteredLocalities = localities.filter(
-      (locality) => locality.city.name.toLowerCase() !== "unknown"
+      (locality) =>
+        locality.city &&
+        locality.city.toLowerCase() !== "unknown"
     );
-    // Map filtered localities to extract city details and ensure uniqueness
-    const uniqueCities = Array.from(
-      new Map(
-        filteredLocalities.map((locality) => [locality.city.id, locality.city])
-      ).values()
-    );
-    return uniqueCities; // Returns an array of { id, name } objects
+
+    // Create a unique set of cities
+    const uniqueCitiesMap = new Map();
+    filteredLocalities.forEach((locality) => {
+      if (!uniqueCitiesMap.has(locality.city)) {
+        uniqueCitiesMap.set(locality.city, {
+          id: locality.id, // optional
+          city: locality.city,
+        });
+      }
+    });
+
+    return Array.from(uniqueCitiesMap.values());
   } catch (error) {
     console.error("Error fetching localities:", error);
     return [];
@@ -728,14 +723,15 @@ export const createnewproject = async (projectdata) => {
     throw error;
   }
 };
+
 export const compareProjectsAPI = async (projectIds) => {
   try {
-    const response = await fetch("http://localhost:8080/v1/api/projects/compare", {
+    const response = await fetch(`${BASE_URL}/projects/compare`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ projectIds }), // :white_check_mark: assuming backend expects "projectIds"
+       body: JSON.stringify({ project_ids: projectIds }), // :white_check_mark: assuming backend expects "projectIds"
     });
     if (!response.ok) {
       throw new Error("Failed to fetch compared projects");
@@ -744,5 +740,16 @@ export const compareProjectsAPI = async (projectIds) => {
   } catch (error) {
     console.error("Error comparing projects:", error);
     throw error;
+  }
+};
+
+
+export const getAllBlogById = async (id) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/blogs/${id}`);
+    return res.data || {}; // Ensures that if the response body is empty, we return an empty object
+  } catch (error) {
+    console.error("Error fetching Blogs By URl:", error);
+    return { content: [] };
   }
 };

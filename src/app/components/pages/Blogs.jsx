@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
-  getAllBlogByUrl,
+  // getAllBlogByUrl,
+  getAllBlogById,
   getAllBlog,
   checkPhoneNumberExists,
   submitLead,
@@ -32,13 +33,12 @@ const Blogs = () => {
       try {
         let response;
 
-        if (blogUrl) {
-          response = await getAllBlogByUrl(blogUrl);
-        } else if (blogId) {
-          // If we have blogId but no blogUrl, we need to get the blog URL first
-          // For now, we'll try to use the blogId as the URL
-          response = await getAllBlogByUrl(blogId);
+        if (blogId) {
+          response = await getAllBlogById(blogId);
         }
+        // else if (blogUrl) {
+        //   response = await getAllBlogByUrl(blogUrl);
+        // }
 
         if (response) {
           const data = response.data || response;
