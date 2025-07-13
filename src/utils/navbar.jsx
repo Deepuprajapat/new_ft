@@ -1,15 +1,6 @@
 
-const getAuthToken = () => {
-  // Try to get token from cookie first
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; authToken=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  
-  // Fallback to localStorage
-  return localStorage.getItem('authToken');
-};
 
-const show = !!getAuthToken();
+const show = true
 const navItems = [
     { label: 'Home', path: '/' },
     {

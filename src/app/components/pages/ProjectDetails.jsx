@@ -824,6 +824,8 @@ const ProjectDetails = () => {
   //   (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   // );
 
+
+
   const [showEdit, setShowEdit] = useState(!!getAuthToken());
   return (
     <>
