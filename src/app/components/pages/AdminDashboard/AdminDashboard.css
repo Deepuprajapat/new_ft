@@ -11,6 +11,17 @@
   padding-bottom: 20px;
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.header-text {
+  flex: 1;
+}
+
 .dashboard-header h1 {
   color: #2c3e50;
   font-size: 2.5rem;
@@ -22,6 +33,36 @@
   color: #6c757d;
   font-size: 1.1rem;
   margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: flex-start;
+}
+
+.add-property-btn {
+  background: #28a745;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+
+.add-property-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.add-property-btn i {
+  font-size: 0.9rem;
 }
 
 .loading-container,
@@ -230,8 +271,19 @@
     padding: 15px;
   }
   
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
   .dashboard-header h1 {
     font-size: 2rem;
+  }
+  
+  .add-property-btn {
+    width: 100%;
+    justify-content: center;
   }
   
   .properties-grid {
