@@ -146,7 +146,7 @@ const PropertyDetails = () => {
       setError("Failed to send OTP. Please try again.");
     }
   };
-
+//last changes
   // Simulate OTP verification API
   const verifyOtp = async () => {
     try {
