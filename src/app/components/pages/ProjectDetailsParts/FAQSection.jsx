@@ -34,7 +34,16 @@ const FAQSection = ({ projectData  , showEdit , handleSave }) => {
  useEffect(() => {
   let sortedFaqs = Array.isArray(projectData?.faqs)
     ? projectData.faqs
-        .map((faq) => ({ ...faq, ...cleanQuestion(faq.question) }))
+        .map((faq) => {
+          // Ensure proper question and answer mapping
+          const cleanedQuestion = cleanQuestion(faq.question || faq.text || "");
+          return {
+            ...faq,
+            question: faq.question || faq.text || "",
+            answer: faq.answer || "",
+            ...cleanedQuestion
+          };
+        })
         .sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity))
     : [];
   setFaqs(sortedFaqs);
@@ -198,7 +207,7 @@ const FAQSection = ({ projectData  , showEdit , handleSave }) => {
                   <span className="fw-bold">
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(faq.question || faq.text)
+                        __html: DOMPurify.sanitize(faq.question || "")
                       }}
                     />
                   </span>
@@ -261,7 +270,7 @@ const FAQSection = ({ projectData  , showEdit , handleSave }) => {
                   ) : (
                     <div
                       dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(faq?.answer),
+                        __html: DOMPurify.sanitize(faq.answer || ""),
                       }}
                     />
                   )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const KnowAboutSection = ({ property, showFullDescription, setShowFullDescription, onSave }) => {
+const KnowAboutSection = ({ showEdit,property, showFullDescription, setShowFullDescription, onSave }) => {
   const [isAboutEditing, setIsAboutEditing] = useState(false);
   // Prefer web_cards.know_about.description if present, else property.about
   const knowAbout = property?.web_cards?.know_about || property?.know_about || {};
@@ -54,6 +54,7 @@ const KnowAboutSection = ({ property, showFullDescription, setShowFullDescriptio
           }}
         >
           Know About {property?.propertyName}
+          {showEdit && (
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isAboutEditing ? (
               <>
@@ -81,6 +82,7 @@ const KnowAboutSection = ({ property, showFullDescription, setShowFullDescriptio
               />
             )}
           </span>
+          )}
         </h4>
         <div className="px-3">
           <div

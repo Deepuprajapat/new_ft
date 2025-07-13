@@ -22,7 +22,6 @@ const SitePlanSection = ({
   const [imgError, setImgError] = useState(false);
   const [editDescription, setEditDescription] = useState(projectData?.web_cards?.site_plan?.description || '');
 
-  // Reset imgError and description when backend image or edit mode changes
   useEffect(() => {
     setImgError(false);
     setEditDescription(projectData?.web_cards?.site_plan?.description || '');
@@ -33,7 +32,7 @@ const SitePlanSection = ({
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setSiteplanImgUrl(ev.target.result); // base64 preview
+      setSiteplanImgUrl(ev.target.result); 
     };
     reader.readAsDataURL(file);
   };
@@ -56,7 +55,6 @@ const SitePlanSection = ({
     setIsSitePlanEditing(false);
   };
 
-  // Helper to normalize image path
   const getSitePlanImageSrc = () => {
     if (isSitePlanEditing && siteplanImgUrl && siteplanImgUrl.trim() !== '') return siteplanImgUrl;
     const img = projectData?.web_cards?.site_plan?.image || imageSrc;
@@ -141,7 +139,7 @@ const SitePlanSection = ({
                   fontWeight: 500,
                 }}
               >
-                {projectData.web_cards.site_plan.description}
+                {projectData?.web_cards?.site_plan?.description}
               </div>
             )
           )}

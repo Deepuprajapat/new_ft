@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
 const FloorPlanSection = ({
+  showEdit,
   property,
   activeFilter,
   setActiveFilter,
@@ -95,6 +96,7 @@ const FloorPlanSection = ({
           }}
         >
           <span>{property?.propertyName} Floor Plan</span>
+          {showEdit && (
           <span className="d-flex align-items-center" style={{gap: '8px'}}>
             {!editMode ? (
               <FontAwesomeIcon icon={faEdit} className="ms-2" style={{ cursor: "pointer", color: "#fff", fontSize: '18px', padding: '2px 6px' }} onClick={handleEdit} title="Edit" />
@@ -105,6 +107,7 @@ const FloorPlanSection = ({
               </>
             )}
           </span>
+          )}
         </h4>
         {/* Floor Plan Title/Description from property_floor_plan */}
         {property?.web_cards?.property_floor_plan?.title && (

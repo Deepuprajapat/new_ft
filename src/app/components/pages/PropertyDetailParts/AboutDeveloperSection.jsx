@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 
-const AboutDeveloperSection = ({ property, onSave }) => {
+const AboutDeveloperSection = ({showEdit, property, onSave }) => {
   const [editMode, setEditMode] = useState(false);
   const [editable, setEditable] = useState({
     developerLogo: property?.developerLogo || "",

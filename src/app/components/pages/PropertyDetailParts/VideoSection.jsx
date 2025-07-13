@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const VideoSection = ({ property, onSave }) => {
+const VideoSection = ({ property, onSave ,showEdit}) => {
   const [isEditing, setIsEditing] = useState(false);
 
   // Extract video ID from full URL or return raw ID
@@ -109,6 +109,7 @@ if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
           }}
         >
           Video Presentation 
+          {showEdit && (
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isEditing ? (
               <>
@@ -149,6 +150,7 @@ if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
               />
             )}
           </span>
+)}
         </h4>
         <div className="px-3">
           {isEditing ? (

@@ -11,7 +11,8 @@ import {
   verifyOTP,
   resendOTP,
   getReraInfoByProjectId,
-  patchProjectByTestUrl,
+  patchProjectById,
+  patchProjectByTestUrl
   // getLeadByPhone,
   // saveLead,
 } from "../../apis/api";
@@ -44,10 +45,10 @@ const ProjectDetails = () => {
     // Try to get token from cookie first
     const value = `; ${document.cookie}`;
     const parts = value.split(`; authToken=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    
+    if (parts.length === 2) return parts.pop().split(";").shift();
+
     // Fallback to localStorage
-    return localStorage.getItem('authToken');
+    return localStorage.getItem("authToken");
   };
 
   const [activeSection, setActiveSection] = useState("overview");
@@ -58,10 +59,23 @@ const ProjectDetails = () => {
   const [developerDetails, setDeveloperDetails] = useState(null);
   const { urlName } = useParams();
   const location = useLocation();
-  // Get projectId from navigation state if available
-  const projectIdFromNav = location.state?.projectId;
-  // const urlName = '8ca4e2ce-4bda-4510-89dc-6e20dc52fb20';
-  const [activeFilter, setActiveFilter] = useState("all");
+
+  const getProjectIdFromSession = () => {
+    const projectState = sessionStorage.getItem("projectState");
+    
+    if (projectState) {
+        try {
+            const data = JSON.parse(projectState);
+            return data.projectId;
+        } catch (err) {
+            sessionStorage.removeItem("projectState");
+        }
+    }
+    return null;
+};
+
+  const projectIdFromNav = getProjectIdFromSession();
+
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -69,18 +83,6 @@ const ProjectDetails = () => {
   const [navInitialPosition, setNavInitialPosition] = useState(null);
   const navigate = useNavigate();
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
-  // const [floorplans, setFloorplans] = useState(projectData?.floorplans || []);
-
-  // const updateFloorplan = (index, key, value) => {
-  //   setFloorplans(prev =>
-  //     prev.map((plan, i) => i === index ? { ...plan, [key]: value } : plan)
-  //   );
-  // };
-
-
-
-
-
   const [isEditing, setIsEditing] = useState(false);
   const [AddProjectButton, setAddProjectButton] = useState(false);
   const [isPaymentEditing, setIsPaymentEditing] = useState(false);
@@ -117,7 +119,6 @@ const ProjectDetails = () => {
     name: developerDetails?.contact_details?.name || "",
   });
 
-  // To update the project data
   // const [PatchFormData, setPatchFormData] = useState({
   //   id: projectData?.id || "",
   //   name: projectData?.name || "",
@@ -176,20 +177,17 @@ const ProjectDetails = () => {
   const handleEdit = () => {
     setIsEditing(!isEditing);
   };
- const handleSave = async (updatedData) => {
-  // Log the updated data received from child componentpatchProjectByTestUrl
-  console.log('Updated data received from child:', updatedData);
-
-  // Update the projectData with the new values from child component
-  let newData = projectData;
-  if (updatedData) {
-    newData = {
-      ...projectData,
-      ...updatedData
-    };
-    setProjectData(newData);
-    console.log('New project data after update:', newData);
-  }
+  const handleSave = async (updatedData) => {
+    console.log("Updated data received from child:", updatedData);
+    let newData = projectData;
+    if (updatedData) {
+      newData = {
+        ...projectData,
+        ...updatedData,
+      };
+      setProjectData(newData);
+      console.log("New project data after update:", newData);
+    }
 
   // Call PATCH API with the updated data
   try {
@@ -239,7 +237,6 @@ const ProjectDetails = () => {
     }
   }, [isAmenitiesEditing]);
 
-
   const updatePaymentPlan = (index, field, value) => {
     const updated = [...paymentPlans];
     updated[index] = { ...updated[index], [field]: value };
@@ -274,8 +271,11 @@ const ProjectDetails = () => {
         setProjectData(projectDataFromState);
         setDeveloperId(projectDataFromState.developerId);
         setProjectId(projectDataFromState.id);
-  
-        if (Array.isArray(projectDataFromState.schema) && projectDataFromState.schema.length > 0) {
+
+        if (
+          Array.isArray(projectDataFromState.schema) &&
+          projectDataFromState.schema.length > 0
+        ) {
           const parsedSchemas = projectDataFromState.schema
             .map((schemaStr) => {
               try {
@@ -290,7 +290,7 @@ const ProjectDetails = () => {
               }
             })
             .filter(Boolean);
-  
+
           setSchemas(parsedSchemas);
         }
       } else if (urlName) {
@@ -316,7 +316,7 @@ const ProjectDetails = () => {
                   }
                 })
                 .filter(Boolean);
-  
+
               setSchemas(parsedSchemas);
             }
           }
@@ -327,7 +327,7 @@ const ProjectDetails = () => {
         console.error("No project data or URL name provided");
       }
     };
-  
+
     fetchData();
   }, [urlName, navigate]);
   
@@ -395,7 +395,7 @@ const ProjectDetails = () => {
         setReraDetails(data || []);
       } catch (error) {
         console.error("Error fetching RERA data:", error);
-        setReraDetails([]); 
+        setReraDetails([]);
       }
     };
     fetchReraInfo();
@@ -434,8 +434,6 @@ const ProjectDetails = () => {
     setEditableVideos([...editableVideos, ""]);
   };
 
-
-
   // Helper function to extract YouTube video ID from various URL formats
   // const extractYouTubeId = (url) => {
   //   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -444,34 +442,35 @@ const ProjectDetails = () => {
   // };
 
   const formatPrice = (price) => {
-  if (price === null || price === undefined || price === "") return "Prices On Request";
+    if (price === null || price === undefined || price === "")
+      return "Prices On Request";
 
-  const numPrice = typeof price === "string" ? parseFloat(price) : price;
+    const numPrice = typeof price === "string" ? parseFloat(price) : price;
 
-  // Check if the price is 1, then return "Prices On Request"
-  if (numPrice === 1) {
-    return "Prices On Request";
-  }
-  // Check if the price is 1.5, then return "Sold Out"
-  if (numPrice === 1.5) {
-    return "Sold Out";
-  }
-  if (numPrice < 100 && numPrice > 0) {
-    return `${numPrice} Cr`;
-  }
+    // Check if the price is 1, then return "Prices On Request"
+    if (numPrice === 1) {
+      return "Prices On Request";
+    }
+    // Check if the price is 1.5, then return "Sold Out"
+    if (numPrice === 1.5) {
+      return "Sold Out";
+    }
+    if (numPrice < 100 && numPrice > 0) {
+      return `${numPrice} Cr`;
+    }
 
-  if (numPrice >= 10000000) {
-    const crores = (numPrice / 10000000).toFixed(2);
-    return `${crores} Cr`;
-  }
+    if (numPrice >= 10000000) {
+      const crores = (numPrice / 10000000).toFixed(2);
+      return `${crores} Cr`;
+    }
 
-  if (numPrice >= 100000) {
-    const lakhs = (numPrice / 100000).toFixed(2);
-    return `${lakhs} L`;
-  }
+    if (numPrice >= 100000) {
+      const lakhs = (numPrice / 100000).toFixed(2);
+      return `${lakhs} L`;
+    }
 
-  return numPrice.toLocaleString("en-IN");
-};
+    return numPrice.toLocaleString("en-IN");
+  };
 
   // Process amenities to match the format of amenities.json
   const processAmenities = () => {
@@ -522,7 +521,9 @@ const ProjectDetails = () => {
     // Filter out prices that are exactly 1.5
     const validFloorPlans = floorPlan.filter((plan) => plan.price !== 1.5);
     if (validFloorPlans.length === 0) return 0;
-    const sortedFloorPlan = [...validFloorPlans].sort((a, b) => a.price - b.price);
+    const sortedFloorPlan = [...validFloorPlans].sort(
+      (a, b) => a.price - b.price
+    );
     return sortedFloorPlan[0].price;
   }
   const getHighestPriceOfFloorPlan = (floorPlan) => {
@@ -571,7 +572,6 @@ const ProjectDetails = () => {
       setError("Please enter your name.");
       return;
     }
-
 
     if (!formData.usermobile || formData.usermobile.length !== 10) {
       setError("Please enter a valid 10-digit phone number.");
@@ -728,7 +728,6 @@ const ProjectDetails = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [navInitialPosition]);
 
-
   useEffect(() => {
     const scrollToHash = () => {
       const hash = window.location.hash;
@@ -794,8 +793,6 @@ const ProjectDetails = () => {
   // const [showImagePopup, setShowImagePopup] = useState(false); // State for image popup
   // const [selectedImage, setSelectedImage] = useState(""); // State to hold selected image URL
 
-
-
   // Function to clean and extract numbers for sorting
   // const cleanQuestion = (question) => {
   //   const match = question.match(/^(\d+)[.\s\t]+(.*)/); // Extracts number and question
@@ -826,8 +823,6 @@ const ProjectDetails = () => {
   // const validPaymentPlans = projectData?.paymentPlans?.filter(
   //   (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   // );
-
-
 
   const [showEdit, setShowEdit] = useState(!!getAuthToken());
   return (
@@ -985,8 +980,9 @@ const ProjectDetails = () => {
                 <li key={item} className="mx-1">
                   <a
                     href={`#${item}`}
-                    className={`text-white text-decoration-none ${activeSection === item ? "fw-bold" : ""
-                      }`}
+                    className={`text-white text-decoration-none ${
+                      activeSection === item ? "fw-bold" : ""
+                    }`}
                     style={{
                       fontWeight: activeSection === item ? "bold" : "400",
                       textDecoration:
@@ -1164,11 +1160,16 @@ const ProjectDetails = () => {
           handleInputChange={handleInputChange}
           showEdit={showEdit}
           handleSave={handleSave}
-          
         />
 
         {/* Project Details */}
-        <section className="container-fluid" style={{ width: window.innerWidth <= 768 ? "90%" : "95%", margin: "0 auto" }}>
+        <section
+          className="container-fluid"
+          style={{
+            width: window.innerWidth <= 768 ? "90%" : "95%",
+            margin: "0 auto",
+          }}
+        >
           <div className="row">
             <section className="col-md-8">
               <ProjectDetailsSection
@@ -1191,7 +1192,6 @@ const ProjectDetails = () => {
                 closeSitePopup={closeSitePopup}
                 showEdit={showEdit}
                 handleSave={handleSave}
-
               />
               {/* Know About */}
               {projectData && (
@@ -1207,8 +1207,6 @@ const ProjectDetails = () => {
               {/* Floor Plan */}
               <FloorPlanSection
                 projectData={projectData}
-                activeFilter={activeFilter}
-                setActiveFilter={setActiveFilter}
                 formatPrice={formatPrice}
                 showEdit={showEdit}
                 handleSave={handleSave}
@@ -1236,14 +1234,16 @@ const ProjectDetails = () => {
               >
                 Get Free Consultation for this property. Call us at:{" "}
                 <a
-                  href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
+                  href={`tel:+91${
+                    projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595189189"
-                    }`}
+                  }`}
                   style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
-                  {`+91-${projectData?.locality?.city?.phoneNumber?.[0] ||
+                  {`+91-${
+                    projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595-189-189"
-                    }`}
+                  }`}
                 </a>
               </div>
               {/* Payment Plan */}
@@ -1357,14 +1357,23 @@ const ProjectDetails = () => {
               <AboutDeveloperSection
                 developerDetails={{
                   logo: projectData?.web_cards?.about?.logo_url || "",
-                  altLogo: projectData?.web_cards?.about?.contact_details?.name || "",
-                  establishedYear: projectData?.web_cards?.about?.establishment_year || "",
-                  totalProjects: projectData?.web_cards?.about?.total_projects || "",
+                  altLogo:
+                    projectData?.web_cards?.about?.contact_details?.name || "",
+                  establishedYear:
+                    projectData?.web_cards?.about?.establishment_year || "",
+                  totalProjects:
+                    projectData?.web_cards?.about?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",
-                  address: projectData?.web_cards?.about?.contact_details?.project_address || "",
-                  name: projectData?.web_cards?.about?.contact_details?.name || "",
-                  phone: projectData?.web_cards?.about?.contact_details?.phone || "",
-                  bookingLink: projectData?.web_cards?.about?.contact_details?.booking_link || "",
+                  address:
+                    projectData?.web_cards?.about?.contact_details
+                      ?.project_address || "",
+                  name:
+                    projectData?.web_cards?.about?.contact_details?.name || "",
+                  phone:
+                    projectData?.web_cards?.about?.contact_details?.phone || "",
+                  bookingLink:
+                    projectData?.web_cards?.about?.contact_details
+                      ?.booking_link || "",
                 }}
                 expandedIndex={expandedIndex}
                 setExpandedIndex={setExpandedIndex}

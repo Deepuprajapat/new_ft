@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, showPopup, closePopup, BrochurePopupDialog, onSave }) => {
+const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, showPopup, closePopup, BrochurePopupDialog, onSave,showEdit }) => {
   const [showReraDetails, setShowReraDetails] = useState(false);
   const [isReraDetailHovered, setIsReraDetailHovered] = useState(false);
   let reraTimeout = null;
@@ -142,6 +142,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                 ) : (
                   <h1 className="h3 mb-0 text-center text-md-start" style={{ fontSize: "20px" }}>
                     {property?.name || property?.projectName || "propert name"}
+                    {showEdit && (
                     <button
                       className="btn btn-light btn-sm ms-2"
                       onClick={handleEdit}
@@ -149,6 +150,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                     >
                       <img src="/images/edit-icon.svg" alt="Edit" style={{ width: "18px", height: "18px" }} />
                     </button>
+                       )}
                   </h1>
                 )}
                 {isEditing ? (

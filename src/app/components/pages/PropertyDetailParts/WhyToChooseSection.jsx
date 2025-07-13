@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
-const WhyToChooseSection = ({ property, onSave }) => {
+const WhyToChooseSection = ({ property, onSave ,showEdit}) => {
   const [editMode, setEditMode] = useState(false);
   // Support new structure: property.web_cards.why_choose_us.usp_list and image_urls
   const uspList = property?.web_cards?.why_choose_us?.usp_list || [];
@@ -63,6 +63,7 @@ const WhyToChooseSection = ({ property, onSave }) => {
               }}
             >
               <span>Why to choose {property?.propertyName}?</span>
+              {showEdit && (
               <span className="d-flex align-items-center" style={{gap: '8px'}}>
                 {!editMode ? (
                   <FontAwesomeIcon
@@ -83,6 +84,7 @@ const WhyToChooseSection = ({ property, onSave }) => {
                   </>
                 )}
               </span>
+                )}
             </h4>
             <div
               className="px-3"

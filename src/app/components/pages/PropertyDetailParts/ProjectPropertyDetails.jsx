@@ -31,7 +31,7 @@ const renderedFields = [
   // configurationTypeName is handled separately
 ];
 
-const ProjectPropertyDetails = ({ property, onSave , ageOfProperty}) => {
+const ProjectPropertyDetails = ({ property, onSave , ageOfProperty,showEdit}) => {
   const [editMode, setEditMode] = useState(false)
   console.log(property , "propertyprop")
   console.log(ageOfProperty, "age of proprt")
@@ -136,6 +136,7 @@ const ProjectPropertyDetails = ({ property, onSave , ageOfProperty}) => {
           }}
         >
           <span>Property Details</span>
+          {showEdit && (
           <span className="d-flex align-items-center" style={{gap: '8px'}}>
             {!editMode ? (
               <FontAwesomeIcon
@@ -156,6 +157,7 @@ const ProjectPropertyDetails = ({ property, onSave , ageOfProperty}) => {
               </>
             )}
           </span>
+          )}
         </h4>
         <div className="px-3">
           <div className="row g-3 mb-0 mb-md-4">

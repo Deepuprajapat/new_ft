@@ -37,6 +37,16 @@ import PropertyListSection from "./PropertyDetailParts/PropertyListSection";
 const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
 
 const PropertyDetails = () => {
+    // Check if user is authenticated by looking for token in cookie or localStorage
+  const getAuthToken = () => {
+    // Try to get token from cookie first
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; authToken=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+
+    // Fallback to localStorage
+    return localStorage.getItem("authToken");
+  };
   const location = useLocation();
   const { id } = useParams(); // Get id from route params
   const [property, setProperty] = useState(null);
@@ -350,7 +360,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
     return merged;
   });
 };
-
+ const [showEdit, setShowEdit] = useState(!!getAuthToken());
   return (
     <>
       {/* {property && (
@@ -737,6 +747,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
           closePopup={closePopup}
           BrochurePopupDialog={BrochurePopupDialog}
           onSave={onSaveProjectDetails}
+           showEdit={showEdit}
         />
 
         {/* Section 2 */}
@@ -767,6 +778,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                   balconyCount={property?.balconyCount}
                   bedroomCount={property?.bedroomCount}
                   coveredParking={property?.coveredParking}
+                   showEdit={showEdit}
                 />
               </div>
 
@@ -1081,11 +1093,13 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
               )}
 
               {/* Why to choose */}
-              <WhyToChooseSection property={property} onSave={onSaveWhyToChoose} />
+              <WhyToChooseSection property={property} onSave={onSaveWhyToChoose} 
+               showEdit={showEdit}/>
 
               {/* Floor Plan */}
               <FloorPlanSection
                 property={property}
+                 showEdit={showEdit}
                 // activeFilter={activeFilter}
                 // setActiveFilter={setActiveFilter}
                 // handleImageClick={handleImageClick}
@@ -1106,6 +1120,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                 showFullDescription={showFullDescription}
                 setShowFullDescription={setShowFullDescription}
                 onSave={onSaveKnowAbout}
+                 showEdit={showEdit}
               />
 
               {/* Amenities */}
@@ -1113,10 +1128,12 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
               property={property}
                 processAmenities={processAmenities}
                 onSave={onSaveAmenities}
+                 showEdit={showEdit}
               />
 
               {/* video presentation */}
-              <VideoSection property={property} onSave={onSaveVideo} />
+              <VideoSection property={property} onSave={onSaveVideo} 
+               showEdit={showEdit}/>
 
               {/* Location Map */}
               <div className="bg-white rounded-3 mb-4" id="location">
