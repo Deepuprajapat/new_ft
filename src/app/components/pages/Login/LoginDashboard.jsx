@@ -1,20 +1,40 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {login} from "../../../apis/api";
 
 const LoginDashboard = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     // Simple validation
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
     }
+    
     setError('');
-    // Add your login logic here
-    alert('Logged in!');
+    setLoading(true);
+    
+    try {
+      const response = await login(email, password);
+      console.log(response)
+      if (response && response.data && response.data.access_token) {
+        localStorage.setItem("auth-token", response.data.access_token);
+        navigate('/');
+      } else {
+        setError('Login failed. Invalid credentials.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Login failed. Please check your credentials and try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

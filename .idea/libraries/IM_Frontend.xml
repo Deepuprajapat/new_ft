@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="IM-Frontend">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/build.zip!/" />
+      <root url="jar://$PROJECT_DIR$/properbackup.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

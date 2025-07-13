@@ -13,6 +13,7 @@ import Form from "react-bootstrap/Form";
 import { FaSearch, FaPhoneAlt } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import AddProject from "./pages/ProjectDetailsParts/AddProject/AddProject";
+import LogoutModal from "./LogoutModal";
 
 const Header = ({ shortAddress }) => {
   // const [matchedCity, setMatchedCity] = useState(null);
@@ -24,8 +25,41 @@ const Header = ({ shortAddress }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Check if user is authenticated by looking for token in cookie or localStorage
+  const getAuthToken = () => {
+    // Try to get token from cookie first
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; authToken=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+
+    // Fallback to localStorage
+    return localStorage.getItem("auth-token");
+  };
+
+  // Check authentication status on component mount and route changes
+  useEffect(() => {
+    setIsAuthenticated(getAuthToken());
+  }, [location]);
+
+  // Handle logout confirmation
+  const handleLogoutConfirm = () => {
+    // Clear authentication tokens from both localStorage and cookies
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("auth-token");
+    localStorage.removeItem("userName");
+    
+    // Clear authToken cookie
+    document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    
+    // Close modal and refresh page
+    setShowLogoutModal(false);
+    window.location.reload();
+  };
 
   // Sticky Navbar on Scroll
   useEffect(() => {
@@ -182,7 +216,9 @@ const Header = ({ shortAddress }) => {
                       {subItem.label}
                     </NavDropdown.Item>
                   ))}
-                  {showAddProjectModal && <AddProject show={showAddProjectModal} handleClose={() => setShowAddProjectModal(false)} />}
+                  {isAuthenticated && (
+                      <AddProject show={showAddProjectModal} handleClose={() => setShowAddProjectModal(false)} />
+                  )}
                 </NavDropdown>
               ) : (
                 <Nav.Link
@@ -254,11 +290,29 @@ const Header = ({ shortAddress }) => {
                     </button>
                   </>
                 )}
+                
+                {/* Logout Button - Only visible when authenticated */}
+                {isAuthenticated && (
+                  <button
+                    className="phoneButton"
+                    style={{ background: "#dc3545", marginLeft: "10px" }}
+                    onClick={() => setShowLogoutModal(true)}
+                  >
+                    Logout
+                  </button>
+                )}
               </div>
             </Nav>
           </Nav>
         </Navbar.Collapse>
       </Container>
+      
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        show={showLogoutModal}
+        handleClose={() => setShowLogoutModal(false)}
+        handleConfirm={handleLogoutConfirm}
+      />
     </Navbar>
   );
 };

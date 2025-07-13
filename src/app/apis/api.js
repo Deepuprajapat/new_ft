@@ -13,13 +13,11 @@ let token = "";
 export const login = async (userName, password) => {
   try {
     const response = await axios.post(`${BASE_URL}/auth/generate-token`, {
-      userName,
-      password,
+      email: userName,
+      password: password,
     });
-    token = response.data.token;
-    localStorage.setItem("authToken", token);
-    localStorage.setItem("userName", userName);
-    return token;
+
+    return response.data;
   } catch (error) {
     console.error("Login failed:", error);
     throw error;

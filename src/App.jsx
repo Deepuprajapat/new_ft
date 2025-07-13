@@ -59,7 +59,7 @@ const router = createBrowserRouter([
       { path: "/terms-and-conditions", element: <TermAndCondition /> },
       {path:"/projectDetails", element: <ProjectDetails />},
       {path:"/login", element: <Login isOpen={true} onClose={() => {}} />}, // Login route
-       {path:"/loginadmin" , element : <LoginDashboard />}, // Login Dashboard route
+       {path:"/admin" , element : <LoginDashboard />}, // Login Dashboard route
  
     ],
   },
