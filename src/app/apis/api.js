@@ -760,3 +760,31 @@ export const compareProjectsAPI = async (projectIds) => {
     throw error;
   }
 };
+
+export const getAdminProperties = async (page = 1, pageSize = 10, filters = {}) => {
+  try {
+    const token = localStorage.getItem("auth-token") || localStorage.getItem("x-auth-token");
+    
+    const params = {
+      page: page,
+      page_size: pageSize,
+    };
+
+    // Add optional filters if provided
+    if (filters.configuration) params.configuration = filters.configuration;
+    if (filters.property_type) params.property_type = filters.property_type;
+    if (filters.city) params.city = filters.city;
+
+    const response = await axios.get(`${BASE_URL}/admin/dashboard/properties`, {
+      headers: {
+        "x-auth-token": `${token}`,
+        "Authorization": `${token}`,
+      },
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching admin properties:", error);
+    throw error;
+  }
+};

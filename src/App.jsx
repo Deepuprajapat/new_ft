@@ -27,6 +27,8 @@ import Privacy from "./app/components/pages/Privacy";
 import TermAndCondition from "./app/components/pages/TermAndCondition";
 import Login from "./app/components/pages/Login/Login";
 import LoginDashboard from "./app/components/pages/Login/LoginDashboard";
+import ProtectedRoute from "./app/components/ProtectedRoute";
+import AdminDashboard from "./app/components/pages/AdminDashboard/AdminDashboard";
 
 
 const router = createBrowserRouter([
@@ -60,6 +62,7 @@ const router = createBrowserRouter([
       {path:"/projectDetails", element: <ProjectDetails />},
       {path:"/login", element: <Login isOpen={true} onClose={() => {}} />}, // Login route
        {path:"/admin" , element : <LoginDashboard />}, // Login Dashboard route
+       {path:"/admin/dashboard", element: <ProtectedRoute><AdminDashboard /></ProtectedRoute>}, // Protected Admin Dashboard route
  
     ],
   },
