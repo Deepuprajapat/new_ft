@@ -1151,7 +1151,9 @@ const ProjectDetails = () => {
         {/* meta form */}
         {showEdit && (
           <div className="d-flex gap-3">
-            <MetaFormSection />
+            <MetaFormSection 
+             projectData={projectData}
+             handleSave={handleSave}/>
           </div>
         )}
         <ProjectHeaderSection

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faFile, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/css/metaform.css";
 
-function MetaFormSection() {
+function MetaFormSection({ projectData, handleSave }) {
   const [showMetaForm, setShowMetaForm] = useState(false);
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
@@ -17,44 +17,28 @@ function MetaFormSection() {
 
   // Prefill with your provided meta_info JSON when form opens
   useEffect(() => {
-    if (showMetaForm) {
-      // Replace this with dynamic data if needed
-      const meta_info = {
-        "title": "ACE Divino | 4 BHK Luxury Flats in Sector 1, Noida Extension",
-        "description": "ACE Divino Sector 1, Noida Extension: Explore prices, floor plans, payment options, location, photos, videos, and more. Download the project brochure now!",
-        "keywords": "ace divino,  ace divino noida extension,  ace divino noida,  flat at noida extension,  ace divino floor plan,  ace divino price list,  2 bhk flat in noida extension,  3 bhk flats in noida extension,  4 bhk flat in noida extension,  ace divino possession date,  ready to move flats in noida extension,  ace divino location,  ace divino latest construction update,  ace divino reviews,  ready to move flats in noida extension,  ultra luxury apartments in noida,  3 bhk flats in noida extension ready to move,  ace group,  residential apartment in noida extension,  residential apartment in noida extension,  best residential project in noida extension,  ready to move apartments",
-        "canonical": "ace-divino",
-        "project_schema": [
-          `<script type="application/ld+json">
-{
-  "@context": "https://schema.org/",
-  "@type": "Product",
-  "name": "ACE Divino",
-  "image": "https://image.investmango.com/images/img/ace-divino/ace-divino-greater-noida-west.webp",
-  "description": "ACE Divino Sector 1, Noida Extension: Explore prices, floor plans, payment options, location, photos, videos, and more. Download the project brochure now!",
-  "brand": {
-    "@type": "Brand",
-    "name": "Ace Group of India"
-  },
-  "offers": {
-    "@type": "AggregateOffer",
-    "url": "https://www.investmango.com/ace-divino",
-    "priceCurrency": "INR",
-    "lowPrice": "18800000",
-    "highPrice": "22500000"
-  }
-}
-</script>`
-        ]
-      };
-      setMetaTitle(meta_info.title || "");
-      setMetaDescription(meta_info.description || "");
-      setMetaKeywords(meta_info.keywords ? meta_info.keywords.split(",").map(k => k.trim()).filter(Boolean) : []);
-      setKeywordInput(meta_info.keywords || "");
-      setSchema(Array.isArray(meta_info.project_schema) ? meta_info.project_schema[0] : meta_info.project_schema || "");
-      setCanonical(meta_info.canonical || "");
+    if (showMetaForm && projectData?.meta_info) {
+      setMetaTitle(projectData.meta_info.title || "");
+      setMetaDescription(projectData.meta_info.description || "");
+      // Handle keywords as array or JSON string
+      let keywords = projectData.meta_info.keywords;
+      if (Array.isArray(keywords)) {
+        keywords = keywords.join(", ");
+      } else if (typeof keywords === "string" && keywords.startsWith("[")) {
+        try {
+          keywords = JSON.parse(keywords).join(", ");
+        } catch {
+          // fallback to raw string
+        }
+      }
+      setMetaKeywords(keywords ? keywords.split(",").map(k => k.trim()).filter(Boolean) : []);
+      setKeywordInput(keywords || "");
+      setSchema(Array.isArray(projectData.meta_info.project_schema)
+        ? projectData.meta_info.project_schema[0]
+        : projectData.meta_info.project_schema || "");
+      setCanonical(projectData.meta_info.canonical || "");
     }
-  }, [showMetaForm]);
+  }, [showMetaForm, projectData]);
 
   const addKeyword = () => {
     if (keywordInput.trim() && !metaKeywords.includes(keywordInput.trim())) {
@@ -105,6 +89,24 @@ function MetaFormSection() {
     const value = e.target.value;
     // Preserve HTML tags by not sanitizing on input
     setter(value);
+  };
+
+  const onSave = (e) => {
+    e.preventDefault();
+    // Prepare updated meta_info
+    const updatedMetaInfo = {
+      title: metaTitle,
+      description: metaDescription,
+      keywords: keywordInput,
+      canonical,
+      project_schema: [schema]
+    };
+    // Call parent's handleSave with updated meta_info merged into projectData
+    handleSave({
+      ...projectData,
+      meta_info: updatedMetaInfo
+    });
+    setShowMetaForm(false);
   };
 
   return (
@@ -180,7 +182,7 @@ function MetaFormSection() {
             {/* <div className="alert alert-info py-2" style={{ fontSize: '0.9rem' }}>
               <strong>Tip:</strong> You can use HTML tags (e.g., &lt;b&gt;, &lt;i&gt;, &lt;strong&gt;, &lt;em&gt;) in these fields.
             </div> */}
-            <form onSubmit={e => e.preventDefault()}>
+            <form onSubmit={onSave}>
               <div className="mb-3">
                 <label className="form-label" style={{ fontWeight: 500 }}>
                   Meta Title
