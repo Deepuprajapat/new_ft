@@ -14,7 +14,7 @@ const processAmenities = (property) => {
   }));
 };
 
-const AmenitiesSection = ({ property }) => (
+const AmenitiesSection = ({ property , showEdit}) => (
   <div
     className="mb-4"
     id="amenities"

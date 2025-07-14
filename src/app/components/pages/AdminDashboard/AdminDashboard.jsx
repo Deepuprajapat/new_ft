@@ -134,10 +134,10 @@ const AdminDashboard = () => {
       // Refresh the properties list
       await fetchAdminProperties(currentPage, filters);
       
-      // Navigate to the new property if we have its ID
+   
       if (response?.data?.property_id) {
-        navigate(`/propertyforsale/${response.data.property_id}`, {
-          state: { ...propertyData, projectId: selectedProject },
+        navigate(`/propertyforsale/${response.data.slug}`, {
+          state: { ...propertyData, propertyid: response.data.property_id },
         });
       }
     } catch (error) {

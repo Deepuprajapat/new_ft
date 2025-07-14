@@ -13,7 +13,7 @@ const FloorPlanSection = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableFloorPara, setEditableFloorPara] = useState(
-    projectData?.floorPara || ""
+    projectData?.description || ""
   );
   const [editableFloorplans, setEditableFloorplans] = useState(
     projectData?.web_cards?.floor_plan?.products || []
@@ -101,7 +101,7 @@ const FloorPlanSection = ({
       web_cards: {
         ...projectData.web_cards,
         floor_plan: {
-          ...projectData.web_cards?.floor_plan,
+          ...projectData.web_cards?.description,
           title: editableFloorPara,
           products: editableFloorplans
         }
@@ -129,7 +129,7 @@ const FloorPlanSection = ({
 
   // Filtering logic
   const filteredPlans = isEditing
-    ? JSON.stringify(editableFloorplans)
+    ? editableFloorplans
     : projectData?.web_cards?.floor_plan?.products || [];
 
 
@@ -154,7 +154,7 @@ const FloorPlanSection = ({
 
   const filterOptions = [
     ...new Set(
-      (projectData?.floor_plan?.products || []).map(
+      (projectData?.web_cards?.floor_plan?.products || []).map(
         (plan) => plan.title || plan.flat_type
       )
     ),

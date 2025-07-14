@@ -29,6 +29,7 @@ import Login from "./app/components/pages/Login/Login";
 import LoginDashboard from "./app/components/pages/Login/LoginDashboard";
 import ProtectedRoute from "./app/components/ProtectedRoute";
 import AdminDashboard from "./app/components/pages/AdminDashboard/AdminDashboard";
+import AddProject from "./app/components/pages/ProjectDetailsParts/AddProject/AddProject";
 
 const router = createBrowserRouter([
   {
@@ -66,6 +67,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <AdminDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "addproject",
+        element: (
+          <ProtectedRoute>
+            <AddProject />
           </ProtectedRoute>
         ),
       },

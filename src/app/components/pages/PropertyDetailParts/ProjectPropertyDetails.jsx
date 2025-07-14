@@ -11,10 +11,11 @@ import {
   faCouch,
   faFlag,
   faEdit,
+  faBath,
+  faThLarge,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-// List of fields already rendered explicitly
 const renderedFields = [
   "built_up_area",
   "size",
@@ -28,7 +29,6 @@ const renderedFields = [
   "furnishing_type",
   "facing",
   "rera_number",
-  // configurationTypeName is handled separately
 ];
 
 const ProjectPropertyDetails = ({ property, onSave , ageOfProperty,showEdit}) => {
@@ -359,7 +359,7 @@ const ProjectPropertyDetails = ({ property, onSave , ageOfProperty,showEdit}) =>
               </div>
             </div>
           {/* Render any extra property_details fields not already shown */}
-          {property?.web_cards?.property_details &&
+          {/* {property?.web_cards?.property_details &&
             Object.entries(property.web_cards.property_details)
               .filter(([key]) => !renderedFields.includes(key))
               .map(([key, detail]) => (
@@ -376,7 +376,7 @@ const ProjectPropertyDetails = ({ property, onSave , ageOfProperty,showEdit}) =>
                     </div>
                   </div>
                 </div>
-              ))}
+              ))} */}
           </div>
         </div>
       </div>

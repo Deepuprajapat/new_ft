@@ -143,7 +143,7 @@ const KnowAboutSection = ({ showEdit,property, showFullDescription, setShowFullD
             )}
           </div>
           {/* Download Brochure Link (styled as in Project Details section) */}
-          {!isAboutEditing && brochureLink && (
+          {!isAboutEditing && !showEdit && brochureLink && (
             <div className="text-center mb-3">
               <a
                 href={brochureLink}

@@ -363,29 +363,29 @@ export const getAllLocalities = async () => {
   }
 };
 
-export const getAllLocalitiess = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}/locality/get/all`);
-    const localities = response.data || [];
+// export const getAllLocalitiess = async () => {
+//   try {
+//     const response = await axios.get(`${BASE_URL}/locality/get/all`);
+//     const localities = response.data || [];
 
-    // // Filter out localities with 'unknown' or 'UNKNOWN' in the city name or any other relevant fields
-    // const filteredLocalities = localities.filter(
-    //   (locality) => locality.city.name.toLowerCase() !== "unknown"
-    // );
+//     // // Filter out localities with 'unknown' or 'UNKNOWN' in the city name or any other relevant fields
+//     // const filteredLocalities = localities.filter(
+//     //   (locality) => locality.city.name.toLowerCase() !== "unknown"
+//     // );
 
-    // // Map filtered localities to extract city details and ensure uniqueness
-    // const uniqueCities = Array.from(
-    //   new Map(
-    //     filteredLocalities.map((locality) => [locality.city.id, locality.city])
-    //   ).values()
-    // );
+//     // // Map filtered localities to extract city details and ensure uniqueness
+//     // const uniqueCities = Array.from(
+//     //   new Map(
+//     //     filteredLocalities.map((locality) => [locality.city.id, locality.city])
+//     //   ).values()
+//     // );
 
-    return localities; // Returns an array of { id, name } objects
-  } catch (error) {
-    console.error("Error fetching localities:", error);
-    return [];
-  }
-};
+//     return localities; // Returns an array of { id, name } objects
+//   } catch (error) {
+//     console.error("Error fetching localities:", error);
+//     return [];
+//   }
+// };
 
 // export const getLeadByPhone = async (phone) => {
 //   try {
@@ -754,7 +754,6 @@ export const compareProjectsAPI = async (projectIds) => {
   }
 };
 
-<<<<<<< HEAD
 export const getAdminProperties = async (page = 1, pageSize = 10, filters = {}) => {
   try {
     const token = localStorage.getItem("auth-token") || localStorage.getItem("x-auth-token");
@@ -782,7 +781,6 @@ export const getAdminProperties = async (page = 1, pageSize = 10, filters = {}) 
     throw error;
   }
 };
-=======
 
 export const getAllBlogById = async (id) => {
   try {
@@ -793,4 +791,3 @@ export const getAllBlogById = async (id) => {
     return { content: [] };
   }
 };
->>>>>>> 82be129ffdd0636252500f2cdd3482ca97dd493c

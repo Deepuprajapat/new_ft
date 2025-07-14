@@ -215,14 +215,14 @@ const PropertyListing = () => {
     }
     return price.toLocaleString();
   };
-
-  const handleMoreDetail = (id, canonical) => {
-    const url = canonical 
-      ? `/propertyforsale/${canonical}` 
-      : `/propertyforsale/${id.toString().toLowerCase().replace(/\s+/g, "-")}`;
-    
+  const handleMoreDetail = (id, slug) => {
+    console.log(id ,"uuuuuuuuuuuuuuuuu")
+    const url = `/propertyforsale/${slug}`;
+      localStorage.setItem('propertyState', JSON.stringify({ id }))
     window.open(url, "_blank", "noopener,noreferrer");
   };
+
+
 
   const handleTypeSelect = async (type) => {
     setSelectedType(type);
@@ -549,7 +549,7 @@ const PropertyListing = () => {
                                     onClick={() =>
                                       handleMoreDetail(
                                         property?.id,
-                                        property?.meta_info?.canonical
+                                        property?.slug
                                       )
                                     }
                                     className="theme-btn"

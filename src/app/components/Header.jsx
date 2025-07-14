@@ -52,12 +52,9 @@ const Header = ({ shortAddress }) => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("auth-token");
     localStorage.removeItem("userName");
-    
-    // Clear authToken cookie
-    document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    
-    // Close modal and refresh page
+        
     setShowLogoutModal(false);
+    navigate('/')
     window.location.reload();
   };
 

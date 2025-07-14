@@ -4,10 +4,12 @@ import React, { useState } from "react";
 const AboutDeveloperSection = ({showEdit, property, onSave }) => {
   const [editMode, setEditMode] = useState(false);
   const [editable, setEditable] = useState({
-    developerLogo: property?.developerLogo || "",
+    developerLogo: property?.developer?.developerLogo || "",
     developerEstiblishedYear: property?.developerEstiblishedYear || "",
     totlprojects: property?.totlprojects || ""
   });
+  console.log(property?.developer?.developerLogo,"eji");
+  console.log(property,"pp")
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,7 +30,7 @@ const AboutDeveloperSection = ({showEdit, property, onSave }) => {
   const handleCancel = () => {
     setEditMode(false);
     setEditable({
-      developerLogo: property?.developerLogo || "",
+      developerLogo: property?.developer?.developerLogo || "",
       developerEstiblishedYear: property?.developerEstiblishedYear || "",
       totlprojects: property?.totlprojects || ""
     });

@@ -136,7 +136,7 @@ const PaymentPlanSection = ({ projectData, showEdit, handleSave }) => {
         </h2>
         <div className="p-3">
           <div
-            className="mb-3"
+            className=""
             style={{
               fontSize: window.innerWidth <= 768 ? "12px" : "16px",
               outline: isPaymentEditing ? "1px solid #2067d1" : "none",

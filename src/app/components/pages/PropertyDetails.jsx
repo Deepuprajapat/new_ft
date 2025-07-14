@@ -37,7 +37,7 @@ import PropertyListSection from "./PropertyDetailParts/PropertyListSection";
 const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
 
 const PropertyDetails = () => {
-    // Check if user is authenticated by looking for token in cookie or localStorage
+  // Check if user is authenticated by looking for token in cookie or localStorage
   const getAuthToken = () => {
     // Try to get token from cookie first
     const value = `; ${document.cookie}`;
@@ -47,8 +47,6 @@ const PropertyDetails = () => {
     // Fallback to localStorage
     return localStorage.getItem("authToken");
   };
-  const location = useLocation();
-  const { id } = useParams(); // Get id from route params
   const [property, setProperty] = useState(null);
   const [expandedIndex, setExpandedIndex] = useState(null); // To track which FAQ is expanded
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -80,7 +78,7 @@ const PropertyDetails = () => {
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);
-    setShowImagePopup(true); 
+    setShowImagePopup(true);
   };
 
   const closeImagePopup = () => {
@@ -95,6 +93,26 @@ const PropertyDetails = () => {
   const closePopup = () => {
     setShowPopup(false);
   };
+
+  const getProjectIdFromSession = () => {
+    const propertyState = localStorage.getItem("propertyState");
+    console.log("Raw propertyState:", propertyState);
+    
+    if (propertyState) {
+      try {
+        const data = JSON.parse(propertyState);
+        console.log("Parsed data:", data);
+        console.log("ID from data:", data.id);
+        return data.id; 
+      } catch (err) {
+        console.error("JSON parsing error:", err);
+      }
+    }
+    return null;
+  };
+  const propertyid = getProjectIdFromSession();
+
+  console.log(propertyid, "ppid")
 
   const [formData, setFormData] = useState({
     username: "",
@@ -118,7 +136,7 @@ const PropertyDetails = () => {
 
   // Handle OTP input change
   const handleOtpChange = (e) => setOtp(e.target.value);
-  
+
   // Simulate sending OTP API
   const sendOtp = async () => {
     if (!formData.usermobile || formData.usermobile.length !== 10) {
@@ -146,7 +164,7 @@ const PropertyDetails = () => {
       setError("Failed to send OTP. Please try again.");
     }
   };
-//last changes
+  //last changes
   // Simulate OTP verification API
   const verifyOtp = async () => {
     try {
@@ -174,8 +192,7 @@ const PropertyDetails = () => {
       setOtpVerified(false);
     }
   };
-  console.log("usjsfhewkj",id)
-  // Resend OTP logic
+
   const resendOtp = async () => {
     try {
       const response = await resendOTP(formData.usermobile);
@@ -200,17 +217,17 @@ const PropertyDetails = () => {
   }, [timer, otpSent]);
 
   useEffect(() => {
-    if (id) {
+    if (propertyid) {
       const fetchProperty = async () => {
-        const data = await getPropertyByUrlName(id);
+        const data = await getPropertyByUrlName(propertyid);
         setProperty(data.data);
         console.log("datayhdsj", data.data);
       };
       fetchProperty();
     }
-  }, [id]);
+  }, [propertyid]);
 
-  console.log(property, "propertyuiehuiew" )
+  console.log(property, "propertyuiehuiew");
 
   const processAmenities = () => {
     if (!property?.propertyAmenities) return [];
@@ -266,101 +283,104 @@ const PropertyDetails = () => {
     setExpandedIndex(index === expandedIndex ? null : index);
   };
 
-
-const onSaveProjectDetails = async (newData) => {
-  setProperty(newData);
-  try {
-  
-    if (id) {
-      const response = await patchPropertyDetails(id, newData);
-      console.log("Patch API response:", response);
-    } else {
-      console.error("Property ID not found!");
+  const onSaveProjectDetails = async (newData) => {
+    setProperty(newData);
+    try {
+      if (propertyid) {
+        const response = await patchPropertyDetails(propertyid, newData);
+        console.log("Patch API response:", response);
+      } else {
+        console.error("Property ID not found!");
+      }
+    } catch (error) {
+      console.error("Error saving property data:", error);
     }
-  } catch (error) {
-    console.error("Error saving property data:", error);
-  }
-};
+  };
 
-const onSaveWhyToChoose = async (changedData) => {
-  setProperty(prev => {
-    const merged = {
-      ...prev,
-      web_cards: {
-        ...prev.web_cards,
-        ...changedData.web_cards,
-      },
-      ...changedData,
-    };
-    // Update backend
-    if (id) {
-      patchPropertyDetails(id, merged);
-    }
-    return merged;
-  });
-};
-
-// const onSaveFloorPlan = (changedData) => {
-//   setProperty(prev => ({ ...prev, ...changedData }));
-//   // TODO: Call patchPropertyDetails API here if needed
-// };
-
-const onSaveAboutDeveloper = (changedData) => {
-  setProperty(prev => ({ ...prev, ...changedData }));
-  // TODO: Call patchPropertyDetails API here if needed
-};
-
-const onSaveKnowAbout = async (aboutHtml) => {
-  setProperty(prev => {
-    const merged = {
-      ...prev,
-      web_cards: {
-        ...prev.web_cards,
-        know_about: {
-          ...(prev.web_cards?.know_about || {}),
-          description: aboutHtml,
+  const onSaveWhyToChoose = async (changedData) => {
+    setProperty((prev) => {
+      const merged = {
+        ...prev,
+        web_cards: {
+          ...prev.web_cards,
+          ...changedData.web_cards,
         },
-      },
-    };
-    // Update backend
-    if (id) {
-      patchPropertyDetails(id, merged);
-    }
-    return merged;
-  });
-};
+        ...changedData,
+      };
+      // Update backend
+      if (propertyid) {
+        patchPropertyDetails(propertyid, merged);
+      }
+      return merged;
+    });
+  };
 
-const onSaveAmenities = (newPropertyAmenities, newAmenitiesPara) => {
-  setProperty(prev => ({
-    ...prev,
-    propertyAmenities: newPropertyAmenities,
-    amenitiesPara: newAmenitiesPara,
-  }));
-  // TODO: Call patchPropertyDetails API here if needed
-};
+  // const onSaveFloorPlan = (changedData) => {
+  //   setProperty(prev => ({ ...prev, ...changedData }));
+  //   // TODO: Call patchPropertyDetails API here if needed
+  // };
 
-const onSaveVideo = async ({ videoPara, propertyVideo }) => {
-  setProperty(prev => {
-    const merged = {
-      ...prev,
-      videoPara,
-      propertyVideo,
-      web_cards: {
-        ...prev.web_cards,
-        video_presentation: {
-          ...(prev.web_cards?.video_presentation || {}),
-          title: JSON.stringify([videoPara]),
-          video_url: JSON.stringify(propertyVideo),
+  const onSaveAboutDeveloper = (changedData) => {
+    setProperty((prev) => ({ ...prev, ...changedData }));
+    // TODO: Call patchPropertyDetails API here if needed
+  };
+
+  const onSaveKnowAbout = async (aboutHtml) => {
+    setProperty((prev) => {
+      const merged = {
+        ...prev,
+        web_cards: {
+          ...prev.web_cards,
+          know_about: {
+            ...(prev.web_cards?.know_about || {}),
+            description: aboutHtml,
+          },
         },
-      },
-    };
-    if (id) {
-      patchPropertyDetails(id, merged);
-    }
-    return merged;
-  });
-};
- const [showEdit, setShowEdit] = useState(!!getAuthToken());
+      };
+      // Update backend
+      if (propertyid) {
+        patchPropertyDetails(propertyid, merged);
+      }
+      return merged;
+    });
+  };
+
+  const onSaveAmenities = (newPropertyAmenities, newAmenitiesPara) => {
+    setProperty((prev) => ({
+      ...prev,
+      propertyAmenities: newPropertyAmenities,
+      amenitiesPara: newAmenitiesPara,
+    }));
+    // TODO: Call patchPropertyDetails API here if needed
+  };
+
+
+  const onSaveVideo = async ({ videoPara, propertyVideo }) => {
+    setProperty((prev) => {
+      const merged = {
+        ...prev,
+        videoPara,
+        propertyVideo,
+        web_cards: {
+          ...prev.web_cards,
+          video_presentation: {
+            ...(prev.web_cards?.video_presentation || {}),
+            title: JSON.stringify([videoPara]),
+            video_url: JSON.stringify(propertyVideo),
+          },
+        },
+      };
+      if (propertyid) {
+        patchPropertyDetails(propertyid, merged);
+      }
+      return merged;
+    });
+  };
+  const showEdit = useState(localStorage.getItem("auth-token"));
+  // Use images from web_cards.why_to_choose.image_urls if available, else fallback
+  const galleryImages = property?.web_cards?.why_to_choose?.image_urls?.length
+    ? property.web_cards.why_to_choose.image_urls
+    : property?.property_images || [];
   return (
     <>
       {/* {property && (
@@ -393,7 +413,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
         <div className="container-fluid p-0 mb-0 w-100">
           {/* Gallery Section */}
           <div className="row mx-0 g-0" style={{ padding: "0.5px" }}>
-            {property && property.property_images && property.property_images.length > 0 && (
+            {galleryImages && galleryImages.length > 0 && (
               <>
                 {/* Main Image - Full width on mobile, half width on desktop */}
                 <div className="col-12 col-md-6 p-0 pe-0 pe-md-0 pb-md-0">
@@ -402,7 +422,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                     style={{ minHeight: "184px", maxHeight: "700px" }}
                   >
                     <a
-                      href={property.property_images[0]}
+                      href={galleryImages[0]}
                       data-toggle="lightbox"
                       data-gallery="gallery"
                       className="d-flex align-items-center justify-content-center w-100 h-100"
@@ -414,7 +434,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                     >
                       <img
                         alt={`Gallery Image 1`}
-                        src={property.property_images[0]}
+                        src={galleryImages[0]}
                         loading="lazy"
                         className="img-fluid w-100 h-100 rounded-0 m-0 p-0"
                         style={{ objectFit: "cover", cursor: "pointer" }}
@@ -426,11 +446,11 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
 
                 {/* Additional Images Grid */}
                 <div className="col-12 col-md-6 p-0">
-                  <div className="row g-0 h-100">
-                    {property.property_images.slice(1, 5).map((img, index) => (
+                  <div className="row g-0 h-100 m-0">
+                    {galleryImages.slice(1, 5).map((img, index) => (
                       <div
                         key={index + 1}
-                        className="col-3 col-md-6"
+                        className="col-3 col-md-6 p-0"
                         style={{ height: "270px" }}
                       >
                         <a
@@ -452,6 +472,9 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                             style={{
                               objectFit: "cover",
                               cursor: "pointer",
+                              margin: 0,
+                              padding: 0,
+                              display: "block",
                             }}
                             fetchpriority="high"
                           />
@@ -465,7 +488,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
           </div>
 
           {/* Fullscreen Image Modal */}
-          {showFullScreen && property?.property_images && (
+          {showFullScreen && galleryImages && (
             <div
               className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
               style={{
@@ -480,9 +503,9 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <img
-                  src={property?.property_images[currentImageIndex]}
+                  src={galleryImages[currentImageIndex]}
                   alt={
-                    property?.property_images[currentImageIndex]?.category ||
+                    galleryImages[currentImageIndex]?.category ||
                     "Full Screen Image"
                   }
                   loading="lazy"
@@ -493,7 +516,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                   className="position-absolute top-50 start-0 translate-middle-y rounded-circle"
                   onClick={() =>
                     setCurrentImageIndex((prev) =>
-                      prev === 0 ? property?.property_images?.length - 1 : prev - 1
+                      prev === 0 ? galleryImages.length - 1 : prev - 1
                     )
                   }
                   style={{
@@ -510,7 +533,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                   className="position-absolute top-50 end-0 translate-middle-y rounded-circle"
                   onClick={() =>
                     setCurrentImageIndex((prev) =>
-                      prev === property?.property_images?.length - 1 ? 0 : prev + 1
+                      prev === galleryImages.length - 1 ? 0 : prev + 1
                     )
                   }
                   style={{
@@ -549,7 +572,6 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
             right: 0,
             zIndex: 500,
             marginTop: isNavFixed ? "0" : "auto",
-            
           }}
         >
           <div
@@ -567,7 +589,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                 "floor",
                 "amenities",
                 "video",
-                "location"
+                "location",
               ].map((item) => (
                 <li key={item} className="mx-1">
                   <a
@@ -747,7 +769,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
           closePopup={closePopup}
           BrochurePopupDialog={BrochurePopupDialog}
           onSave={onSaveProjectDetails}
-           showEdit={showEdit}
+          showEdit={showEdit}
         />
 
         {/* Section 2 */}
@@ -766,7 +788,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                 id="overview"
                 style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}
               >
-                <ProjectPropertyDetails 
+                <ProjectPropertyDetails
                   property={property}
                   onSave={onSaveProjectDetails}
                   propertyType={property?.propertyType}
@@ -778,7 +800,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                   balconyCount={property?.balconyCount}
                   bedroomCount={property?.bedroomCount}
                   coveredParking={property?.coveredParking}
-                   showEdit={showEdit}
+                  showEdit={showEdit}
                 />
               </div>
 
@@ -912,9 +934,9 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                             <option value="">Select</option>
                             {property?.configurations?.map((config, index) => (
                               <option key={index} value={config}>
-                                      {config}
-                                    </option>
-                             ))}
+                                {config}
+                              </option>
+                            ))}
                           </select>
                         </div>
                         <div className="mb-3">
@@ -1093,14 +1115,17 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
               )}
 
               {/* Why to choose */}
-              <WhyToChooseSection property={property} onSave={onSaveWhyToChoose} 
-               showEdit={showEdit}/>
+              <WhyToChooseSection
+                property={property}
+                onSave={onSaveWhyToChoose}
+                showEdit={showEdit}
+              />
 
               {/* Floor Plan */}
               <FloorPlanSection
                 property={property}
-                 showEdit={showEdit}
-                // activeFilter={activeFilter}
+                showEdit={showEdit}
+                activeFilter={activeFilter}
                 // setActiveFilter={setActiveFilter}
                 // handleImageClick={handleImageClick}
                 // showImagePopup={showImagePopup}
@@ -1113,27 +1138,29 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                 //onSave={onSaveFloorPlan}
               />
 
-             
               {/* Know About */}
               <KnowAboutSection
                 property={property}
                 showFullDescription={showFullDescription}
                 setShowFullDescription={setShowFullDescription}
                 onSave={onSaveKnowAbout}
-                 showEdit={showEdit}
+                showEdit={showEdit}
               />
 
               {/* Amenities */}
               <AmenitiesSection
-              property={property}
+                property={property}
                 processAmenities={processAmenities}
                 onSave={onSaveAmenities}
-                 showEdit={showEdit}
+                showEdit={showEdit}
               />
 
               {/* video presentation */}
-              <VideoSection property={property} onSave={onSaveVideo} 
-               showEdit={showEdit}/>
+              <VideoSection
+                property={property}
+                onSave={onSaveVideo}
+                showEdit={showEdit}
+              />
 
               {/* Location Map */}
               <div className="bg-white rounded-3 mb-4" id="location">
@@ -1166,7 +1193,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                       ></div>
                       <iframe
                         title="Location"
-                        src={property?.locationMap}
+                        src={property?.location_map}
                         width="100%"
                         height="300"
                         style={{ border: 0 }}
@@ -1399,7 +1426,7 @@ const onSaveVideo = async ({ videoPara, propertyVideo }) => {
                             >
                               <img
                                 src={
-                                  property?.developerLogo ||
+                                  property?.developer.developer_logo ||
                                   "/img/developer-img/ace-group.webp"
                                 }
                                 className="img-fluid"

@@ -1,6 +1,6 @@
 
 
-const show = true
+const show = localStorage.getItem('auth-token')
 const navItems = [
     { label: 'Home', path: '/' },
     {
@@ -18,7 +18,7 @@ const navItems = [
   dropdown: [
     { label: 'All Projects', path: '/allProjects' },
     { label: 'Featured Properties', path: '/featuredProperties' },
-    show ? { label: 'Add Project', path: '/addProject' } : null,
+    show ? { label: 'Add Project', path: '/addproject' } : null,
   ].filter(Boolean),
 },
     { label: 'All Properties', path: '/allProperties' },

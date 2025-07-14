@@ -26,7 +26,8 @@ const LoginDashboard = () => {
       if (response && response.data && response.data.access_token) {
         localStorage.setItem("auth-token", response.data.access_token);
         navigate('/admin/dashboard');
-      } else {
+        window.location.reload();
+        } else {
         setError('Login failed. Invalid credentials.');
       }
     } catch (error) {

@@ -93,7 +93,6 @@ function MetaFormSection({ projectData, handleSave }) {
 
   const onSave = (e) => {
     e.preventDefault();
-    // Prepare updated meta_info
     const updatedMetaInfo = {
       title: metaTitle,
       description: metaDescription,
@@ -101,7 +100,6 @@ function MetaFormSection({ projectData, handleSave }) {
       canonical,
       project_schema: [schema]
     };
-    // Call parent's handleSave with updated meta_info merged into projectData
     handleSave({
       ...projectData,
       meta_info: updatedMetaInfo
