@@ -302,7 +302,7 @@ const AdminDashboard = () => {
                 </div>
                 
                 <div className="property-details">
-                  <h3 className="property-title">{property.title}</h3>
+                  <h3 className="property-title">{property.name || property.title || 'Unnamed Property'}</h3>
                   <p className="property-location">
                     <i className="fas fa-map-marker-alt"></i>
                     {property.location}
@@ -330,11 +330,17 @@ const AdminDashboard = () => {
                   </div>
                   
                   <div className="property-actions">
-                    <button className="btn btn-primary btn-sm">
+                    <button 
+                      className="btn btn-primary btn-sm"
+                      onClick={() => navigate(`/propertyforsale/${property.id}`, { state: { editMode: true } })}
+                    >
                       <i className="fas fa-edit"></i>
                       Edit
                     </button>
-                    <button className="btn btn-outline-secondary btn-sm">
+                    <button 
+                      className="btn btn-outline-secondary btn-sm"
+                      onClick={() => navigate(`/propertyforsale/${property.id}`)}
+                    >
                       <i className="fas fa-eye"></i>
                       View
                     </button>
