@@ -5,49 +5,58 @@ const VideoSection = ({ property, onSave ,showEdit}) => {
 
   // Extract video ID from full URL or return raw ID
   const extractVideoId = (url) => {
-    if (!url) return "";
-    try {
-      const urlObj = new URL(url);
-      if (urlObj.hostname.includes("youtu.be")) {
-        return urlObj.pathname.slice(1);
-      }
-      if (urlObj.hostname.includes("youtube.com")) {
-        return urlObj.searchParams.get("v");
-      }
-    } catch {
-      return url; // Assume it's already an ID
+    if (!url || url.trim() === '') return "";
+    
+    // If it's already a valid embed URL, extract the ID
+    if (url.includes('youtube.com/embed/')) {
+      return url.split('embed/')[1].split('?')[0];
     }
+    
+    // If it's a full URL, extract the ID
+    if (url.startsWith('http')) {
+      try {
+        const urlObj = new URL(url);
+        if (urlObj.hostname.includes("youtu.be")) {
+          return urlObj.pathname.slice(1).split('?')[0];
+        }
+        if (urlObj.hostname.includes("youtube.com")) {
+          if (urlObj.searchParams.get("v")) {
+            return urlObj.searchParams.get("v");
+          }
+          // Handle youtube.com/watch URLs
+          if (url.includes('youtube.com/watch?v=')) {
+            return url.split('v=')[1].split('&')[0];
+          }
+        }
+      } catch (error) {
+        console.warn('Error parsing video URL:', error);
+      }
+    }
+    
+    // Assume it's already a video ID if it's not a URL
     return url;
   };
 
   // Prefer web_cards.video_presentation if present
   const videoPresentation = property?.web_cards?.video_presentation || property?.video_presentation || {};
   const videoParaInit = property?.web_cards?.video_presentation?.description || property?.videoPara || videoPresentation.title || "";
-console.log("fhudfhiuhu",videoParaInit)
+console.log("Video presentation data:", videoPresentation);
+console.log("Video para init:", videoParaInit);
   let videoUrlsInit = [];
 
-if (Array.isArray(videoPresentation.urls)) {
-  videoUrlsInit = videoPresentation.urls;
-} else if (videoPresentation.url) {
-  videoUrlsInit = Array.isArray(videoPresentation.url)
-    ? videoPresentation.url
-    : [videoPresentation.url];
-} else if (videoPresentation.video_url) {
-  if (Array.isArray(videoPresentation.video_url)) {
-    videoUrlsInit = videoPresentation.video_url;
-  } else if (typeof videoPresentation.video_url === "string") {
-    try {
-      const parsed = JSON.parse(videoPresentation.video_url);
-      videoUrlsInit = Array.isArray(parsed) ? parsed : [videoPresentation.video_url];
-    } catch {
-      videoUrlsInit = [videoPresentation.video_url];
-    }
-  }
+// Use only the urls array from web_cards.video_presentation
+if (Array.isArray(videoPresentation.urls) && videoPresentation.urls.length > 0) {
+  videoUrlsInit = videoPresentation.urls.filter(url => url && url.trim() !== "");
 } else if (property?.propertyVideo?.length > 0) {
-  videoUrlsInit = [...property.propertyVideo];
+  // Fallback to propertyVideo if urls array is not available
+  videoUrlsInit = property.propertyVideo.filter(url => url && url.trim() !== "");
 }
 
-if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
+// Ensure we always have at least one empty string for editing
+if (videoUrlsInit.length === 0) videoUrlsInit = [""];
+
+console.log("Video URLs init:", videoUrlsInit);
+console.log("Filtered videos:", videoUrlsInit.filter(v => v.trim() !== ""));
 
   const [videoPara, setVideoPara] = useState(videoParaInit);
   const [videos, setVideos] = useState(videoUrlsInit);
@@ -57,32 +66,31 @@ if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
     setVideos(videoUrlsInit);
   }, [property]);
 
-  const getChangedFields = (original, edited) => {
-    const changed = {};
-    if ((original.videoPara || "") !== (edited.videoPara || "")) {
-      changed.videoPara = edited.videoPara;
-    }
-    const origVideos = Array.isArray(original.propertyVideo) ? original.propertyVideo.filter(v => v.trim() !== "") : [];
-    const editVideos = Array.isArray(edited.propertyVideo) ? edited.propertyVideo.filter(v => v.trim() !== "") : [];
-    if (origVideos.length !== editVideos.length || origVideos.some((v, i) => v !== editVideos[i])) {
-      changed.propertyVideo = editVideos;
-    }
-    return changed;
-  };
-
   const handleSave = () => {
-    const edited = { videoPara, propertyVideo: videos.filter(v => v.trim() !== "") };
-    const changedFields = getChangedFields(property, edited);
-    if (onSave && Object.keys(changedFields).length > 0) {
-      onSave(changedFields);
+    // Create updated property with consistent web_cards.video_presentation structure
+    const updatedProperty = {
+      ...property,
+      web_cards: {
+        ...(property.web_cards || {}),
+        video_presentation: {
+          description: videoPara,
+          urls: videos.filter(v => v.trim() !== ""),
+          // Keep title if it exists, otherwise don't include it
+          ...(videoPresentation.title && { title: videoPresentation.title })
+        },
+      },
+    };
+    
+    if (onSave) {
+      onSave(updatedProperty);
     }
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
-    setVideoPara(property?.videoPara || "");
-    setVideos(property?.propertyVideo?.length > 0 ? [...property.propertyVideo] : [""]);
+    setVideoPara(videoParaInit);
+    setVideos(videoUrlsInit);
   };
 
   const handleVideoChange = (index, value) => {
@@ -109,7 +117,7 @@ if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
           }}
         >
           Video Presentation 
-          {showEdit && (
+          {/* {showEdit && (
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isEditing ? (
               <>
@@ -150,7 +158,7 @@ if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
               />
             )}
           </span>
-)}
+)} */}
         </h4>
         <div className="px-3">
           {isEditing ? (
@@ -248,43 +256,55 @@ if (!videoUrlsInit || videoUrlsInit.length === 0) videoUrlsInit = [""];
                 </div>
               )}
               <div className="d-flex flex-column">
-                {videos.filter(v => v.trim() !== "").length > 0 ? (
-                  videos.filter(v => v.trim() !== "").map((videoUrl, index) => (
-                    <div key={index} className="ratio ratio-16x9 mb-3">
-                      <iframe
-                        src={`https://www.youtube.com/embed/${extractVideoId(videoUrl)}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                        title={`${property?.propertyName} Video Presentation ${index + 1}`}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        style={{
-                          border: "none",
-                          borderRadius: "8px",
-                        }}
-                      ></iframe>
+                {(() => {
+                  const validVideos = videos.filter(v => v.trim() !== "");
+                  console.log("Valid videos for display:", validVideos);
+                  console.log("Video URLs length:", validVideos.length);
+                  
+                  return validVideos.length > 0 ? (
+                    validVideos.map((videoUrl, index) => {
+                      const videoId = extractVideoId(videoUrl);
+                      const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&origin=${window.location.origin}`;
+                      console.log(`Video ${index + 1}:`, { videoUrl, videoId, embedUrl });
+                      
+                      return videoId ? (
+                        <div key={index} className="ratio ratio-16x9 mb-3">
+                          <iframe
+                            src={embedUrl}
+                            title={`${property?.propertyName || property?.name} Video Presentation ${index + 1}`}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            style={{
+                              border: "none",
+                              borderRadius: "8px",
+                            }}
+                          ></iframe>
+                        </div>
+                      ) : null;
+                    })
+                  ) : (
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "160px",
+                        backgroundImage: "url('/images/investmango-youtube-banner.webp')",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#fff",
+                        fontSize: "20px",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        backgroundColor: "#f0f0f0",
+                      }}
+                    >
+                      {/* No Videos Available */}
                     </div>
-                  ))
-                ) : (
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "160px",
-                      backgroundImage: "url('/images/investmango-youtube-banner.webp')",
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#fff",
-                      fontSize: "20px",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      backgroundColor: "#f0f0f0",
-                    }}
-                  >
-                    {/* No Videos Available */}
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             </>
           )}

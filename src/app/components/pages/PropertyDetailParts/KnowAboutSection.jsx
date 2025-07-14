@@ -161,7 +161,7 @@ const KnowAboutSection = ({ showEdit,property, showFullDescription, setShowFullD
                 }}
               >
                 <img src="/images/download-icon.svg" alt="Download" style={{ width: 18, height: 18, marginRight: 8, verticalAlign: "middle" }} />
-                Download Brochure
+                 Brochure
               </a>
             </div>
           )}

@@ -4,9 +4,9 @@ import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
 const WhyToChooseSection = ({ property, onSave ,showEdit}) => {
   const [editMode, setEditMode] = useState(false);
-  // Support new structure: property.web_cards.why_choose_us.usp_list and image_urls
-  const uspList = property?.web_cards?.why_choose_us?.usp_list || [];
-  const imageUrls = property?.web_cards?.why_choose_us?.image_urls || [];
+  // Support new structure: property.web_cards.why_to_choose.usp_list and image_urls
+  const uspList = property?.web_cards?.why_to_choose?.usp_list || [];
+  const imageUrls = property?.web_cards?.why_to_choose?.image_urls || [];
   const [editableUsp, setEditableUsp] = useState([...uspList]);
 
   // Sync editableUsp with uspList when property changes
@@ -29,7 +29,7 @@ const WhyToChooseSection = ({ property, onSave ,showEdit}) => {
         ...property,
         web_cards: {
           ...property.web_cards,
-          why_choose_us: {
+          why_to_choose: {
             image_urls: imageUrls,
             usp_list: editableUsp,
           },
