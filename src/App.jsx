@@ -30,7 +30,6 @@ import LoginDashboard from "./app/components/pages/Login/LoginDashboard";
 import ProtectedRoute from "./app/components/ProtectedRoute";
 import AdminDashboard from "./app/components/pages/AdminDashboard/AdminDashboard";
 
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -59,11 +58,17 @@ const router = createBrowserRouter([
       { path: "/404", element: <NotFound /> },
       { path: "/privacy-policy", element: <Privacy /> },
       { path: "/terms-and-conditions", element: <TermAndCondition /> },
-      {path:"/projectDetails", element: <ProjectDetails />},
-      {path:"/login", element: <Login isOpen={true} onClose={() => {}} />}, // Login route
-       {path:"/admin" , element : <LoginDashboard />}, // Login Dashboard route
-       {path:"/admin/dashboard", element: <ProtectedRoute><AdminDashboard /></ProtectedRoute>}, // Protected Admin Dashboard route
- 
+      { path: "/projectDetails", element: <ProjectDetails /> },
+      { path: "/login", element: <Login isOpen={true} onClose={() => {}} /> }, // Login route
+      { path: "/admin", element: <LoginDashboard /> }, 
+      {
+        path: "/admin/dashboard",
+        element: (
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ]);
