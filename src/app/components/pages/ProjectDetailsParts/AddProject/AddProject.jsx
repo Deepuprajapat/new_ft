@@ -22,12 +22,13 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
   const [projectData, setProjectData] = useState(null);
   const [localityOptions, setLocalityOptions] = useState([]);
   const [localitiesLoading, setLocalitiesLoading] = useState(false);
+  const [cityOptions , setCityoptions]= useState([])
 
-  const cityOptions = [
-    { value: 'DELHI', label: 'Delhi' },
-    { value: 'NOIDA', label: 'Noida' },
-    { value: 'GURGAON', label: 'Gurgaon' },
-  ];
+  // const cityOptions = [
+  //   { value: 'DELHI', label: 'Delhi' },
+  //   { value: 'NOIDA', label: 'Noida' },
+  //   { value: 'GURGAON', label: 'Gurgaon' },
+  // ];
 
   useEffect(() => {
     if (show) { // Only fetch when modal is shown
@@ -69,6 +70,19 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
     try {
       const response = await getAllLocations();
       const options = (response || []).map(loc => ({ value: loc.id, label: loc.locality_name }));
+      
+      // Create unique city options by filtering out duplicates
+      const uniqueCities = [];
+      const seenCities = new Set();
+      
+      (response || []).forEach(loc => {
+        if (loc.city && !seenCities.has(loc.city)) {
+          seenCities.add(loc.city);
+          uniqueCities.push({ value: loc.city, label: loc.city });
+        }
+      });
+      
+      setCityoptions(uniqueCities);
       setLocalityOptions(options);
     } catch (err) {
       setLocalityOptions([]);
@@ -96,8 +110,6 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
       const projectId = response.data?.project_id;
 
       if (projectId) {
-        // 2. Get project details by ID to fetch canonical
-        console.log(projectId, "jbrigr")
         const propertyResponse = await getAllProjectsByUrlName(projectId);
         console.log("propertyResponse", propertyResponse);
         console.log(propertyResponse.meta_info.canonical, "cc")
@@ -207,7 +219,23 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
               ))}
             </Form.Select>
           </Form.Group>
+         
 
+          <Form.Group className="mb-3">
+            <Form.Label>Project City</Form.Label>
+            <Form.Select
+              name="project_city"
+              value={formData.project_city}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select City</option>
+              {cityOptions.map((city) => (
+                <option key={city.value} value={city.value}>{city.label}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+          
           <Form.Group className="mb-3">
             <Form.Label>Locality</Form.Label>
             <Form.Select
@@ -224,20 +252,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
             </Form.Select>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Project City</Form.Label>
-            <Form.Select
-              name="project_city"
-              value={formData.project_city}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select City</option>
-              {cityOptions.map((city) => (
-                <option key={city.value} value={city.value}>{city.label}</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
+     
 
           <div className="d-flex justify-content-end gap-2">
             <Button

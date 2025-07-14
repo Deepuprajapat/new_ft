@@ -100,7 +100,7 @@ const Head = () => {
     ?.sort((a, b) => {
       return projectOrder.indexOf(a.id) - projectOrder.indexOf(b.id);
     })
-    .slice(0, 30); // Limit to 30 projects
+    ?.slice(0, 30); // Limit to 30 projects
 
   return (
     <div>
