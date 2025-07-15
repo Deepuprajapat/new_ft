@@ -25,9 +25,6 @@ const ProjectCard = ({ project }) => {
     }
 };
 
-   
- 
-
   const sizeRange = project.sizes?.match(/\d+/g); // Extract all numbers from the string
   console.log(project.canonical,"canonical URL");
 

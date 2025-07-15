@@ -30,24 +30,15 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
   //   { value: 'GURGAON', label: 'Gurgaon' },
   // ];
 
-  useEffect(() => {
-    if (show) { // Only fetch when modal is shown
-      fetchDevelopers();
-      fetchLocalities();
-    }
-  }, [show]);
-
+  // Fetch developers
   const fetchDevelopers = async () => {
     setDevelopersLoading(true);
     try {
       const response = await getAllDeveloper();
       console.log("Full API response: ", response);
-      
       // Based on your API structure: {data: Array(10), pagination: {...}}
       const devs = response?.data?.data || [];
-      
       console.log("Processed developers: ", devs);
-      
       // Ensure it's an array and has valid data
       if (Array.isArray(devs) && devs.length > 0) {
         setDevelopers(devs);
@@ -65,24 +56,42 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
     }
   };
 
-  const fetchLocalities = async () => {
-    setLocalitiesLoading(true);
+  useEffect(() => {
+    if (show) { // Only fetch when modal is shown
+      fetchDevelopers();
+      fetchCities(); // Fetch all cities on modal open
+      setLocalityOptions([]); // Reset localities when modal opens
+    }
+  }, [show]);
+
+  // Fetch all cities (on modal open)
+  const fetchCities = async () => {
     try {
       const response = await getAllLocations();
-      const options = (response || []).map(loc => ({ value: loc.id, label: loc.locality_name }));
-      
-      // Create unique city options by filtering out duplicates
       const uniqueCities = [];
       const seenCities = new Set();
-      
+
       (response || []).forEach(loc => {
         if (loc.city && !seenCities.has(loc.city)) {
           seenCities.add(loc.city);
           uniqueCities.push({ value: loc.city, label: loc.city });
         }
       });
-      
+
       setCityoptions(uniqueCities);
+    } catch (err) {
+      setCityoptions([]);
+      setError('Failed to fetch cities');
+      console.error('Error fetching cities:', err);
+    }
+  };
+
+  // Fetch localities for a city
+  const fetchLocalities = async (city) => {
+    setLocalitiesLoading(true);
+    try {
+      const response = await getAllLocations(city); // Pass city param
+      const options = (response || []).map(loc => ({ value: loc.id, label: loc.locality_name }));
       setLocalityOptions(options);
     } catch (err) {
       setLocalityOptions([]);
@@ -99,6 +108,14 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
       ...prev,
       [name]: value
     }));
+
+    if (name === "project_city") {
+      fetchLocalities(value); // Fetch localities for selected city
+      setFormData(prev => ({
+        ...prev,
+        locality: '' // Reset locality when city changes
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -143,6 +160,18 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper to reset form
+  const resetForm = () => {
+    setFormData({
+      project_name: '',
+      project_url: '',
+      project_type: '',
+      project_city: '',
+      developer_id: '',
+      locality: '',
+    });
   };
 
   // Debug logging
@@ -257,7 +286,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
           <div className="d-flex justify-content-end gap-2">
             <Button
               variant="secondary"
-              onClick={handleClose}
+              onClick={() => { resetForm(); handleClose(); }}
               disabled={loading}
             >
               Cancel

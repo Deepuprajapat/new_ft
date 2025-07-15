@@ -334,17 +334,15 @@ function MetaFormSection({ projectData, handleSave }) {
                 </div>
               </div>
 
-              <div className="d-flex justify-content-end mt-4">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  style={{ borderRadius: 8, fontWeight: 500 }}
-                  disabled={!metaTitle || !metaDescription || brochureError}
-                  title={!metaTitle || !metaDescription ? "Please fill required fields" : ""}
-                >
-                  Save
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{ borderRadius: 8, fontWeight: 500, cursor: "pointer", justifyContent:'end' }}
+                disabled={!metaTitle || !metaDescription || brochureError}
+                title={!metaTitle || !metaDescription ? "Please fill required fields" : ""}
+              >
+                Save
+              </button>
             </form>
           </div>
         </div>

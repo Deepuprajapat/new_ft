@@ -674,9 +674,14 @@ export const patchProjectDetails = async (projectId, patchData) => {
 };
 
 // Get all locations
-export const getAllLocations = async () => {
+export const getAllLocations = async (city) => {
   try {
-    const res = await axios.get(`${BASE_URL}/locations`);
+    let url = `${BASE_URL}/locations`;
+    const config = {};
+    if (city) {
+      config.params = { city };
+    }
+    const res = await axios.get(url, config);
     console.log("Locations fetched successfully:", res.data.data);
     return res.data?.data || [];
   } catch (error) {

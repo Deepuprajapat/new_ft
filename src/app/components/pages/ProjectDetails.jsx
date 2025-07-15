@@ -62,11 +62,12 @@ const ProjectDetails = () => {
 
   const getProjectIdFromSession = () => {
     const projectState = sessionStorage.getItem("projectState");
-    
+    console.log(projectState, "tttttttt");
     if (projectState) {
         try {
-            const data = JSON.parse(projectState);
-            return data.projectId;
+            // Only parse if it looks like JSON
+            const data = /^[{\[]/.test(projectState) ? JSON.parse(projectState) : projectState;
+            return data.projectId || data;
         } catch (err) {
             sessionStorage.removeItem("projectState");
         }
@@ -75,6 +76,7 @@ const ProjectDetails = () => {
 };
 
   const projectIdFromNav = getProjectIdFromSession();
+  console.log(projectIdFromNav, "project id from nav")
 
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -295,6 +297,7 @@ const ProjectDetails = () => {
         }
       } else if (urlName) {
         try {
+          console.log(projectIdFromNav, "project id from nav")
           const data = await getAllProjectsByUrlName(projectIdFromNav, navigate);
           console.log(data , "gggg")
           if (data) {

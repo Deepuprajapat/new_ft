@@ -31,7 +31,7 @@ const SortableImage = ({
   setShowFullScreen,
   setCurrentImageIndex,
   showEdit,
-  loadingImg,
+  isDataLoaded, // Add this prop
 }) => {
   const {
     attributes,
@@ -46,13 +46,36 @@ const SortableImage = ({
     transition,
   };
 
-  // Use dummy image if no imageUrl is present
+  // Only show dummy image if data is loaded and no actual image exists
   const imageUrl = imageData?.imageUrl
     ? imageData.imageUrl
-    : loadingImg  
-      ? "" // Show nothing or a spinner while loading
-      : DUMMY_IMAGE_PATH;
+    : (isDataLoaded ? DUMMY_IMAGE_PATH : "");
+  
   const caption = imageData?.caption || `Image ${index + 1}`;
+
+  // Don't render anything if data is not loaded and no image URL
+  if (!isDataLoaded && !imageData?.imageUrl) {
+    return (
+      <div
+        ref={setNodeRef}
+        {...(showEdit ? { ...attributes, ...listeners } : {})}
+        className={isMainImage ? "col-12 col-md-6 p-0 pe-0 pe-md-1" : "col-6"}
+        style={{
+          ...style,
+          height: isMainImage ? "540px" : "270px",
+          padding: !isMainImage ? "0 0 0.5px 0.5px" : undefined,
+          backgroundColor: '#f8f9fa', // Light background while loading
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <div className="spinner-border text-secondary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   const imageContent = (
     <div
@@ -150,8 +173,8 @@ const ProjectGallerySection = ({
   const [hoveredImageIndex, setHoveredImageIndex] = useState(null);
   const [localImages, setLocalImages] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [loadingImg, setLoadingImg] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null); // <-- Add this line
+  const [isDataLoaded, setIsDataLoaded] = useState(false); // Add this state
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const IMAGE_BASE_URL = "https://image.investmango.com/project/venkatesh-laurel/";
 
@@ -168,19 +191,23 @@ const ProjectGallerySection = ({
 
   // Initialize localImages with projectData.web_cards.images (skip first image)
   useEffect(() => {
-    // Skip the first image (index 0)
-    const images =
-      projectData?.web_cards?.images?.length > 1
-        ? projectData.web_cards.images.slice(1).map((fileName, idx) => ({
-            imageUrl: fileName, // Just the file name
-            caption: fileName,
-          }))
-        : [];
-    setLocalImages(images);
-    const timeout = setTimeout(() => {
-      setLoadingImg(false);
-    }, 500);
-    return () => clearTimeout(timeout);
+    // Only process if projectData is available
+    if (projectData && projectData.web_cards && projectData.web_cards.images) {
+      // Skip the first image (index 0)
+      const images =
+        projectData.web_cards.images.length > 1
+          ? projectData.web_cards.images.slice(1).map((fileName, idx) => ({
+              imageUrl: fileName, // Just the file name
+              caption: fileName,
+            }))
+          : [];
+      setLocalImages(images);
+      setIsDataLoaded(true); // Mark data as loaded
+    } else if (projectData) {
+      // If projectData exists but no images, still mark as loaded
+      setLocalImages([]);
+      setIsDataLoaded(true);
+    }
   }, [projectData]);
 
   const handleEdit = () => setIsEditing(true);
@@ -334,7 +361,7 @@ const ProjectGallerySection = ({
                 setShowFullScreen={setShowFullScreen}
                 setCurrentImageIndex={setCurrentImageIndex}
                 showEdit={showEdit}
-                loadingImg={loadingImg}
+                isDataLoaded={isDataLoaded} // Pass the prop
               />
 
               {/* Grid Images */}
@@ -353,6 +380,7 @@ const ProjectGallerySection = ({
                       setShowFullScreen={setShowFullScreen}
                       setCurrentImageIndex={setCurrentImageIndex}
                       showEdit={showEdit}
+                      isDataLoaded={isDataLoaded} // Pass the prop
                     />
                   ))}
                 </div>

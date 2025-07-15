@@ -63,7 +63,6 @@ const SearchBar = () => {
 
     let queryParams = [];
 
-    // Include the search query in the URL
     if (searchQuery) {
       console.log("Search Query", searchQuery);
       const matchedProject = projectSuggestions.find(
@@ -71,13 +70,20 @@ const SearchBar = () => {
       );
 
       if (matchedProject) {
-        navigate(`/${matchedProject.canonical}`);
-        return; // Exit since we found an exact match
-      }
+        const stateData =  matchedProject.project_id ;
+        const cleanUrl = `/${matchedProject.canonical.toLowerCase().replace(/\s+/g, "-")}`;
 
+        sessionStorage.setItem('projectState', stateData);
+
+        const newWindow = window.open('', '_blank');
+      if (newWindow) {
+          newWindow.location.href = cleanUrl;
+      }
+        return;
+      }
       queryParams.push(`search=${encodeURIComponent(searchQuery)}`);
     }
-
+  
     // Include the location in the URL
     if (location) {
       console.log("Location", location);  
