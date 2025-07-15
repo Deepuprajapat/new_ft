@@ -1,15 +1,41 @@
 import React, { useState } from 'react';
-import { FaHome, FaUser, FaCog, FaChartLine, FaBars } from 'react-icons/fa';
-import { MdExpandMore, MdExpandLess } from 'react-icons/md';
+import { FaHome, FaBars, FaUsers, FaSignOutAlt, FaBuilding, FaPlus } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import "../styles/css/Sidebar.css";
 
 const index = () => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [activeSection, setActiveSection] = useState('home');
-    const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
+    const navigate = useNavigate();
 
     const toggleSidebar = () => setIsExpanded(!isExpanded);
-    const toggleSettingsMenu = () => setIsSettingsExpanded(!isSettingsExpanded);
+
+    const getUserRole = () => {
+        return localStorage.getItem("user-role");
+    };
+
+    const canAccessLeads = () => {
+        const role = getUserRole();
+        return role === 'dm' || role === 'superadmin';
+    };
+
+    const canManageProjects = () => {
+        const role = getUserRole();
+        return role === 'superadmin' || role === 'admin';
+    };
+
+    const handleNavigation = (section, path) => {
+        setActiveSection(section);
+        if (path) {
+            navigate(path);
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("auth-token");
+        localStorage.removeItem("user-role");
+        navigate("/admin");
+    };
   return (
     <div className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}>
     <div className="toggle-btn" onClick={toggleSidebar}>
@@ -17,59 +43,48 @@ const index = () => {
     </div>
     <div className="sidebar-content">
         <div
-            className={`sidebar-item ${activeSection === 'home' ? 'active' : ''}`}
-            onClick={() => setActiveSection('home')}
+            className={`sidebar-item ${activeSection === 'dashboard' ? 'active' : ''}`}
+            onClick={() => handleNavigation('dashboard', '/admin/dashboard')}
         >
             <FaHome className="icon" />
-            {isExpanded && <span>Home</span>}
+            {isExpanded && <span>Dashboard</span>}
         </div>
-        <div
-            className={`sidebar-item ${activeSection === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveSection('profile')}
-        >
-            <FaUser className="icon" />
-            {isExpanded && <span>Profile</span>}
-        </div>
-        <div
-            className={`sidebar-item ${activeSection === 'analytics' ? 'active' : ''}`}
-            onClick={() => setActiveSection('analytics')}
-        >
-            <FaChartLine className="icon" />
-            {isExpanded && <span>Analytics</span>}
-        </div>
-        <div
-            className="sidebar-item"
-            onClick={toggleSettingsMenu}
-        >
-            <FaCog className="icon" />
-            {isExpanded && (
-                <span>
-                    Settings {isSettingsExpanded ? <MdExpandLess /> : <MdExpandMore />}
-                </span>
-            )}
-        </div>
-        {isSettingsExpanded && isExpanded && (
-            <div className="sub-menu">
-                <div
-                    className={`sidebar-item sub-item ${activeSection === 'general' ? 'active' : ''}`}
-                    onClick={() => setActiveSection('general')}
-                >
-                    General
-                </div>
-                <div
-                    className={`sidebar-item sub-item ${activeSection === 'security' ? 'active' : ''}`}
-                    onClick={() => setActiveSection('security')}
-                >
-                    Security
-                </div>
+        
+        {canAccessLeads() && (
+            <div
+                className={`sidebar-item ${activeSection === 'leads' ? 'active' : ''}`}
+                onClick={() => handleNavigation('leads', '/admin/leads/dashboard')}
+            >
+                <FaUsers className="icon" />
+                {isExpanded && <span>Leads Management</span>}
             </div>
-            
         )}
+        
+        {canManageProjects() && (
+            <div
+                className={`sidebar-item ${activeSection === 'projects' ? 'active' : ''}`}
+                onClick={() => handleNavigation('projects', '/admin/dashboard')}
+            >
+                <FaBuilding className="icon" />
+                {isExpanded && <span>Projects</span>}
+            </div>
+        )}
+        
+        {canManageProjects() && (
+            <div
+                className={`sidebar-item ${activeSection === 'addproject' ? 'active' : ''}`}
+                onClick={() => handleNavigation('addproject', '/addproject')}
+            >
+                <FaPlus className="icon" />
+                {isExpanded && <span>Add Project</span>}
+            </div>
+        )}
+        
         <div
-            className={`sidebar-item ${activeSection === 'Logout' ? 'active' : ''}`}
-            onClick={() => setActiveSection('Logout')}
+            className={`sidebar-item logout-item`}
+            onClick={handleLogout}
         >
-            <FaChartLine className="icon" />
+            <FaSignOutAlt className="icon" />
             {isExpanded && <span>Logout</span>}
         </div>
     </div>

@@ -71,7 +71,7 @@ const PopupDialog = ({ open, onClose, projectName }) => {
     }
 
     try {
-      await sendOTP(usermobile, projectName, "brochure", username, "", "", formData.userType);
+      await sendOTP(usermobile, projectName, "brochure", username, "", "", formData.userType, "", "");
       setIsOtpSent(true);
       Swal.fire({
         icon: "success",
@@ -96,7 +96,7 @@ const PopupDialog = ({ open, onClose, projectName }) => {
     try {
       const response = await verifyOTP(formData.usermobile, otp);
 
-      if (response.message === "OTP Validated Successfully") {
+      if (response.data.message === "OTP Validated Successfully") {
         Swal.fire({
           icon: "success",
           title: "Success!",

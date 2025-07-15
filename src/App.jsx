@@ -30,6 +30,8 @@ import LoginDashboard from "./app/components/pages/Login/LoginDashboard";
 import ProtectedRoute from "./app/components/ProtectedRoute";
 import AdminDashboard from "./app/components/pages/AdminDashboard/AdminDashboard";
 import AddProject from "./app/components/pages/ProjectDetailsParts/AddProject/AddProject";
+import Dashboard from "./app/components/pages/Dashboard";
+import LeadsDashboard from "./app/components/pages/Dashboard/LeadsDashboard";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +69,16 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <AdminDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/leads/dashboard",
+        element: (
+          <ProtectedRoute allowedRoles={['dm', 'superadmin']}>
+            <Dashboard>
+              <LeadsDashboard />
+            </Dashboard>
           </ProtectedRoute>
         ),
       },
