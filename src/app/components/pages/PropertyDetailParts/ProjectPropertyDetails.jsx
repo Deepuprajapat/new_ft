@@ -221,7 +221,25 @@ const ProjectPropertyDetails = ({ property, onSave , ageOfProperty,showEdit}) =>
                     />
                   ) : (
                     <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>
-                      {property?.configuration?.configurationType?.configurationTypeName || property?.configuration}
+                      {(() => {
+                        let configVal = property?.configuration?.configurationType?.configurationTypeName || property?.configuration;
+                        if (!configVal) return "";
+                        let arr = [];
+                        try {
+                          arr = typeof configVal === "string" ? JSON.parse(configVal) : configVal;
+                        } catch {
+                          arr = Array.isArray(configVal) ? configVal : [configVal];
+                        }
+                        // Only keep BHK configs
+                        const bhkArr = arr.filter((c) => /\d+BHK/.test(c));
+                        if (bhkArr.length > 0) {
+                          // Extract numbers and find min
+                          const minBHK = Math.min(...bhkArr.map((c) => parseInt(c)));
+                          return `${minBHK}BHK`;
+                        }
+                        // fallback: show first config
+                        return arr[0] || configVal;
+                      })()}
                     </p>
                   )}
                 </div>

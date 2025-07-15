@@ -126,14 +126,12 @@ const AdminDashboard = () => {
       name: propertyName.trim(),
       property_type: selectedPropertyType,
     };
-
+    
     try {
       const response = await saveProperty(propertyData);
+      console.log(response?.data?.property_id,"yehg")
       setShowPropertyDetailsModal(false);
-      
-      // Refresh the properties list
       await fetchAdminProperties(currentPage, filters);
-      
    
       if (response?.data?.property_id) {
         navigate(`/propertyforsale/${response.data.slug}`, {

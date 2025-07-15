@@ -79,11 +79,11 @@ const AboutDeveloperSection = ({
                   <button
                     className="btn btn-success btn-sm"
                     style={{ backgroundColor: "#000", borderColor: "#000" }}
-                    onClick={handleSaveChanges  }
+                    onClick={handleSaveChanges}
                   >
                     Save
                   </button>
-                  <button 
+                  <button
                     className="btn btn-secondary btn-sm"
                     style={{
                       backgroundColor: "#6c757d",
@@ -308,9 +308,12 @@ const AboutDeveloperSection = ({
                   )}
                   <br />
                   <b>Book Your Site Visit</b>{" "}
-                  {developerDetails?.bookingLink ? (
-                    <a
-                      href={developerDetails.bookingLink}
+                    <span
+                      onClick={
+                        isMobileView
+                          ? handleDownloadBrochuree
+                          : handleDownloadBrochure
+                      }
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -321,10 +324,7 @@ const AboutDeveloperSection = ({
                       id="BookBtn3"
                     >
                       Click Here
-                    </a>
-                  ) : (
-                    <span style={{ color: "#888" }}>Not Available</span>
-                  )}
+                    </span>
                 </p>
               </>
             )}

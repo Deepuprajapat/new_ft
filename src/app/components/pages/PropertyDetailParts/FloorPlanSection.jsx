@@ -205,7 +205,7 @@ const FloorPlanSection = ({
                   (plan, idx) => (
                     <div
                       key={idx}
-                      className="px-2 d-flex justify-content-center"
+                      className="px-2 justify-content-center"
                     >
                       <div
                         className="card border-0"
@@ -214,7 +214,9 @@ const FloorPlanSection = ({
                           maxWidth: window.innerWidth <= 768 ? "80%" : "auto",
                         }}
                       >
-                        <div className="card-body p-3 text-center">
+                        <div className="card-body p-3 text-center "
+                          style={{alignItems: "center" }}
+                        >
                           <p
                             className="mb-3"
                             style={{
@@ -226,57 +228,111 @@ const FloorPlanSection = ({
                             {plan.title || `Floor Plan ${idx + 1}`}
                           </p>
                           {/* 2D Floor Plan */}
-                          {plan["2D"] && (
-                            <>
-                              <div
-                                style={{
-                                  fontSize: "12px",
-                                  fontWeight: 500,
-                                  marginBottom: 4,
-                                }}
-                              >
-                                2D Floor Plan
+                          {plan["2D"] && plan["3D"] ? (
+                            <div style={{ display: "flex", flexDirection: "row", gap: "16px", justifyContent: "center", alignItems: "flex-start" }}>
+                              <div style={{ flex: 1, textAlign: "center" }}>
+                                <div
+                                  style={{
+                                    fontSize: "12px",
+                                    fontWeight: 500,
+                                    marginBottom: 4,
+                                  }}
+                                >
+                                  2D Floor Plan
+                                </div>
+                                <img
+                                  src={plan["2D"]}
+                                  alt={`2D Floor Plan ${idx + 1}`}
+                                  loading="lazy"
+                                  className="img-fluid mb-3"
+                                  style={{
+                                    width: "100%",
+                                    maxHeight: "300px",
+                                    objectFit: "contain",
+                                    borderRadius: "5px",
+                                  }}
+                                  onClick={() => handleImageClick(plan["2D"])}
+                                />
                               </div>
-                              <img
-                                src={plan["2D"]}
-                                alt={`2D Floor Plan ${idx + 1}`}
-                                loading="lazy"
-                                className="img-fluid mb-3"
-                                style={{
-                                  width: "100%",
-                                  maxHeight: "300px",
-                                  objectFit: "contain",
-                                  borderRadius: "5px",
-                                }}
-                                onClick={() => handleImageClick(plan["2D"])}
-                              />
-                            </>
-                          )}
-                          {/* 3D Floor Plan */}
-                          {plan["3D"] && (
-                            <>
-                              <div
-                                style={{
-                                  fontSize: "12px",
-                                  fontWeight: 500,
-                                  marginBottom: 4,
-                                }}
-                              >
-                                3D Floor Plan
+                              <div style={{ flex: 1, textAlign: "center" }}>
+                                <div
+                                  style={{
+                                    fontSize: "12px",
+                                    fontWeight: 500,
+                                    marginBottom: 4,
+                                  }}
+                                >
+                                  3D Floor Plan
+                                </div>
+                                <img
+                                  src={plan["3D"]}
+                                  alt={`3D Floor Plan ${idx + 1}`}
+                                  loading="lazy"
+                                  className="img-fluid mb-3"
+                                  style={{
+                                    width: "100%",
+                                    maxHeight: "300px",
+                                    objectFit: "contain",
+                                    borderRadius: "5px",
+                                  }}
+                                  onClick={() => handleImageClick(plan["3D"])}
+                                />
                               </div>
-                              <img
-                                src={plan["3D"]}
-                                alt={`3D Floor Plan ${idx + 1}`}
-                                loading="lazy"
-                                className="img-fluid mb-3"
-                                style={{
-                                  width: "100%",
-                                  maxHeight: "300px",
-                                  objectFit: "contain",
-                                  borderRadius: "5px",
-                                }}
-                                onClick={() => handleImageClick(plan["3D"])}
-                              />
+                            </div>
+                          ) : (
+                            <>
+                              {plan["2D"] && (
+                                <>
+                                  <div
+                                    style={{
+                                      fontSize: "12px",
+                                      fontWeight: 500,
+                                      marginBottom: 4,
+                                    }}
+                                  >
+                                    2D Floor Plan
+                                  </div>
+                                  <img
+                                    src={plan["2D"]}
+                                    alt={`2D Floor Plan ${idx + 1}`}
+                                    loading="lazy"
+                                    className="img-fluid mb-3"
+                                    style={{
+                                      width: "100%",
+                                      maxHeight: "300px",
+                                      objectFit: "contain",
+                                      borderRadius: "5px",
+                                    }}
+                                    onClick={() => handleImageClick(plan["2D"])}
+                                  />
+                                </>
+                              )}
+                              {plan["3D"] && (
+                                <>
+                                  <div
+                                    style={{
+                                      fontSize: "12px",
+                                      fontWeight: 500,
+                                      marginBottom: 4,
+                                    }}
+                                  >
+                                    3D Floor Plan
+                                  </div>
+                                  <img
+                                    src={plan["3D"]}
+                                    alt={`3D Floor Plan ${idx + 1}`}
+                                    loading="lazy"
+                                    className="img-fluid mb-3"
+                                    style={{
+                                      width: "100%",
+                                      maxHeight: "300px",
+                                      objectFit: "contain",
+                                      borderRadius: "5px",
+                                    }}
+                                    onClick={() => handleImageClick(plan["3D"])}
+                                  />
+                                </>
+                              )}
                             </>
                           )}
                         </div>

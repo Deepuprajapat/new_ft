@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation  } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import {
   getPropertyByUrlName,
@@ -75,6 +75,8 @@ const PropertyDetails = () => {
   const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
   const handleDownloadFloorPlan = () => setShowFloorPlanPopup(true);
   const closeFloorPlanPopup = () => setShowFloorPlanPopup(false);
+  
+  const location = useLocation();
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);
@@ -110,7 +112,7 @@ const PropertyDetails = () => {
     }
     return null;
   };
-  const propertyid = getProjectIdFromSession();
+  const propertyid = location.state?.propertyid || getProjectIdFromSession();
 
   console.log(propertyid, "ppid")
 
@@ -315,10 +317,10 @@ const PropertyDetails = () => {
     });
   };
 
-  // const onSaveFloorPlan = (changedData) => {
-  //   setProperty(prev => ({ ...prev, ...changedData }));
-  //   // TODO: Call patchPropertyDetails API here if needed
-  // };
+  const onSaveFloorPlan = (changedData) => {
+    setProperty(prev => ({ ...prev, ...changedData }));
+    // TODO: Call patchPropertyDetails API here if needed
+  };
 
   const onSaveAboutDeveloper = (changedData) => {
     setProperty((prev) => ({ ...prev, ...changedData }));
@@ -1126,16 +1128,16 @@ const PropertyDetails = () => {
                 property={property}
                 showEdit={showEdit}
                 activeFilter={activeFilter}
-                // setActiveFilter={setActiveFilter}
-                // handleImageClick={handleImageClick}
-                // showImagePopup={showImagePopup}
-                // selectedImage={selectedImage}
-                // closeImagePopup={closeImagePopup}
-                // handleDownloadFloorPlan={handleDownloadFloorPlan}
-                // showFloorPlanPopup={showFloorPlanPopup}
-                // closeFloorPlanPopup={closeFloorPlanPopup}
-                // formatPrice={formatPrice}
-                //onSave={onSaveFloorPlan}
+                setActiveFilter={setActiveFilter}
+                handleImageClick={handleImageClick}
+                showImagePopup={showImagePopup}
+                selectedImage={selectedImage}
+                closeImagePopup={closeImagePopup}
+                handleDownloadFloorPlan={handleDownloadFloorPlan}
+                showFloorPlanPopup={showFloorPlanPopup}
+                closeFloorPlanPopup={closeFloorPlanPopup}
+                formatPrice={formatPrice}
+                onSave={onSaveFloorPlan}
               />
 
               {/* Know About */}

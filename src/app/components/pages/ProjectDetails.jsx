@@ -36,6 +36,7 @@ import ProjectDetailsSection from "./ProjectDetailsParts/ProjectDetailsSection";
 import MetaFormSection from "./ProjectDetailsParts/MetaForm";
 import ProjectGallerySection from "./ProjectDetailsParts/ProjectGallerySection";
 import AboutDeveloperSection from "./ProjectDetailsParts/AboutDeveloperSection";
+import { DataArray } from "@mui/icons-material";
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg";
 
@@ -87,7 +88,6 @@ const ProjectDetails = () => {
 
   const getProjectIdFromSession = () => {
     const projectState = sessionStorage.getItem("projectState");
-    console.log(projectState, "tttttttt");
     if (projectState) {
         try {
             // Only parse if it looks like JSON
@@ -145,60 +145,7 @@ const ProjectDetails = () => {
     address: developerDetails?.contact_details?.project_address || "",
     name: developerDetails?.contact_details?.name || "",
   });
-
-  // const [PatchFormData, setPatchFormData] = useState({
-  //   id: projectData?.id || "",
-  //   name: projectData?.name || "",
-  //   status: projectData?.status || "",
-  //   project_configurations: projectData?.project_configurations || "",
-  //   total_towers: projectData?.total_towers || 0,
-  //   price_unit: projectData?.price_unit || "",
-  //   timeline_info: {
-  //     project_launch_date: projectData?.timeline_info?.project_launch_date || "",
-  //     project_possession_date: projectData?.timeline_info?.project_possession_date || ""
-  //   },
-  //   meta_info: {
-  //     title: projectData?.meta_info?.title || "",
-  //     description: projectData?.meta_info?.description || "",
-  //     keywords: projectData?.meta_info?.keywords || "",
-  //     canonical: projectData?.meta_info?.canonical || "",
-  //     project_schema: projectData?.meta_info?.project_schema || []
-  //   },
-  //   web_cards: {
-  //     images: projectData?.web_cards?.images || [],
-  //     rera_info: projectData?.web_cards?.rera_info || {},
-  //     project_details: projectData?.web_cards?.project_details || {},
-  //     why_to_choose: projectData?.web_cards?.why_to_choose || {},
-  //     know_about: projectData?.web_cards?.know_about || {},
-  //     floor_plan: projectData?.web_cards?.floor_plan || {},
-  //     price_list: projectData?.web_cards?.price_list || {},
-  //     amenities: projectData?.web_cards?.amenities || {},
-  //     video_presentation: projectData?.web_cards?.video_presentation || {},
-  //     payment_plans: projectData?.web_cards?.payment_plans || {},
-  //     site_plan: projectData?.web_cards?.site_plan || {},
-  //     about: projectData?.web_cards?.about || {},
-  //     faqs: projectData?.web_cards?.faqs || []
-  //   },
-  //   location_info: {
-  //     short_address: projectData?.location_info?.short_address || "",
-  //     longitude: projectData?.location_info?.longitude || "",
-  //     latitude: projectData?.location_info?.latitude || "",
-  //     google_map_link: projectData?.location_info?.google_map_link || ""
-  //   },
-  //   is_featured: projectData?.is_featured || false,
-  //   is_premium: projectData?.is_premium || false,
-  //   is_priority: projectData?.is_priority || false,
-  //   search_context: projectData?.search_context || []
-  // });
-
-  // const updatePatchFormData = (field, value) => {
-  //   setPatchFormData((prev) => ({
-  //     ...prev,
-  //     [field]: value
-  //   }));
-  // };
  
-
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const handleEdit = () => {
@@ -322,9 +269,7 @@ const ProjectDetails = () => {
         }
       } else if (urlName) {
         try {
-          console.log(projectIdFromNav, "project id from nav")
           const data = await getAllProjectsByUrlName(projectIdFromNav, navigate);
-          console.log(data , "gggg")
           if (data) {
             setProjectData(data);
             setDeveloperId(data.developerId);
@@ -361,7 +306,6 @@ const ProjectDetails = () => {
   
   useEffect(() => {
     const Pid = projectDataFromState?.project_id;
-    console.log(projectIdFromNav, Pid, "pppp");
   
     // If both are missing, navigate to 404
     if (!Pid && !projectIdFromNav) {
@@ -376,15 +320,15 @@ const ProjectDetails = () => {
     if (projectData) {
       const fetchAllProject = async () => {
         try {
-          const data = await getAllProject(projectData?.locality?.city?.id);
-
-          if (data?.content) {
+          const data = await getAllProject(projectData?.city);
+          console.log(data ,"daya")
+          if (data) {
             // Filter projects based on locality ID
-            const filteredProjects = data.content.filter(
+            const filteredProjects = data.filter(
               (project) =>
-                project?.locality?.city?.id === projectData?.locality?.city?.id
+                project?.city === projectData?.city
             );
-
+        console.log(filteredProjects,"filter")
             // Limit the projects to max 15
             setAllSimilarProjects(filteredProjects.slice(0, 15));
           }
@@ -810,6 +754,7 @@ const ProjectDetails = () => {
   };
 
   const [showBrochurePopup, setShowBrochurePopup] = useState(false);
+
   const handleDownloadBrochuree = () => setShowBrochurePopup(true);
 
   const [isMobileView, setIsMobileView] = useState(false); // To track if mobile/tablet view
@@ -842,17 +787,17 @@ const ProjectDetails = () => {
   // const [selectedImage, setSelectedImage] = useState(""); // State to hold selected image URL
 
   // Function to clean and extract numbers for sorting
-  // const cleanQuestion = (question) => {
-  //   const match = question.match(/^(\d+)[.\s\t]+(.*)/); // Extracts number and question
-  //   return match
-  //     ? { number: parseInt(match[1]), text: match[2] }
-  //     : { number: null, text: question.trim() };
-  // };
+  const cleanQuestion = (question) => {
+    const match = question.match(/^(\d+)[.\s\t]+(.*)/); 
+    return match
+      ? { number: parseInt(match[1]), text: match[2] }
+      : { number: null, text: question.trim() };
+  };
 
-  // Sort FAQs based on extracted number
-  // const sortedFaqs = projectData?.faqs
-  //   ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) })) // Add cleaned data
-  //   ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); // Sort numerically if a number exists
+
+  const sortedFaqs = projectData?.web_cards?.faqs
+    ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) }))
+    ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); 
 
   const imageSrc =
     projectData?.siteplanImg && projectData.siteplanImg.trim() !== ""

@@ -20,16 +20,16 @@ const Footer = ({ shortAddress }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchFooterItems = async () => {
-      try {
-        const keywords = await getAllGenericKeywords();
-        setFooterItems(keywords);
-      } catch (error) {
-        console.error("Error fetching footer items:", error);
-      }
-    };
+    // const fetchFooterItems = async () => {
+    //   try {
+    //     const keywords = await getAlGenericKeywords();
+    //     setFooterItems(keywords);
+    //   } catch (error) {
+    //     console.error("Error fetching footer items:", error);
+    //   }
+    // };
 
-    fetchFooterItems();
+    // fetchFooterItems();
     const handleScroll = () => {
       setIsVisible(window.scrollY > 20);
     };

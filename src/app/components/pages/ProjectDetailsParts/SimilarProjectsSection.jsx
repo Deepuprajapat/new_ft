@@ -64,8 +64,8 @@ const SimilarProjectsSection = ({
                             }}
                           >
                             <img
-                              src={project?.images[0]?.imageUrl}
-                              alt={project?.name}
+                              src={project?.images[1]}
+                              alt={project?.project_name}
                               loading="lazy"
                               style={{
                                 height: "150px",
@@ -85,7 +85,7 @@ const SimilarProjectsSection = ({
                                 minHeight: "45px",
                               }}
                             >
-                              {project.name}
+                              {project.project_name}
                             </p>
                           </a>
                           <div className="project-details">
@@ -101,9 +101,9 @@ const SimilarProjectsSection = ({
                                 className="fas fa-map-marker-alt me-2"
                                 style={{ color: "#2067d1" }}
                               ></i>
-                              {project?.shortAddress}
+                              {project?.short_address}
                             </p>
-                            {project?.area && (
+                            {project&& (
                               <p
                                 className="mb-1"
                                 style={{
@@ -117,19 +117,25 @@ const SimilarProjectsSection = ({
                                   style={{ color: "#2067d1" }}
                                 ></i>
                                 Size Info:{" "}
-                                {project?.configurations &&
-                                project.configurations.length > 0
-                                  ? `${
-                                      Math.min(
-                                        ...project.configurations.map((config) =>
-                                          parseInt(config)
-                                        )
-                                      ) + "BHK"
-                                    }`
+                                {project?.configuration 
+                                  ? (() => {
+                                      let arr = [];
+                                      try {
+                                        arr = typeof project.configuration === "string" ? JSON.parse(project.configuration) : project.configuration;
+                                      } catch {
+                                        arr = Array.isArray(project.configuration) ? project.configuration : [project.configuration];
+                                      }
+                                      const bhkArr = arr.filter((c) => /\d+BHK/.test(c));
+                                      if (bhkArr.length > 0) {
+                                        const minBHK = Math.min(...bhkArr.map((c) => parseInt(c)));
+                                        return `${minBHK}BHK`;
+                                      }
+                                      return arr[0] || "";
+                                    })()
                                   : ""}
                               </p>
                             )}
-                            {project?.floorplans && (
+                            {project?.min_price && (
                               <p
                                 className="mb-1"
                                 style={{
@@ -140,9 +146,7 @@ const SimilarProjectsSection = ({
                               >
                                 Starting ₹
                                 <b>
-                                  {formatPrice(
-                                    getLeastPriceOfFloorPlan(project?.floorplans)
-                                  )}
+                                  {project?.min_price}
                                 </b>
                               </p>
                             )}

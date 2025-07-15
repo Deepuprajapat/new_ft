@@ -17,6 +17,7 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { uploadImage } from '../../../apis/api';
 
 const DUMMY_IMAGE_PATH = require('../../../assets/img/dummy.webp');
 
@@ -32,6 +33,7 @@ const SortableImage = ({
   setCurrentImageIndex,
   showEdit,
   isDataLoaded, // Add this prop
+  isLoading, // Add this prop
 }) => {
   const {
     attributes,
@@ -72,6 +74,31 @@ const SortableImage = ({
       >
         <div className="spinner-border text-secondary" role="status">
           <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Show spinner if uploading
+  if (isLoading) {
+    return (
+      <div
+        ref={setNodeRef}
+        className={isMainImage ? "col-12 col-md-6 p-0 pe-0 pe-md-1" : "col-6"}
+        style={{
+          ...style,
+          height: isMainImage ? "540px" : "270px",
+          padding: !isMainImage ? "0 0 0.5px 0.5px" : undefined,
+          backgroundColor: '#f8f9fa',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          zIndex: 10,
+        }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Uploading...</span>
         </div>
       </div>
     );
@@ -175,6 +202,7 @@ const ProjectGallerySection = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false); // Add this state
   const [selectedImage, setSelectedImage] = useState(null);
+  const [imageLoading, setImageLoading] = useState([false, false, false, false, false]); // Loading state for each slot
 
   const IMAGE_BASE_URL = "https://image.investmango.com/project/venkatesh-laurel/";
 
@@ -238,39 +266,76 @@ const ProjectGallerySection = ({
   };
 
   // Only call handleSave when an image is selected/uploaded or reordered (not on every localImages change)
-  const handleImageUpload = (index, event) => {
+  const handleImageUpload = async (index, event) => {
     const file = event.target.files[0];
     if (file) {
-      const newImages = [...localImages];
-      while (newImages.length <= index) {
-        newImages.push({});
-      }
-      newImages[index] = {
-        ...newImages[index],
-        imageUrl: URL.createObjectURL(file), // For preview
-        caption: file.name,                  // For saving
-      };
-      setLocalImages(newImages);
-
-      // Save only file names
-      const mainImage = projectData?.web_cards?.images?.[0] || "";
-      const imagesForWebCards = [
-        mainImage,
-        ...newImages.map(img => img.caption || "")
-      ];
-      setProjectData({
-        ...projectData,
-        web_cards: {
-          ...projectData.web_cards,
-          images: imagesForWebCards
-        }
+      // Set loading for this slot
+      setImageLoading((prev) => {
+        const arr = [...prev];
+        arr[index] = true;
+        return arr;
       });
-      if (typeof handleSaveProp === 'function') {
-        handleSaveProp({
+      try {
+        // 1. Get presigned URL from your API
+        const file_name = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+        const alt_keywords = "project,siteplan,real estate";
+        const file_path = "Webcard/images";
+        const response = await uploadImage({ file_name, alt_keywords, file_path });
+        const presignedUrl = response?.presignedUrl; // adjust this to your API's response
+
+        // 2. Upload file to S3
+        await fetch(presignedUrl, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
+
+        const s3ImageUrl = presignedUrl.split('?')[0];
+        console.log('S3 Image URL:', s3ImageUrl);
+        
+        const uploadedFileName = response?.file_name || file.name;
+        const newImages = [...localImages];
+        while (newImages.length <= index) {
+          newImages.push({});
+        }
+        newImages[index] = {
+          ...newImages[index],
+          imageUrl: uploadedFileName, 
+          caption: uploadedFileName,
+        };
+        setLocalImages(newImages);
+        // Save only file names
+        const mainImage = projectData?.web_cards?.images?.[0] || "";
+        const imagesForWebCards = [
+          mainImage,
+          ...newImages.map(img => img.caption || "")
+        ];
+        setProjectData({
+          ...projectData,
           web_cards: {
             ...projectData.web_cards,
             images: imagesForWebCards
           }
+        });
+        if (typeof handleSaveProp === 'function') {
+          handleSaveProp({
+            web_cards: {
+              ...projectData.web_cards,
+              images: imagesForWebCards
+            }
+          });
+        }
+      } catch (error) {
+        // Handle error (show message, etc.)
+        console.error('Image upload failed:', error);
+      } finally {
+        // Unset loading for this slot
+        setImageLoading((prev) => {
+          const arr = [...prev];
+          arr[index] = false;
+          return arr;
         });
       }
     }
@@ -362,6 +427,7 @@ const ProjectGallerySection = ({
                 setCurrentImageIndex={setCurrentImageIndex}
                 showEdit={showEdit}
                 isDataLoaded={isDataLoaded} // Pass the prop
+                isLoading={imageLoading[0]}
               />
 
               {/* Grid Images */}
@@ -381,6 +447,7 @@ const ProjectGallerySection = ({
                       setCurrentImageIndex={setCurrentImageIndex}
                       showEdit={showEdit}
                       isDataLoaded={isDataLoaded} // Pass the prop
+                      isLoading={imageLoading[index]}
                     />
                   ))}
                 </div>

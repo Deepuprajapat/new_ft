@@ -574,15 +574,15 @@ export const getLeadsDuplicates = async () => {
   }
 };
 
-export const getAllGenericKeywords = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}/generic/keywords/get/all`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching Keywords:", error);
-    return [];
-  }
-};
+// export const getAllGenericKeywords = async () => {
+//   try {
+//     const response = await axios.get(`${BASE_URL}/generic/keywords/get/all`);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching Keywords:", error);
+//     return [];
+//   }
+// };
 
 export const getGenericKeywordByPath = async (path) => {
   try {
@@ -860,5 +860,28 @@ export const getAllBlogById = async (id) => {
   } catch (error) {
     console.error("Error fetching Blogs By URl:", error);
     return { content: [] };
+  }
+};
+
+export const uploadImage = async ({ file_name, alt_keywords, file_path }) => {
+  try {
+    const payload = {
+      file_name,
+      alt_keywords,
+      file_path
+    };
+    const response = await axios.post(
+      `${BASE_URL}/upload`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    throw error;
   }
 };
