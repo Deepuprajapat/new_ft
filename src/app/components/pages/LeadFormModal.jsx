@@ -107,7 +107,7 @@ const LeadFormModal = ({ open, onClose, onDownload }) => {
       <DialogContent>
         {!otpSent ? (
           <>
-            <select
+            {/* <select
               name="userType"
               className="form-select"
               style={{
@@ -126,7 +126,7 @@ const LeadFormModal = ({ open, onClose, onDownload }) => {
               <option value="Broker">Broker</option>
               <option value="Seller">Seller</option>
               <option value="Buyer">Buyer</option>
-            </select>
+            </select> */}
 
             <TextField
               name="username"

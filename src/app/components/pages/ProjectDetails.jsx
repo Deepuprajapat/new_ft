@@ -39,6 +39,31 @@ import AboutDeveloperSection from "./ProjectDetailsParts/AboutDeveloperSection";
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg";
 
+// Helper function to parse flexible date formats (cross-browser compatible)
+const parseFlexibleDate = (dateStr) => {
+  if (!dateStr) return null;
+  const trimmed = dateStr.trim();
+  // Handle timestamps
+  if (!isNaN(trimmed)) {
+    return new Date(Number(trimmed));
+  }
+  // Handle "Month Year" or "Month,Year" or "Month, Year" format (Safari/iPhone friendly)
+  const monthYearMatch = trimmed.match(/^([a-zA-Z]+),?\s*(\d{4})$/);
+  if (monthYearMatch) {
+    const monthName = monthYearMatch[1];
+    const year = monthYearMatch[2];
+    // Use a fixed day to avoid Safari issues
+    return new Date(`${monthName} 1, ${year}`);
+  }
+  // Handle YYYY-MM-DD format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return new Date(trimmed.replace(/-/g, "/") + "T00:00:00");
+  }
+  // Handle other formats by converting dashes to slashes (Safari-friendly)
+  const safariDate = trimmed.replace(/-/g, "/");
+  return new Date(safariDate);
+};
+
 const ProjectDetails = () => {
   // Check if user is authenticated by looking for token in cookie or localStorage
   // const getAuthToken = () => {
@@ -843,10 +868,43 @@ const ProjectDetails = () => {
     }
   }, [projectData, setShortAddress]);
 
-  // const validPaymentPlans = projectData?.paymentPlans?.filter(
-  //   (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
-  // );
+  const defaultFaqs = [
+    {
+      question: "Why choose Invest Mango?",
+      answer:
+        "Invest Mango works as one team with a common purpose to provide best-in-class services, thoroughly understands the changing needs of its clients. We are client-centric as client is the focal point of Invest Mango. We provide advice and recommendations that are in the client's best interest. We strive to understand the client's requirement by entering into his shoes and offer advice which have far reaching impact. A happy client is what makes us happy and we are proud to serve our client's.",
+    },
+    {
+      question: "How much is the total size of {{projectData.name}}?",
+      answer: "{{projectData.area}}.",
+    },
+    {
+      question: "What is the project location?",
+      answer: "{{projectData.shortAddress}}.",
+    },
+  ];
 
+  const injectProjectData = (template, data) => {
+    return template
+      .replace(/{{projectData\.name}}/g, data?.name || "")
+      .replace(/{{projectData\.shortAddress}}/g, data?.shortAddress || "")
+      .replace(/{{projectData\.area}}/g, data?.area || "");
+  };
+
+  const isValidFaq = (faq) =>
+    faq?.question?.trim() !== "" || faq?.answer?.trim() !== "";
+
+  const displayedFaqs =
+    Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
+      ? sortedFaqs
+      : defaultFaqs.map((faq) => ({
+          question: injectProjectData(faq.question, projectData),
+          answer: injectProjectData(faq.answer, projectData),
+        }));
+
+  const validPaymentPlans = projectData?.paymentPlans?.filter(
+    (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
+  );
 
 
   const showEdit = localStorage.getItem('auth-token');

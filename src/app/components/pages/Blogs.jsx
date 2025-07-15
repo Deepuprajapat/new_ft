@@ -200,6 +200,15 @@ const Blogs = () => {
                             src={blogData.blog_content.image || ""}
                             alt={blogData.blog_content.image_alt || "Blog Image"}
                             loading="lazy"
+                            style={{
+                              width: '100%',
+                              height: 'auto',
+                              objectFit: 'cover',
+                              maxWidth: '800px', 
+                              maxHeight: '550px', 
+                              display: 'block',
+                              margin: '0 auto',
+                            }}
                           />
                         </div>
                         <div
@@ -393,6 +402,17 @@ const Blogs = () => {
           </div>
         </div>
       </section>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 768px) {
+          .blog-image {
+            width: 100% !important;
+            height: auto !important;
+            max-width: 100vw !important;
+            max-height: 60vw !important;
+            object-fit: contain !important;
+          }
+        }
+      ` }} />
     </>
   );
 };

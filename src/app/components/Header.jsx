@@ -29,6 +29,7 @@ const Header = ({ shortAddress }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
 
   // Check if user is authenticated by looking for token in cookie or localStorage
   const getAuthToken = () => {
@@ -169,6 +170,14 @@ const Header = ({ shortAddress }) => {
     fetchCities();
   }, [shortAddress]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth > 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
 
     <Navbar
@@ -229,7 +238,7 @@ const Header = ({ shortAddress }) => {
             )}
             <Nav>
               {/* Search Button */}
-              <div className="search-form-container">
+            { isDesktop && <div className="search-form-container">
                 {/* <h3>{shortAddress ? `Location: ${shortAddress}` : "Welcome!"}</h3> */}
 
                 <button onClick={handleSearchClick} className="search-button">
@@ -237,7 +246,7 @@ const Header = ({ shortAddress }) => {
                 </button>
 
                 {/* Search Input */}
-                {showSearch && (
+                {showSearch  && (
                   <div className="search-overlay">
                     <Form className="d-flex" onSubmit={handleSearchSubmit}>
                       <Form.Control
@@ -251,10 +260,9 @@ const Header = ({ shortAddress }) => {
                     </Form>
                   </div>
                 )}
-              </div>
+              </div>}
               <div style={{ display: "flex", flexDirection: "row" }}>
                 {/* Phone Buttons */}
-                {/* Phone Number Display */}
                 {matchedPhoneNumber && matchedPhoneNumber.length > 0 ? (
                   matchedPhoneNumber.map((number, index) => (
                     <button

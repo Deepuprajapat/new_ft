@@ -263,17 +263,10 @@ const ContactUs = () => {
                         <form id="contactpage" onSubmit={handleFormSubmit}>
                           <div className="row">
                             <div className="col-md-12">
-                              <label>Role:</label>
+                              {/* <label>Role:</label>
                               <select
                                 name="userType"
                                 className="form-select"
-                                // style={{
-                                //   width: "100%",
-                                //   padding: "8px",
-                                //   margin: "8px 0", // Similar to `margin="dense"`
-                                //   borderRadius: "4px",
-                                //   border: "1px solid #ccc",
-                                // }}
                                 value={formData.userType} // Ensure this is in your state
                                 onChange={handleChange}
                               >
@@ -283,7 +276,7 @@ const ContactUs = () => {
                                 <option value="Broker">Broker</option>
                                 <option value="Seller">Seller</option>
                                 <option value="Buyer">Buyer</option>
-                              </select>
+                              </select> */}
                               <label>Name:</label>
                               <input
                                 required
@@ -355,6 +348,25 @@ const ContactUs = () => {
                                 </label>
                               </div>
 
+
+
+                              <div className="form-group my-3 d-flex align-items-start">
+                                <input
+                                  type="checkbox"
+                                  id="consentCheckbox"
+                                  required
+                                  style={{
+                                    marginTop: "5px",
+                                    marginRight: "10px",
+                                    flexShrink: 0,
+                                  }}
+                                />
+                                <label htmlFor="consentCheckbox" style={{ fontSize: "14px", lineHeight: "1.5", padding: "0px", }}>
+                                  I authorize <strong>Invest Mango</strong> and its representative to contact
+                                  me with updates and notifications via Email, SMS, WhatsApp, and Call. This
+                                  will override the registry on DND / NDNC.
+                                </label>
+                              </div>
 
                               <button type="submit" className="theme-btn">
                                 Send

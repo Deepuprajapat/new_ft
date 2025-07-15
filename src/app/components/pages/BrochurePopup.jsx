@@ -26,7 +26,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
     username: "",
     usermobile: "",
     usermsg: projectName || "",
-    userType: "",
+    // userType: "",
   });
 
   const [error, setError] = useState("");
@@ -197,7 +197,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
                 {projectName || "Invest Mango"}
               </div>
             </p>
-            <select
+            {/* <select
               name="userType"
               className="form-select"
               style={{
@@ -216,7 +216,7 @@ const BrochurePopupDialog = ({ open, onClose, projectName, brochure }) => {
               <option value="Broker">Broker</option>
               <option value="Seller">Seller</option>
               <option value="Buyer">Buyer</option>
-            </select>
+            </select> */}
             <input
               type="text"
               name="username"
