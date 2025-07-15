@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 // const BASE_URL = process.env.REACT_APP_BASE_URL || "http://13.200.229.71:8282";
 
 let BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -400,11 +399,11 @@ export const getAllLocalities = async () => {
 // API Call to Check Phone Number
 export const checkPhoneNumberExists = async (phone) => {
   try {
-    const response = await axios.get(`${BASE_URL}/leads/get/all`, {
+    const response = await axios.get(`${BASE_URL}/leads`, {
       params: {
         phone: phone,
         page: 0,
-        size: 300,
+        size: 12,
       },
     });
 
@@ -420,24 +419,19 @@ export const checkPhoneNumberExists = async (phone) => {
   }
 };
 
-// API Call to Submit New Lead
+// API Call to Submit New Lead (without OTP)
 export const submitLead = async (formData) => {
   const payload = {
-    id: 0,
-    createdDate: new Date().getTime(),
-    updatedDate: new Date().getTime(),
-    name: formData.username,
-    phone: formData.usermobile,
-    email: formData.useremail,
-    projectName: formData.usermsg,
-    message: formData.message,
-    source: formData.source,
-    otp: "", // Sending OTP-related fields if needed
-    frequency: 1,
+    property_id: formData.property_id || "",
+    project_id: formData.project_id || "",
+    name: formData.username || formData.name,
+    phone: formData.usermobile || formData.phone,
+    email: formData.useremail || formData.email,
+    message: formData.message || formData.usermsg || ""
   };
 
   try {
-    const response = await axios.post(`${BASE_URL}/leads/save/new`, payload);
+    const response = await axios.post(`${BASE_URL}/leads`, payload);
     return response.data;
   } catch (error) {
     console.error("Error submitting lead:", error);
@@ -452,24 +446,25 @@ export const sendOTP = async (
   name,
   usermsg,
   email,
-  userType
+  userType,
+  property_id = "",
+  project_id = ""
 ) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/leads/save/new/and/send-otp`,
+      `${BASE_URL}/leads/send-otp`,
       {
+        property_id: property_id,
+        project_id: project_id,
         name: name,
         phone: phone,
         email: email,
-        message: usermsg,
-        projectName: projectName,
-        source: source,
-        userType: userType,
+        message: usermsg || `Interested in ${projectName || 'property'}`
       }
     );
     return response.data;
   } catch (error) {
-    console.error("Error resending OTP:", error);
+    console.error("Error sending OTP:", error);
     throw error;
   }
 };
@@ -477,7 +472,7 @@ export const sendOTP = async (
 export const verifyOTP = async (phone, otp) => {
   try {
     const response = await axios.patch(
-      `${BASE_URL}/leads/validate/otp?phone=${phone}&OTP=${otp}`
+      `${BASE_URL}/leads/validate-otp?phone=${phone}&OTP=${otp}`
     );
     return response.data;
   } catch (error) {
@@ -489,12 +484,23 @@ export const verifyOTP = async (phone, otp) => {
 export const resendOTP = async (phone) => {
   try {
     const response = await axios.patch(
-      `${BASE_URL}/leads/resend/otp?phone=${phone}`
+      `${BASE_URL}/leads/resend-otp?phone=${phone}`
     );
     return response.data;
   } catch (error) {
     console.error("Error resending OTP:", error);
     throw error;
+  }
+};
+
+// API Call to Get Lead by ID
+export const getLeadById = async (id) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/leads/get/by/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching lead by ID:", error);
+    throw new Error("Failed to fetch lead.");
   }
 };
 
@@ -507,6 +513,66 @@ export const resendOTP = async (phone) => {
 //     throw error;
 //   }
 // };
+
+// Admin Leads API Endpoints
+export const getAllLeadsAdmin = async (page = 0, size = 20, filters = {}) => {
+  try {
+    const token = localStorage.getItem("auth-token");
+    const params = { page, size, ...filters };
+    const response = await axios.get(`${BASE_URL}/leads`, {
+      headers: {
+        "x-auth-token": token,
+      },
+      params
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching admin leads:", error);
+    throw new Error("Failed to fetch leads.");
+  }
+};
+
+export const getLeadsDuplicates = async () => {
+  try {
+    const token = localStorage.getItem("auth-token");
+    // For now, we'll implement duplicate detection on frontend
+    // since there's no specific duplicates endpoint
+    const response = await axios.get(`${BASE_URL}/leads`, {
+      headers: {
+        "x-auth-token": token,
+      },
+      params: { page: 0, size: 1000 } // Get more data to detect duplicates
+    });
+    
+    const leads = response.data?.content || [];
+    const duplicates = [];
+    const phoneMap = new Map();
+    const emailMap = new Map();
+    
+    leads.forEach(lead => {
+      if (lead.phone && phoneMap.has(lead.phone)) {
+        duplicates.push(lead);
+        const existing = phoneMap.get(lead.phone);
+        if (!duplicates.includes(existing)) duplicates.push(existing);
+      } else if (lead.phone) {
+        phoneMap.set(lead.phone, lead);
+      }
+      
+      if (lead.email && emailMap.has(lead.email)) {
+        duplicates.push(lead);
+        const existing = emailMap.get(lead.email);
+        if (!duplicates.includes(existing)) duplicates.push(existing);
+      } else if (lead.email) {
+        emailMap.set(lead.email, lead);
+      }
+    });
+    
+    return duplicates;
+  } catch (error) {
+    console.error("Error fetching lead duplicates:", error);
+    throw new Error("Failed to fetch duplicate leads.");
+  }
+};
 
 export const getAllGenericKeywords = async () => {
   try {

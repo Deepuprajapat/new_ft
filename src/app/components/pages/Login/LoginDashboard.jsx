@@ -25,7 +25,19 @@ const LoginDashboard = () => {
       console.log(response)
       if (response && response.data && response.data.access_token) {
         localStorage.setItem("auth-token", response.data.access_token);
-        navigate('/admin/dashboard');
+        
+        // Store user role if provided in response
+        if (response.data.role) {
+          localStorage.setItem("user-role", response.data.role);
+        }
+        
+        // Redirect based on user role
+        const userRole = response.data.role;
+        if (userRole === 'dm') {
+          navigate('/admin/leads/dashboard');
+        } else {
+          navigate('/admin/dashboard');
+        }
         window.location.reload();
         } else {
         setError('Login failed. Invalid credentials.');

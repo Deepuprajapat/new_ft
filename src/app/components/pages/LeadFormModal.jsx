@@ -40,7 +40,9 @@ const LeadFormModal = ({ open, onClose, onDownload }) => {
         formData.username,
         "",
         "",
-        formData.userType
+        formData.userType,
+        "",
+        ""
       );
       console.log("OTP Response:", response); // Debugging
       if (response.message === "Leads Saved Successfully") {
@@ -57,17 +59,36 @@ const LeadFormModal = ({ open, onClose, onDownload }) => {
 
   const handleVerifyOTP = async () => {
     try {
-      await verifyOTP(formData.usermobile, otp);
-      setOtpVerified(true);
-      setError("");
-      onDownload(); // Trigger PDF download after OTP verification
-      onClose();
-      // Refresh the page after OTP verification
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000); // Adding a short delay for a smooth experience
+      const response = await verifyOTP(formData.usermobile, otp);
+      console.log("OTP Verification Response:", response);
+      
+      if (response && response.data.message === "OTP Validated Successfully") {
+        setOtpVerified(true);
+        setError("");
+        onDownload(); // Trigger PDF download after OTP verification
+        onClose();
+        // Refresh the page after OTP verification
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000); // Adding a short delay for a smooth experience
+      } else {
+        console.log("Unexpected response format:", response);
+        setError("Invalid OTP. Please try again.");
+      }
     } catch (error) {
-      setError("Invalid OTP. Please try again.");
+      console.error("Error verifying OTP:", error);
+      // Check if it's a network error vs API error
+      if (error.response && error.response.status === 200) {
+        setOtpVerified(true);
+        setError("");
+        onDownload(); // Trigger PDF download after OTP verification
+        onClose();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        setError("Invalid OTP. Please try again.");
+      }
     }
   };
 

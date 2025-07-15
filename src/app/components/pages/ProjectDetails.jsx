@@ -587,7 +587,9 @@ const ProjectDetails = () => {
         formData.username,
         formData.usermsg,
         formData.useremail,
-        formData.userType
+        formData.userType,
+        "",
+        projectData?.project_id || ""
       );
       if (response) {
         setOtpSent(true);
@@ -604,9 +606,10 @@ const ProjectDetails = () => {
   const verifyOtp = async () => {
     try {
       const response = await verifyOTP(formData.usermobile, otp);
+      console.log("OTP Verification Response:", response);
 
       // Check the response structure and adjust based on the API response
-      if (response && response.message === "OTP Validated Successfully") {
+      if (response && response.data.message === "OTP Validated Successfully") {
         Swal.fire({
           title: "Success",
           text: "OTP verified successfully!",
@@ -618,13 +621,30 @@ const ProjectDetails = () => {
         setOtpVerified(true);
         setError("");
       } else {
-        setError("OTP verification failed. Please try again.");
+        console.log("Unexpected response format:", response);
+        setError(response?.message || "OTP verification failed. Please try again.");
         setOtpVerified(false);
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      setError("Failed to verify OTP. Please try again.");
-      setOtpVerified(false);
+      // Check if it's a network error vs API error
+      if (error.response && error.response.status === 200) {
+        // API returned 200 but axios treated it as error
+        console.log("API returned 200, treating as success");
+        Swal.fire({
+          title: "Success",
+          text: "OTP verified successfully!",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          window.location.href = "/thankYou"; // Redirect to Thank You page
+        });
+        setOtpVerified(true);
+        setError("");
+      } else {
+        setError(error.response?.data?.message || "Failed to verify OTP. Please try again.");
+        setOtpVerified(false);
+      }
     }
   };
 

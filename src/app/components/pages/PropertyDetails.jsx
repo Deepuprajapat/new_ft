@@ -171,7 +171,7 @@ const PropertyDetails = () => {
       const response = await verifyOTP(formData.usermobile, otp);
 
       // Check the response structure and adjust based on the API response
-      if (response && response.message === "OTP Validated Successfully") {
+      if (response && response.data.message === "OTP Validated Successfully") {
         Swal.fire({
           title: "Success",
           text: "OTP verified successfully!",
@@ -183,12 +183,12 @@ const PropertyDetails = () => {
         setOtpVerified(true);
         setError("");
       } else {
-        setError("OTP verification failed. Please try again.");
+        setError(response?.message || "OTP verification failed. Please try again.");
         setOtpVerified(false);
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      setError("Failed to verify OTP. Please try again.");
+      setError(error.response?.data?.message || "Failed to verify OTP. Please try again.");
       setOtpVerified(false);
     }
   };

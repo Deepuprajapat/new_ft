@@ -57,7 +57,7 @@ const ContactUs = () => {
         "ORGANIC", // Source
         formData.username,
         formData.message,
-        "",
+        formData.useremail,
         formData.userType
       );
       swal("OTP Sent!", "Please check your phone for the OTP.", "success");
@@ -78,13 +78,27 @@ const ContactUs = () => {
     }
 
     try {
-      await verifyOTP(formData.usermobile, otp);
-      swal("Verified!", "OTP verification successful.", "success").then(() => {
-        navigate("/thankYou");
-      });
+      const response = await verifyOTP(formData.usermobile, otp);
+      console.log("OTP Verification Response:", response);
+      
+      if (response && response.data.message === "OTP Validated Successfully") {
+        swal("Verified!", "OTP verification successful.", "success").then(() => {
+          navigate("/thankYou");
+        });
+      } else {
+        console.log("Unexpected response format:", response);
+        setOtpError("Invalid OTP. Please try again.");
+      }
     } catch (error) {
       console.error("Error verifying OTP:", error.message);
-      setOtpError("Invalid OTP. Please try again.");
+      // Check if it's a network error vs API error  
+      if (error.response && error.response.status === 200) {
+        swal("Verified!", "OTP verification successful.", "success").then(() => {
+          navigate("/thankYou");
+        });
+      } else {
+        setOtpError("Invalid OTP. Please try again.");
+      }
     }
   };
 
