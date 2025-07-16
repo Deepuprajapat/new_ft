@@ -497,15 +497,14 @@ export const getLeadById = async (id) => {
 // };
 
 // Admin Leads API Endpoints
-export const getAllLeadsAdmin = async (page = 0, size = 20, filters = {}) => {
+export const getAllLeadsAdmin = async (filters = {}) => {
   try {
     const token = localStorage.getItem("auth-token");
-    const params = { page, size, ...filters };
     const response = await axios.get(`${BASE_URL}/leads`, {
       headers: {
         "x-auth-token": token,
       },
-      params
+      params: filters
     });
     return response.data;
   } catch (error) {
