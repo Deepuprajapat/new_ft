@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { FaHome, FaBars, FaUsers, FaSignOutAlt, FaBuilding, FaPlus } from 'react-icons/fa';
+import { FaBars, FaUsers, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import "../styles/css/Sidebar.css";
 
-const index = () => {
+const Sidebar = () => {
     const [isExpanded, setIsExpanded] = useState(true);
-    const [activeSection, setActiveSection] = useState('home');
+    const [activeSection, setActiveSection] = useState('leads');
     const navigate = useNavigate();
 
     const toggleSidebar = () => setIsExpanded(!isExpanded);
@@ -17,11 +17,6 @@ const index = () => {
     const canAccessLeads = () => {
         const role = getUserRole();
         return role === 'dm' || role === 'superadmin';
-    };
-
-    const canManageProjects = () => {
-        const role = getUserRole();
-        return role === 'superadmin' || role === 'admin';
     };
 
     const handleNavigation = (section, path) => {
@@ -42,14 +37,6 @@ const index = () => {
         <FaBars />
     </div>
     <div className="sidebar-content">
-        <div
-            className={`sidebar-item ${activeSection === 'dashboard' ? 'active' : ''}`}
-            onClick={() => handleNavigation('dashboard', '/admin/dashboard')}
-        >
-            <FaHome className="icon" />
-            {isExpanded && <span>Dashboard</span>}
-        </div>
-        
         {canAccessLeads() && (
             <div
                 className={`sidebar-item ${activeSection === 'leads' ? 'active' : ''}`}
@@ -57,26 +44,6 @@ const index = () => {
             >
                 <FaUsers className="icon" />
                 {isExpanded && <span>Leads Management</span>}
-            </div>
-        )}
-        
-        {canManageProjects() && (
-            <div
-                className={`sidebar-item ${activeSection === 'projects' ? 'active' : ''}`}
-                onClick={() => handleNavigation('projects', '/admin/dashboard')}
-            >
-                <FaBuilding className="icon" />
-                {isExpanded && <span>Projects</span>}
-            </div>
-        )}
-        
-        {canManageProjects() && (
-            <div
-                className={`sidebar-item ${activeSection === 'addproject' ? 'active' : ''}`}
-                onClick={() => handleNavigation('addproject', '/addproject')}
-            >
-                <FaPlus className="icon" />
-                {isExpanded && <span>Add Project</span>}
             </div>
         )}
         
@@ -92,4 +59,4 @@ const index = () => {
   )
 }
 
-export default index
+export default Sidebar

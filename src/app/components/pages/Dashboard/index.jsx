@@ -1,10 +1,8 @@
 import React from 'react';
-import Header from '../../Header';
-import Sidebar from '../Sidebar';
+import Sidebar from './Sidebar';
 import "../../styles/css/Dashboard.css";
-import { Outlet } from 'react-router-dom';
 
-const index = () => {
+const Dashboard = ({ children }) => {
   return (
     <div className="dashboard-container">
       {/* <Header/>  */}
@@ -13,11 +11,11 @@ const index = () => {
           <Sidebar /> 
         </div>
         <div className="main-content">
-          <Outlet /> 
+          {children}
         </div>
       </div>
     </div>
   )
 }
 
-export default index
+export default Dashboard
