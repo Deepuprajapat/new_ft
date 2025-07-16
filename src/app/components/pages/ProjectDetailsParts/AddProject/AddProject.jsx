@@ -125,7 +125,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
       // 1. Create the project
       const response = await createnewproject(formData);
       const projectId = response.data?.project_id;
-
+      console.log(projectId,"projectid")
       if (projectId) {
         const propertyResponse = await getAllProjectsByUrlName(projectId);
         console.log("propertyResponse", propertyResponse);
@@ -144,10 +144,12 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
           developer_id: '',
           locality: '',
         });
+       const stateData = { projectId }
 
         // 4. Navigate to the canonical URL with project data
         if (canonical) {
-          navigate(`/${canonical}`, { state: { projectData: propertyResponse } });
+          sessionStorage.setItem('projectState', JSON.stringify(stateData));
+          navigate(`/${canonical}`);
         } else {
           navigate('/ProjectDetails', { state: { projectData: propertyResponse } });
         }
@@ -161,6 +163,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
       setLoading(false);
     }
   };
+
 
   // Helper to reset form
   const resetForm = () => {
@@ -204,7 +207,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Project URL</Form.Label>
+            <Form.Label>Slug</Form.Label>
             <Form.Control
               type="text"
               name="project_url"

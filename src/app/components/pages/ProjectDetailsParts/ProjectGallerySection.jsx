@@ -279,10 +279,10 @@ const ProjectGallerySection = ({
         // 1. Get presigned URL from your API
         const file_name = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
         const alt_keywords = "project,siteplan,real estate";
-        const file_path = "Webcard/images";
+        const file_path = "";
         const response = await uploadImage({ file_name, alt_keywords, file_path });
-        const presignedUrl = response?.presignedUrl; // adjust this to your API's response
-
+        const presignedUrl = response?.data?.presigned_url; // adjust this to your API's response
+       console.log(presignedUrl,"yyyy")
         // 2. Upload file to S3
         await fetch(presignedUrl, {
           method: 'PUT',
@@ -294,7 +294,7 @@ const ProjectGallerySection = ({
 
         const s3ImageUrl = presignedUrl.split('?')[0];
         console.log('S3 Image URL:', s3ImageUrl);
-        
+
         const uploadedFileName = response?.file_name || file.name;
         const newImages = [...localImages];
         while (newImages.length <= index) {

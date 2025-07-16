@@ -1386,11 +1386,11 @@ const ProjectDetails = () => {
               {/* About Developer Section */}
               <AboutDeveloperSection
                 developerDetails={{
-                  logo: projectData?.web_cards?.about?.logo_url || "",
+                  logo: projectData?.developer_info?.logo || "",
                   altLogo:
-                    projectData?.web_cards?.about?.contact_details?.name || "",
+                    projectData?.developer_info?.alt_logo|| "",
                   establishedYear:
-                    projectData?.web_cards?.about?.establishment_year || "",
+                    projectData?.developer_info.established_year || "",
                   totalProjects:
                     projectData?.web_cards?.about?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",

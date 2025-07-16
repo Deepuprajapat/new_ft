@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/css/home.css";
-import { fetchTestimonials } from "../../apis/api";
+import { patchStaticSiteData } from "../../apis/api";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -15,7 +15,10 @@ const Testimonial = () => {
   useEffect(() => {
     const loadTestimonials = async () => {
       setLoading(true);
-      const fetchedTestimonials = await fetchTestimonials();
+      const data = await patchStaticSiteData();
+      console.log(data.data,"data")
+      // Try to extract testimonials from the returned data, fallback to []
+      const fetchedTestimonials = data?.testimonials || [];
       setTestimonials(
         fetchedTestimonials.map((item) => ({
           text: item.description,

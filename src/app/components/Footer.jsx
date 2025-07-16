@@ -7,15 +7,78 @@ import {
   getAllGenericKeywords,
   getGenericKeywordByPath,
   getAllCityForMobile,
-   getAllProjectsByUrlName,
+  getAllProjectsByUrlName,
 } from "../apis/api";
 import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Checkbox,
+  FormControlLabel,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  OutlinedInput,
+  Chip,
+  Box,
+} from "@mui/material";
 
 const Footer = ({ shortAddress }) => {
   const [footerItems, setFooterItems] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
   const [projectName, setProjectName] = useState("");
+
+  // Modal state for Add Generic Link
+  const [showAddGenericModal, setShowAddGenericModal] = useState(false);
+  const [genericForm, setGenericForm] = useState({
+    title: "",
+    description: "",
+    slug: "",
+    search_term: "",
+    filters: {
+      is_premium: false,
+      city: "",
+      type: "RESIDENTIAL",
+      configurations: [],
+    },
+  });
+  const configurationOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
+
+  const handleGenericFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (["is_premium", "city", "type"].includes(name)) {
+      setGenericForm((prev) => ({
+        ...prev,
+        filters: {
+          ...prev.filters,
+          [name]: type === "checkbox" ? checked : value,
+        },
+      }));
+    } else if (name === "configurations") {
+      setGenericForm((prev) => ({
+        ...prev,
+        filters: {
+          ...prev.filters,
+          configurations: typeof value === "string" ? value.split(",") : value,
+        },
+      }));
+    } else {
+      setGenericForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleOpenAddGenericModal = () => setShowAddGenericModal(true);
+  const handleCloseAddGenericModal = () => setShowAddGenericModal(false);
+  const handleSaveGenericLink = () => {
+    // Here you would handle the save logic (API call etc.)
+    handleCloseAddGenericModal();
+  };
 
   const navigate = useNavigate();
 
@@ -122,9 +185,124 @@ const Footer = ({ shortAddress }) => {
 
   return (
     <div>
+      {/* Add Generic Link Modal */}
+      <Dialog
+        open={showAddGenericModal}
+        onClose={handleCloseAddGenericModal}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Add Generic Link</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            label="Title"
+            name="title"
+            value={genericForm.title}
+            onChange={handleGenericFormChange}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            name="description"
+            value={genericForm.description}
+            onChange={handleGenericFormChange}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Slug"
+            name="slug"
+            value={genericForm.slug}
+            onChange={handleGenericFormChange}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Search Term"
+            name="search_term"
+            value={genericForm.search_term}
+            onChange={handleGenericFormChange}
+            fullWidth
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={genericForm.filters.is_premium}
+                onChange={handleGenericFormChange}
+                name="is_premium"
+              />
+            }
+            label="Is Premium"
+          />
+          <TextField
+            margin="dense"
+            label="City"
+            name="city"
+            value={genericForm.filters.city}
+            onChange={handleGenericFormChange}
+            fullWidth
+          />
+          <FormControl fullWidth margin="dense">
+            <InputLabel id="type-label">Type</InputLabel>
+            <Select
+              labelId="type-label"
+              name="type"
+              value={genericForm.filters.type}
+              onChange={handleGenericFormChange}
+              label="Type"
+            >
+              <MenuItem value="RESIDENTIAL">Residential</MenuItem>
+              <MenuItem value="COMMERCIAL">Commercial</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="dense">
+            <InputLabel id="configurations-label">Configurations</InputLabel>
+            <Select
+              labelId="configurations-label"
+              multiple
+              name="configurations"
+              value={genericForm.filters.configurations}
+              onChange={handleGenericFormChange}
+              input={
+                <OutlinedInput
+                  id="select-multiple-chip"
+                  label="Configurations"
+                />
+              }
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} />
+                  ))}
+                </Box>
+              )}
+            >
+              {configurationOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAddGenericModal} color="secondary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveGenericLink}
+            color="primary"
+            variant="contained"
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
       <div className="CTA">
         <div className="whatsapp">
-        <a
+          <a
             href="https://api.whatsapp.com/send?phone=+918448141652&text=I%27m%20interested%20in%20this%20project.%20Please%20provide%20more%20details!"
             target="_blank"
             rel="noopener noreferrer"
@@ -136,20 +314,14 @@ const Footer = ({ shortAddress }) => {
           matchedPhoneNumber.map((number, index) => (
             <div className="callnow">
               <a href={`tel:+91${number}`}>
-                <i
-                  className="fas fa-phone"
-                ></i>{" "}
-                {number}
+                <i className="fas fa-phone"></i> {number}
               </a>
             </div>
           ))
         ) : (
           <div className="callnow">
             <a href="tel:+918368547490">
-              <i
-                className="fas fa-phone"
-              ></i>{" "}
-              8595189189
+              <i className="fas fa-phone"></i> 8595189189
             </a>
           </div>
         )}
@@ -165,8 +337,9 @@ const Footer = ({ shortAddress }) => {
       </button>
 
       <footer>
+        {/* Add Generic Link Button (stick to footer) */}
         <div className="Whatsupbuttn" style={{ width: "70px" }}>
-        <a 
+          <a
             href="https://web.whatsapp.com/send?phone=+91-8448141652&text=I%27m%20interested%20in%20this%20project.%20Please%20provide%20more%20details!"
             target="_blank"
             style={{ float: "right" }}
@@ -211,7 +384,7 @@ const Footer = ({ shortAddress }) => {
             </div>
           </div>
         </div>
-
+       
         <div className="top-footer">
           <div className="container">
             <div className="row">
@@ -335,17 +508,17 @@ const Footer = ({ shortAddress }) => {
                   </li>
                   <li>
                     <a href="tel:+91-8595-189-189">
-                      <i className="fas fa-phone" ></i> +91-8595-189-189
+                      <i className="fas fa-phone"></i> +91-8595-189-189
                     </a>
                   </li>
                   <li>
                     <a href="tel:+91-7428-189-189">
-                      <i className="fas fa-phone" ></i> +91-7428-189-189
+                      <i className="fas fa-phone"></i> +91-7428-189-189
                     </a>
                   </li>
                   <li>
                     <a href="tel:+91-9911-189-189">
-                      <i className="fas fa-phone" ></i> +91-9911-189-189
+                      <i className="fas fa-phone"></i> +91-9911-189-189
                     </a>
                   </li>
                 </ul>
@@ -413,6 +586,16 @@ const Footer = ({ shortAddress }) => {
                   </li>
                 </ul>
               </div>
+              <div style={{ width: "100%", display: "flex", justifyContent: "center", marginBottom: 16 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpenAddGenericModal}
+            style={{ minWidth: 200 }}
+          >
+            Add Generic Link
+          </Button>
+        </div>
             </div>
 
             <div className="bottom-footer">

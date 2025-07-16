@@ -261,24 +261,6 @@ export const getAllTestimonials = async () => {
   }
 };
 
-export const fetchTestimonials = async () => {
-  try {
-    const response = await fetch(
-      `${BASE_URL}/testimonials/get/all?page=0&size=100`
-    );
-    if (response.ok) {
-      const data = await response.json(); // Parse the JSON response
-      return data.content || []; // Return the content array if available
-    } else {
-      console.error("Failed to fetch testimonials:", response.statusText);
-      return [];
-    }
-  } catch (error) {
-    console.error("Error fetching testimonials:", error);
-    return []; // Return an empty array in case of error
-  }
-};
-
 export const fetchAllVacancies = async () => {
   try {
     const response = await fetch(
@@ -883,5 +865,41 @@ export const uploadImage = async ({ file_name, alt_keywords, file_path }) => {
   } catch (error) {
     console.error("Error uploading image:", error);
     throw error;
+  }
+};
+
+/**
+ * Patch static site data (property types, amenities, etc.) with a static payload.
+ * The payload includes property_types and categories_with_amenities.
+ * @returns {Promise<Object|null>} The response data or null if error
+ */
+export const patchStaticSiteData = async () => {
+  try {
+    const payload = {
+      property_types: {
+        commercial: ["SHOPS", "SUITS", "OFFICE", "RETAIL SHOP"],
+        residential: ["1BHK", "2BHK", "3BHK", "4BHK", "VILLAS"]
+      },
+      categories_with_amenities: {
+        categories: {
+          "Sports & Recreation": [
+            { icon: ":swimmer:", value: "Swimming Pool" }
+          ]
+        }
+      }
+    };
+    const response = await axios.patch(
+      `${BASE_URL}/static-site-data`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error patching static site data:", error);
+    return null;
   }
 };

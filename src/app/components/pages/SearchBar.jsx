@@ -148,17 +148,17 @@ const SearchBar = () => {
             onKeyDown={handleKeyDown} // Detect Escape key
           />
           {showSuggestions && searchQuery && (
-            <ul className="suggestions-list">
+            <div className="suggestions-list">
               {projectSuggestions.map((project) => (
-                <li
+                <div
                   key={project.project_id}
                   className="suggestion-item"
                   onClick={() => handleSuggestionClick(project)}
                 >
                   {project.project_name}{" "}
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
         <div className="form-group">

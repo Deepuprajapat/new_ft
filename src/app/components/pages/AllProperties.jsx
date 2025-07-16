@@ -45,6 +45,7 @@ const PropertyListing = () => {
   const [balconyCount, setBalconyCount] = useState("");
   const [bedroomCount, setBedroomCount] = useState("");
   const [coveredParking, setCoveredParking] = useState("");
+  const [propertyUrl, setPropertyUrl] = useState("");
 
   const pageSize = 10;
   const [projectId, setProjectId] = useState("");
@@ -250,12 +251,17 @@ const PropertyListing = () => {
     setBalconyCount("");
     setBedroomCount("");
     setCoveredParking("");
+    setPropertyUrl("");
   };
 
   const handleConfirm = async () => {
     // Validation
     if (!selectedProject) {
       alert("Please select a project");
+      return;
+    }
+    if (!propertyUrl.trim()) {
+      alert("Please enter a property URL");
       return;
     }
 
@@ -268,6 +274,7 @@ const PropertyListing = () => {
       project_id: selectedProject,
       name: projectName,
       property_type: "COMMERCIAL",
+      slug: propertyUrl.trim(),
       // age_of_property: ageOfProperty,
       // floor_number: floorNo,
       // facing: facing,
@@ -935,159 +942,25 @@ const PropertyListing = () => {
                 menu: (base) => ({ ...base, zIndex: 9999 }),
               }}
             />
-            {/* <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>
-                  Property Type
-                </div>
-                <select
-                  value={propertyType}
-                  onChange={(e) => setPropertyType(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  <option value="">Select</option>
-                  <option value="Apartments">Apartments</option>
-                  <option value="Villa">Villa</option>
-                  <option value="Plot">Plot</option>
-                </select>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>
-                  Age of Property
-                </div>
-                <input
-                  type="text"
-                  value={ageOfProperty}
-                  onChange={(e) => setAgeOfProperty(e.target.value)}
-                  placeholder="2 Years"
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                  }}
-                />
-              </div>
+            {/* Property URL input */}
+            <div style={{ marginBottom: 18 }}>
+              <label htmlFor="property-url" style={{ fontWeight: 500, display: "block", marginBottom: 4 }}>
+                Property URL (slug)
+              </label>
+              <input
+                id="property-url"
+                type="text"
+                value={propertyUrl}
+                onChange={e => setPropertyUrl(e.target.value)}
+                placeholder="Enter property URL (slug)"
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: 6,
+                  border: "1px solid #ccc",
+                }}
+              />
             </div>
-            <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>
-                  Floor No.
-                </div>
-                <input
-                  type="text"
-                  value={floorNo}
-                  onChange={(e) => setFloorNo(e.target.value)}
-                  placeholder="14"
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                  }}
-                />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>
-                  Configuration
-                </div>
-                <select
-                  value={configuration}
-                  onChange={(e) => setConfiguration(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  <option value="">Select</option>
-                  <option value="2 BHK">2 BHK</option>
-                  <option value="3 BHK">3 BHK</option>
-                  <option value="4 BHK">4 BHK</option>
-                </select>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>Facing</div>
-                <select
-                  value={facing}
-                  onChange={(e) => setFacing(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  <option value="">Select</option>
-                  <option value="North - East">North - East</option>
-                  <option value="South - West">South - West</option>
-                  <option value="East">East</option>
-                  <option value="West">West</option>
-                </select>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>Furnishing</div>
-                <select
-                  value={furnishing}
-                  onChange={(e) => setFurnishing(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  <option value="">Select</option>
-                  <option value="Semi-Furnished">Semi-Furnished</option>
-                  <option value="Fully-Furnished">Fully-Furnished</option>
-                  <option value="Unfurnished">Unfurnished</option>
-                </select>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>
-                  Balcony Count
-                </div>
-                <input
-                  type="text"
-                  value={balconyCount}
-                  onChange={(e) => setBalconyCount(e.target.value)}
-                  placeholder="2"
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                  }}
-                />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>
-                  Bedroom Count
-                </div>
-                <input
-                  type="text"
-                  value={bedroomCount}
-                  onChange={(e) => setBedroomCount(e.target.value)}
-                  placeholder="2"
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                  }}
-                />
-              </div>
-            </div> */}
             <div style={{display: "flex", gap: 16, marginBottom: 24, justifyContent: "flex-end"}}>
               {/* <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 500, marginBottom: 4 }}>

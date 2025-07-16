@@ -63,8 +63,8 @@ const SimilarProjectsSection = ({
                               textDecoration: "none",
                             }}
                           >
-                            <img
-                              src={project?.images[1]}
+                            {project.images && <img
+                              src={project.images?.[1] || project.images?.[0]}
                               alt={project?.project_name}
                               loading="lazy"
                               style={{
@@ -73,7 +73,7 @@ const SimilarProjectsSection = ({
                                 objectFit: "cover",
                                 borderRadius: "10px",
                               }}
-                            />
+                            />}
                             <p
                               style={{
                                 color: "#2067d1",
