@@ -556,15 +556,15 @@ export const getLeadsDuplicates = async () => {
   }
 };
 
-// export const getAllGenericKeywords = async () => {
-//   try {
-//     const response = await axios.get(`${BASE_URL}/generic/keywords/get/all`);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching Keywords:", error);
-//     return [];
-//   }
-// };
+export const getAllGenericKeywords = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/generic/keywords/get/all`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Keywords:", error);
+    return [];
+  }
+};
 
 export const getGenericKeywordByPath = async (path) => {
   try {
@@ -903,3 +903,23 @@ export const patchStaticSiteData = async () => {
     return null;
   }
 };
+
+
+export const CustomSearch = async ({ payload }) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/internal/custom-search-page`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    throw error;
+  }
+};
+

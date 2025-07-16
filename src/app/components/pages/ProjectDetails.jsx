@@ -1392,15 +1392,14 @@ const ProjectDetails = () => {
                   establishedYear:
                     projectData?.developer_info.established_year || "",
                   totalProjects:
-                    projectData?.web_cards?.about?.total_projects || "",
+                    projectData?.developer_info?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",
                   address:
-                    projectData?.web_cards?.about?.contact_details
-                      ?.project_address || "",
+                    projectData?.developer_info?.address|| "",
                   name:
-                    projectData?.web_cards?.about?.contact_details?.name || "",
+                    projectData?.developer_info?.developer_name|| "",
                   phone:
-                    projectData?.web_cards?.about?.contact_details?.phone || "",
+                    projectData?.developer_info?.phone || "",
                   bookingLink:
                     projectData?.web_cards?.about?.contact_details
                       ?.booking_link || "",

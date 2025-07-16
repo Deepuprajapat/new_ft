@@ -279,7 +279,7 @@ const ProjectGallerySection = ({
         // 1. Get presigned URL from your API
         const file_name = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
         const alt_keywords = "project,siteplan,real estate";
-        const file_path = "";
+        const file_path = "/myimwebsite/new_vi";
         const response = await uploadImage({ file_name, alt_keywords, file_path });
         const presignedUrl = response?.data?.presigned_url; // adjust this to your API's response
        console.log(presignedUrl,"yyyy")

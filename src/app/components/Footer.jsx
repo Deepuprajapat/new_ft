@@ -8,6 +8,7 @@ import {
   getGenericKeywordByPath,
   getAllCityForMobile,
   getAllProjectsByUrlName,
+  CustomSearch
 } from "../apis/api";
 import { useNavigate } from "react-router-dom";
 import {
@@ -75,8 +76,32 @@ const Footer = ({ shortAddress }) => {
 
   const handleOpenAddGenericModal = () => setShowAddGenericModal(true);
   const handleCloseAddGenericModal = () => setShowAddGenericModal(false);
-  const handleSaveGenericLink = () => {
-    // Here you would handle the save logic (API call etc.)
+
+
+  const handleSaveGenericLink = async () => {
+    // Construct the payload from the form state
+    const payload = {
+      title: genericForm.title,
+      description: genericForm.description,
+      slug: genericForm.slug,
+      search_term: genericForm.search_term,
+      filters: {
+        is_premium: genericForm.filters.is_premium,
+        city: genericForm.filters.city,
+        type: genericForm.filters.type,
+        configurations: genericForm.filters.configurations,
+      },
+    };
+
+    try {
+      // Await the API call if CustomSearch is async
+      const response = await CustomSearch({ payload });
+      // Optionally handle the response here (e.g., show a message)
+      console.log(response,"uyftyf")
+    } catch (error) {
+      // Optionally handle errors here
+      console.error("Error saving generic link:", error);
+    }
     handleCloseAddGenericModal();
   };
 

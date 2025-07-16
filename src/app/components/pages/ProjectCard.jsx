@@ -12,7 +12,6 @@ const ProjectCard = ({ project }) => {
   
   const handleMoreDetails = (url, projectId) => {
     console.log(url, projectId, "yyyy");
-    const cleanUrl = `/${url.toLowerCase().replace(/\s+/g, "-")}`;
     const stateData = { projectId };
     
     // Fix: Stringify the object before storing
@@ -21,12 +20,12 @@ const ProjectCard = ({ project }) => {
     
     const newWindow = window.open('', '_blank');
     if (newWindow) {
-        newWindow.location.href = cleanUrl;
+        newWindow.location.href = url;
     }
 };
 
   const sizeRange = project.sizes?.match(/\d+/g); // Extract all numbers from the string
-  console.log(project.canonical,"canonical URL");
+  console.log(project.slug,"canonical URL");
 
   const minSize = sizeRange && sizeRange.length ? parseInt(sizeRange[0]) : null;
   const maxSize = sizeRange && sizeRange.length > 1 ? parseInt(sizeRange[1]) : minSize;
@@ -41,7 +40,7 @@ const ProjectCard = ({ project }) => {
   return (
     <div className="card-im">
       <div
-        onClick={() => handleMoreDetails(project.canonical, project.project_id)}
+        onClick={() => handleMoreDetails(project.slug, project.project_id)}
         style={{ cursor: "pointer" }}
       >
         {project.is_premium && <span className="premium-tag">Premium</span>}
@@ -129,7 +128,7 @@ const ProjectCard = ({ project }) => {
           </b>
         </p>
         <button
-          onClick={() => handleMoreDetails(project.canonical, project.project_id)}
+          onClick={() => handleMoreDetails(project.slug, project.project_id)}
           className="project-card-details-btn"
         >
           more details

@@ -8,7 +8,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     project_name: '',
-    project_url: '',
+    slug: '',
     project_type: '',
     project_city: '',
     developer_id: '',
@@ -129,16 +129,16 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
       if (projectId) {
         const propertyResponse = await getAllProjectsByUrlName(projectId);
         console.log("propertyResponse", propertyResponse);
-        console.log(propertyResponse.meta_info.canonical, "cc")
+        console.log(propertyResponse.meta_info.slug, "cc")
 
         // Store the project data in state
         setProjectData(propertyResponse);
 
-        const canonical = propertyResponse.meta_info.canonical
+        const canonical = propertyResponse.slug
         handleClose();
         setFormData({
           project_name: '',
-          project_url: '',
+          slug: '',
           project_type: '',
           project_city: '',
           developer_id: '',
@@ -150,8 +150,6 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
         if (canonical) {
           sessionStorage.setItem('projectState', JSON.stringify(stateData));
           navigate(`/${canonical}`);
-        } else {
-          navigate('/ProjectDetails', { state: { projectData: propertyResponse } });
         }
       } else {
         alert("Project created, but no project ID returned.");
@@ -169,7 +167,7 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
   const resetForm = () => {
     setFormData({
       project_name: '',
-      project_url: '',
+      slug: '',
       project_type: '',
       project_city: '',
       developer_id: '',
@@ -210,8 +208,8 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
             <Form.Label>Slug</Form.Label>
             <Form.Control
               type="text"
-              name="project_url"
-              value={formData.project_url}
+              name="slug"
+              value={formData.slug}
               onChange={handleChange}
               placeholder="Enter project URL"
               required
