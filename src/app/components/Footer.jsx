@@ -8,7 +8,8 @@ import {
   getGenericKeywordByPath,
   getAllCityForMobile,
   getAllProjectsByUrlName,
-  CustomSearch
+  CustomSearch,
+  filterforgeneric
 } from "../apis/api";
 import { useNavigate } from "react-router-dom";
 import {
@@ -28,12 +29,19 @@ import {
   Chip,
   Box,
 } from "@mui/material";
+import AddGenericLinkForm from "./AddGenericLinkForm";
 
 const Footer = ({ shortAddress }) => {
   const [footerItems, setFooterItems] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
-  const [projectName, setProjectName] = useState("");
+  const [filterData, setFilterData] = useState(null);
+  const filterOptions = filterData || {};
+  const cityOptions = filterOptions.cities || [];
+  const typeOptions = filterOptions.types || [];
+  const configurationOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
+  const developerOptions =  filterOptions.developers|| [];
+  const locationOptions = filterOptions.locations || [];
 
   // Modal state for Add Generic Link
   const [showAddGenericModal, setShowAddGenericModal] = useState(false);
@@ -47,9 +55,10 @@ const Footer = ({ shortAddress }) => {
       city: "",
       type: "RESIDENTIAL",
       configurations: [],
+      developer:"",
+      location:"",
     },
   });
-  const configurationOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
 
   const handleGenericFormChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -118,6 +127,31 @@ const Footer = ({ shortAddress }) => {
     // };
 
     // fetchFooterItems();
+    const response = filterforgeneric()
+    console.log(response)
+    
+    const handleScroll = () => {
+      setIsVisible(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchFilterData = async () => {
+      try {
+        const response = await filterforgeneric();
+        console.log(response.data,"jgdjg")
+        setFilterData(response.data);
+        console.log(filterData,"yyyyyyyyyy") 
+      } catch (error) {
+        console.error("Error fetching filter data:", error);
+      }
+    };
+
+    fetchFilterData();
+
     const handleScroll = () => {
       setIsVisible(window.scrollY > 20);
     };
@@ -211,120 +245,15 @@ const Footer = ({ shortAddress }) => {
   return (
     <div>
       {/* Add Generic Link Modal */}
-      <Dialog
+      <AddGenericLinkForm
         open={showAddGenericModal}
         onClose={handleCloseAddGenericModal}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Add Generic Link</DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            label="Title"
-            name="title"
-            value={genericForm.title}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Description"
-            name="description"
-            value={genericForm.description}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Slug"
-            name="slug"
-            value={genericForm.slug}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Search Term"
-            name="search_term"
-            value={genericForm.search_term}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={genericForm.filters.is_premium}
-                onChange={handleGenericFormChange}
-                name="is_premium"
-              />
-            }
-            label="Is Premium"
-          />
-          <TextField
-            margin="dense"
-            label="City"
-            name="city"
-            value={genericForm.filters.city}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="type-label">Type</InputLabel>
-            <Select
-              labelId="type-label"
-              name="type"
-              value={genericForm.filters.type}
-              onChange={handleGenericFormChange}
-              label="Type"
-            >
-              <MenuItem value="RESIDENTIAL">Residential</MenuItem>
-              <MenuItem value="COMMERCIAL">Commercial</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="configurations-label">Configurations</InputLabel>
-            <Select
-              labelId="configurations-label"
-              multiple
-              name="configurations"
-              value={genericForm.filters.configurations}
-              onChange={handleGenericFormChange}
-              input={
-                <OutlinedInput
-                  id="select-multiple-chip"
-                  label="Configurations"
-                />
-              }
-              renderValue={(selected) => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={value} />
-                  ))}
-                </Box>
-              )}
-            >
-              {configurationOptions.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAddGenericModal} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSaveGenericLink}
-            color="primary"
-            variant="contained"
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onSave={handleSaveGenericLink}
+        filterData={filterData}
+        genericForm={genericForm}
+        setGenericForm={setGenericForm}
+        handleGenericFormChange={handleGenericFormChange}
+      />
       <div className="CTA">
         <div className="whatsapp">
           <a

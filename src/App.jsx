@@ -18,7 +18,6 @@ import SiteMap from "./app/components/pages/SiteMap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import DeveloperPage from "./app/components/pages/DeveloperPage";
 import CompareProjects from "./app/components/pages/CompareProjects";
 import NotFound from "./app/components/pages/NotFound";
 import ThankYouPage from "./app/components/ThankYouPage";
@@ -51,7 +50,6 @@ const router = createBrowserRouter([
       { path: "/career", element: <Career /> },
       { path: "/contact", element: <Contact /> },
       { path: "/sitemap", element: <SiteMap /> },
-      { path: "/developerPage", element: <DeveloperPage /> },
       { path: "/:urlName", element: <ProjectDetails /> },
       { path: "/propertyforsale", element: <PropertyDetails /> },
       { path: "/propertyforsale/:id", element: <PropertyDetails /> },

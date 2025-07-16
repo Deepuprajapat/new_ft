@@ -923,3 +923,15 @@ export const CustomSearch = async ({ payload }) => {
   }
 };
 
+
+export const filterforgeneric = async () => {
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/internal/projects/filters`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    throw error;
+  }
+};
