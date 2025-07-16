@@ -83,9 +83,11 @@ const ProjectDetails = () => {
   const [isNavFixed, setIsNavFixed] = useState(false);
   const [navInitialPosition, setNavInitialPosition] = useState(null);
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
+  const [showImgPopup, setImgShowPopup] = useState(false);
+
 
   const navigate = useNavigate();
-  console.log(projectData, "project")
+  // console.log(projectData, "project")
   // Store initial nav position on mount
   useEffect(() => {
     const navElement = document.getElementById("navigation-section");
@@ -581,6 +583,14 @@ const ProjectDetails = () => {
     }
   }, [projectData, setShortAddress]);
 
+
+  useEffect(() => {
+    // console.log("Projecttttt ID:", projectData?.id);
+    if (projectData?.id === 360) {
+      setImgShowPopup(true);
+    }
+  }, [projectData]);
+
   const defaultFaqs = [
     {
       question: "Why choose Invest Mango?",
@@ -611,9 +621,9 @@ const ProjectDetails = () => {
     Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
       ? sortedFaqs
       : defaultFaqs.map((faq) => ({
-          question: injectProjectData(faq.question, projectData),
-          answer: injectProjectData(faq.answer, projectData),
-        }));
+        question: injectProjectData(faq.question, projectData),
+        answer: injectProjectData(faq.answer, projectData),
+      }));
 
   const validPaymentPlans = projectData?.paymentPlans?.filter(
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
@@ -909,9 +919,8 @@ const ProjectDetails = () => {
                 <li key={item} className="mx-1">
                   <a
                     href={`#${item}`}
-                    className={`text-white text-decoration-none ${
-                      activeSection === item ? "fw-bold" : ""
-                    }`}
+                    className={`text-white text-decoration-none ${activeSection === item ? "fw-bold" : ""
+                      }`}
                     style={{
                       fontWeight: activeSection === item ? "bold" : "400",
                       textDecoration:
@@ -1147,7 +1156,7 @@ const ProjectDetails = () => {
                       cursor: "pointer",
                     }}
                     onMouseEnter={() => setShowReraDetails(true)}
-                    // onMouseLeave={() => setShowReraDetails(false)}
+                  // onMouseLeave={() => setShowReraDetails(false)}
                   >
                     Rera
                   </span>
@@ -1365,8 +1374,11 @@ const ProjectDetails = () => {
                       fontWeight: "300",
                     }}
                   >
-                    Floor Plans Available
+                    {projectData?.id === 360 
+                      ? "Coming Soon"
+                      : "Floor Plans Available"}
                   </span>
+
                   <span
                     className="badge text-dark"
                     style={{
@@ -1540,16 +1552,16 @@ const ProjectDetails = () => {
                               }}
                             >
                               {projectData?.floorplans &&
-                              projectData.floorplans.length > 0
+                                projectData.floorplans.length > 0
                                 ? `${Math.min(
-                                    ...projectData.floorplans.map(
-                                      (fp) => fp.size
-                                    )
-                                  )} - ${Math.max(
-                                    ...projectData.floorplans.map(
-                                      (fp) => fp.size
-                                    )
-                                  )} Sq. Ft.`
+                                  ...projectData.floorplans.map(
+                                    (fp) => fp.size
+                                  )
+                                )} - ${Math.max(
+                                  ...projectData.floorplans.map(
+                                    (fp) => fp.size
+                                  )
+                                )} Sq. Ft.`
                                 : "Size not available"}
                             </p>
                           </div>
@@ -1629,7 +1641,7 @@ const ProjectDetails = () => {
                                 .includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.launchDate
-                                ? (() => {
+                                  ? (() => {
                                     const dateObj = parseFlexibleDate(
                                       projectData.launchDate
                                     );
@@ -1640,7 +1652,7 @@ const ProjectDetails = () => {
                                       month: "long",
                                     });
                                   })()
-                                : "-"}
+                                  : "-"}
                             </p>
                           </div>
                         </div>
@@ -1682,7 +1694,7 @@ const ProjectDetails = () => {
                                 .includes("coming")
                                 ? "Coming Soon"
                                 : projectData?.possessionDate
-                                ? (() => {
+                                  ? (() => {
                                     const dateObj = parseFlexibleDate(
                                       projectData.possessionDate
                                     );
@@ -1693,7 +1705,7 @@ const ProjectDetails = () => {
                                       month: "long",
                                     });
                                   })()
-                                : "-"}
+                                  : "-"}
                             </p>
                           </div>
                         </div>
@@ -2352,10 +2364,9 @@ const ProjectDetails = () => {
                               />
                               <div className="col-12 mt-2">
                                 <a
-                                  href={`tel:+91${
-                                    projectData?.locality?.city
-                                      ?.phoneNumber?.[0] || "8595189189"
-                                  }`}
+                                  href={`tel:+91${projectData?.locality?.city
+                                    ?.phoneNumber?.[0] || "8595189189"
+                                    }`}
                                   className="btn w-100 py-1"
                                   style={{
                                     backgroundColor: "#fff",
@@ -2546,9 +2557,8 @@ const ProjectDetails = () => {
                     <div className="d-flex gap-2 mb-3">
                       <button
                         onClick={() => setActiveFilter("all")}
-                        className={`btn ${
-                          activeFilter === "all" ? "btn-primary" : ""
-                        }`}
+                        className={`btn ${activeFilter === "all" ? "btn-primary" : ""
+                          }`}
                         style={{
                           border: "2px solid #000",
                           borderRadius: "15px",
@@ -2573,9 +2583,8 @@ const ProjectDetails = () => {
                           <button
                             key={index}
                             onClick={() => setActiveFilter(config)}
-                            className={`btn ${
-                              activeFilter === config ? "btn-primary" : ""
-                            }`}
+                            className={`btn ${activeFilter === config ? "btn-primary" : ""
+                              }`}
                             style={{
                               border: "2px solid #000",
                               borderRadius: "15px",
@@ -2668,8 +2677,8 @@ const ProjectDetails = () => {
                                 <img
                                   src={
                                     plan.imageUrl &&
-                                    plan.imageUrl !== BASE_URL &&
-                                    plan.imageUrl !== ""
+                                      plan.imageUrl !== BASE_URL &&
+                                      plan.imageUrl !== ""
                                       ? plan.imageUrl
                                       : "/images/Floor.png" // Fallback image in other cases
                                   }
@@ -2735,10 +2744,9 @@ const ProjectDetails = () => {
                                 </div>
                                 <div className="d-flex flex-column gap-2 align-items-center">
                                   <a
-                                    href={`tel:+91${
-                                      projectData?.locality?.city
-                                        ?.phoneNumber?.[0] || "8595189189"
-                                    }`}
+                                    href={`tel:+91${projectData?.locality?.city
+                                      ?.phoneNumber?.[0] || "8595189189"
+                                      }`}
                                     className="btn btn-primary w-100"
                                     style={{
                                       fontSize:
@@ -2809,8 +2817,8 @@ const ProjectDetails = () => {
                           <img
                             src={
                               selectedImage &&
-                              selectedImage !== BASE_URL &&
-                              selectedImage !== ""
+                                selectedImage !== BASE_URL &&
+                                selectedImage !== ""
                                 ? selectedImage
                                 : "/images/Floor.png" // Fallback image when no image is available
                             }
@@ -2972,7 +2980,7 @@ const ProjectDetails = () => {
                                 zIndex: 1,
                               }}
                             >
-                              Price 
+                              Price
                             </th>
                           </tr>
                         </thead>
@@ -3053,16 +3061,14 @@ const ProjectDetails = () => {
               >
                 Get Free Consultation for this property. Call us at:{" "}
                 <a
-                  href={`tel:+91${
-                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                  href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595189189"
-                  }`}
+                    }`}
                   style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
-                  {`+91-${
-                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                  {`+91-${projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595-189-189"
-                  }`}
+                    }`}
                 </a>
               </div>
               {/* Payment Plan */}
@@ -3272,10 +3278,10 @@ const ProjectDetails = () => {
 
                     <div className="d-flex flex-column">
                       {projectData?.videos &&
-                      projectData.videos.length > 0 &&
-                      projectData.videos.some(
-                        (videoUrl) => videoUrl.trim() !== ""
-                      ) ? (
+                        projectData.videos.length > 0 &&
+                        projectData.videos.some(
+                          (videoUrl) => videoUrl.trim() !== ""
+                        ) ? (
                         projectData.videos.map(
                           (videoUrl, index) =>
                             videoUrl.trim() !== "" && ( // Ignore empty strings
@@ -3285,9 +3291,8 @@ const ProjectDetails = () => {
                               >
                                 <iframe
                                   src={`https://www.youtube.com/embed/${videoUrl}?rel=0&modestbranding=1&origin=${window.location.origin}`}
-                                  title={`${
-                                    projectData?.name
-                                  } Video Presentation ${index + 1}`}
+                                  title={`${projectData?.name
+                                    } Video Presentation ${index + 1}`}
                                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                   allowFullScreen
                                   style={{
@@ -3497,9 +3502,8 @@ const ProjectDetails = () => {
 
                             // Only allow movement if zoomed in
                             if (scale > 1) {
-                              img.style.transform = `scale(${scale}) translate(${
-                                translateX + deltaX
-                              }px, ${translateY + deltaY}px)`;
+                              img.style.transform = `scale(${scale}) translate(${translateX + deltaX
+                                }px, ${translateY + deltaY}px)`;
                             }
                           };
 
@@ -3732,39 +3736,37 @@ const ProjectDetails = () => {
                                 __html:
                                   expandedIndex === "about"
                                     ? developerDetails.about
-                                        .replace(
-                                          /<ul>/g,
-                                          '<ul style="padding-left: 20px; margin-top: 10px;">'
-                                        )
-                                        .replace(
-                                          /<li>/g,
-                                          '<li style="font-size: 1em; color: #666;">'
-                                        ) // Adds inline styles to <li>
-                                    : developerDetails.about.substring(0, 150) +
-                                      "...",
+                                      .replace(
+                                        /<ul>/g,
+                                        '<ul style="padding-left: 20px; margin-top: 10px;">'
+                                      )
+                                      .replace(
+                                        /<li>/g,
+                                        '<li style="font-size: 1em; color: #666;">'
+                                      ) // Adds inline styles to <li>
+                                    : developerDetails.about.substring(0, 250) +
+                                    "...",
                               }}
                             />
-                            <button
-                              onClick={() =>
-                                setExpandedIndex(
-                                  expandedIndex === "about" ? null : "about"
-                                )
-                              }
-                              className="btn btn-link p-0 read-more-btn"
-                              style={{
-                                width: "fit-content",
-                                fontSize:
-                                  window.innerWidth <= 768 ? "12px" : "14px",
-                                color: "#2067d1", // Set the text color
-                                textDecoration: "none", // Remove underline
-                                fontWeight: "bold", // Make the text bold
-                                transition: "color 0.3s ease", // Smooth color transition on hover
-                              }}
+                            <a
+                              href={`/developerPage/${developerDetails?.id}/${developerDetails?.url}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="theme-btn"
                             >
-                              {expandedIndex === "about"
-                                ? "Show Less"
-                                : "Read More"}
-                            </button>
+                              <button
+                                className="btn btn-link p-0 read-more-btn"
+                                style={{
+                                  fontSize: window.innerWidth <= 768 ? "12px" : "14px",
+                                  color: "#fff",
+                                  fontWeight: "bold",
+                                  textDecoration: "none",
+                                }}
+                              >
+                                Read More
+                              </button>
+                            </a>
+
                           </>
                         )}
                       </div>
@@ -3789,10 +3791,9 @@ const ProjectDetails = () => {
                         <br />
                         <b>Phone:</b>{" "}
                         <a
-                          href={`tel:+91${
-                            projectData?.locality?.city?.phoneNumber?.[0] ||
+                          href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
                             "8595189189"
-                          }`}
+                            }`}
                           style={{
                             textDecoration: "none",
                             color: "#2067d1",
@@ -3816,7 +3817,7 @@ const ProjectDetails = () => {
                               ? handleDownloadBrochuree
                               : handleDownloadBrochure
                           } // Use the correct handler based on screen size
-                          // onClick={handleDownloadBrochure}
+                        // onClick={handleDownloadBrochure}
                         >
                           Click Here
                         </span>
@@ -3936,7 +3937,7 @@ const ProjectDetails = () => {
                           }}
                         >
                           {allSimilarProjects &&
-                          allSimilarProjects.length > 0 ? (
+                            allSimilarProjects.length > 0 ? (
                             allSimilarProjects.map((project, index) => (
                               <div key={index} className="px-2">
                                 <div className="similar_projects_item">
@@ -4011,14 +4012,13 @@ const ProjectDetails = () => {
                                           ></i>
                                           Size Info:{" "}
                                           {project?.configurations &&
-                                          project.configurations.length > 0
-                                            ? `${
-                                                Math.min(
-                                                  ...project.configurations.map(
-                                                    (config) => parseInt(config)
-                                                  )
-                                                ) + "BHK"
-                                              }`
+                                            project.configurations.length > 0
+                                            ? `${Math.min(
+                                              ...project.configurations.map(
+                                                (config) => parseInt(config)
+                                              )
+                                            ) + "BHK"
+                                            }`
                                             : ""}
                                         </p>
                                       )}
@@ -4433,9 +4433,78 @@ const ProjectDetails = () => {
             </section>
           </div>
         </section>
+
+        {showImgPopup && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 999,
+      background: "rgba(0, 0, 0, 0.7)", // Optional overlay background
+    }}
+  >
+    <div
+      style={{
+        position: "relative",
+        display: "inline-block",
+        borderRadius: "8px",
+        overflow: "hidden",
+      }}
+    >
+      <button
+        onClick={() => setImgShowPopup(false)}
+        style={{
+          position: "absolute",
+          top: "5px",
+          right: "5px",
+          background: "rgba(0,0,0,0.5)",
+          border: "none",
+          color: "#fff",
+          fontSize: "20px",
+          cursor: "pointer",
+          borderRadius: "50%",
+          width: "30px",
+          height: "30px",
+          lineHeight: "30px",
+          textAlign: "center",
+        }}
+      >
+        ×
+      </button>
+
+      <div
+        style={{
+          display: "block",
+        }}
+      >
+        <img
+          src="/images/NiralaPopup.png"
+          alt="Popup"
+          style={{
+            width: "100%",
+            height: "auto",
+            display: "block",
+          }}
+        />
+      </div>
+    </div>
+  </div>
+)}
+
+      
+
+
+
       </div>
     </>
   );
+  
 };
 
 export default ProjectDetails;

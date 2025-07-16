@@ -16,16 +16,17 @@ const Video = () => {
       const data = await getAllProject({ isDeleted: false });
       console.log("Fetched Projects: ", JSON.stringify(data)); // Log the data to verify the structure
 
-      const sortedProjects = data.content
-        ? data.content
-            .filter(
-              (project) =>
-                project.videos &&
-                project.videos.length > 0 &&
-                project.videos.some((video) => video.trim() !== "") // Ensure videos have valid content
-            )
-            .sort((a, b) => b.videoCount - a.videoCount)
-        : [];
+const sortedProjects = data.content
+  ? data.content
+      .filter(
+        (project) =>
+          project.videos &&
+          project.videos.length > 0 &&
+          project.videos.some((video) => video.trim() !== "")
+      )
+      .sort((a, b) => b.id - a.id) // Sort by project id descending
+  : [];
+
 
       setProjects(sortedProjects);
       setLoading(false); // End loading

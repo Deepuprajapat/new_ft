@@ -4,7 +4,7 @@ import "../components/styles/css/header.css";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { getAllProject, getAllCityForMobile } from "../apis/api";
-import logo from "../assets/img/Untitled-1.png";
+import logo from "../assets/img/IM-Logo-Black-01.svg";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Container, Navbar } from "react-bootstrap";
@@ -170,14 +170,14 @@ const Header = ({ shortAddress }) => {
                   title={item.label}
                   id={`nav-dropdown-${index}`}
                   key={index}
-                  style={{ paddingBottom: "0px"}}
+                  style={{ paddingBottom: "0px" }}
                 >
                   {item.dropdown.map((subItem, subIndex) => (
                     <NavDropdown.Item
                       href={subItem.path}
                       key={subIndex}
                       target="_blank"
-                      style={{ paddingLeft: 2, paddingRight: 4,borderBottom:"1px solid #d4cfcf",textAlign: 'center'}}
+                      style={{ paddingLeft: 2, paddingRight: 4, borderBottom: "1px solid #d4cfcf", textAlign: 'center' }}
                     >
                       {subItem.label}
                     </NavDropdown.Item>
@@ -195,7 +195,7 @@ const Header = ({ shortAddress }) => {
             )}
             <Nav>
               {/* Search Button */}
-            { isDesktop && <div className="search-form-container">
+              {isDesktop && <div className="search-form-container">
                 {/* <h3>{shortAddress ? `Location: ${shortAddress}` : "Welcome!"}</h3> */}
 
                 <button onClick={handleSearchClick} className="search-button">
@@ -203,7 +203,7 @@ const Header = ({ shortAddress }) => {
                 </button>
 
                 {/* Search Input */}
-                {showSearch  && (
+                {showSearch && (
                   <div className="search-overlay">
                     <Form className="d-flex" onSubmit={handleSearchSubmit}>
                       <Form.Control
@@ -242,14 +242,14 @@ const Header = ({ shortAddress }) => {
                         <FaPhoneAlt /> 8595-189-189
                       </a>
                     </button>
-                    <button
+                    {/* <button
                       className="phoneButton"
                       style={{ background: "#2067d1" }}
                     >
                       <a href="tel:+917428189189">
                         <FaPhoneAlt /> 7428-189-189
                       </a>
-                    </button>
+                    </button> */}
                   </>
                 )}
               </div>

@@ -1,19 +1,19 @@
 .client_slider .headline .h3 {
   font-family: Lato, sans-serif;
   text-align: center;
-  font-size: 2.5rem; 
+  font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 30px;
 }
 
 .client_slider .item img {
   max-width: 150px;
-  transition: transform 0.3s ease-in-out; 
-  cursor: pointer; 
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer;
 }
 
 .client_slider .item img:hover {
-  transform: scale(1.2); 
+  transform: scale(1.2);
 }
 
 .mail-section .headline .h3 {
@@ -70,8 +70,10 @@
   line-height: 1.5;
   margin: 10px 0;
   /* max-height: 80px;  */
-  min-height: 100px; /* Ensures enough space */
-  max-height: none; /* Allow full height dynamically */
+  min-height: 100px;
+  /* Ensures enough space */
+  max-height: none;
+  /* Allow full height dynamically */
   overflow: visible;
 }
 
@@ -90,7 +92,7 @@
 }
 
 .testimonial .client-slide .item .normal.expanded {
-  max-height: none; 
+  max-height: none;
   overflow: visible;
 }
 
@@ -100,11 +102,13 @@
   margin-top: 10px;
 }
 
-.swiper-button-prev::after, .swiper-button-next::after{
-  font-size: 10px!important;
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 10px !important;
   z-index: 10 !important;
- 
+
 }
+
 /* .swiper-button-next, .swiper-button-prev {
   z-index: 10 !important;
 } */
@@ -130,8 +134,8 @@
 
 .listing-home {
   overflow-x: hidden;
-  gap: 20px; 
-  scroll-behavior: smooth; 
+  gap: 20px;
+  scroll-behavior: smooth;
 }
 
 .project-card:hover {
@@ -152,7 +156,7 @@
   color: #000;
   margin: 0;
   padding: 20px 0 0;
-  min-height:80px;
+  min-height: 80px;
 }
 
 .project-card-location {
@@ -170,7 +174,7 @@
   margin: 10px 0;
 }
 
-.project-card-details span > :nth-child(1) {
+.project-card-details span> :nth-child(1) {
   color: #2067d1;
 }
 
@@ -216,12 +220,12 @@ a {
 }
 
 .loader-container {
-  position: absolute; 
-  top: 50%; 
+  position: absolute;
+  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); 
-  z-index: 1000; 
-  width: 100%; 
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -234,11 +238,11 @@ a {
 }
 
 .listing-home {
-  position: relative; 
+  position: relative;
 }
 
 .main-con {
-  position: relative; 
+  position: relative;
 }
 
 h1,
@@ -248,7 +252,7 @@ p {
 }
 
 .btn {
-  position: relative; 
+  position: relative;
   z-index: 1;
 }
 
@@ -328,9 +332,9 @@ p {
   padding: 5px 10px;
   border-radius: 5px;
   position: absolute;
-  top:20px;
-  left: 35px;
-  font-size: 10px;
+  top: 20px;
+  /* left: 35px; */
+  font-size: 15px;
   text-transform: uppercase;
   /* z-index: 10; */
 }

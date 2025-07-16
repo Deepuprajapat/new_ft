@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useRef  } from "react";
+import React, { useState,useEffect, useMemo, useRef  } from "react";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { getAllProject, getAllLocalities } from "../../apis/api";
@@ -24,6 +24,9 @@ const SearchBar = () => {
     fetchLocalities();
   }, []);
 
+
+
+
   // useEffect(() => {
   //   function handleClickOutside(event) {
   //     if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -41,11 +44,12 @@ const SearchBar = () => {
   };
 
   // Handle Project Name Change with Debounced API Call
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    debouncedSearch(value);
-  };
+const handleSearchChange = (e) => {
+  const value = e.target.value;
+  setSearchQuery(value);
+  debouncedSearch(value);
+};
+
 
   // Close suggestions on ESC key
 const handleKeyDown = (e) => {
@@ -54,16 +58,25 @@ const handleKeyDown = (e) => {
   }
 };
 
-  const debouncedSearch = debounce(async (query) => {
+const debouncedSearch = useMemo(() => 
+  debounce(async (query) => {
     if (query.trim() === "") {
       setProjectSuggestions([]);
       return;
     }
-    console.log("Query", query);
     const response = await getAllProject({ name: query });
     setProjectSuggestions(response.content || []);
-    setShowSuggestions(true); // Show suggestions when data is fetched
-  }, 500);
+    setShowSuggestions(true);
+  }, 500)
+, []);
+
+useEffect(() => {
+  return () => {
+    debouncedSearch.cancel();
+  };
+}, []);
+
+
 
   // Handle Property Type Change
   const handlePropertyTypeChange = (e) => {
@@ -167,17 +180,17 @@ const handleKeyDown = (e) => {
             onKeyDown={handleKeyDown} // Detect Escape key
           />
           {showSuggestions && searchQuery && (
-            <ul className="suggestions-list">
+            <div className="suggestions-list">
               {projectSuggestions.map((project) => (
-                <li
+                <div
                   key={project.id}
                   className="suggestion-item"
                   onClick={() => handleSuggestionClick(project)}
                 >
                   {project.name}
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
         <div className="form-group">
