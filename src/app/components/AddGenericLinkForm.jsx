@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,64 +12,98 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
-  OutlinedInput,
-  Chip,
-  Box,
   Autocomplete,
+  Box,
 } from "@mui/material";
+import { CustomSearch, filterforgeneric } from "../apis/api";
 
-const AddGenericLinkForm = ({
-  open,
-  onClose,
-  onSave,
-  filterData,
-  genericForm,
-  setGenericForm,
-  handleGenericFormChange,
-}) => {
+const initialFormState = {
+  slug: "",
+  search_term: "",
+  meta_info: {
+    title: "",
+    description: "",
+    keywords: "",
+  },
+  filters: {
+    is_premium: false,
+    city: "",
+    type: "RESIDENTIAL",
+    developer: "",
+    location: "",
+  },
+};
+
+const AddGenericLinkForm = ({ open, onClose, onSave }) => {
+  const [filterData, setFilterData] = useState(null);
   const filterOptions = filterData || {};
   const cityOptions = filterOptions.cities || [];
   const typeOptions = filterOptions.types || [];
-  const configurationOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
   const developerOptions = filterOptions.developers || [];
   const locationOptions = filterOptions.locations || [];
 
-  const handleDeveloperChange = (event, newValue) => {
-    setGenericForm((prev) => ({
-      ...prev,
-      filters: {
-        ...prev.filters,
-        developer: newValue ? newValue.id : "",
-      },
-    }));
+  const [genericForm, setGenericForm] = useState(initialFormState);
+
+  const handleCancel = () => {
+    setGenericForm(initialFormState);
+    onClose();
   };
 
+  useEffect(() => {
+    const fetchFilterData = async () => {
+      try {
+        const response = await filterforgeneric();
+        setFilterData(response.data);
+      } catch (error) {
+        console.error("Error fetching filter data:", error);
+      }
+    };
+
+    fetchFilterData();
+  }, []);
+
+  const handleGenericFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (["is_premium", "city", "type", "location"].includes(name)) {
+      setGenericForm((prev) => ({
+        ...prev,
+        filters: {
+          ...prev.filters,
+          [name]: type === "checkbox" ? checked : value,
+        },
+      }));
+    } else {
+      setGenericForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
 
   const handleSaveGenericLink = async () => {
-    // Construct the payload from the form state
     const payload = {
       title: genericForm.title,
       description: genericForm.description,
+      meta_info: {
+        title: genericForm.title,
+        description: genericForm.description,
+        keywords:
+          "mumbai, premium, residential, projects, apartments, luxury, investment, real estate",
+      },
       slug: genericForm.slug,
       search_term: genericForm.search_term,
-      filters: {
-        is_premium: genericForm.filters.is_premium,
-        city: genericForm.filters.city,
-        type: genericForm.filters.type,
-        configurations: genericForm.filters.configurations,
-      },
+      filters: genericForm.filters,
     };
 
     try {
-      // Await the API call if CustomSearch is async
       const response = await CustomSearch({ payload });
-      // Optionally handle the response here (e.g., show a message)
-      console.log(response,"uyftyf")
+      console.log("Saved successfully:", response);
+      
+      // Call the onSave callback to refresh footer links
+      if (onSave) {
+        onSave();
+      }
     } catch (error) {
-      // Optionally handle errors here
       console.error("Error saving generic link:", error);
     }
-    handleCloseAddGenericModal();
+    onClose();
   };
 
   return (
@@ -104,7 +138,18 @@ const AddGenericLinkForm = ({
                 value={genericForm.description}
                 onChange={handleGenericFormChange}
                 fullWidth
+                multiline
+                rows={3}
+                InputProps={{
+                  sx: {
+                    "& .MuiInputBase-input": {
+                      padding: "16px 12px"
+                    }
+                  }
+                }}
               />
+            </Box>
+
               <TextField
                 label="Search Term"
                 name="search_term"
@@ -112,29 +157,21 @@ const AddGenericLinkForm = ({
                 onChange={handleGenericFormChange}
                 fullWidth
               />
-            </Box>
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={genericForm.filters.is_premium}
-                  onChange={handleGenericFormChange}
-                  name="is_premium"
-                />
-              }
-              label="Is Premium"
-            />
 
             <Box display="flex" gap={2}>
               <Autocomplete
                 options={developerOptions}
-                getOptionLabel={(option) => option.name || ""}
-                value={
-                  developerOptions.find(
-                    (dev) => dev.id === genericForm.filters.developer
-                  ) || null
-                }
-                onChange={handleDeveloperChange}
+                getOptionLabel={(option) => option || ""}
+                value={genericForm.filters.developer || null}
+                onChange={(event, newValue) => {
+                  setGenericForm((prev) => ({
+                    ...prev,
+                    filters: {
+                      ...prev.filters,
+                      developer: newValue || "",
+                    },
+                  }));
+                }}
                 renderInput={(params) => (
                   <TextField {...params} label="Developer" />
                 )}
@@ -194,40 +231,25 @@ const AddGenericLinkForm = ({
                 </Select>
               </FormControl>
             </Box>
-
-            <FormControl fullWidth>
-              <InputLabel id="configurations-label">Configurations</InputLabel>
-              <Select
-                labelId="configurations-label"
-                multiple
-                name="configurations"
-                value={genericForm.filters.configurations}
-                onChange={handleGenericFormChange}
-                input={<OutlinedInput label="Configurations" />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selected.map((value) => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </Box>
-                )}
-              >
-                {configurationOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={genericForm.filters.is_premium}
+                  onChange={handleGenericFormChange}
+                  name="is_premium"
+                />
+              }
+              label="Is Premium"
+            />
           </Box>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
+        <Button onClick={handleCancel} color="secondary">
           Cancel
         </Button>
         <Button
-          onClick={onSave}
+          onClick={handleSaveGenericLink}
           color="primary"
           variant="contained"
           disabled={!filterData}

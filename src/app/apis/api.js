@@ -935,3 +935,27 @@ export const filterforgeneric = async () => {
     throw error;
   }
 };
+
+export const fetchfooterlinks = async () => {
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/links`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    throw error;
+  }
+};
+
+export const getCustompage = async (slug) => {
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/s/${slug}`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    throw error;
+  }
+};

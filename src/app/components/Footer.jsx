@@ -9,26 +9,11 @@ import {
   getAllCityForMobile,
   getAllProjectsByUrlName,
   CustomSearch,
-  filterforgeneric
+  fetchfooterlinks,
+  filterforgeneric,
 } from "../apis/api";
 import { useNavigate } from "react-router-dom";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Checkbox,
-  FormControlLabel,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  OutlinedInput,
-  Chip,
-  Box,
-} from "@mui/material";
+import { Button } from "@mui/material";
 import AddGenericLinkForm from "./AddGenericLinkForm";
 
 const Footer = ({ shortAddress }) => {
@@ -40,96 +25,65 @@ const Footer = ({ shortAddress }) => {
   const cityOptions = filterOptions.cities || [];
   const typeOptions = filterOptions.types || [];
   const configurationOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
-  const developerOptions =  filterOptions.developers|| [];
+  const developerOptions = filterOptions.developers || [];
   const locationOptions = filterOptions.locations || [];
 
   // Modal state for Add Generic Link
   const [showAddGenericModal, setShowAddGenericModal] = useState(false);
-  const [genericForm, setGenericForm] = useState({
-    title: "",
-    description: "",
-    slug: "",
-    search_term: "",
-    filters: {
-      is_premium: false,
-      city: "",
-      type: "RESIDENTIAL",
-      configurations: [],
-      developer:"",
-      location:"",
-    },
-  });
-
-  const handleGenericFormChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (["is_premium", "city", "type"].includes(name)) {
-      setGenericForm((prev) => ({
-        ...prev,
-        filters: {
-          ...prev.filters,
-          [name]: type === "checkbox" ? checked : value,
-        },
-      }));
-    } else if (name === "configurations") {
-      setGenericForm((prev) => ({
-        ...prev,
-        filters: {
-          ...prev.filters,
-          configurations: typeof value === "string" ? value.split(",") : value,
-        },
-      }));
-    } else {
-      setGenericForm((prev) => ({ ...prev, [name]: value }));
-    }
-  };
 
   const handleOpenAddGenericModal = () => setShowAddGenericModal(true);
   const handleCloseAddGenericModal = () => setShowAddGenericModal(false);
 
-
-  const handleSaveGenericLink = async () => {
-    // Construct the payload from the form state
-    const payload = {
-      title: genericForm.title,
-      description: genericForm.description,
-      slug: genericForm.slug,
-      search_term: genericForm.search_term,
-      filters: {
-        is_premium: genericForm.filters.is_premium,
-        city: genericForm.filters.city,
-        type: genericForm.filters.type,
-        configurations: genericForm.filters.configurations,
-      },
-    };
-
+  const refreshFooterLinks = async () => {
     try {
-      // Await the API call if CustomSearch is async
-      const response = await CustomSearch({ payload });
-      // Optionally handle the response here (e.g., show a message)
-      console.log(response,"uyftyf")
+      const links = await fetchfooterlinks();
+      setFooterItems(links.data);
+      console.log("Footer links refreshed:", links.data);
     } catch (error) {
-      // Optionally handle errors here
-      console.error("Error saving generic link:", error);
+      console.error("Error refreshing footer links:", error);
     }
-    handleCloseAddGenericModal();
   };
+
+  // const handleSaveGenericLink = async () => {
+  //   // Construct the payload from the form state
+  //   const payload = {
+  //     title: genericForm.title,
+  //     description: genericForm.description,
+  //     slug: genericForm.slug,
+  //     search_term: genericForm.search_term,
+  //     filters: {
+  //       is_premium: genericForm.filters.is_premium,
+  //       city: genericForm.filters.city,
+  //       type: genericForm.filters.type,
+  //       configurations: genericForm.filters.configurations,
+  //     },
+  //   };
+
+  //   try {
+  //     // Await the API call if CustomSearch is async
+  //     const response = await CustomSearch({ payload });
+  //     // Optionally handle the response here (e.g., show a message)
+  //     console.log(response,"uyftyf")
+  //   } catch (error) {
+  //     // Optionally handle errors here
+  //     console.error("Error saving generic link:", error);
+  //   }
+  //   handleCloseAddGenericModal();
+  // };
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    // const fetchFooterItems = async () => {
-    //   try {
-    //     const keywords = await getAlGenericKeywords();
-    //     setFooterItems(keywords);
-    //   } catch (error) {
-    //     console.error("Error fetching footer items:", error);
-    //   }
-    // };
+    const fetchLinks = async () => {
+      const response = await filterforgeneric();
+      console.log(response, "hhh");
+      const links = await fetchfooterlinks();
+      setFooterItems(links.data);
+      console.log(links.data, "ooooooo");
+    };
 
-    // fetchFooterItems();
-    const response = filterforgeneric()
-    console.log(response)
-    
+    fetchLinks();
+
     const handleScroll = () => {
       setIsVisible(window.scrollY > 20);
     };
@@ -139,19 +93,6 @@ const Footer = ({ shortAddress }) => {
   }, []);
 
   useEffect(() => {
-    const fetchFilterData = async () => {
-      try {
-        const response = await filterforgeneric();
-        console.log(response.data,"jgdjg")
-        setFilterData(response.data);
-        console.log(filterData,"yyyyyyyyyy") 
-      } catch (error) {
-        console.error("Error fetching filter data:", error);
-      }
-    };
-
-    fetchFilterData();
-
     const handleScroll = () => {
       setIsVisible(window.scrollY > 20);
     };
@@ -160,21 +101,16 @@ const Footer = ({ shortAddress }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleKeywordClick = async (path) => {
+
+  const handleKeywordClick = async (slug) => {
     try {
-      // Fetch data based on path
-      const keywordData = await getGenericKeywordByPath(path);
-      if (keywordData) {
-        // Navigate first
-        navigate(`allProjects?${path}`);
-        setTimeout(() => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }, 500); // Adjust delay if needed
-      } else {
-        console.warn("No valid data found for path:", path);
-      }
+      console.log('Footer keyword clicked:', slug);
+      navigate(`/s/${slug}`);
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 500); // Adjust delay if needed
     } catch (error) {
-      console.error("Error fetching keyword data:", error);
+      console.error('Error handling keyword click:', error);
     }
   };
 
@@ -248,11 +184,8 @@ const Footer = ({ shortAddress }) => {
       <AddGenericLinkForm
         open={showAddGenericModal}
         onClose={handleCloseAddGenericModal}
-        onSave={handleSaveGenericLink}
+        onSave={refreshFooterLinks}
         filterData={filterData}
-        genericForm={genericForm}
-        setGenericForm={setGenericForm}
-        handleGenericFormChange={handleGenericFormChange}
       />
       <div className="CTA">
         <div className="whatsapp">
@@ -312,11 +245,11 @@ const Footer = ({ shortAddress }) => {
           <div className="container">
             <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2">
               {footerItems.map((item) => (
-                <div className="col" key={item.id}>
+                <div className="col" key={item.title}>
                   <ul className="footer-links list-unstyled m-0 p-0">
                     <li>
                       <button
-                        onClick={() => handleKeywordClick(item.path)}
+                        onClick={() => handleKeywordClick(item.slug)}
                         className="text-reset text-start custom-link"
                         style={{
                           background: "none",
@@ -329,7 +262,7 @@ const Footer = ({ shortAddress }) => {
                           textAlign: "left",
                         }}
                       >
-                        {item.keywords}
+                        {item.title}
                       </button>
                     </li>
                   </ul>
@@ -338,7 +271,7 @@ const Footer = ({ shortAddress }) => {
             </div>
           </div>
         </div>
-       
+
         <div className="top-footer">
           <div className="container">
             <div className="row">
@@ -540,16 +473,23 @@ const Footer = ({ shortAddress }) => {
                   </li>
                 </ul>
               </div>
-              <div style={{ width: "100%", display: "flex", justifyContent: "center", marginBottom: 16 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenAddGenericModal}
-            style={{ minWidth: 200 }}
-          >
-            Add Generic Link
-          </Button>
-        </div>
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  marginBottom: 16,
+                }}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleOpenAddGenericModal}
+                  style={{ minWidth: 200 }}
+                >
+                  Add Generic Link
+                </Button>
+              </div>
             </div>
 
             <div className="bottom-footer">

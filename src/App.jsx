@@ -31,6 +31,7 @@ import AdminDashboard from "./app/components/pages/AdminDashboard/AdminDashboard
 import AddProject from "./app/components/pages/ProjectDetailsParts/AddProject/AddProject";
 import Dashboard from "./app/components/pages/Dashboard";
 import LeadsDashboard from "./app/components/pages/Dashboard/LeadsDashboard";
+import CustomSearchPage from "./app/components/pages/CustomSearchPage";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
       { path: "/:urlName", element: <ProjectDetails /> },
       { path: "/propertyforsale", element: <PropertyDetails /> },
       { path: "/propertyforsale/:id", element: <PropertyDetails /> },
+      {path:"/s/:slug",element:<CustomSearchPage/>},
       { path: "/featuredProperties", element: <FeaturedProperties /> },
       { path: "/thankYou", element: <ThankYouPage /> },
       { path: "*", element: <NotFound /> }, // Not Found route
