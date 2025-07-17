@@ -2,6 +2,9 @@
   padding: 2rem;
   background-color: #f8f9fa;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
 }
 
 .dashboard-header {
@@ -265,6 +268,246 @@
   font-size: 0.9rem;
 }
 
+/* Expandable row styles */
+.expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: #2067d1;
+  transition: transform 0.2s ease;
+}
+
+.expand-btn:hover {
+  color: #1557b8;
+  transform: scale(1.1);
+}
+
+.date-highlight {
+  background-color: #fff3cd;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  border-left: 3px solid #ffc107;
+}
+
+/* History row styles */
+.leads-table tbody tr:has(.date-highlight) {
+  background-color: #fefbf0;
+}
+
+.leads-table tbody tr:has(.date-highlight):hover {
+  background-color: #fdf6e3;
+}
+
+/* Improved duplicate row styles */
+.duplicate-row {
+  background-color: #fff8e1 !important;
+  border-left: 4px solid #ff9800;
+}
+
+.duplicate-row:hover {
+  background-color: #fff3c4 !important;
+}
+
+/* Animation for row expansion */
+.leads-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+/* Lead name with expand button */
+.lead-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.duplicate-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background-color: #ff9800;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Enhanced Date Filter Styles */
+.date-filter-section {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1.5rem;
+}
+
+.filter-label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.date-presets {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.preset-btn {
+  background: white;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.preset-btn:hover {
+  border-color: #2067d1;
+  background-color: #f8f9fa;
+}
+
+.preset-btn.active {
+  background-color: #2067d1;
+  border-color: #2067d1;
+  color: white;
+}
+
+.custom-date-section {
+  margin-top: 1rem;
+}
+
+.custom-date-toggle {
+  margin-bottom: 1rem;
+}
+
+.toggle-btn {
+  background: white;
+  border: 2px solid #6c757d;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+  border-color: #495057;
+  background-color: #f8f9fa;
+}
+
+.toggle-btn.active {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.custom-date-controls {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.custom-date-options {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.radio-option input[type="radio"] {
+  margin: 0;
+  accent-color: #2067d1;
+}
+
+.custom-date-inputs {
+  display: grid;
+  gap: 1rem;
+}
+
+.single-date-input,
+.date-range-inputs {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.date-range-inputs {
+  grid-template-columns: 1fr 1fr;
+}
+
+.date-input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-input-group label {
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.other-filters {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+/* Active filter indicator */
+.filters-section {
+  position: relative;
+}
+
+.filter-status {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  background-color: #2067d1;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Animation for smooth transitions */
+.custom-date-controls {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 768px) {
   .leads-dashboard {
     padding: 1rem;
@@ -286,5 +529,37 @@
   
   .leads-table {
     min-width: 800px;
+  }
+  
+  .expand-btn {
+    padding: 0 0.25rem 0 0;
+  }
+  
+  .lead-name {
+    gap: 0.25rem;
+  }
+
+  /* Mobile optimizations for date filter */
+  .date-presets {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .preset-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+  }
+  
+  .date-range-inputs {
+    grid-template-columns: 1fr;
+  }
+  
+  .other-filters {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .custom-date-options {
+    flex-direction: column;
+    gap: 0.75rem;
   }
 }

@@ -76,9 +76,7 @@ const router = createBrowserRouter([
         path: "/admin/leads/dashboard",
         element: (
           <ProtectedRoute allowedRoles={['dm', 'superadmin']}>
-            <Dashboard>
-              <LeadsDashboard />
-            </Dashboard>
+            <LeadsDashboard />
           </ProtectedRoute>
         ),
       },
