@@ -28,6 +28,7 @@ const AdminDashboard = () => {
   const [loadingProjects, setLoadingProjects] = useState(false);
   const [selectedProject, setSelectedProject] = useState('');
   const [propertyName, setPropertyName] = useState('');
+  const [propertyslug , setPropertyslug] = useState('');
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
 
   const fetchAdminProperties = async (page = 1, currentFilters = filters) => {
@@ -125,6 +126,7 @@ const AdminDashboard = () => {
       project_id: selectedProject,
       name: propertyName.trim(),
       property_type: selectedPropertyType,
+      slug:propertyslug
     };
     
     try {
@@ -614,6 +616,33 @@ const AdminDashboard = () => {
                         type="text"
                         value={propertyName}
                         onChange={(e) => setPropertyName(e.target.value)}
+                        placeholder="Enter property name (e.g., Premium 3BHK Apartment)"
+                        style={{
+                          width: "100%",
+                          padding: "10px 12px",
+                          borderRadius: 6,
+                          border: "1px solid #ccc",
+                          fontSize: "14px",
+                          boxSizing: "border-box",
+                          transition: "border-color 0.2s ease",
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = "#007bff";
+                          e.target.style.outline = "none";
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = "#ccc";
+                        }}
+                      />
+                    </div>
+                    <div style={{ marginBottom: 18 }}>
+                      <div style={{ fontWeight: 500, marginBottom: 8, textAlign: "left" }}>
+                        Property Slug
+                      </div>
+                      <input
+                        type="text"
+                        value={propertyslug}
+                        onChange={(e) => setPropertyslug(e.target.value)}
                         placeholder="Enter property name (e.g., Premium 3BHK Apartment)"
                         style={{
                           width: "100%",

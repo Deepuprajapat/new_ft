@@ -84,8 +84,7 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
       meta_info: {
         title: genericForm.title,
         description: genericForm.description,
-        keywords:
-          "mumbai, premium, residential, projects, apartments, luxury, investment, real estate",
+        keywords:genericForm.keywords,
       },
       slug: genericForm.slug,
       search_term: genericForm.search_term,
@@ -149,7 +148,7 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                 }}
               />
             </Box>
-
+            <Box display="flex" gap={2}>
               <TextField
                 label="Search Term"
                 name="search_term"
@@ -157,6 +156,19 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                 onChange={handleGenericFormChange}
                 fullWidth
               />
+               <TextField
+                label="keywords"
+                name="keywords"
+                value={genericForm.keywords}
+                onChange={handleGenericFormChange}
+                fullWidth
+              />
+           </Box>
+
+            {/* Filters Section Title */}
+            <Box mt={2} mb={1}>
+              <strong style={{ fontSize: '1.1rem' }}>Filters</strong>
+            </Box>
 
             <Box display="flex" gap={2}>
               <Autocomplete

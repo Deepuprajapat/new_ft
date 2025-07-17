@@ -839,13 +839,13 @@ const ProjectDetails = () => {
   const isValidFaq = (faq) =>
     faq?.question?.trim() !== "" || faq?.answer?.trim() !== "";
 
-  const displayedFaqs =
-    Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
-      ? sortedFaqs
-      : defaultFaqs.map((faq) => ({
-          question: injectProjectData(faq.question, projectData),
-          answer: injectProjectData(faq.answer, projectData),
-        }));
+  // const displayedFaqs =
+  //   Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
+  //     ? sortedFaqs
+  //     : defaultFaqs.map((faq) => ({
+  //         question: injectProjectData(faq.question, projectData),
+  //         answer: injectProjectData(faq.answer, projectData),
+  //       }));
 
   const validPaymentPlans = projectData?.paymentPlans?.filter(
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
@@ -1417,7 +1417,13 @@ const ProjectDetails = () => {
               <FAQSection
                 projectData={{
                   ...projectData,
-                  faqs: projectData?.web_cards?.faqs || [],
+                  faqs:
+                    Array.isArray(projectData?.web_cards?.faqs) && projectData.web_cards.faqs.some(isValidFaq)
+                      ? projectData.web_cards.faqs
+                      : defaultFaqs.map((faq) => ({
+                          question: injectProjectData(faq.question, projectData),
+                          answer: injectProjectData(faq.answer, projectData),
+                        })),
                   name: projectData?.basic_info?.project_name || "",
                   area:
                     projectData?.web_cards?.project_details?.area?.value || "",

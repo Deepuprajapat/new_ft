@@ -160,7 +160,7 @@ export const getAllProjectsByUrlName = async (Projectid, navigate) => {
   export const patchProjectByTestUrl = async (urlName,patchData) => {
 
     try {
-      const res = await axios.patch(`${BASE_URL}/projects/${urlName}`,
+      const res = await axios.patch(`${BASE_URL}/internal/projects/${urlName}`,
         patchData,
       );
       console.log(res,"fsfrf")
@@ -174,7 +174,7 @@ export const getAllProjectsByUrlName = async (Projectid, navigate) => {
 export const patchProjectById = async (id, patchData) => {
   console.log("rrrr")
   try {
-    const res = await axios.patch(`${BASE_URL}/projects/${id}`,patchData);
+    const res = await axios.patch(`${BASE_URL}/internal/projects/${id}`,patchData);
     return res;
   } catch (error) {
     console.error("Error patching project by test URL:", error);
@@ -743,7 +743,7 @@ export const patchPropertyDetails = async (propertyId, patchData) => {
     const token = localStorage.getItem("x-auth-token");
 
     const res = await axios.patch(
-      `${BASE_URL}/properties/${propertyId}`,
+      `${BASE_URL}/internal/properties/${propertyId}`,
       patchData,
       {
         headers: {
@@ -761,9 +761,12 @@ export const patchPropertyDetails = async (propertyId, patchData) => {
 // Save property to API
 export const saveProperty = async (propertyData) => {
   try {
-    const res = await axios.post(`${BASE_URL}/properties`, propertyData, {
+    const token = localStorage.getItem('auth-token');
+    console.log("token", token)
+    const res = await axios.post(`${BASE_URL}/internal/properties`, propertyData, {
       headers: {
         "Content-Type": "application/json",
+        "x-auth-token": `${token}`,
       },
     });
     return res.data;
@@ -775,7 +778,7 @@ export const saveProperty = async (propertyData) => {
 
 export const createnewproject = async (projectdata) => {
   try {
-    const res = await axios.post(`${BASE_URL}/projects`, projectdata, {
+    const res = await axios.post(`${BASE_URL}/internal/projects`, projectdata, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -820,7 +823,7 @@ export const getAdminProperties = async (page = 1, pageSize = 10, filters = {}) 
     if (filters.property_type) params.property_type = filters.property_type;
     if (filters.city) params.city = filters.city;
 
-    const response = await axios.get(`${BASE_URL}/admin/dashboard/properties`, {
+    const response = await axios.get(`${BASE_URL}/internal/admin/dashboard/properties`, {
       headers: {
         "x-auth-token": `${token}`,
         "Authorization": `${token}`,
@@ -888,7 +891,7 @@ export const patchStaticSiteData = async () => {
       }
     };
     const response = await axios.patch(
-      `${BASE_URL}/static-site-data`,
+      `${BASE_URL}/internal/static-site-data`,
       payload,
       {
         headers: {

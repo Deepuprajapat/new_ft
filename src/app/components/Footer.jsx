@@ -13,7 +13,7 @@ import {
   filterforgeneric,
 } from "../apis/api";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import AddGenericLinkForm from "./AddGenericLinkForm";
 
 const Footer = ({ shortAddress }) => {
@@ -101,16 +101,15 @@ const Footer = ({ shortAddress }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
   const handleKeywordClick = async (slug) => {
     try {
-      console.log('Footer keyword clicked:', slug);
+      console.log("Footer keyword clicked:", slug);
       navigate(`/s/${slug}`);
       setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }, 500); // Adjust delay if needed
     } catch (error) {
-      console.error('Error handling keyword click:', error);
+      console.error("Error handling keyword click:", error);
     }
   };
 
@@ -244,7 +243,7 @@ const Footer = ({ shortAddress }) => {
         <div className="top-footer">
           <div className="container">
             <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2">
-              {footerItems.map((item) => (
+              {footerItems?.map((item) => (
                 <div className="col" key={item.title}>
                   <ul className="footer-links list-unstyled m-0 p-0">
                     <li>
@@ -473,25 +472,18 @@ const Footer = ({ shortAddress }) => {
                   </li>
                 </ul>
               </div>
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  marginBottom: 16,
-                }}
-              >
+             
+            </div>
+            <Box display="flex" justifyContent="center" >
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={handleOpenAddGenericModal}
-                  style={{ minWidth: 200 }}
+                  style={{ minWidth: 150 }}
                 >
-                  Add Generic Link
+                  Add Link
                 </Button>
-              </div>
-            </div>
-
+              </Box>
             <div className="bottom-footer">
               <div className="container">
                 <p>All right Reserved | Invest Mango</p>
