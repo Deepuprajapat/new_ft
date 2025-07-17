@@ -1352,6 +1352,9 @@ const ProjectDetails = () => {
                   <span
                     className="badge text-dark"
                     style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       padding: "4px 8px",
                       fontSize: "10px",
                       marginRight: "3px",
@@ -1359,6 +1362,7 @@ const ProjectDetails = () => {
                       borderRadius: "0",
                       backgroundColor: "#f0f0f0",
                       fontWeight: "300",
+                      minHeight: "22px", // optional, adjust as needed
                     }}
                   >
                     No Brokerage
@@ -1383,6 +1387,9 @@ const ProjectDetails = () => {
                   <span
                     className="badge text-dark"
                     style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       padding: "4px 8px",
                       fontSize: "10px",
                       marginRight: "3px",
@@ -1390,6 +1397,7 @@ const ProjectDetails = () => {
                       borderRadius: "0",
                       backgroundColor: "#f0f0f0",
                       fontWeight: "300",
+                      minHeight: "22px", // optional, adjust as needed
                     }}
                   >
                     Top Amenities
@@ -4474,7 +4482,7 @@ const ProjectDetails = () => {
               </button>
 
               <img
-                src="/images/NiralaPopup.png"
+                src="/images/NiralaPopupNoidaIVR.png"
                 alt="Popup"
                 style={{
                   width: "100%",
