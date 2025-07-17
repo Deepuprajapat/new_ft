@@ -1,6 +1,12 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { getAllLeadsAdmin } from '../../../../apis/api';
+import React, { useState, useEffect } from 'react';
+import { Select, Button, DatePicker, Space, Table, Tag, Badge, Typography, Tooltip } from 'antd';
+import { ExpandAltOutlined, ShrinkOutlined, CheckCircleOutlined, CloseCircleOutlined, SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import { getAllLeadsAdmin, getProjectNames } from '../../../../apis/api';
+import LeadModal from './LeadModal';
 import './LeadsDashboard.css';
+
+const { Text } = Typography;
 
 const LeadsDashboard = () => {
   const [uniqueLeads, setUniqueLeads] = useState([]);
@@ -10,26 +16,38 @@ const LeadsDashboard = () => {
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedSource, setSelectedSource] = useState('');
+  const [selectedProject, setSelectedProject] = useState('');
+  const [projects, setProjects] = useState([]);
+  const [projectOptions, setProjectOptions] = useState([]);
   const [dateFilterType, setDateFilterType] = useState('preset'); // 'preset' or 'custom'
   const [selectedPreset, setSelectedPreset] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [customDateMode, setCustomDateMode] = useState('range'); // 'single' or 'range'
+  const [selectedLead, setSelectedLead] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchLeads();
-  }, [selectedDate, selectedSource, startDate, endDate]);
+  }, [selectedDate, selectedSource, selectedProject, startDate, endDate]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
-        setExpandedRows(new Set());
+        if (isModalOpen) {
+          closeModal();
+        } else {
+          setExpandedRows(new Set());
+        }
       }
     };
     
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isModalOpen]);
 
   // Date utility functions
   const formatDateForAPI = (date) => {
@@ -68,6 +86,25 @@ const LeadsDashboard = () => {
     };
   };
 
+  const fetchProjects = async () => {
+    try {
+      const response = await getProjectNames();
+      const projectData = response?.data || [];
+      setProjects(projectData);
+      
+      // Format projects for Select dropdown
+      const formattedOptions = projectData.map(project => ({
+        value: project.project_id,
+        label: project.project_name
+      }));
+      setProjectOptions(formattedOptions);
+    } catch (error) {
+      console.error('Error fetching project names:', error);
+      setProjects([]);
+      setProjectOptions([]);
+    }
+  };
+
   const fetchLeads = async () => {
     try {
       setLoading(true);
@@ -87,6 +124,14 @@ const LeadsDashboard = () => {
       
       if (selectedSource) {
         filters.source = selectedSource;
+      }
+      
+      if (selectedProject) {
+        if (selectedProject === 'empty') {
+          filters.project_name = '';
+        } else {
+          filters.project_id = selectedProject;
+        }
       }
       
       const response = await getAllLeadsAdmin(filters);
@@ -114,12 +159,12 @@ const LeadsDashboard = () => {
     });
   };
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
-
   const handleSourceChange = (source) => {
     setSelectedSource(source);
+  };
+
+  const handleProjectChange = (project) => {
+    setSelectedProject(project);
   };
 
   const handlePresetSelect = (presetKey) => {
@@ -139,15 +184,6 @@ const LeadsDashboard = () => {
     setStartDate('');
     setEndDate('');
     setSelectedDate('');
-    setCustomDateMode('range'); // Default to range mode
-  };
-
-  const handleCustomModeChange = (mode) => {
-    setCustomDateMode(mode);
-    setSelectedDate('');
-    setStartDate('');
-    setEndDate('');
-    setSelectedPreset('');
   };
 
   const handleCustomSingleDate = (date) => {
@@ -155,7 +191,6 @@ const LeadsDashboard = () => {
     setStartDate('');
     setEndDate('');
     setSelectedPreset('');
-    setCustomDateMode('single');
   };
 
   const handleCustomDateRange = (start, end) => {
@@ -163,17 +198,16 @@ const LeadsDashboard = () => {
     setEndDate(end);
     setSelectedDate('');
     setSelectedPreset('');
-    setCustomDateMode('range');
   };
 
   const clearFilters = () => {
     setSelectedDate('');
     setSelectedSource('');
+    setSelectedProject('');
     setDateFilterType('preset');
     setSelectedPreset('');
     setStartDate('');
     setEndDate('');
-    setCustomDateMode('range');
   };
 
   const toggleRowExpansion = (leadId) => {
@@ -186,48 +220,224 @@ const LeadsDashboard = () => {
     setExpandedRows(newExpandedRows);
   };
 
-  const renderLeadRow = (lead, isDuplicate = false, isHistory = false) => {
-    return (
-      <tr key={`${lead.id}-${isHistory ? 'history' : 'main'}`} className={isDuplicate && !isHistory ? 'duplicate-row' : ''}>
-        <td>
-          <span style={{ marginLeft: isHistory ? '2rem' : '0' }}>{lead.id}</span>
-        </td>
-        <td>
-          {isDuplicate && !isHistory ? (
-            <div className="lead-name">
-              <button 
-                className="expand-btn"
-                onClick={() => toggleRowExpansion(lead.id)}
-                title={expandedRows.has(lead.id) ? 'Collapse history' : 'Show history'}
-              >
-                {expandedRows.has(lead.id) ? '▼' : '▶'}
-              </button>
-              {lead.name}
-              <span className="duplicate-badge">D</span>
-            </div>
-          ) : (
-            <span style={{ marginLeft: isHistory ? '2rem' : '0' }}>{lead.name}</span>
+  const openModal = (lead) => {
+    setSelectedLead(lead);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedLead(null);
+  };
+
+  // Column definitions for Ant Design Table
+  const columns = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      width: 80,
+      sorter: (a, b) => a.id - b.id,
+      fixed: 'left',
+    },
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      width: 150,
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      render: (text, record) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Text strong style={{ fontSize: '14px' }}>
+            {text}
+          </Text>
+          {record.isDuplicate && (
+            <Badge count="D" style={{ backgroundColor: '#ff9800', fontSize: '10px' }} />
           )}
-        </td>
-        <td>{lead.email}</td>
-        <td>{lead.phone}</td>
-        <td className="message-cell">
-          <div className="message-preview">
-            {lead.message?.substring(0, 50)}
-            {lead.message?.length > 50 && '...'}
-          </div>
-        </td>
-        <td>
-          <span className="source-badge">
-            {lead.source}
-          </span>
-        </td>
-        <td>
-          <span className={isHistory ? 'date-highlight' : ''}>
-            {formatDate(lead.created_at)}
-          </span>
-        </td>
-      </tr>
+        </div>
+      ),
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: 200,
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (email) => (
+        <Tooltip placement="topLeft" title={email}>
+          <Text style={{ fontSize: '13px' }}>{email}</Text>
+        </Tooltip>
+      ),
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone',
+      key: 'phone',
+      width: 140,
+      render: (phone) => (
+        <Text style={{ fontSize: '13px', fontFamily: 'monospace' }}>{phone}</Text>
+      ),
+    },
+    {
+      title: 'OTP Status',
+      dataIndex: 'otp_verified',
+      key: 'otp_verified',
+      width: 120,
+      align: 'center',
+      filters: [
+        { text: 'Verified', value: true },
+        { text: 'Unverified', value: false },
+      ],
+      onFilter: (value, record) => record.otp_verified === value,
+      render: (verified) => (
+        <Tag
+          icon={verified ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+          color={verified ? 'success' : 'error'}
+          style={{ fontSize: '12px', fontWeight: '500' }}
+        >
+          {verified ? 'Verified' : 'Unverified'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Sync Status',
+      dataIndex: 'sync_status',
+      key: 'sync_status',
+      width: 120,
+      align: 'center',
+      filters: [
+        { text: 'Synced', value: 'synced' },
+        { text: 'Rejected', value: 'rejected' },
+        { text: 'Fresh', value: 'fresh' },
+      ],
+      onFilter: (value, record) => record.sync_status === value,
+      render: (status) => {
+        const statusConfig = {
+          synced: { color: 'success', icon: <CheckCircleOutlined /> },
+          rejected: { color: 'error', icon: <CloseCircleOutlined /> },
+          fresh: { color: 'processing', icon: <ClockCircleOutlined /> },
+        };
+        const config = statusConfig[status] || { color: 'default', icon: <SyncOutlined /> };
+        return (
+          <Tag
+            icon={config.icon}
+            color={config.color}
+            style={{ fontSize: '12px', fontWeight: '500', textTransform: 'capitalize' }}
+          >
+            {status}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: 'Source',
+      dataIndex: 'source',
+      key: 'source',
+      width: 100,
+      align: 'center',
+      filters: [
+        { text: 'Organic', value: 'Organic' },
+        { text: 'Meta', value: 'meta' },
+      ],
+      onFilter: (value, record) => record.source === value,
+      render: (source) => (
+        <Tag color={source === 'Organic' ? 'green' : 'blue'} style={{ fontSize: '11px', fontWeight: '500' }}>
+          {source}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Project',
+      dataIndex: 'project_name',
+      key: 'project_name',
+      width: 150,
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (project) => (
+        project ? (
+          <Tooltip placement="topLeft" title={project}>
+            <Tag color="geekblue" style={{ fontSize: '11px', fontWeight: '500' }}>
+              {project}
+            </Tag>
+          </Tooltip>
+        ) : (
+          <Text type="secondary" style={{ fontSize: '12px' }}>-</Text>
+        )
+      ),
+    },
+    {
+      title: 'Date',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      width: 160,
+      sorter: (a, b) => new Date(a.created_at) - new Date(b.created_at),
+      defaultSortOrder: 'descend',
+      render: (date) => (
+        <Text style={{ fontSize: '12px', fontFamily: 'monospace' }}>
+          {formatDate(date)}
+        </Text>
+      ),
+    },
+  ];
+
+  // Prepare data for Ant Design Table
+  const prepareTableData = () => {
+    const tableData = [];
+    
+    // Add unique leads
+    uniqueLeads.forEach(lead => {
+      tableData.push({
+        ...lead,
+        key: `unique-${lead.id}`,
+        isDuplicate: false,
+      });
+    });
+    
+    // Add duplicate leads
+    Object.entries(duplicateLeads).forEach(([leadId, duplicateData]) => {
+      const lastLead = duplicateData.last;
+      const history = duplicateData.history || [];
+      
+      tableData.push({
+        ...lastLead,
+        key: `duplicate-${lastLead.id}`,
+        isDuplicate: true,
+        duplicateHistory: history,
+      });
+    });
+    
+    return tableData;
+  };
+  
+  const expandedRowRender = (record) => {
+    if (!record.isDuplicate || !record.duplicateHistory?.length) {
+      return null;
+    }
+    
+    const historyColumns = columns.map(col => ({
+      ...col,
+      render: col.key === 'created_at' ? (date) => (
+        <Tag color="orange" style={{ fontSize: '11px' }}>
+          {formatDate(date)}
+        </Tag>
+      ) : col.render,
+    }));
+    
+    return (
+      <Table
+        columns={historyColumns}
+        dataSource={record.duplicateHistory.map((item, index) => ({
+          ...item,
+          key: `history-${record.id}-${index}`,
+        }))}
+        pagination={false}
+        size="small"
+        style={{ margin: '0 0 0 40px' }}
+        showHeader={false}
+      />
     );
   };
 
@@ -267,12 +477,13 @@ const LeadsDashboard = () => {
 
       <div className="filters-section">
         <h4>Filters</h4>
-        {(selectedPreset || selectedDate || (startDate && endDate) || selectedSource) && (
+        {(selectedPreset || selectedDate || (startDate && endDate) || selectedSource || selectedProject) && (
           <div className="filter-status">
             {selectedPreset && `${getDatePresets()[selectedPreset].label}`}
             {selectedDate && `Date: ${selectedDate}`}
             {startDate && endDate && `Range: ${startDate} to ${endDate}`}
             {selectedSource && ` • Source: ${selectedSource}`}
+            {selectedProject && ` • Project: ${selectedProject === 'empty' ? 'No Project' : projects.find(p => p.project_id === selectedProject)?.project_name || selectedProject}`}
           </div>
         )}
         
@@ -281,93 +492,70 @@ const LeadsDashboard = () => {
           <label className="filter-label">Date Filter</label>
           
           {/* Preset Date Buttons */}
-          <div className="date-presets">
+          <Space wrap>
             {Object.entries(getDatePresets()).map(([key, preset]) => (
-              <button
+              <Button
                 key={key}
-                className={`preset-btn ${selectedPreset === key ? 'active' : ''}`}
+                type={selectedPreset === key ? 'primary' : 'default'}
                 onClick={() => handlePresetSelect(key)}
+                size="middle"
               >
                 {preset.label}
-              </button>
+              </Button>
             ))}
-          </div>
+          </Space>
 
-          {/* Custom Date Options */}
-          <div className="custom-date-section">
-            <div className="custom-date-toggle">
-              <button
-                className={`toggle-btn ${dateFilterType === 'custom' ? 'active' : ''}`}
-                onClick={handleCustomDateMode}
-              >
-                Custom Date
-              </button>
-            </div>
-
+          {/* Custom Date Selection */}
+          <div style={{ marginTop: '16px' }}>
+            <Button
+              type={dateFilterType === 'custom' ? 'primary' : 'default'}
+              onClick={handleCustomDateMode}
+              style={{ marginBottom: '12px' }}
+            >
+              Custom Date Range
+            </Button>
+            
             {dateFilterType === 'custom' && (
-              <div className="custom-date-controls">
-                <div className="custom-date-options">
-                  <label className="radio-option">
-                    <input
-                      type="radio"
-                      name="customDateType"
-                      value="single"
-                      checked={customDateMode === 'single'}
-                      onChange={() => handleCustomModeChange('single')}
-                    />
-                    <span>Single Date</span>
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+                    Select Date Range:
                   </label>
-                  <label className="radio-option">
-                    <input
-                      type="radio"
-                      name="customDateType"
-                      value="range"
-                      checked={customDateMode === 'range'}
-                      onChange={() => handleCustomModeChange('range')}
-                    />
-                    <span>Date Range</span>
+                  <DatePicker.RangePicker
+                    value={startDate && endDate ? [dayjs(startDate), dayjs(endDate)] : null}
+                    onChange={(dates) => {
+                      if (dates && dates.length === 2) {
+                        const startDateStr = dates[0].format('YYYY-MM-DD');
+                        const endDateStr = dates[1].format('YYYY-MM-DD');
+                        handleCustomDateRange(startDateStr, endDateStr);
+                      } else {
+                        handleCustomDateRange('', '');
+                      }
+                    }}
+                    style={{ width: '300px' }}
+                    placeholder={['Start Date', 'End Date']}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+                    Or select single date:
                   </label>
+                  <DatePicker
+                    value={selectedDate ? dayjs(selectedDate) : null}
+                    onChange={(date) => {
+                      if (date) {
+                        const dateStr = date.format('YYYY-MM-DD');
+                        handleCustomSingleDate(dateStr);
+                      } else {
+                        handleCustomSingleDate('');
+                      }
+                    }}
+                    style={{ width: '200px' }}
+                    placeholder="Select Date"
+                  />
                 </div>
-
-                <div className="custom-date-inputs">
-                  {/* Single Date Input */}
-                  {customDateMode === 'single' && (
-                    <div className="single-date-input">
-                      <label>Select Date</label>
-                      <input
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => handleCustomSingleDate(e.target.value)}
-                        className="form-control"
-                      />
-                    </div>
-                  )}
-
-                  {/* Date Range Inputs */}
-                  {customDateMode === 'range' && (
-                    <div className="date-range-inputs">
-                      <div className="date-input-group">
-                        <label>Start Date</label>
-                        <input
-                          type="date"
-                          value={startDate}
-                          onChange={(e) => handleCustomDateRange(e.target.value, endDate)}
-                          className="form-control"
-                        />
-                      </div>
-                      <div className="date-input-group">
-                        <label>End Date</label>
-                        <input
-                          type="date"
-                          value={endDate}
-                          onChange={(e) => handleCustomDateRange(startDate, e.target.value)}
-                          className="form-control"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              </Space>
             )}
           </div>
         </div>
@@ -376,72 +564,140 @@ const LeadsDashboard = () => {
         <div className="other-filters">
           <div className="filter-group">
             <label>Lead Source</label>
-            <select
-              value={selectedSource}
-              onChange={(e) => handleSourceChange(e.target.value)}
-              className="form-control"
-            >
-              <option value="">All Sources</option>
-              <option value="Organic">Organic</option>
-              <option value="meta">Meta</option>
-            </select>
+            <Select
+              showSearch
+              placeholder="Search sources..."
+              value={selectedSource || undefined}
+              onChange={handleSourceChange}
+              options={[
+                { value: '', label: 'All Sources' },
+                { value: 'Organic', label: 'Organic' },
+                { value: 'meta', label: 'Meta' }
+              ]}
+              filterOption={(input, option) =>
+                option?.label?.toLowerCase().includes(input.toLowerCase())
+              }
+              style={{ width: '100%' }}
+              allowClear
+            />
+          </div>
+          
+          <div className="filter-group">
+            <label>Project</label>
+            <Select
+              showSearch
+              placeholder="Search projects..."
+              value={selectedProject || undefined}
+              onChange={handleProjectChange}
+              options={[
+                { value: '', label: 'All Projects' },
+                { value: 'empty', label: 'No Project' },
+                ...projectOptions
+              ]}
+              filterOption={(input, option) =>
+                option?.label?.toLowerCase().includes(input.toLowerCase())
+              }
+              style={{ width: '100%' }}
+              allowClear
+            />
           </div>
           
           <div className="filter-actions">
-            <button 
+            <Button 
               onClick={clearFilters}
-              className="btn btn-outline-secondary"
+              type="default"
+              danger
             >
               Clear All Filters
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
       <div className="leads-table-container">
-        <table className="leads-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Message</th>
-              <th>Source</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Render unique leads first */}
-            {uniqueLeads.map((lead) => renderLeadRow(lead, false))}
-            
-            {/* Render duplicate leads */}
-            {Object.entries(duplicateLeads).map(([leadId, duplicateData]) => {
-              const lastLead = duplicateData.last;
-              const history = duplicateData.history || [];
-              
+        <Table
+          columns={columns}
+          dataSource={prepareTableData()}
+          loading={loading}
+          pagination={{
+            total: uniqueLeads.length + Object.keys(duplicateLeads).length,
+            pageSize: 50,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => (
+              <Text style={{ fontSize: '14px', fontWeight: '500', color: '#6b7280' }}>
+                Showing {range[0]}-{range[1]} of {total} leads
+              </Text>
+            ),
+            pageSizeOptions: ['25', '50', '100', '200'],
+          }}
+          scroll={{ x: 'max-content', y: 600 }}
+          size="middle"
+          rowClassName={(record) => {
+            if (record.isDuplicate) {
+              return 'duplicate-row';
+            }
+            return 'clickable-row';
+          }}
+          onRow={(record) => ({
+            onClick: () => openModal(record),
+            style: { cursor: 'pointer' },
+          })}
+          expandable={{
+            expandedRowRender,
+            expandIcon: ({ expanded, onExpand, record }) => {
+              if (!record.isDuplicate || !record.duplicateHistory?.length) {
+                return null;
+              }
               return (
-                <React.Fragment key={leadId}>
-                  {/* Main duplicate lead row */}
-                  {renderLeadRow(lastLead, true)}
-                  
-                  {/* Expanded history rows */}
-                  {expandedRows.has(lastLead.id) && history.map((historyLead, index) => 
-                    renderLeadRow(historyLead, true, true)
-                  )}
-                </React.Fragment>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={expanded ? <ShrinkOutlined /> : <ExpandAltOutlined />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onExpand(record, e);
+                  }}
+                  title={expanded ? 'Collapse history' : 'Show duplicate history'}
+                />
               );
-            })}
-          </tbody>
-        </table>
-
-        {uniqueLeads.length === 0 && Object.keys(duplicateLeads).length === 0 && !loading && (
-          <div className="no-leads">
-            <p>No leads found for the selected date and source.</p>
-          </div>
-        )}
+            },
+            rowExpandable: (record) => record.isDuplicate && record.duplicateHistory?.length > 0,
+          }}
+          locale={{
+            emptyText: (
+              <div style={{ padding: '40px', textAlign: 'center', color: '#999' }}>
+                <Text type="secondary">No leads found for the selected filters.</Text>
+              </div>
+            ),
+          }}
+          summary={(data) => {
+            const duplicateCount = data.filter(item => item.isDuplicate).length;
+            const uniqueCount = data.filter(item => !item.isDuplicate).length;
+            
+            return (
+              <Table.Summary fixed>
+                <Table.Summary.Row>
+                  <Table.Summary.Cell index={0} colSpan={9}>
+                    <div style={{ textAlign: 'center', padding: '8px' }}>
+                      <Text strong>Total: {data.length} leads</Text>
+                      <Text type="secondary" style={{ marginLeft: '16px' }}>
+                        ({uniqueCount} unique, {duplicateCount} duplicates)
+                      </Text>
+                    </div>
+                  </Table.Summary.Cell>
+                </Table.Summary.Row>
+              </Table.Summary>
+            );
+          }}
+        />
       </div>
 
+      <LeadModal 
+        isOpen={isModalOpen} 
+        onClose={closeModal} 
+        lead={selectedLead} 
+      />
     </div>
   );
 };

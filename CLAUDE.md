@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Important Rules
+
+### Process Management
+- **NEVER run npm start, npm run dev, or any server/development processes directly**
+- Instead, ask the user to run these commands and explain what to expect:
+  - `npm start`: Will start the development server on port 8080 (or 3000 if default CRA config)
+  - `npm run build`: Will create a production build in the `build` directory
+  - `npm test`: Will run the test suite in watch mode
+- This ensures the user has control over long-running processes and can properly terminate them
+
 ## Development Commands
 
 - **Start Development Server**: `npm start` (runs on port 8080)
