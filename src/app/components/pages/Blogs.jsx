@@ -10,6 +10,8 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "../styles/css/blog.css";
 import swal from "sweetalert";
 import { Helmet } from "react-helmet";
+import BlogModal from "./BlogModal";
+import IconButton from "@mui/material/IconButton";
 
 const Blogs = () => {
   const [blogData, setBlogData] = useState(null);
@@ -27,6 +29,39 @@ const Blogs = () => {
   const blogId = location.state?.blogId;
   const [schema, setSchema] = useState(null);
   const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("add"); // 'add' or 'edit'
+  const [modalInitialData, setModalInitialData] = useState(null);
+
+  const refreshBlogData = async (id = blogId) => {
+    try {
+      let response;
+      if (id) {
+        response = await getAllBlogById(id);
+      }
+      if (response) {
+        const data = response.data || response;
+        setBlogData(data);
+        if (Array.isArray(data.schema) && data.schema.length > 0) {
+          try {
+            const rawSchema = data.schema[0]
+              .replace(/<script[^>]*>/g, "")
+              .replace(/<\/script>/g, "")
+              .trim();
+            const parsedSchema = JSON.parse(rawSchema);
+            setSchema(parsedSchema);
+          } catch (error) {
+            console.error("Error parsing schema JSON:", error);
+          }
+        }
+      } else {
+        navigate("*");
+      }
+    } catch (error) {
+      console.error("Error fetching blog data:", error);
+      navigate("*");
+    }
+  };
 
   useEffect(() => {
     const fetchBlogData = async () => {
@@ -70,7 +105,7 @@ const Blogs = () => {
       try {
         const response = await getAllBlog(); // Don't pass 0, 20
         // Show only 20 most recent posts
-        const top20Posts = (response || []).slice(-20).reverse();
+        const top20Posts = (response.data.blogs || []).slice(-20).reverse();
         setRecentPosts(top20Posts);
       } catch (error) {
         console.error("Error fetching recent posts:", error);
@@ -181,7 +216,40 @@ const Blogs = () => {
                     {blogData ? (
                       <>
                         <div className="col-md-12">
-                          <p id="blog-title">{blogData.blog_content.title}</p>
+                          <p id="blog-title" style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                            <span style={{ display: "inline-block", verticalAlign: "middle" }}>
+                              {blogData.blog_content.title}
+                            </span>
+                            <IconButton
+                              aria-label="Edit Blog"
+                              size="small"
+                              onClick={() => {
+                                const d = blogData;
+                                setModalMode("edit");
+                                setModalInitialData({
+                                  blog_url: d.blog_url || "",
+                                  blog_content: {
+                                    title: d.blog_content?.title || "",
+                                    description: d.blog_content?.description || "",
+                                    image: d.blog_content?.image || "",
+                                    image_alt: d.blog_content?.image_alt || ""
+                                  },
+                                  seo_meta_info: {
+                                    blog_schema: Array.isArray(d.seo_meta_info?.blog_schema)
+                                      ? (d.seo_meta_info.blog_schema[0] || "")
+                                      : (d.seo_meta_info?.blog_schema || ""),
+                                    canonical: d.seo_meta_info?.canonical || "",
+                                    title: d.seo_meta_info?.title || "",
+                                    keywords: d.seo_meta_info?.keywords || ""
+                                  }
+                                });
+                                setModalOpen(true);
+                              }}
+                              style={{ marginLeft: 6, padding: 4, verticalAlign: "middle" }}
+                            >
+                              <img src="/images/editlogo.png" alt="Edit" style={{ width: 20, height: 20, display: "inline-block", verticalAlign: "middle" }} />
+                            </IconButton>
+                          </p>
                           <small>
                             Date -{" "}
                             {new Date(blogData?.created_at).toLocaleDateString(
@@ -204,8 +272,8 @@ const Blogs = () => {
                               width: '100%',
                               height: 'auto',
                               objectFit: 'cover',
-                              maxWidth: '800px', 
-                              maxHeight: '550px', 
+                              maxWidth: '800px',
+                              maxHeight: '550px',
                               display: 'block',
                               margin: '0 auto',
                             }}
@@ -413,6 +481,16 @@ const Blogs = () => {
           }
         }
       ` }} />
+      <BlogModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        initialData={modalInitialData}
+        mode={modalMode}
+        onSuccess={() => {
+          setModalOpen(false);
+          refreshBlogData();
+        }}
+      />
     </>
   );
 };

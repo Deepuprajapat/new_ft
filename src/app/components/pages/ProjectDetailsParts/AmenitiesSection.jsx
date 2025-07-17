@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
+import {getAmenties ,patchStaticSiteData} from '../../../apis/api'
 
 const isMobile = window.innerWidth <= 768;
 
@@ -14,6 +15,7 @@ const AmenitiesSection = ({
 }) => {
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [editableAmenities, setEditableAmenities] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [editableAmenitiesPara, setEditableAmenitiesPara] = useState(amenitiesPara);
   const [showAmenityModal, setShowAmenityModal] = useState(false);
   const [showCreateNewCategoryModal, setShowCreateNewCategoryModal] = useState(false);
@@ -129,82 +131,38 @@ const AmenitiesSection = ({
   // Use grouped amenities for display
   const groupedAmenities = groupAmenities(amenities);
 
-  // Dummy data for dropdowns (replace with API data as needed)
-  const ALL_CATEGORIES = [
-    "Club House",
-    "Swimming Pool",
-    "Gym",
-    "Security",
-    "Parking",
-    "Garden",
-    "Other",
-  ];
+  // Add state for API amenities data
+  const [apiAmenities, setApiAmenities] = useState({});
 
-  const ICON_BASE_URL = "http://localhost:8000/";
+  // Fetch amenities from API when modal opens
+  useEffect(() => {
+    if (showAmenityModal) {
+      const fetchAmenities = async () => {
+        try {
+          const res = await getAmenties();
+          setApiAmenities(res.data?.categories || {});
+        } catch (err) {
+          setApiAmenities({});
+        }
+      };
+      fetchAmenities();
+    }
+  }, [showAmenityModal]);
 
+  // Use API data for categories and amenities
+  const availableCategories = Object.keys(apiAmenities);
 
- const ALL_AMENITIES = {
-    "Club House": [
-      { name: "Banquet Hall", icon: `${ICON_BASE_URL}golf_course.svg` },
-      { name: "Indoor Games", icon: `${ICON_BASE_URL}golf_course.svg` },
-    ],
-    "Swimming Pool": [
-      { name: "Kids Pool", icon: `${ICON_BASE_URL}golf_course.svg` },
-      { name: "Lap Pool", icon: `${ICON_BASE_URL}golf_course.svg` },
-    ],
-     Gym: [
-    { name: "Cardio Zone", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "Weight Training", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "Yoga Studio", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "CrossFit Area", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "Steam Room", icon: `${ICON_BASE_URL}golf_course.svg`},
-    { name: "Sauna", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "Personal Training", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "Fitness Classes", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "Spinning Studio", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "Boxing Area", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "Dance Studio", icon: `${ICON_BASE_URL}golf_course.svg`},
-    { name: "Zumba Classes", icon: `${ICON_BASE_URL}golf_course.svg` },
-  ],
-  Security: [
-    { name: "24/7 Security", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "CCTV Surveillance", icon: `${ICON_BASE_URL}golf_course.svg`},
-    { name: "Security Guards", icon: `${ICON_BASE_URL}golf_course.svg` },
-  ],
-  Parking: [
-    { name: "Car Parking", icon:`${ICON_BASE_URL}golf_course.svg`},
-    { name: "Bike Parking", icon: `${ICON_BASE_URL}golf_course.svg` },
-    { name: "Visitor Parking", icon:`${ICON_BASE_URL}golf_course.svg`},
-  ],
-    "Garden": [
-      { name: "Landscaped Garden", icon: `${ICON_BASE_URL}golf_course.svg` },
-      { name: "Children's Play Area", icon: `${ICON_BASE_URL}golf_course.svg` },
-      { name: "Walking Track", icon: `${ICON_BASE_URL}golf_course.svg` },
-    ],
-    "Other": [
-      { name: "Power Backup", icon: `${ICON_BASE_URL}golf_course.svg` },
-      { name: "Rain Water Harvesting", icon: `${ICON_BASE_URL}golf_course.svg` },
-      { name: "Solar Panels", icon: `${ICON_BASE_URL}golf_course.svg` },
-    ],
-  };
-
-  // Add these states at the top of your component:
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedAmenities, setSelectedAmenities] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
-
-  // Helpers for dropdowns
   const addedCategories = editableAmenities.map((cat) => cat.name);
-  const availableCategories = ALL_CATEGORIES;
   const addedAmenities = (catName) => {
     const cat = editableAmenities.find((c) => c.name === catName);
     return cat ? cat.assets.map((a) => a.name) : [];
   };
-  const [allAmenities, setAllAmenities] = useState(ALL_AMENITIES);
+
   const availableAmenities = selectedCategory
-    ? (allAmenities[selectedCategory] || []).map((amenity) => ({
-        ...amenity,
-        alreadyAdded: addedAmenities(selectedCategory).includes(amenity.name),
+    ? (apiAmenities[selectedCategory] || []).map((amenity) => ({
+        name: amenity.value,
+        icon: amenity.icon,
+        alreadyAdded: addedAmenities(selectedCategory).includes(amenity.value),
       }))
     : [];
 
@@ -273,25 +231,45 @@ const AmenitiesSection = ({
     // Optionally reset editableAmenities and editableAmenitiesPara to original values if needed
   };
 
-  const handleCreateNewCategory = () => {
+  const handleCreateNewCategory = async () => {
     if (!newCategoryData.name) return;
 
-    const updated = [...editableAmenities];
-    updated.push({
-      name: newCategoryData.name,
-      assets: newCategoryAmenityName
-        ? [{ name: newCategoryAmenityName, icon: newCategoryData.icon }]
-        : []
-    });
+    // 1. Clone the current categories
+    const updatedCategories = { ...apiAmenities };
 
-    setEditableAmenities(updated);
-    setNewCategoryData({
-      name: "",
-      icon: "/images/noimage.png"
-    });
-    setNewCategoryAmenityName("");
-    setShowCreateNewCategoryModal(false);
+    // 2. Add the new category
+    updatedCategories[newCategoryData.name] = newCategoryAmenityName
+      ? [{ value: newCategoryAmenityName, icon: newCategoryData.icon }]
+      : [];
+
+    try {
+      // 3. Call the API to save the new categories
+      await patchStaticSiteData(updatedCategories);
+
+      // 4. Update local state
+      setApiAmenities(updatedCategories);
+      setEditableAmenities([
+        ...editableAmenities,
+        {
+          name: newCategoryData.name,
+          assets: newCategoryAmenityName
+            ? [{ name: newCategoryAmenityName, icon: newCategoryData.icon }]
+            : []
+        }
+      ]);
+      setNewCategoryData({
+        name: "",
+        icon: "/images/noimage.png"
+      });
+      setNewCategoryAmenityName("");
+      setShowCreateNewCategoryModal(false);
+    } catch (error) {
+      alert("Failed to save new category. Please try again.");
+    }
   };
+
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   return (
     <div
@@ -1033,6 +1011,62 @@ const AmenitiesSection = ({
                   onBlur={(e) => e.target.style.borderColor = "#ddd"}
                 />
               </div>
+              {/* Upload Icon Section */}
+              <div>
+                <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "500", color: "#444" }}>
+                  Upload Icon
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      const file = e.target.files[0];
+                      // Show loading state
+                      setNewCategoryData(prev => ({ ...prev, uploading: true }));
+                      try {
+                        // Prepare form data for uploadImage API
+                        const formData = new FormData();
+                        formData.append("file_name", file.name);
+                        formData.append("alt_keywords", newCategoryData.name || "category icon");
+                        formData.append("file_path", file);
+                        // Use uploadImage API
+                        const { uploadImage } = await import('../../../apis/api');
+                        const res = await uploadImage({
+                          file_name: file.name,
+                          alt_keywords: newCategoryData.name || "category icon",
+                          file_path: file
+                        });
+                        // Set the icon URL
+                        setNewCategoryData(prev => ({ ...prev, icon: res.url || res.file_path, uploading: false }));
+                      } catch (err) {
+                        setNewCategoryData(prev => ({ ...prev, uploading: false }));
+                        alert("Failed to upload icon. Please try again.");
+                      }
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "6px",
+                    border: "1px solid #ddd",
+                    fontSize: "14px",
+                    color: "#333",
+                    backgroundColor: "#fff",
+                    outline: "none",
+                    transition: "border-color 0.2s",
+                  }}
+                />
+                {/* Show preview and loading */}
+                {newCategoryData.uploading && (
+                  <div style={{ marginTop: "8px", color: "#2067d1", fontSize: "13px" }}>Uploading...</div>
+                )}
+                {newCategoryData.icon && !newCategoryData.uploading && (
+                  <div style={{ marginTop: "8px" }}>
+                    <img src={newCategoryData.icon} alt="Icon Preview" style={{ width: 48, height: 48, objectFit: "contain", borderRadius: 6, border: "1px solid #eee" }} />
+                  </div>
+                )}
+              </div>
 
               {/* <div>
                 <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "500", color: "#444" }}>
@@ -1234,7 +1268,7 @@ const AmenitiesSection = ({
               <button
                 onClick={() => {
                   if (!newAmenityName) return;
-                  setAllAmenities(prev => {
+                  setApiAmenities(prev => {
                     const updated = { ...prev };
                     if (updated[selectedCategory]) {
                       updated[selectedCategory] = [

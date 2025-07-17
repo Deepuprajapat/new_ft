@@ -36,13 +36,15 @@ const initialFormState = {
 
 const AddGenericLinkForm = ({ open, onClose, onSave }) => {
   const [filterData, setFilterData] = useState(null);
+  const [genericForm, setGenericForm] = useState(initialFormState);
   const filterOptions = filterData || {};
-  const cityOptions = filterOptions.cities || [];
+  const cityOptions = filterOptions.locations ? Object.keys(filterOptions.locations) : [];
   const typeOptions = filterOptions.types || [];
   const developerOptions = filterOptions.developers || [];
-  const locationOptions = filterOptions.locations || [];
+  const locationOptions = filterOptions.locations && genericForm.filters.city
+    ? filterOptions.locations[genericForm.filters.city] || []
+    : [];
 
-  const [genericForm, setGenericForm] = useState(initialFormState);
 
   const handleCancel = () => {
     setGenericForm(initialFormState);
@@ -189,27 +191,7 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                 )}
                 fullWidth
               />
-
-              <FormControl fullWidth>
-                <InputLabel id="location-label">Location</InputLabel>
-                <Select
-                  labelId="location-label"
-                  name="location"
-                  value={genericForm.filters.location || ""}
-                  onChange={handleGenericFormChange}
-                  label="Location"
-                >
-                  {locationOptions.map((loc, idx) => (
-                    <MenuItem key={idx} value={loc}>
-                      {loc}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box display="flex" gap={2}>
-              <FormControl fullWidth>
+ <FormControl fullWidth>
                 <InputLabel id="city-label">City</InputLabel>
                 <Select
                   labelId="city-label"
@@ -225,7 +207,27 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                   ))}
                 </Select>
               </FormControl>
+             
+            </Box>
 
+            <Box display="flex" gap={2}>
+             
+            <FormControl fullWidth>
+                <InputLabel id="location-label">Location</InputLabel>
+                <Select
+                  labelId="location-label"
+                  name="location"
+                  value={genericForm.filters.location || ""}
+                  onChange={handleGenericFormChange}
+                  label="Location"
+                >
+                  {locationOptions.map((loc, idx) => (
+                    <MenuItem key={idx} value={loc}>
+                      {loc}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <FormControl fullWidth>
                 <InputLabel id="type-label">Type</InputLabel>
                 <Select

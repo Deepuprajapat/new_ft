@@ -207,10 +207,10 @@ export const getAllFloor = async (params = {}) => {
   }
 };
 
-export const getAllBlog = async (page = 0, size = 500) => {
+export const getAllBlog = async () => {
   try {
     const res = await axios.get(
-      `${BASE_URL}/blogs/get/all?isDeleted=false&page=${page}&size=${size}`
+      `${BASE_URL}/blogs`
     );
     return res.data;
   } catch (error) {
@@ -870,12 +870,7 @@ export const uploadImage = async ({ file_name, alt_keywords, file_path }) => {
   }
 };
 
-/**
- * Patch static site data (property types, amenities, etc.) with a static payload.
- * The payload includes property_types and categories_with_amenities.
- * @returns {Promise<Object|null>} The response data or null if error
- */
-export const patchStaticSiteData = async () => {
+export const patchStaticSiteData = async (categories) => {
   try {
     const payload = {
       property_types: {
@@ -883,7 +878,7 @@ export const patchStaticSiteData = async () => {
         residential: ["1BHK", "2BHK", "3BHK", "4BHK", "VILLAS"]
       },
       categories_with_amenities: {
-        categories: {
+        categories: categories || {
           "Sports & Recreation": [
             { icon: ":swimmer:", value: "Swimming Pool" }
           ]
@@ -954,6 +949,41 @@ export const getCustompage = async (slug) => {
   try {
     const res = await axios.get(
       `${BASE_URL}/s/${slug}`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    throw error;
+  }
+};
+
+export const getAmenties = async () => {
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/internal/amenities`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    throw error;
+  }
+};
+
+export const SaveNewBlog = async (data) => {
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/internal/blogs`,data
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    throw error;
+  }
+};
+export const EditBlog = async (data ,blog_id) => {
+  try {
+    const res = await axios.patch(
+      `${BASE_URL}/internal/blogs/${blog_id}`,data
     );
     return res.data;
   } catch (error) {
