@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
 import "../components/styles/css/footer.css";
-import logo from "../assets/img/Logo-footer.png";
+import logo from "../assets/img/IM-Logo-white-01.svg";
 import {
   getAllGenericKeywords,
   getGenericKeywordByPath,

@@ -32,6 +32,7 @@ import "react-multi-carousel/lib/styles.css";
 import { Helmet } from "react-helmet";
 import DOMPurify from "dompurify";
 import Swal from "sweetalert2";
+import "../styles/css/popup.css";
 import Header from "../Header";
 
 const BASE_URL = "https://image.investmango.com/images/";
@@ -1362,7 +1363,7 @@ const ProjectDetails = () => {
                   >
                     No Brokerage
                   </span>
-                  <span
+                  {/* <span
                     className="badge text-dark"
                     style={{
                       padding: "4px 8px",
@@ -1377,7 +1378,7 @@ const ProjectDetails = () => {
                     {projectData?.id === 360 
                       ? "Coming Soon"
                       : "Floor Plans Available"}
-                  </span>
+                  </span> */}
 
                   <span
                     className="badge text-dark"
@@ -4435,76 +4436,62 @@ const ProjectDetails = () => {
         </section>
 
         {showImgPopup && (
-  <div
-    style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 999,
-      background: "rgba(0, 0, 0, 0.7)", // Optional overlay background
-    }}
-  >
-    <div
-      style={{
-        position: "relative",
-        display: "inline-block",
-        borderRadius: "8px",
-        overflow: "hidden",
-      }}
-    >
-      <button
-        onClick={() => setImgShowPopup(false)}
-        style={{
-          position: "absolute",
-          top: "5px",
-          right: "5px",
-          background: "rgba(0,0,0,0.5)",
-          border: "none",
-          color: "#fff",
-          fontSize: "20px",
-          cursor: "pointer",
-          borderRadius: "50%",
-          width: "30px",
-          height: "30px",
-          lineHeight: "30px",
-          textAlign: "center",
-        }}
-      >
-        ×
-      </button>
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+              background: "rgba(0, 0, 0, 0.7)",
+              backdropFilter: "blur(2px)",
+            }}
+          >
+            <div className="popup-wrapper">
+              <button
+                onClick={() => setImgShowPopup(false)}
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  background: "rgba(0,0,0,0.6)",
+                  border: "none",
+                  color: "#fff",
+                  fontSize: "20px",
+                  cursor: "pointer",
+                  borderRadius: "50%",
+                  width: "30px",
+                  height: "30px",
+                  lineHeight: "30px",
+                  textAlign: "center",
+                }}
+              >
+                ×
+              </button>
 
-      <div
-        style={{
-          display: "block",
-        }}
-      >
-        <img
-          src="/images/NiralaPopup.png"
-          alt="Popup"
-          style={{
-            width: "100%",
-            height: "auto",
-            display: "block",
-          }}
-        />
-      </div>
-    </div>
-  </div>
-)}
-
-      
+              <img
+                src="/images/NiralaPopup.png"
+                alt="Popup"
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  display: "block",
+                }}
+              />
+            </div>
+          </div>
+        )}
 
 
 
       </div>
     </>
   );
-  
+
 };
 
 export default ProjectDetails;
