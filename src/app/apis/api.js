@@ -688,17 +688,17 @@ export const getAllCityForMobile = async () => {
     return [];
   }
 };
-export const getAllCityForMobileByCityName = async (cityName) => {
-  try {
-    const response = await axios.get(
-      `${BASE_URL}/locality/get/all?cityName=${cityName}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching cities:", error);
-    return [];
-  }
-};
+// export const getAllCityForMobileByCityName = async (cityName) => {
+//   try {
+//     const response = await axios.get(
+//       `${BASE_URL}/locality/get/all?cityName=${cityName}`
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching cities:", error);
+//     return [];
+//   }
+// };
 
 export const patchProjectDetails = async (projectId, patchData) => {
   try {

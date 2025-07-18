@@ -121,7 +121,6 @@ const ProjectDetails = () => {
   );
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [editableAmenities, setEditableAmenities] = useState([]);
-  const [reraDetails, setReraDetails] = useState(null);
   const [isVideoEditing, setIsVideoEditing] = useState(false);
   const [editableVideos, setEditableVideos] = useState([]);
   const [isLocationEditing, setIsLocationEditing] = useState(false);
@@ -357,21 +356,6 @@ const ProjectDetails = () => {
     };
     fetchDeveloper();
   }, [developerId]);
-
-  useEffect(() => {
-    const fetchReraInfo = async () => {
-      if (!projectId) return;
-
-      try {
-        const data = await getReraInfoByProjectId(projectId);
-        setReraDetails(data || []);
-      } catch (error) {
-        console.error("Error fetching RERA data:", error);
-        setReraDetails([]);
-      }
-    };
-    fetchReraInfo();
-  }, [projectId]);
 
   // useEffect(() => {
   //   setFloorplans(projectData?.floorplans ? [...projectData.floorplans] : []);
