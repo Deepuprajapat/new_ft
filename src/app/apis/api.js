@@ -126,6 +126,58 @@ export const getAllProject = async (filters = {}) => {
   }
 };
 
+// Get project names for dropdown (optimized endpoint)
+export const getProjectNames = async () => {
+  const CACHE_KEY = 'investmango_projects_cache';
+  const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  
+  // Check if we have valid cached data
+  try {
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    if (cachedData) {
+      const parsed = JSON.parse(cachedData);
+      const isValid = parsed.timestamp && (Date.now() - parsed.timestamp < CACHE_DURATION);
+      
+      if (isValid && parsed.data) {
+        return parsed.data;
+      } else {
+        localStorage.removeItem(CACHE_KEY);
+      }
+    }
+  } catch (cacheError) {
+    localStorage.removeItem(CACHE_KEY);
+  }
+  
+  // Fetch fresh data from API
+  try {
+    const res = await axios.get(`${BASE_URL}/projects/names`);
+    
+    // Cache the successful response
+    try {
+      const cacheData = {
+        data: res.data,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+    } catch (cacheError) {
+      // Don't fail the request if caching fails
+    }
+    
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching project names:", error);
+    
+    // Clear cache on API error to ensure we retry fresh next time
+    try {
+      localStorage.removeItem(CACHE_KEY);
+    } catch (clearError) {
+      // Silent fail
+    }
+    
+    return { data: [] };
+  }
+};
+
 //  get all project by urlname
 // Get all projects by type (for modal project list)
 export const getAllProjectsByType = async (type) => {
