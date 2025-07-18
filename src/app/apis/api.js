@@ -244,25 +244,16 @@ export const getAllBlogByUrl = async (blogUrl) => {
   }
 };
 
-//floor-plan/get/all
-export const getAllFloor = async (params = {}) => {
-  try {
-    const res = await axios.get(`${BASE_URL}/floor-plan/get/all`, {
-      params: {
-        ...params,
-      },
-    });
-    return res.data || {}; // Ensures that if the response body is empty, we return an empty object
-  } catch (error) {
-    console.error("Error fetching floor plans:", error);
-    return { content: [] }; // Return an empty array if there's an error
-  }
-};
 
-export const getAllBlog = async () => {
+export const getAllBlog = async (is_published) => {
   try {
+    const params = {};
+    if (typeof is_published !== 'undefined') {
+      params.is_published = is_published;
+    }
     const res = await axios.get(
-      `${BASE_URL}/blogs`
+      `${BASE_URL}/blogs`,
+      Object.keys(params).length ? { params } : undefined
     );
     return res.data;
   } catch (error) {
@@ -271,20 +262,6 @@ export const getAllBlog = async () => {
   }
 };
 
-export const getAllDevelopers = async () => {
-  try {
-    // Make the API request
-    const res = await axios.get(
-      `${BASE_URL}/developer/get/all?isVerifed=true&isActive=true`
-    );
-    // Return the data from the API
-    return res.data;
-  } catch (error) {
-    // Handle errors and log them
-    console.error("Error fetching developers:", error);
-    return []; // Return an empty array if there's an error
-  }
-};
 
 export const getDeveloperById = async (developer_id) => {
   try {
@@ -295,21 +272,6 @@ export const getDeveloperById = async (developer_id) => {
   } catch (error) {
     console.error("Error fetching developers:", error);
     return [];
-  }
-};
-
-export const getAllTestimonials = async () => {
-  try {
-    // Make the API request
-    const res = await axios.get(
-      `${BASE_URL}/developer/get/all?isVerifed=true&isActive=true`
-    );
-    // Return the data from the API
-    return res.data;
-  } catch (error) {
-    // Handle errors and log them
-    console.error("Error fetching developers:", error);
-    return []; // Return an empty array if there's an error
   }
 };
 
@@ -395,40 +357,6 @@ export const getAllLocalities = async () => {
     return [];
   }
 };
-
-// export const getAllLocalitiess = async () => {
-//   try {
-//     const response = await axios.get(`${BASE_URL}/locality/get/all`);
-//     const localities = response.data || [];
-
-//     // // Filter out localities with 'unknown' or 'UNKNOWN' in the city name or any other relevant fields
-//     // const filteredLocalities = localities.filter(
-//     //   (locality) => locality.city.name.toLowerCase() !== "unknown"
-//     // );
-
-//     // // Map filtered localities to extract city details and ensure uniqueness
-//     // const uniqueCities = Array.from(
-//     //   new Map(
-//     //     filteredLocalities.map((locality) => [locality.city.id, locality.city])
-//     //   ).values()
-//     // );
-
-//     return localities; // Returns an array of { id, name } objects
-//   } catch (error) {
-//     console.error("Error fetching localities:", error);
-//     return [];
-//   }
-// };
-
-// export const getLeadByPhone = async (phone) => {
-//   try {
-//     const response = await axios.get(`${BASE_URL}/leads/get/by/phone/${phone}`);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching lead by phone:", error);
-//     return [];
-//   }
-// };
 
 // API Call to Check Phone Number
 export const checkPhoneNumberExists = async (phone) => {
@@ -527,26 +455,6 @@ export const resendOTP = async (phone) => {
   }
 };
 
-// API Call to Get Lead by ID
-export const getLeadById = async (id) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/leads/get/by/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching lead by ID:", error);
-    throw new Error("Failed to fetch lead.");
-  }
-};
-
-// export const saveLead = async (lead) => {
-//   try {
-//     const response = await axios.post(`${BASE_URL}/leads/save/new`, lead);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error saving lead:", error);
-//     throw error;
-//   }
-// };
 
 // Admin Leads API Endpoints
 export const getAllLeadsAdmin = async (filters = {}) => {
@@ -629,15 +537,6 @@ export const getGenericKeywordByPath = async (path) => {
   }
 };
 
-export const getAllCities = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}/city/get/all`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching cities:", error);
-    return [];
-  }
-};
 
 export const getAllProperties = async (
   page,
@@ -660,54 +559,6 @@ export const getAllProperties = async (
   return response.data.data; // Return the full object
 };
 
-// export const getAllProperties = async (filters = {}) => {
-//   const {
-//     page = 0,
-//     size = 10,
-//     propertyType,
-//     configTypeName,
-//     configurationName,
-//     name,
-//     localityId,
-//   } = filters;
-
-//   try {
-//     const params = {
-//       ...(page !== undefined && { page }),
-//       ...(size !== undefined && { size }),
-//       isDeleted: false, // This will always be 'false'
-//       ...(propertyType && { propertyType }),
-//       ...(configTypeName && { configTypeName }),
-//       ...(configurationName && { configurationName }),
-//       ...(name && { name }),
-//       ...(localityId && { localityId }),
-//     };
-
-//     const response = await axios.get(`${BASE_URL}/property/get/all`, { params });
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching properties:", error);
-//     return { content: [], totalPages: 0 };
-//   }
-// };
-
-// const getAllProperties = async (page, pageSize, propertyType, configuration, locality) => {
-//   // const url = new URL('http://15.207.69.218:9191/get/all/projects');
-//   const url = new URL(`${BASE_URL}/property/get/all`);
-//   const params = {
-//     isDeleted: 'false',
-//     page: page,
-//     size: pageSize,
-//     propertyType: propertyType || '', // Pass the selected property type (empty string if not selected)
-//     projectConfigurationName: configuration || '', // Pass the selected configuration (empty string if not selected)
-//     locality: locality || '' // Pass the selected locality (empty string if not selected)
-//   };
-//   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-
-//   const response = await fetch(url);
-//   const data = await response.json();
-//   return data;
-// };
 
 export const getPropertyByUrlName = async (urlName) => {
   try {
@@ -719,58 +570,7 @@ export const getPropertyByUrlName = async (urlName) => {
   }
 };
 
-export const getReraInfoByProjectId = async (projectId) => {
-  try {
-    const response = await axios.get(
-      `${BASE_URL}/rera-info/get/by/project/${projectId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching lead by phone:", error);
-    return [];
-  }
-};
 
-export const getAllCityForMobile = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}/locality/get/all`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching cities:", error);
-    return [];
-  }
-};
-// export const getAllCityForMobileByCityName = async (cityName) => {
-//   try {
-//     const response = await axios.get(
-//       `${BASE_URL}/locality/get/all?cityName=${cityName}`
-//     );
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching cities:", error);
-//     return [];
-//   }
-// };
-
-export const patchProjectDetails = async (projectId, patchData) => {
-  try {
-    const token = localStorage.getItem("x-auth-token");
-    const res = await axios.patch(
-      `${BASE_URL}/project/update/${projectId}`,
-      patchData,
-      {
-        headers: {
-          "x-auth-token": `${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return res.data;
-  } catch (error) {
-    console.error("Error patching project details:", error);
-    throw error;
-  }
-};
 
 // Get all locations
 export const getAllLocations = async (city) => {
@@ -1021,10 +821,27 @@ export const getAmenties = async () => {
   }
 };
 
-export const SaveNewBlog = async (data) => {
+export const checkSlugAvialableUrl = async (slug) => {
   try {
+    const res = await axios.get(
+      `${BASE_URL}/internal/check-avialable-url`,slug
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    throw error;
+  }
+};
+
+export const SaveNewBlog = async (data ) => {
+  try {
+    const is_published = true;
     const res = await axios.post(
-      `${BASE_URL}/internal/blogs`,data
+      `${BASE_URL}/internal/blogs`,
+      data,
+      {
+        params: { is_published }
+      }
     );
     return res.data;
   } catch (error) {

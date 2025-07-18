@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { getAllDeveloper, getAllLocations } from '../../../../apis/api';
 import { useNavigate } from 'react-router-dom';
-import { createnewproject, getAllProjectsByUrlName } from '../../../../apis/api';
+import { createnewproject, getAllProjectsByUrlName ,checkSlugAvialableUrl } from '../../../../apis/api';
+import { useRef } from 'react';
 
-const AddProject = ({ show, handleClose, onSubmit }) => {
+const AddProject = ({ show, handleClose }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     project_name: '',
@@ -23,6 +24,9 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
   const [localityOptions, setLocalityOptions] = useState([]);
   const [localitiesLoading, setLocalitiesLoading] = useState(false);
   const [cityOptions , setCityoptions]= useState([])
+  const [slugAvailable, setSlugAvailable] = useState(null);
+  const [slugCheckLoading, setSlugCheckLoading] = useState(false);
+  const slugDebounceRef = useRef();
 
   // const cityOptions = [
   //   { value: 'DELHI', label: 'Delhi' },
@@ -162,6 +166,37 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
     }
   };
 
+  // Debounced slug check
+  useEffect(() => {
+    if (!formData.slug) {
+      setSlugAvailable(null);
+      setSlugCheckLoading(false);
+      return;
+    }
+    setSlugCheckLoading(true);
+    setSlugAvailable(null);
+    if (slugDebounceRef.current) {
+      clearTimeout(slugDebounceRef.current);
+    }
+    slugDebounceRef.current = setTimeout(async () => {
+      try {
+        const response = await checkSlugAvialableUrl({ params: { url: formData.slug } });
+        if (response.data) {
+          setSlugAvailable(response.data.exists);
+        } else if (typeof response.data === 'boolean') {
+          setSlugAvailable(response.data);
+        } else {
+          setError('Unexpected response from slug check');
+        }
+      } catch (err) {
+        setError('Failed to check slug availability');
+        setSlugAvailable(null);
+      } finally {
+        setSlugCheckLoading(false);
+      }
+    }, 500);
+    return () => clearTimeout(slugDebounceRef.current);
+  }, [formData.slug]);
 
   // Helper to reset form
   const resetForm = () => {
@@ -214,6 +249,15 @@ const AddProject = ({ show, handleClose, onSubmit }) => {
               placeholder="Enter project URL"
               required
             />
+            {slugCheckLoading && formData.slug && (
+              <div style={{ color: '#888', fontSize: '0.9em', marginTop: 4 }}>Checking slug availability...</div>
+            )}
+            {slugAvailable === false && (
+              <div style={{ color: 'green', fontSize: '0.9em', marginTop: 4 }}>Slug is available!</div>
+            )}
+            {slugAvailable === true && (
+              <div style={{ color: 'red', fontSize: '0.9em', marginTop: 4 }}>Slug is already taken.</div>
+            )}
           </Form.Group>
 
           <Form.Group className="mb-3">

@@ -126,7 +126,6 @@ const AdminDashboard = () => {
       project_id: selectedProject,
       name: propertyName.trim(),
       property_type: selectedPropertyType,
-      slug:propertyslug
     };
     
     try {
@@ -635,7 +634,7 @@ const AdminDashboard = () => {
                         }}
                       />
                     </div>
-                    <div style={{ marginBottom: 18 }}>
+                    {/* <div style={{ marginBottom: 18 }}>
                       <div style={{ fontWeight: 500, marginBottom: 8, textAlign: "left" }}>
                         Property Slug
                       </div>
@@ -661,7 +660,7 @@ const AdminDashboard = () => {
                           e.target.style.borderColor = "#ccc";
                         }}
                       />
-                    </div>
+                    </div> */}
                   </>
                 )}
                 

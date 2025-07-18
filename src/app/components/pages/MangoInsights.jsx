@@ -21,7 +21,7 @@ const MangoInsights = () => {
       </div>
       <div className="main-con">
         <div className="container">
-          <BlogSection isSwiper={false} />
+          <BlogSection isSwiper={false} hideAddButton={false} />
         </div>
       </div>
     </section>

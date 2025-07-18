@@ -7,14 +7,29 @@ import BlogModal from "./BlogModal";
 import "../styles/css/blogCard.css";
 import Loading from "../Loader"; 
 
-const BlogSection = ({ isSwiper }) => {
+const BlogSection = ({ isSwiper, hideAddButton }) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
+
+  const getAuthToken = () => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; authToken=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return localStorage.getItem("auth-token") || localStorage.getItem("x-auth-token");
+  };
+
+  const isAuthenticated = () => {
+    const token = getAuthToken();
+    return !!token;
+  };
+  
   const fetchBlogs = async () => {
     try {
-      const response = await getAllBlog();
+      const is_publish = ''
+      // If no token, only fetch published blogs
+      const response = await getAllBlog(is_publish);
       const sortedBlogs = (response.data.blogs || []).sort(
         (a, b) => new Date(b.created_at) - new Date(a.created_at)
       );
@@ -46,16 +61,22 @@ const BlogSection = ({ isSwiper }) => {
     return date.toLocaleDateString('en-GB', options);
   };
 
+  // Function to check for auth token (same as in ProtectedRoute)
+ 
+
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "flex-end", margin: "20px 0" }}>
-        <button
-          style={{ background: "#2067d1", color: "#fff", padding: "10px 20px", border: "none", borderRadius: "5px", fontWeight: 700, cursor: "pointer" }}
-          onClick={() => setModalOpen(true)}
-        >
-          Add Blog
-        </button>
-      </div>
+      {/* Only show Add Blog button if not hidden and user is authenticated */}
+      {!hideAddButton && isAuthenticated() && (
+        <div style={{ display: "flex", justifyContent: "flex-end", margin: "20px 0" }}>
+          <button
+            style={{ background: "#2067d1", color: "#fff", padding: "10px 20px", border: "none", borderRadius: "5px", fontWeight: 700, cursor: "pointer" }}
+            onClick={() => setModalOpen(true)}
+          >
+            Add Blog
+          </button>
+        </div>
+      )}
       {isSwiper ? (
         <Swiper {...sliderSettings}>
           {blogs.map((blog) => (
@@ -89,7 +110,7 @@ const BlogSection = ({ isSwiper }) => {
 
 const BlogCard = ({ blog, stripHtml, formatDate }) => (
   <div className="itemm">
-    <Link to={`/blogs/${blog.blog_url}`} state={{ blogId: blog.id }}>
+    <Link to={`/blogs/${blog.slug}`} state={{ blogId: blog.id }}>
       <img
         src={blog?.image || "path/to/default-image.jpg"}
         alt={blog.alt || "Blog Image"}
@@ -103,7 +124,7 @@ const BlogCard = ({ blog, stripHtml, formatDate }) => (
     <small style={{ color: "#666a6f" }}>Date - {formatDate(blog.created_at)}</small>
     <p className="des">{stripHtml(blog.description).slice(0, 100)} . . .</p>
     <hr />
-    <Link to={`/blogs/${blog.blog_url}`} state={{ blogId: blog.id }} className="theme-btn">
+    <Link to={`/blogs/${blog.slug}`} state={{ blogId: blog.id }} className="theme-btn">
       Read More
     </Link>
   </div>

@@ -1,4 +1,6 @@
 import { Navigation, Autoplay } from "swiper/modules";  
+import { uploadImage } from '../app/apis/api';
+
 export const sliderSettings = {
     modules: [Navigation,Autoplay],
     // navigation: true, 
@@ -52,4 +54,30 @@ export const carouselOptions={
             slidesPerView:6
         }
     }
+}
+
+/**
+ * Uploads a file to S3 using the uploadImage API and returns the live S3 URL.
+ * @param {File} file - The file to upload
+ * @param {Object} options - { alt_keywords, file_path }
+ * @returns {Promise<string>} - The S3 image URL
+ */
+export async function imgUplod(file, { alt_keywords = '', file_path = '' } = {}) {
+  if (!file) throw new Error('No file provided');
+  const file_name = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+  // 1. Get presigned URL from API
+  const response = await uploadImage({ file_name, alt_keywords, file_path });
+  const presignedUrl = response?.data?.presigned_url || response?.presigned_url;
+  if (!presignedUrl) throw new Error('No presigned URL returned from API');
+  // 2. Upload file to S3
+  await fetch(presignedUrl, {
+    method: 'PUT',
+    body: file,
+    headers: {
+      'Content-Type': file.type,
+    },
+  });
+  // 3. Return the S3 image URL (without query params)
+  const s3ImageUrl = presignedUrl.split('?')[0];
+  return s3ImageUrl;
 }

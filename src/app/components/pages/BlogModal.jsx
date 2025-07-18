@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 import { SaveNewBlog, EditBlog } from "../../apis/api";
+import { checkSlugAvialableUrl } from "../../apis/api";
+import { useRef } from "react";
 
 const BlogModal = ({ open, onClose, initialData, mode, onSuccess }) => {
   const [form, setForm] = useState({
-    blog_url: "",
+    slug: "",
     blog_content: {
       title: "",
       description: "",
@@ -21,11 +23,15 @@ const BlogModal = ({ open, onClose, initialData, mode, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
+  const [slugAvailable, setSlugAvailable] = useState(null);
+  const [slugCheckLoading, setSlugCheckLoading] = useState(false);
+  const slugDebounceRef = useRef();
+  const [initialSlug, setInitialSlug] = useState("");
 
   useEffect(() => {
     if (initialData) {
       setForm({
-        blog_url: initialData.blog_url || "",
+        slug: initialData.slug || "",
         blog_content: {
           title: initialData.blog_content?.title || "",
           description: initialData.blog_content?.description || "",
@@ -39,9 +45,12 @@ const BlogModal = ({ open, onClose, initialData, mode, onSuccess }) => {
           keywords: initialData.seo_meta_info?.keywords || ""
         }
       });
+      setInitialSlug(initialData.slug || "");
+      setSlugAvailable(null);
+      setSlugCheckLoading(false);
     } else {
       setForm({
-        blog_url: "",
+        slug: "",
         blog_content: {
           title: "",
           description: "",
@@ -55,8 +64,43 @@ const BlogModal = ({ open, onClose, initialData, mode, onSuccess }) => {
           keywords: ""
         }
       });
+      setInitialSlug("");
+      setSlugAvailable(null);
+      setSlugCheckLoading(false);
     }
   }, [initialData, open]);
+
+  // Debounced slug check
+  useEffect(() => {
+    // Only check if slug is not empty and has changed from initialSlug (in edit mode)
+    if (!form.slug || (mode === "edit" && form.slug === initialSlug)) {
+      setSlugAvailable(null);
+      setSlugCheckLoading(false);
+      return;
+    }
+    setSlugCheckLoading(true);
+    setSlugAvailable(null);
+    if (slugDebounceRef.current) {
+      clearTimeout(slugDebounceRef.current);
+    }
+    slugDebounceRef.current = setTimeout(async () => {
+      try {
+        const response = await checkSlugAvialableUrl({ params: { url: form.slug } });
+        if (response.data) {
+          setSlugAvailable(response.data.exists);
+        } else if (typeof response.data === 'boolean') {
+          setSlugAvailable(response.data);
+        } else {
+          setSlugAvailable(null);
+        }
+      } catch (err) {
+        setSlugAvailable(null);
+      } finally {
+        setSlugCheckLoading(false);
+      }
+    }, 500);
+    return () => clearTimeout(slugDebounceRef.current);
+  }, [form.slug, mode, initialSlug]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -139,12 +183,26 @@ const BlogModal = ({ open, onClose, initialData, mode, onSuccess }) => {
         <h2>{mode === "edit" ? "Edit Blog" : "Add New Blog"}</h2>
         <TextField
           label="Blog URL"
-          name="blog_url"
-          value={form.blog_url}
+          name="slug"
+          value={form.slug}
           onChange={handleChange}
           fullWidth
           margin="normal"
         />
+        {/* Only show slug check if slug is changed from initial in edit mode, or always in add mode */}
+        {((mode !== "edit") || (form.slug !== initialSlug)) && (
+          <>
+            {slugCheckLoading && form.slug && (
+              <div style={{ color: '#888', fontSize: '0.9em', marginTop: 4 }}>Checking slug availability...</div>
+            )}
+            {slugAvailable === false && (
+              <div style={{ color: 'green', fontSize: '0.9em', marginTop: 4 }}>Slug is available!</div>
+            )}
+            {slugAvailable === true && (
+              <div style={{ color: 'red', fontSize: '0.9em', marginTop: 4 }}>Slug is already taken.</div>
+            )}
+          </>
+        )}
         <TextField
           label="Title"
           name="blog_content.title"

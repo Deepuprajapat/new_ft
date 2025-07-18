@@ -16,6 +16,8 @@ import {
   Box,
 } from "@mui/material";
 import { CustomSearch, filterforgeneric } from "../apis/api";
+import { checkSlugAvialableUrl } from "../apis/api";
+import { useRef } from "react";
 
 const initialFormState = {
   slug: "",
@@ -38,31 +40,70 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
   const [filterData, setFilterData] = useState(null);
   const [genericForm, setGenericForm] = useState(initialFormState);
   const filterOptions = filterData || {};
-  const cityOptions = filterOptions.locations ? Object.keys(filterOptions.locations) : [];
+  const cityOptions = filterOptions.locations
+    ? Object.keys(filterOptions.locations)
+    : [];
   const typeOptions = filterOptions.types || [];
   const developerOptions = filterOptions.developers || [];
-  const locationOptions = filterOptions.locations && genericForm.filters.city
-    ? filterOptions.locations[genericForm.filters.city] || []
-    : [];
-
+  const locationOptions =
+    filterOptions.locations && genericForm.filters.city
+      ? filterOptions.locations[genericForm.filters.city] || []
+      : [];
+  const [slugAvailable, setSlugAvailable] = useState(null);
+  const [slugCheckLoading, setSlugCheckLoading] = useState(false);
+  const slugDebounceRef = useRef();
 
   const handleCancel = () => {
     setGenericForm(initialFormState);
     onClose();
   };
 
-  useEffect(() => {
-    const fetchFilterData = async () => {
-      try {
-        const response = await filterforgeneric();
-        setFilterData(response.data);
-      } catch (error) {
-        console.error("Error fetching filter data:", error);
-      }
-    };
+  // Move fetchFilterData outside useEffect so it can be reused
+  const fetchFilterData = async () => {
+    try {
+      const response = await filterforgeneric();
+      setFilterData(response.data);
+    } catch (error) {
+      console.error("Error fetching filter data:", error);
+    }
+  };
 
-    fetchFilterData();
-  }, []);
+  useEffect(() => {
+    if (open) {
+      fetchFilterData();
+    }
+  }, [open]);
+
+  // Debounced slug check
+  useEffect(() => {
+    if (!genericForm.slug) {
+      setSlugAvailable(null);
+      setSlugCheckLoading(false);
+      return;
+    }
+    setSlugCheckLoading(true);
+    setSlugAvailable(null);
+    if (slugDebounceRef.current) {
+      clearTimeout(slugDebounceRef.current);
+    }
+    slugDebounceRef.current = setTimeout(async () => {
+      try {
+        const response = await checkSlugAvialableUrl({ params: { url: genericForm.slug } });
+        if (response.data) {
+          setSlugAvailable(response.data.exists);
+        } else if (typeof response.data === 'boolean') {
+          setSlugAvailable(response.data);
+        } else {
+          setSlugAvailable(null);
+        }
+      } catch (err) {
+        setSlugAvailable(null);
+      } finally {
+        setSlugCheckLoading(false);
+      }
+    }, 500);
+    return () => clearTimeout(slugDebounceRef.current);
+  }, [genericForm.slug]);
 
   const handleGenericFormChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -86,7 +127,7 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
       meta_info: {
         title: genericForm.title,
         description: genericForm.description,
-        keywords:genericForm.keywords,
+        keywords: genericForm.keywords,
       },
       slug: genericForm.slug,
       search_term: genericForm.search_term,
@@ -96,7 +137,7 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
     try {
       const response = await CustomSearch({ payload });
       console.log("Saved successfully:", response);
-      
+
       // Call the onSave callback to refresh footer links
       if (onSave) {
         onSave();
@@ -123,13 +164,24 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                 onChange={handleGenericFormChange}
                 fullWidth
               />
-              <TextField
-                label="Slug"
-                name="slug"
-                value={genericForm.slug}
-                onChange={handleGenericFormChange}
-                fullWidth
-              />
+              <Box width="100%">
+                <TextField
+                  label="Slug"
+                  name="slug"
+                  value={genericForm.slug}
+                  onChange={handleGenericFormChange}
+                  fullWidth
+                />
+                {slugCheckLoading && genericForm.slug && (
+                  <div style={{ color: '#888', fontSize: '0.9em', marginTop: 4 }}>Checking slug availability...</div>
+                )}
+                {slugAvailable === false && (
+                  <div style={{ color: 'green', fontSize: '0.9em', marginTop: 4 }}>Slug is available!</div>
+                )}
+                {slugAvailable === true && (
+                  <div style={{ color: 'red', fontSize: '0.9em', marginTop: 4 }}>Slug is already taken.</div>
+                )}
+              </Box>
             </Box>
 
             <Box display="flex" gap={2}>
@@ -144,9 +196,9 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                 InputProps={{
                   sx: {
                     "& .MuiInputBase-input": {
-                      padding: "16px 12px"
-                    }
-                  }
+                      padding: "16px 12px",
+                    },
+                  },
                 }}
               />
             </Box>
@@ -158,18 +210,18 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                 onChange={handleGenericFormChange}
                 fullWidth
               />
-               <TextField
+              <TextField
                 label="keywords"
                 name="keywords"
                 value={genericForm.keywords}
                 onChange={handleGenericFormChange}
                 fullWidth
               />
-           </Box>
+            </Box>
 
             {/* Filters Section Title */}
             <Box mt={2} mb={1}>
-              <strong style={{ fontSize: '1.1rem' }}>Filters</strong>
+              <strong style={{ fontSize: "1.1rem" }}>Filters</strong>
             </Box>
 
             <Box display="flex" gap={2}>
@@ -191,7 +243,7 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                 )}
                 fullWidth
               />
- <FormControl fullWidth>
+              <FormControl fullWidth>
                 <InputLabel id="city-label">City</InputLabel>
                 <Select
                   labelId="city-label"
@@ -207,12 +259,10 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                   ))}
                 </Select>
               </FormControl>
-             
             </Box>
 
             <Box display="flex" gap={2}>
-             
-            <FormControl fullWidth>
+              <FormControl fullWidth>
                 <InputLabel id="location-label">Location</InputLabel>
                 <Select
                   labelId="location-label"

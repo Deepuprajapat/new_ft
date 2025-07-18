@@ -30,7 +30,6 @@ const LoginDashboard = () => {
         if (response.data.role) {
           localStorage.setItem("user-role", response.data.role);
         }
-        
         // Redirect based on user role
         const userRole = response.data.role;
         if (userRole === 'dm') {

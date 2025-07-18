@@ -3,7 +3,6 @@ import "../styles/css/projectDetails.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "react-router-dom";
 import { getAllProjectsByUrlName, getDeveloperById } from "../../apis/api";
-import { getAllFloor } from "../../apis/api";
 
 import {
   faExpandArrowsAlt,

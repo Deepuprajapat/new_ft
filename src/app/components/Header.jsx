@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../components/styles/css/header.css";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
-import { getAllProject, getAllCityForMobile } from "../apis/api";
+import { getAllProject, getAllLocalities } from "../apis/api";
 import logo from "../assets/img/Untitled-1.png";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
@@ -15,9 +15,7 @@ import { useLocation } from "react-router-dom";
 import AddProject from "./pages/ProjectDetailsParts/AddProject/AddProject";
 import LogoutModal from "./LogoutModal";
 
-const Header = ({ shortAddress }) => {
-  // const [matchedCity, setMatchedCity] = useState(null);
-  const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
+const Header = ({ projectPhoneNumber }) => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,7 +28,7 @@ const Header = ({ shortAddress }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
-
+   
   // Check if user is authenticated by looking for token in cookie or localStorage
   const getAuthToken = () => {
     // Try to get token from cookie first
@@ -135,42 +133,6 @@ const Header = ({ shortAddress }) => {
   }, [location.pathname]);
 
   useEffect(() => {
-    const fetchCities = async () => {
-      try {
-        const response = await getAllCityForMobile(); // Fetch city data
-        const cityData = Array.isArray(response) ? response : response?.data;
-
-        if (!Array.isArray(cityData) || cityData.length === 0) {
-          console.error("No data found in response");
-          return;
-        }
-
-        // Extract city names and corresponding phone numbers
-        const cityMap = cityData.reduce((acc, item) => {
-          if (item?.city?.name) {
-            acc[item.city.name.toLowerCase()] = item.city.phoneNumber;
-          }
-
-          return acc;
-        }, {});
-        // Match shortAddress with city names
-        if (shortAddress) {
-          const matchedCity = Object.keys(cityMap).find((city) =>
-            shortAddress.toLowerCase().includes(city)
-          );
-          if (matchedCity) {
-            setMatchedPhoneNumber(cityMap[matchedCity]); // Set the matched phone number
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching cities:", error);
-      }
-    };
-
-    fetchCities();
-  }, [shortAddress]);
-
-  useEffect(() => {
     const handleResize = () => {
       setIsDesktop(window.innerWidth > 768);
     };
@@ -239,8 +201,6 @@ const Header = ({ shortAddress }) => {
             <Nav>
               {/* Search Button */}
             { isDesktop && <div className="search-form-container">
-                {/* <h3>{shortAddress ? `Location: ${shortAddress}` : "Welcome!"}</h3> */}
-
                 <button onClick={handleSearchClick} className="search-button">
                   <FaSearch />
                 </button>
@@ -263,18 +223,15 @@ const Header = ({ shortAddress }) => {
               </div>}
               <div style={{ display: "flex", flexDirection: "row" }}>
                 {/* Phone Buttons */}
-                {matchedPhoneNumber && matchedPhoneNumber.length > 0 ? (
-                  matchedPhoneNumber.map((number, index) => (
-                    <button
-                      key={index}
-                      className="phoneButton"
-                      style={{ background: "#2067d1", marginLeft: "320px" }}
-                    >
-                      <a href={`tel:${number}`}>
-                        <FaPhoneAlt /> {number}
-                      </a>
-                    </button>
-                  ))
+                {projectPhoneNumber ? (
+                  <button
+                    className="phoneButton"
+                    style={{ background: "#2067d1", marginLeft: "320px" }}
+                  >
+                    <a href={`tel:${projectPhoneNumber}`}>
+                      <FaPhoneAlt /> {projectPhoneNumber}
+                    </a>
+                  </button>
                 ) : (
                   <>
                     <button
@@ -295,7 +252,6 @@ const Header = ({ shortAddress }) => {
                     </button>
                   </>
                 )}
-                
                 {/* Logout Button - Only visible when authenticated */}
                 {isAuthenticated && (
                   <button
@@ -311,7 +267,6 @@ const Header = ({ shortAddress }) => {
           </Nav>
         </Navbar.Collapse>
       </Container>
-      
       {/* Logout Confirmation Modal */}
       <LogoutModal
         show={showLogoutModal}

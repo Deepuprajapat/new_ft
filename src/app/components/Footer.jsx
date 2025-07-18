@@ -4,31 +4,15 @@ import { Link } from "react-router-dom";
 import "../components/styles/css/footer.css";
 import logo from "../assets/img/Logo-footer.png";
 import {
-  getAllGenericKeywords,
-  getGenericKeywordByPath,
-  getAllCityForMobile,
-  getAllProjectsByUrlName,
-  CustomSearch,
   fetchfooterlinks,
-  filterforgeneric,
 } from "../apis/api";
 import { useNavigate } from "react-router-dom";
 import { Button, Box } from "@mui/material";
 import AddGenericLinkForm from "./AddGenericLinkForm";
 
-const Footer = ({ shortAddress }) => {
+const Footer = ({ projectPhoneNumber }) => {
   const [footerItems, setFooterItems] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
-  const [filterData, setFilterData] = useState(null);
-  const filterOptions = filterData || {};
-  const cityOptions = filterOptions.cities || [];
-  const typeOptions = filterOptions.types || [];
-  const configurationOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
-  const developerOptions = filterOptions.developers || [];
-  const locationOptions = filterOptions.locations || [];
-
-  // Modal state for Add Generic Link
   const [showAddGenericModal, setShowAddGenericModal] = useState(false);
 
   const handleOpenAddGenericModal = () => setShowAddGenericModal(true);
@@ -75,8 +59,6 @@ const Footer = ({ shortAddress }) => {
 
   useEffect(() => {
     const fetchLinks = async () => {
-      const response = await filterforgeneric();
-      console.log(response, "hhh");
       const links = await fetchfooterlinks();
       setFooterItems(links.data);
       console.log(links.data, "ooooooo");
@@ -124,41 +106,7 @@ const Footer = ({ shortAddress }) => {
       behavior: "smooth",
     });
   };
-  useEffect(() => {
-    const fetchCities = async () => {
-      try {
-        const response = await getAllCityForMobile(); // Fetch city data
-        const cityData = Array.isArray(response) ? response : response?.data;
 
-        if (!Array.isArray(cityData) || cityData.length === 0) {
-          console.error("No data found in response");
-          return;
-        }
-
-        // Extract city names and corresponding phone numbers
-        const cityMap = cityData.reduce((acc, item) => {
-          if (item?.city?.name) {
-            acc[item.city.name.toLowerCase()] = item.city.phoneNumber;
-          }
-
-          return acc;
-        }, {});
-        // Match shortAddress with city names
-        if (shortAddress) {
-          const matchedCity = Object.keys(cityMap).find((city) =>
-            shortAddress.toLowerCase().includes(city)
-          );
-          if (matchedCity) {
-            setMatchedPhoneNumber(cityMap[matchedCity]); // Set the matched phone number
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching cities:", error);
-      }
-    };
-
-    fetchCities();
-  }, [shortAddress]);
 
   // useEffect(() => {
   //   const fetchProject = async () => {
@@ -177,6 +125,19 @@ const Footer = ({ shortAddress }) => {
   // );
   // const whatsappLink = `https://api.whatsapp.com/send?phone=+918448141652&text=${message}`;
 
+  // Function to check for auth token (same as in ProtectedRoute)
+  const getAuthToken = () => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; authToken=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return localStorage.getItem("auth-token") || localStorage.getItem("x-auth-token");
+  };
+
+  const isAuthenticated = () => {
+    const token = getAuthToken();
+    return !!token;
+  };
+
   return (
     <div>
       {/* Add Generic Link Modal */}
@@ -184,7 +145,6 @@ const Footer = ({ shortAddress }) => {
         open={showAddGenericModal}
         onClose={handleCloseAddGenericModal}
         onSave={refreshFooterLinks}
-        filterData={filterData}
       />
       <div className="CTA">
         <div className="whatsapp">
@@ -196,14 +156,12 @@ const Footer = ({ shortAddress }) => {
             <i className="fab fa-whatsapp"></i> WhatsApp
           </a>
         </div>
-        {matchedPhoneNumber && matchedPhoneNumber.length > 0 ? (
-          matchedPhoneNumber.map((number, index) => (
-            <div className="callnow">
-              <a href={`tel:+91${number}`}>
-                <i className="fas fa-phone"></i> {number}
-              </a>
-            </div>
-          ))
+        {projectPhoneNumber ? (
+          <div className="callnow">
+            <a href={`tel:+91${projectPhoneNumber}`}>
+              <i className="fas fa-phone"></i> {projectPhoneNumber}
+            </a>
+          </div>
         ) : (
           <div className="callnow">
             <a href="tel:+918368547490">
@@ -472,9 +430,9 @@ const Footer = ({ shortAddress }) => {
                   </li>
                 </ul>
               </div>
-             
             </div>
-            <Box display="flex" justifyContent="center" >
+            <Box display="flex" justifyContent="center">
+              {isAuthenticated() && (
                 <Button
                   variant="contained"
                   color="primary"
@@ -483,7 +441,8 @@ const Footer = ({ shortAddress }) => {
                 >
                   Add Link
                 </Button>
-              </Box>
+              )}
+            </Box>
             <div className="bottom-footer">
               <div className="container">
                 <p>All right Reserved | Invest Mango</p>

@@ -5,12 +5,10 @@ import PopupDialog from "./CommanPopup";
 import { useOutletContext } from "react-router-dom";
 import {
   getAllProjectsByUrlName,
-  getDeveloperById,
   getAllProject,
   sendOTP,
   verifyOTP,
   resendOTP,
-  getReraInfoByProjectId,
   patchProjectById,
   patchProjectByTestUrl
   // getLeadByPhone,
@@ -82,7 +80,6 @@ const ProjectDetails = () => {
   const [allSimilarProjects, setAllSimilarProjects] = useState(null);
   const [developerId, setDeveloperId] = useState("");
   const [projectId, setProjectId] = useState("");
-  const [developerDetails, setDeveloperDetails] = useState(null);
   const { urlName } = useParams();
   const location = useLocation();
 
@@ -134,16 +131,6 @@ const ProjectDetails = () => {
   const [siteplanImgUrl, setSiteplanImgUrl] = useState(
     projectData?.web_cards?.site_plan?.image || ""
   );
-  // ...existing code...
-  //state variabe for ace group
-  const [developerForm, setDeveloperForm] = useState({
-    logo: developerDetails?.logo_url || "",
-    establishedYear: developerDetails?.establishment_year || "",
-    totalProjects: developerDetails?.total_properties || "",
-    about: developerDetails?.description || "",
-    address: developerDetails?.contact_details?.project_address || "",
-    name: developerDetails?.contact_details?.name || "",
-  });
  
   const [expandedIndex, setExpandedIndex] = useState(null);
 
@@ -181,19 +168,6 @@ const ProjectDetails = () => {
       [field]: value,
     }));
   };
-
-  // ace group
-  useEffect(() => {
-    setDeveloperForm({
-      logo: developerDetails?.logo_url || "",
-      establishedYear: developerDetails?.establishment_year || "",
-      totalProjects: developerDetails?.total_properties || "",
-      about: developerDetails?.description || "",
-      address: developerDetails?.contact_details?.project_address || "",
-      name: developerDetails?.contact_details?.name || "",
-    });
-  }, [developerDetails]);
-
   //  site plan popup
   useEffect(() => {
     setSiteplanParaHtml(projectData?.web_cards?.site_plan?.html_content || "");
@@ -340,28 +314,6 @@ const ProjectDetails = () => {
     }
   }, [projectData]);
 
-  // Fetch developer details when DeveloperId changes
-  useEffect(() => {
-    const fetchDeveloper = async () => {
-      if (developerId) {
-        try {
-          const data = await getDeveloperById(developerId);
-          if (data) {
-            setDeveloperDetails(data);
-          }
-        } catch (error) {
-          console.error("Error fetching developer data:", error);
-        }
-      }
-    };
-    fetchDeveloper();
-  }, [developerId]);
-
-  // useEffect(() => {
-  //   setFloorplans(projectData?.floorplans ? [...projectData.floorplans] : []);
-  // }, [projectData]);
-
-  // Initialize editable videos when editing starts
   useEffect(() => {
     if (isVideoEditing) {
       const videos = projectData?.videos || [""];
@@ -789,13 +741,13 @@ const ProjectDetails = () => {
         ? projectData.siteplanImg
         : `${BASE_URL}${projectData.siteplanImg}`
       : FALLBACK_IMAGE;
-  const { setShortAddress } = useOutletContext();
+  const { setShortAddress ,setprojectPhoneNumber} = useOutletContext();
 
   useEffect(() => {
-    if (projectData?.shortAddress) {
-      setShortAddress(projectData.shortAddress);
+    if (projectData?.developer_info?.phone) {
+      setprojectPhoneNumber(projectData?.developer_info?.phone);
     }
-  }, [projectData, setShortAddress]);
+  }, [projectData, setprojectPhoneNumber]);
 
   const defaultFaqs = [
     {
