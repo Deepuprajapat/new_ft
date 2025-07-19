@@ -25,7 +25,7 @@ export const login = async (userName, password) => {
 
 axios.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("x-auth-token");
+    const token = localStorage.getItem("auth-token") || localStorage.getItem("x-auth-token");
     if (token) {
       config.headers.Authorization = `${token}`;
     }
@@ -551,11 +551,7 @@ export const getLeadById = async (id) => {
 // Admin Leads API Endpoints
 export const getAllLeadsAdmin = async (filters = {}) => {
   try {
-    const token = localStorage.getItem("auth-token");
     const response = await axios.get(`${BASE_URL}/leads`, {
-      headers: {
-        "x-auth-token": token,
-      },
       params: filters
     });
     return response.data;
@@ -567,13 +563,9 @@ export const getAllLeadsAdmin = async (filters = {}) => {
 
 export const getLeadsDuplicates = async () => {
   try {
-    const token = localStorage.getItem("auth-token");
     // For now, we'll implement duplicate detection on frontend
     // since there's no specific duplicates endpoint
     const response = await axios.get(`${BASE_URL}/leads`, {
-      headers: {
-        "x-auth-token": token,
-      },
       params: { page: 0, size: 1000 } // Get more data to detect duplicates
     });
     

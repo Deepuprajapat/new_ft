@@ -151,7 +151,7 @@ const AllProjects = () => {
                   <Loading isFullScreen={false} />
                 ) : projects.length > 0 ? (
                   projects.map((project, index) => (
-                    <div className="col-md-4" key={index}>
+                    <div className="col-12 col-sm-6 col-md-4 col-lg-4 mb-3" key={index}>
                       <ProjectCard project={project} />
                     </div>
                   ))

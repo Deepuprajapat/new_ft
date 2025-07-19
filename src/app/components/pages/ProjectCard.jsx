@@ -39,7 +39,7 @@ const ProjectCard = ({ project }) => {
   const minPrice = validPrices?.length ? Math.min(...validPrices) : null;
 
   return (
-    <div className="card-im">
+    <div className="card-im w-100">
       <div
         onClick={() => handleMoreDetails(project.canonical, project.project_id)}
         style={{ cursor: "pointer" }}
@@ -130,7 +130,12 @@ const ProjectCard = ({ project }) => {
         </p>
         <button
           onClick={() => handleMoreDetails(project.canonical, project.project_id)}
-          className="project-card-details-btn"
+          className="project-card-details-btn btn btn-primary btn-sm w-100"
+          style={{
+            fontSize: "12px",
+            padding: "8px 12px",
+            borderRadius: "6px"
+          }}
         >
           more details
         </button>
