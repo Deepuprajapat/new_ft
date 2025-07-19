@@ -145,6 +145,12 @@ const Header = ({ shortAddress }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleNavbarToggle = () => {
+    if (window.innerWidth <= 768) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <Navbar
       bg="light"
@@ -161,7 +167,7 @@ const Header = ({ shortAddress }) => {
             className="logo-img"
           />
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={handleNavbarToggle} />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto" >
             {navItems.map((item, index) =>
@@ -220,37 +226,39 @@ const Header = ({ shortAddress }) => {
               </div>}
               <div style={{ display: "flex", flexDirection: "row" }}>
                 {/* Phone Buttons */}
-                {matchedPhoneNumber && matchedPhoneNumber.length > 0 ? (
-                  matchedPhoneNumber.map((number, index) => (
-                    <button
-                      key={index}
-                      className="phoneButton"
-                      style={{ background: "#2067d1", marginLeft: "320px" }}
-                    >
-                      <a href={`tel:${number}`}>
-                        <FaPhoneAlt /> {number}
-                      </a>
-                    </button>
-                  ))
-                ) : (
-                  <>
-                    <button
-                      className="phoneButton"
-                      style={{ background: "#2067d1", marginLeft: "185px" }}
-                    >
-                      <a href="tel:+918595189189">
-                        <FaPhoneAlt /> 8595-189-189
-                      </a>
-                    </button>
-                    {/* <button
-                      className="phoneButton"
-                      style={{ background: "#2067d1" }}
-                    >
-                      <a href="tel:+917428189189">
-                        <FaPhoneAlt /> 7428-189-189
-                      </a>
-                    </button> */}
-                  </>
+                {window.innerWidth > 768 && (
+                  matchedPhoneNumber && matchedPhoneNumber.length > 0 ? (
+                    matchedPhoneNumber.map((number, index) => (
+                      <button
+                        key={index}
+                        className="phoneButton"
+                        style={{ background: "#2067d1", marginLeft: "320px" }}
+                      >
+                        <a href={`tel:${number}`}>
+                          <FaPhoneAlt /> {number}
+                        </a>
+                      </button>
+                    ))
+                  ) : (
+                    <>
+                      <button
+                        className="phoneButton"
+                        style={{ background: "#2067d1", marginLeft: "185px" }}
+                      >
+                        <a href="tel:+918595189189">
+                          <FaPhoneAlt /> 8595-189-189
+                        </a>
+                      </button>
+                      {/* <button
+                        className="phoneButton"
+                        style={{ background: "#2067d1" }}
+                      >
+                        <a href="tel:+917428189189">
+                          <FaPhoneAlt /> 7428-189-189
+                        </a>
+                      </button> */}
+                    </>
+                  )
                 )}
               </div>
             </Nav>

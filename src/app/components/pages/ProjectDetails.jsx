@@ -34,6 +34,7 @@ import DOMPurify from "dompurify";
 import Swal from "sweetalert2";
 import "../styles/css/popup.css";
 import Header from "../Header";
+import LeadFormPopup from "./LeadFormPopup";
 
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg"; // Local path to banner
@@ -85,6 +86,7 @@ const ProjectDetails = () => {
   const [navInitialPosition, setNavInitialPosition] = useState(null);
   const [schemas, setSchemas] = useState([]); // Initialize schemas as an empty array
   const [showImgPopup, setImgShowPopup] = useState(false);
+  const [showLeadPopup, setShowLeadPopup] = useState(false);
 
 
   const navigate = useNavigate();
@@ -629,6 +631,19 @@ const ProjectDetails = () => {
   const validPaymentPlans = projectData?.paymentPlans?.filter(
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   );
+
+  // Show popup automatically on mount
+  // useEffect(() => {
+  //   setShowLeadPopup(true);
+  // }, []);
+
+  // Show popup automatically after a delay when user explores the page
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLeadPopup(true);
+    }, 5000); // 5 seconds delay
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <>
@@ -1433,7 +1448,7 @@ const ProjectDetails = () => {
                   <span style={{ color: "#000000", fontSize: "18px", marginLeft: "4px" }}>*</span>
                 </h2>
                 <div style={{ fontSize: "12px", color: "#888", marginTop: "2px" }}>
-                  *Prices are subject to change and may fluctuate.
+                  *Prices are subject to change.
                 </div>
               </div>
             </div>
@@ -3049,7 +3064,7 @@ const ProjectDetails = () => {
                         </tbody>
                       </table>
                       <div style={{ fontSize: "12px", color: "#888", marginTop: "2px" }}>
-                        *Prices are subject to change and may fluctuate.
+                        *Prices are subject to change.
                       </div>
                     </div>
                   </div>
@@ -4494,7 +4509,15 @@ const ProjectDetails = () => {
           </div>
         )}
 
-
+        {/* Add a button to open the popup. You can move this wherever you want. */}
+        {/* <button
+          style={{ position: "fixed", top: 100, right: 20, zIndex: 2000 }}
+          className="btn btn-primary"
+          onClick={() => setShowLeadPopup(true)}
+        >
+          Get Best Offer
+        </button> */}
+        <LeadFormPopup open={showLeadPopup} onClose={() => setShowLeadPopup(false)} />
 
       </div>
     </>

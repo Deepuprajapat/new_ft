@@ -447,19 +447,45 @@ const CompareProjects = () => {
         <link rel="canonical" href="https://www.investmango.com/compare" />
       </Helmet>
 
-      <div className="container mt-5">
-        <h1>Compare Projects</h1>
-        <p>Home / Compare Projects</p>
+      <div
+        className="container mt-5"
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: window.innerWidth <= 480 ? "10px" : window.innerWidth <= 768 ? "20px" : "40px",
+          background: "#fff",
+          borderRadius: 16,
+          boxShadow: "0 4px 32px rgba(32,103,209,0.10)",
+          marginBottom: window.innerWidth <= 480 ? 24 : 40,
+        }}
+      >
+        <h1
+          style={{
+            fontSize: window.innerWidth <= 480 ? 22 : 32,
+            fontWeight: 700,
+            textAlign: "center",
+            marginBottom: 16,
+            color: "#000",
+          }}
+        >
+          Compare Projects
+        </h1>
+        <p style={{ textAlign: "center", color: "#000", fontSize: window.innerWidth <= 480 ? 13 : 16, marginBottom: 24 }}>
+          Home / Compare Projects
+        </p>
 
-        <div className="d-flex flex-wrap justify-content-center mb-4">
+        <div
+          className="d-flex flex-wrap justify-content-center mb-4"
+          style={{ gap: 8, alignItems: "center", marginBottom: 24 }}
+        >
           <span>
             <i
-              class="fa-solid fa-location-dot"
+              className="fa-solid fa-location-dot"
               style={{
                 color: "#d0cccc",
-                fontSize: "24px",
+                fontSize: 24,
                 alignItems: "center",
-                padding: "7px",
+                padding: 7,
               }}
             ></i>
           </span>
@@ -475,29 +501,47 @@ const CompareProjects = () => {
                 label="Select City"
                 variant="outlined"
                 size="small"
+                style={{
+                  background: "#f8fafd",
+                  borderRadius: 8,
+                  boxShadow: "0 2px 8px rgba(32,103,209,0.07)",
+                }}
               />
             )}
             sx={{
               width: window.innerWidth <= 768 ? "100%" : "75%",
               margin: "0 8px",
+              background: "#f8fafd",
+              borderRadius: 8,
+              boxShadow: "0 2px 8px rgba(32,103,209,0.07)",
             }}
           />
         </div>
-        <div className="d-flex flex-wrap justify-content-center mb-4" style={{gap: '10px'}}>
+        <div
+          className="d-flex flex-wrap justify-content-center mb-4"
+          style={{ gap: 10, marginBottom: 24 }}
+        >
           {[0, 1, 2].map((index) => (
             <div
               key={index}
-              // className="mx-2"
-              style={{ width: window.innerWidth <= 768 ? "100%" : "320px" ,display:'flex',alignItems:'center'}}
+              style={{
+                width: window.innerWidth <= 768 ? "100%" : 320,
+                display: "flex",
+                alignItems: "center",
+                background: "#f8fafd",
+                borderRadius: 10,
+                boxShadow: "0 2px 8px rgba(32,103,209,0.07)",
+                padding: window.innerWidth <= 480 ? "8px" : "12px",
+                marginBottom: window.innerWidth <= 480 ? 8 : 0,
+              }}
             >
-             <ListIcon />
+              <ListIcon style={{ color: "#2067d1", fontSize: 28 }} />
               <Autocomplete
                 options={filteredProjects}
                 getOptionLabel={(option) => option.name}
-                style= {{width:'100%',marginLeft:'10px'}}
+                style={{ width: "100%", marginLeft: 10 }}
                 onChange={(event, value) =>
-                  handleSelect(index, value ? value.id : "",event)
-                
+                  handleSelect(index, value ? value.id : "", event)
                 }
                 renderInput={(params) => (
                   <TextField
@@ -505,16 +549,22 @@ const CompareProjects = () => {
                     label="Search Project"
                     variant="outlined"
                     size="small"
+                    style={{
+                      background: "#fff",
+                      borderRadius: 8,
+                      fontSize: window.innerWidth <= 480 ? 13 : 15,
+                    }}
                   />
                 )}
               />
             </div>
           ))}
-
-        
         </div>
-        <div className="d-flex flex-wrap justify-content-center mb-4">
-        <button
+        <div
+          className="d-flex flex-wrap justify-content-center mb-4"
+          style={{ gap: 10, marginBottom: 24 }}
+        >
+          <button
             className="btn mx-2"
             onClick={handleCompare}
             style={{
@@ -522,6 +572,13 @@ const CompareProjects = () => {
               borderColor: "#2067d1",
               color: "#fff",
               width: window.innerWidth <= 768 ? "100%" : "72%",
+              borderRadius: 8,
+              padding: window.innerWidth <= 480 ? "10px 0" : "12px 0",
+              fontWeight: 600,
+              fontSize: window.innerWidth <= 480 ? 15 : 16,
+              marginBottom: 8,
+              boxShadow: "0 2px 8px rgba(32,103,209,0.07)",
+              transition: "background 0.2s",
             }}
           >
             Compare Now
@@ -530,8 +587,9 @@ const CompareProjects = () => {
             className="share-btn"
             onMouseEnter={() => setShowShareOptions(true)}
             onMouseLeave={() => setShowShareOptions(false)}
+            style={{ display: "flex", alignItems: "center", gap: 8 }}
           >
-            <IconButton onClick={handleMenuClick} color="primary">
+            <IconButton onClick={handleMenuClick} color="primary" style={{ background: "#f0f4fa", borderRadius: 8 }}>
               <ShareIcon />
             </IconButton>
             <Menu
@@ -539,16 +597,16 @@ const CompareProjects = () => {
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
             >
-              <MenuItem onClick={() => handleShareClick("whatsapp")}>
+              <MenuItem onClick={() => handleShareClick("whatsapp")}> 
                 <WhatsAppIcon sx={{ marginRight: 1 }} />
                 <ListItemText>WhatsApp</ListItemText>
               </MenuItem>
-              <MenuItem onClick={() => handleShareClick("facebook")}>
+              <MenuItem onClick={() => handleShareClick("facebook")}> 
                 <FacebookIcon sx={{ marginRight: 1 }} />
                 <ListItemText>Facebook</ListItemText>
               </MenuItem>
             </Menu>
-            <IconButton onClick={handleOpenForm} color="primary">
+            <IconButton onClick={handleOpenForm} color="primary" style={{ background: "#f0f4fa", borderRadius: 8 }}>
               <GetAppIcon />
             </IconButton>
             <LeadFormModal
@@ -559,13 +617,33 @@ const CompareProjects = () => {
           </div>
         </div>
         {comparedProjects.length > 0 && (
-          <div className="table-responsive">
-            <table className="table table-bordered" style={{ width: "100%" }}>
+          <div
+            className="table-responsive"
+            style={{
+              overflowX: "auto",
+              marginTop: 24,
+              borderRadius: 12,
+              boxShadow: "0 2px 16px rgba(32,103,209,0.07)",
+              background: "#fff",
+              padding: window.innerWidth <= 480 ? 4 : 16,
+            }}
+          >
+            <table
+              className="table table-bordered"
+              style={{
+                width: "100%",
+                minWidth: 600,
+                fontSize: window.innerWidth <= 480 ? 12 : 15,
+                borderRadius: 12,
+                overflow: "hidden",
+                background: "#fff",
+              }}
+            >
               <thead>
-                <tr>
-                  <th>Details</th>
+                <tr style={{ background: "#f0f4fa" }}>
+                  <th style={{ fontWeight: 700, fontSize: window.innerWidth <= 480 ? 13 : 16, padding: window.innerWidth <= 480 ? 6 : 12 }}>Details</th>
                   {comparedProjects.map((project) => (
-                    <th key={project.id}>{project.name}</th>
+                    <th key={project.id} style={{ fontWeight: 700, fontSize: window.innerWidth <= 480 ? 13 : 16, padding: window.innerWidth <= 480 ? 6 : 12 }}>{project.name}</th>
                   ))}
                 </tr>
               </thead>
@@ -585,9 +663,9 @@ const CompareProjects = () => {
                   "Construction Type",
                 ].map((field) => (
                   <tr key={field}>
-                    <td>{field}</td>
+                    <td style={{ fontWeight: 600, background: "#f8fafd", padding: window.innerWidth <= 480 ? 6 : 12 }}>{field}</td>
                     {comparedProjects.map((project) => (
-                      <td key={project.id}>
+                      <td key={project.id} style={{ padding: window.innerWidth <= 480 ? 6 : 12, verticalAlign: "middle", background: "#fff" }}>
                         {renderProjectData(project, field)}
                       </td>
                     ))}

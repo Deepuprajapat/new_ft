@@ -150,3 +150,275 @@ footer .top-footer li a:hover {
     max-width: 25%;
   }
 }
+
+/* Ensure all columns are the same height and content is spaced well */
+footer .top-footer .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+}
+
+footer .top-footer .col-md-3 {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-bottom: 24px;
+  min-width: 220px;
+}
+
+footer .top-footer .headlineee {
+  font-weight: 700;
+  font-size: 1.08rem; /* or 1.1rem for slightly bigger */
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+footer .top-footer ul {
+  padding-left: 0;
+  list-style: none;
+  margin-bottom: 0;
+}
+
+footer .top-footer li {
+  margin-bottom: 4px; /* Reduced from 8px or 14px */  
+  font-size: 14px;
+  /* color: #b7b7b7; */
+}
+
+footer .top-footer li a {
+  color: #b7b7b7;
+  transition: color 0.2s;
+}
+
+footer .top-footer li a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+footer .top-footer .social-links {
+  margin-top: 12px;
+  gap: 6px;
+}
+
+footer .top-footer .social-links img {
+  margin-right: 6px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  background: #fff;
+  border: 1px solid #eee;
+  transition: box-shadow 0.2s;
+}
+
+footer .top-footer .social-links img:hover {
+  box-shadow: 0 2px 8px rgba(32,103,209,0.15);
+}
+
+footer .top-footer .footer-logo {
+  margin-bottom: 16px;
+  max-width: 160px;
+  height: auto;
+}
+
+footer .top-footer .content_li {
+  margin-bottom: 0;
+}
+
+footer .top-footer .add a {
+  color: #b7b7b7;
+  font-size: 13px;
+}
+
+footer .top-footer .add a:hover {
+  color: #fff;
+}
+
+footer .top-footer .subhead {
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+@media (max-width: 991px) {
+  footer .top-footer .col-md-3 {
+    min-width: 180px;
+    margin-bottom: 18px;
+  }
+}
+
+@media (max-width: 767px) {
+  footer .top-footer .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  footer .top-footer .col-md-3 {
+    width: 100%;
+    min-width: unset;
+    margin-bottom: 18px;
+  }
+  footer .top-footer .footer-logo {
+    /* margin-left: 0; */
+    margin-right: 0;
+    display: block;
+  }
+}
+
+/* Reduce space between footer columns and items on mobile */
+@media (max-width: 767px) {
+  footer .top-footer .row {
+    row-gap: 8px !important; /* Less space between columns */
+  }
+  footer .top-footer .col-md-3 {
+    margin-bottom: 10px !important; /* Less space below each column */
+    padding-bottom: 0 !important;
+  }
+  footer .top-footer ul,
+  .footer-links {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  footer .top-footer li,
+  .footer-links li {
+    margin-bottom: 6px !important; /* Less space between list items */
+  }
+  footer .top-footer .headline {
+    margin-bottom: 8px !important; /* Less space below section titles */
+    font-size: 1rem;
+  }
+}
+
+/* Footer keywords grid improvements */
+/* .footer-keywords-section {
+  margin-bottom: 24px;
+} */
+
+.footer-keywords-section .footer-keywords-title {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.footer-links {
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.footer-links li {
+  margin-bottom: 4px; /* Reduced from 8px or 14px */
+  font-size: 14px;
+  color: #b7b7b7;
+}
+
+.footer-links button.custom-link {
+  color: #b7b7b7 !important;
+  font-size: 14px;
+  padding: 0;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.footer-links button.custom-link:hover {
+  color: #2067d1 !important;
+  text-decoration: underline;
+  background: none;
+}
+
+/* Center and stack keyword links in a single column on mobile */
+@media (max-width: 767px) {
+  .footer-keywords-section .row {
+    flex-direction: column !important;
+    align-items: center !important;
+    /* justify-content: center !important; */
+    gap: 0 !important;
+  }
+  .footer-keywords-section .col {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+  }
+  .footer-links {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .footer-links li {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .footer-links button.custom-link {
+    text-align: center !important;
+    width: 100%;
+    font-size: 15px;
+    background: none;
+    border: none;
+    color: #b7b7b7 !important;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.footer-center-row {
+  justify-content: center !important;
+  text-align: center;
+}
+.footer-center-row > [class^="col-"] {
+  text-align: center;
+}
+.footer-center-row > .col-md-3:first-child {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+.footer-center-row > .col-md-3:first-child .footer-logo {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+@media (max-width: 767px) {
+  .footer-center-row > .col-md-3:first-child .footer-logo {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block;
+  }
+}
+
+/* Ensure both top-footer sections have the same padding and width */
+footer .top-footer,
+footer .footer-keywords-section {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+footer .top-footer .container,
+footer .footer-keywords-section .container {
+  padding-left: 15px;
+  padding-right: 15px;
+  max-width: 1200px; /* or your preferred max-width */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Remove any extra margin from the keywords section */
+.footer-keywords-section {
+  margin-bottom: 0;
+}
+
+.footer-keywords-section .row {
+  margin-left: 0;
+  margin-right: 0;
+}

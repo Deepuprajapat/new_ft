@@ -181,8 +181,9 @@ const Footer = ({ shortAddress }) => {
           </a>
         </div>
 
-        <div className="top-footer">
+        <div className="top-footer footer-keywords-section">
           <div className="container">
+            {/* <div className="footer-keywords-title">Popular Searches</div> */}
             <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2">
               {footerItems.map((item) => (
                 <div className="col" key={item.id}>
@@ -191,16 +192,6 @@ const Footer = ({ shortAddress }) => {
                       <button
                         onClick={() => handleKeywordClick(item.path)}
                         className="text-reset text-start custom-link"
-                        style={{
-                          background: "none",
-                          border: "none",
-                          color: "inherit",
-                          cursor: "pointer",
-                          padding: 0,
-                          margin: 0,
-                          width: "100%",
-                          textAlign: "left",
-                        }}
                       >
                         {item.keywords}
                       </button>
@@ -214,7 +205,7 @@ const Footer = ({ shortAddress }) => {
 
         <div className="top-footer">
           <div className="container">
-            <div className="row">
+            <div className="row footer-center-row">
               <div className="col-md-3">
                 <img
                   src={logo}
@@ -245,7 +236,7 @@ const Footer = ({ shortAddress }) => {
                     <i className="fas fa-key"></i> DLRERA2021A0071
                   </li>
                   <li>
-                    <i className="fas fa-key"></i> A041262401669
+                    <i className="fas fa-key"></i> MAHARERA-A041262401669
                   </li>
                 </ul>
                 <div className="social-links">
@@ -331,7 +322,7 @@ const Footer = ({ shortAddress }) => {
               </div>
 
               <div className="col-md-3">
-                <p className="headline">Contact</p>
+                <p className="headlineee">Contact</p>
                 <ul>
                   <li className="subhead">
                     <i className="fas fa-map-marker-alt"></i> HEAD OFFICE
@@ -344,24 +335,24 @@ const Footer = ({ shortAddress }) => {
                   </li>
                   <li>
                     <a href="tel:+91-8595-189-189">
-                      <i className="fas fa-phone" ></i> +91-8595-189-189
+                      <i className="fas fa-phone"></i> +91-8595-189-189
                     </a>
                   </li>
                   <li>
                     <a href="tel:+91-7428-189-189">
-                      <i className="fas fa-phone" ></i> +91-7428-189-189
+                      <i className="fas fa-phone"></i> +91-7428-189-189
                     </a>
                   </li>
                   <li>
                     <a href="tel:+91-9911-189-189">
-                      <i className="fas fa-phone" ></i> +91-9911-189-189
+                      <i className="fas fa-phone"></i> +91-9911-189-189
                     </a>
                   </li>
                 </ul>
               </div>
 
               <div className="col-md-3">
-                <p className="headline">Quick Links</p>
+                <p className="headlineee">Quick Links</p>
                 <ul>
                   <li>
                     <Link to="/about">About Us</Link>
@@ -388,7 +379,7 @@ const Footer = ({ shortAddress }) => {
               </div>
 
               <div className="col-md-3" id="our-project">
-                <p className="headline">Our Projects</p>
+                <p className="headlineee">Our Projects</p>
                 <ul>
                   <li>
                     <a href="https://www.investmango.com/ace-starlit-sector-152-noida">

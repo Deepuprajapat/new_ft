@@ -118,202 +118,288 @@ const Career = () => {
         <link rel="canonical" href="https://www.investmango.com/career" />
       </Helmet>
 
-      <div>
-        <section className="main-body">
-          <div className="container">
-            <h1>Career</h1>
-            <p>
+      <div
+        style={{
+          background: "#f5f8fd",
+          minHeight: "100vh",
+          padding: window.innerWidth <= 480 ? "10px 0" : window.innerWidth <= 768 ? "20px 0" : "40px 0",
+        }}
+      >
+        <section
+          style={{
+            width: "100%",
+            maxWidth: 1200,
+            margin: "0 auto",
+            background: "#fff",
+            borderRadius: 18,
+            boxShadow: "0 4px 32px rgba(32,103,209,0.10)",
+            padding: window.innerWidth <= 480 ? "10px" : window.innerWidth <= 768 ? "18px" : "40px",
+          }}
+        >
+          <div style={{ width: "100%", maxWidth: 1200, margin: "0 auto", padding: window.innerWidth <= 480 ? "0 8px" : "0 16px" }}>
+            <h1
+              style={{
+                fontSize: window.innerWidth <= 480 ? 22 : 32,
+                fontWeight: 700,
+                // textAlign: "center",
+                marginBottom: 8,
+                color: "#000",
+              }}
+            >
+              Career
+            </h1>
+            <p style={{color: "#888", fontSize: window.innerWidth <= 480 ? 13 : 16, marginBottom: 24 }}>
               <a
                 href="https://www.investmango.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="styled-link"
+                style={{ color: "#2067d1", textDecoration: "underline" }}
               >
                 Home
-              </a>{" "}
-              / Career
+              </a>{" "}/ Career
             </p>
           </div>
 
-          <div className="main-con">
-            <div className="container">
-              <div className="content" style={{ padding: "20px 0px 60px" }}>
-                <div className="row padding_im_about align-self-center">
-                  <div className="col-md-4">
-                    <h2 style={{ fontWeight: 700, textAlign: "left" }}>
-                      We want you
-                    </h2>
-                    <h5
+          <div
+            style={{
+              display: "flex",
+              flexDirection: window.innerWidth <= 991 ? "column" : "row",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: window.innerWidth <= 480 ? 16 : 32,
+              width: "100%",
+              maxWidth: 1200,
+              margin: "0 auto",
+            }}
+          >
+            {/* Form Section */}
+            <div
+              style={{
+                flex: 1,
+                minWidth: window.innerWidth <= 991 ? "100%" : 340,
+                maxWidth: window.innerWidth <= 991 ? "100%" : 400,
+                background: "#f8fafd",
+                borderRadius: 14,
+                boxShadow: "0 2px 16px rgba(32,103,209,0.07)",
+                padding: window.innerWidth <= 480 ? 12 : 24,
+                marginBottom: window.innerWidth <= 991 ? 24 : 0,
+              }}
+            >
+              <h2 style={{ fontWeight: 700, textAlign: "left", fontSize: window.innerWidth <= 480 ? 18 : 24, color: "#222" }}>
+                We want you
+              </h2>
+              <h5
+                style={{
+                  fontSize: window.innerWidth <= 480 ? 32 : 48,
+                  fontWeight: 800,
+                  lineHeight: window.innerWidth <= 480 ? "36px" : "60px",
+                  color: "#2067d1",
+                  margin: "8px 0 12px 0",
+                }}
+              >
+                Come and Join Us
+              </h5>
+              <p id="topform" style={{ fontSize: window.innerWidth <= 480 ? 13 : 15, color: "#444", marginBottom: 16 }}>
+                Don’t Hesitate to Contact with us for any kind of information
+              </p>
+              <form
+                id="contactForm"
+                onSubmit={handleSubmit}
+                encType="multipart/form-data"
+                ref={formRef}
+              >
+                <div style={{ marginBottom: 12 }}>
+                  <select
+                    name="userposition"
+                    style={{
+                      width: "100%",
+                      padding: window.innerWidth <= 480 ? "8px" : "12px",
+                      borderRadius: 8,
+                      border: "1px solid #d6e0ef",
+                      fontSize: window.innerWidth <= 480 ? 13 : 15,
+                      background: "#fff",
+                      marginBottom: 8,
+                      appearance: "auto",
+                    }}
+                    value={formData.userposition}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Position</option>
+                    {positions
+                      .filter((pos) => pos?.designation)
+                      .map((pos) => (
+                        <option key={pos.designation} value={pos.id}>
+                          {pos.designation}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                {[{
+                  type: "text",
+                  placeholder: "Name :",
+                  name: "username",
+                  required: true,
+                }, {
+                  type: "text",
+                  placeholder: "Phone No. :",
+                  name: "usermobile",
+                  required: true,
+                }, {
+                  type: "email",
+                  placeholder: "Email :",
+                  name: "useremail",
+                  required: true,
+                }, {
+                  type: "text",
+                  placeholder: "Date of Birth:",
+                  name: "userdob",
+                  onFocus: (e) => (e.target.type = "date"),
+                }, {
+                  type: "text",
+                  placeholder: "Work Experience :",
+                  name: "userexp",
+                  required: true,
+                }, {
+                  type: "text",
+                  placeholder: "Current CTC :",
+                  name: "current_ctc",
+                }, {
+                  type: "text",
+                  placeholder: "Expected CTC :",
+                  name: "expected_ctc",
+                }, {
+                  type: "text",
+                  placeholder: "Notice Period :",
+                  name: "notice_period",
+                }].map((field, idx) => (
+                  <div key={field.name} style={{ marginBottom: 12 }}>
+                    <input
+                      type={field.type}
+                      className="form-control"
+                      placeholder={field.placeholder}
+                      name={field.name}
+                      value={formData[field.name]}
+                      onChange={handleChange}
+                      required={field.required}
+                      onFocus={field.onFocus}
                       style={{
-                        fontSize: "65px",
-                        fontWeight: 800,
-                        lineHeight: "60px",
+                        width: "100%",
+                        padding: window.innerWidth <= 480 ? "8px" : "12px",
+                        borderRadius: 8,
+                        border: "1px solid #d6e0ef",
+                        fontSize: window.innerWidth <= 480 ? 13 : 15,
+                        background: "#fff",
+                        marginBottom: 4,
                       }}
-                    >
-                      Come and Join Us
-                    </h5>
-                    <p id="topform">
-                      Don’t Hesitate to Contact with us for any kind of
-                      information
-                    </p>
-                    <form
-                      id="contactForm"
-                      onSubmit={handleSubmit}
-                      encType="multipart/form-data"
-                    >
-                      <div className="form-group">
-                        <select
-                          className="form-control"
-                          name="userposition"
-                          style={{ appearance: "auto" }}
-                          value={formData.userposition}
-                          onChange={handleChange}
-                          ref={formRef} // Attach ref to the form
-                        >
-                          <option value="">Select Position</option>
-                          {positions
-                            .filter((pos) => pos?.designation) // Only include positions with a designation
-                            .map((pos) => (
-                              <option key={pos.designation} value={pos.id}>
-                                {" "}
-                                {/* Ensure `pos.id` is valid */}
-                                {pos.designation}
-                              </option>
-                            ))}
-                        </select>
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Name :"
-                          name="username"
-                          value={formData.username}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Phone No. :"
-                          name="usermobile"
-                          value={formData.usermobile}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="email"
-                          className="form-control"
-                          placeholder="Email :"
-                          name="useremail"
-                          value={formData.useremail}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          onFocus={(e) => (e.target.type = "date")}
-                          className="form-control"
-                          placeholder="Date of Birth:"
-                          name="userdob"
-                          value={formData.userdob}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Work Experience :"
-                          name="userexp"
-                          value={formData.userexp}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Current CTC :"
-                          name="current_ctc"
-                          value={formData.current_ctc}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Expected CTC :"
-                          name="expected_ctc"
-                          value={formData.expected_ctc}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Notice Period :"
-                          name="notice_period"
-                          value={formData.notice_period}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="file"
-                          name="fileToUpload"
-                          id="CustomFile"
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                      <div className="form-group">
-                        <button type="submit" className="theme-btn">
-                          SEND
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                  <div className="col-md-2"></div>
-                  <div className="col-md-6">
-                    <img
-                      style={{ width: "100%" }}
-                      src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/a88e788f-a24a-498c-b72d-0e9913e3b300/public"
-                      alt="career"
-                      className="img-fluid"
-                      loading="eager"
                     />
                   </div>
+                ))}
+                <div style={{ marginBottom: 12 }}>
+                  <input
+                    type="file"
+                    name="fileToUpload"
+                    id="CustomFile"
+                    onChange={handleChange}
+                    required
+                    style={{
+                      width: "100%",
+                      padding: window.innerWidth <= 480 ? "8px" : "12px",
+                      borderRadius: 8,
+                      border: "1px solid #d6e0ef",
+                      fontSize: window.innerWidth <= 480 ? 13 : 15,
+                      background: "#fff",
+                    }}
+                  />
                 </div>
-
-                <div className="row">
-                  <div className="col-md-12">
-                    <div>
-                      <div className="theme_sec">
-                        <p>Current Openings</p>
-                      </div>
-                      <Accordion
-                        data={jobOpenings.map((opening) => ({
-                          ...opening,
-                          detail: `${opening.detail}`, // Job description
-                        }))}
-                        allowMultipleExpanded={true}
-                        scrollToForm={scrollToForm} // Pass scrollToForm function
-                      />
-                    </div>
-                  </div>
+                <div style={{ marginBottom: 8 }}>
+                  <button
+                    type="submit"
+                    style={{
+                      width: window.innerWidth <= 480 ? "100%" : window.innerWidth <= 991 ? "80%" : "auto",
+                      background: "#2067d1",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 8,
+                      // padding: window.innerWidth <= 480 ? "14px 0" : window.innerWidth <= 991 ? "12px 0" : "14px 0",
+                      fontWeight: 700,
+                      fontSize: window.innerWidth <= 480 ? 17 : window.innerWidth <= 991 ? 16 : 17,
+                      boxShadow: window.innerWidth <= 480 ? "0 2px 8px rgba(32,103,209,0.07)" : undefined,
+                      transition: "background 0.2s",
+                      cursor: "pointer",
+                      display: "block",
+                      margin: window.innerWidth <= 480 ? "0 auto" : undefined,
+                    }}
+                  >
+                    SEND
+                  </button>
                 </div>
-              </div>
+              </form>
             </div>
+            {/* Spacer for desktop */}
+            <div style={{ flex: 0.1, minWidth: 8, display: window.innerWidth <= 991 ? "none" : "block" }}></div>
+            {/* Image Section */}
+            <div
+              style={{
+                flex: 1.5,
+                minWidth: window.innerWidth <= 991 ? "100%" : 400,
+                maxWidth: window.innerWidth <= 991 ? "100%" : 600,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: window.innerWidth <= 991 ? 24 : 0,
+              }}
+            >
+              <img
+                style={{
+                  width: "100%",
+                  maxWidth: 500,
+                  borderRadius: 14,
+                  boxShadow: "0 2px 16px rgba(32,103,209,0.07)",
+                  objectFit: "cover",
+                }}
+                src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/a88e788f-a24a-498c-b72d-0e9913e3b300/public"
+                alt="career"
+                loading="eager"
+              />
+            </div>
+          </div>
+
+          {/* Accordion Section */}
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 900,
+              margin: "32px auto 0 auto",
+              background: "#f8fafd",
+              borderRadius: 14,
+              boxShadow: "0 2px 16px rgba(32,103,209,0.07)",
+              padding: window.innerWidth <= 480 ? 8 : 24,
+            }}
+          >
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <span
+                style={{
+                  display: "inline-block",
+                  background: "#2067d1",
+                  color: "#fff",
+                  borderRadius: 8,
+                  padding: window.innerWidth <= 480 ? "4px 12px" : "6px 24px",
+                  fontWeight: 700,
+                  fontSize: window.innerWidth <= 480 ? 15 : 18,
+                  marginBottom: 8,
+                }}
+              >
+                Current Openings
+              </span>
+            </div>
+            <Accordion
+              data={jobOpenings.map((opening) => ({
+                ...opening,
+                detail: `${opening.detail}`,
+              }))}
+              allowMultipleExpanded={true}
+              scrollToForm={scrollToForm}
+            />
           </div>
         </section>
       </div>

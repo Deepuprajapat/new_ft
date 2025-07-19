@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useMemo, useRef  } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { getAllProject, getAllLocalities } from "../../apis/api";
@@ -36,7 +36,7 @@ const SearchBar = () => {
   //   document.addEventListener("mousedown", handleClickOutside);
   //   return () => document.removeEventListener("mousedown", handleClickOutside);
   // }, []);
-  
+
 
   // Handle Location Change
   const handleLocationChange = (e) => {
@@ -44,37 +44,37 @@ const SearchBar = () => {
   };
 
   // Handle Project Name Change with Debounced API Call
-const handleSearchChange = (e) => {
-  const value = e.target.value;
-  setSearchQuery(value);
-  debouncedSearch(value);
-};
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    debouncedSearch(value);
+  };
 
 
   // Close suggestions on ESC key
-const handleKeyDown = (e) => {
-  if (e.key === "Escape") {
-    setShowSuggestions(false);
-  }
-};
-
-const debouncedSearch = useMemo(() => 
-  debounce(async (query) => {
-    if (query.trim() === "") {
-      setProjectSuggestions([]);
-      return;
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      setShowSuggestions(false);
     }
-    const response = await getAllProject({ name: query });
-    setProjectSuggestions(response.content || []);
-    setShowSuggestions(true);
-  }, 500)
-, []);
-
-useEffect(() => {
-  return () => {
-    debouncedSearch.cancel();
   };
-}, []);
+
+  const debouncedSearch = useMemo(() =>
+    debounce(async (query) => {
+      if (query.trim() === "") {
+        setProjectSuggestions([]);
+        return;
+      }
+      const response = await getAllProject({ name: query });
+      setProjectSuggestions(response.content || []);
+      setShowSuggestions(true);
+    }, 500)
+    , []);
+
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, []);
 
 
 
@@ -136,98 +136,100 @@ useEffect(() => {
   };
 
   return (
-    <form onSubmit={handleSearchSubmit} method="POST" autoComplete="off">
-      <div className="form">
-        <div className="form-group">
-          <div className="form-top-home-select">
-            <select
-              name="location"
-              className="form-control"
-              aria-label="Location"
-              value={location}
-              onChange={handleLocationChange}
-            >
-              <option value="">Location--</option>
-              {localities
-                .map((city) => ({
-                  ...city,
-                  name: city.name.toUpperCase(), // Convert name to uppercase
-                }))
-                // .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
-                .map((city) => (
-                  <option
-                    key={city.id}
-                    value={city.id}
-                    style={{ fontSize: "13px", color: "#000" }}
-                  >
-                    {city.name}
-                  </option>
-                ))}
-            </select>
-          </div>
-        </div>
-        <div className="form-group">
-          <input
-          //  ref={searchRef} // Attach ref to input
-            className="form-control"
-            type="text"
-            name="search"
-            id="search"
-            placeholder="Search Projects"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onFocus={() => setShowSuggestions(true)} // Show suggestions on focus
-            onKeyDown={handleKeyDown} // Detect Escape key
-          />
-          {showSuggestions && searchQuery && (
-            <div className="suggestions-list">
-              {projectSuggestions.map((project) => (
-                <div
-                  key={project.id}
-                  className="suggestion-item"
-                  onClick={() => handleSuggestionClick(project)}
-                >
-                  {project.name}
-                </div>
-              ))}
+    <div className="search-bar-wrapper">
+      <form onSubmit={handleSearchSubmit} method="POST" autoComplete="off">
+        <div className="form">
+          <div className="form-group">
+            <div className="form-top-home-select">
+              <select
+                name="location"
+                className="form-control"
+                aria-label="Location"
+                value={location}
+                onChange={handleLocationChange}
+              >
+                <option value="">Location--</option>
+                {localities
+                  .map((city) => ({
+                    ...city,
+                    name: city.name.toUpperCase(), // Convert name to uppercase
+                  }))
+                  .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
+                  .map((city) => (
+                    <option
+                      key={city.id}
+                      value={city.id}
+                      style={{ fontSize: "13px", color: "#000" }}
+                    >
+                      {city.name}
+                    </option>
+                  ))}
+              </select>
             </div>
-          )}
-        </div>
-        <div className="form-group">
-          <div className="form-top-home-select">
-            <select
-              name="type"
-              className="form-control border-r"
-              aria-label="Property Type"
-              value={propertyType}
-              onChange={handlePropertyTypeChange}
+          </div>
+          <div className="form-group">
+            <input
+              //  ref={searchRef} // Attach ref to input
+              className="form-control"
+              type="text"
+              name="search"
+              id="search"
+              placeholder="Search Projects"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onFocus={() => setShowSuggestions(true)} // Show suggestions on focus
+              onKeyDown={handleKeyDown} // Detect Escape key
+            />
+            {showSuggestions && searchQuery && (
+              <div className="suggestions-list">
+                {projectSuggestions.map((project) => (
+                  <div
+                    key={project.id}
+                    className="suggestion-item"
+                    onClick={() => handleSuggestionClick(project)}
+                  >
+                    {project.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="form-group">
+            <div className="form-top-home-select">
+              <select
+                name="type"
+                className="form-control border-r"
+                aria-label="Property Type"
+                value={propertyType}
+                onChange={handlePropertyTypeChange}
+              >
+                <option value="">Property --</option>
+                <option value="Residential">Residential</option>
+                <option value="Commercial">Commercial</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <button
+              type="submit"
+              className="btn btn-dark"
+              style={{
+                maxWidth: "150px", // Smaller width than dropdowns
+                width: "100%",
+                padding: "12px 20px",
+                fontSize: "16px",
+                borderRadius: "5px",
+                backgroundColor: "#000",
+                color: "#fff",
+                fontWeight: "bold",
+              }}
             >
-              <option value="">Property --</option>
-              <option value="Residential">Residential</option>
-              <option value="Commercial">Commercial</option>
-            </select>
+              Search
+            </button>
           </div>
         </div>
-        <div className="form-group">
-          <button
-            type="submit"
-            className="btn btn-dark"
-            style={{
-              maxWidth: "150px", // Smaller width than dropdowns
-              width: "100%",
-              padding: "12px 20px",
-              fontSize: "16px",
-              borderRadius: "5px",
-              backgroundColor: "#000",
-              color: "#fff",
-              fontWeight: "bold",
-            }}
-          >
-            Search
-          </button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

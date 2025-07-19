@@ -148,18 +148,28 @@ const Blogs = () => {
             <div className="content">
               <div
                 className="row d-flex"
-                style={{ justifyContent: "start", alignItems: "flex-start" }}
+                style={{
+                  justifyContent: "start",
+                  alignItems: "flex-start",
+                  flexDirection: window.innerWidth <= 991 ? "column" : "row",
+                  gap: window.innerWidth <= 991 ? 24 : 0,
+                  marginTop: 10,
+                }}
               >
                 <div
                   className="col-md-8 blog-container"
-                  style={{ padding: "25px" }}
+                  style={{
+                    padding: window.innerWidth <= 480 ? "12px 0" : "25px",
+                    width: window.innerWidth <= 991 ? "100%" : "66.666%",
+                    maxWidth: "100%",
+                  }}
                 >
                   <div className="blog-content">
                     {blogData ? (
                       <>
                         <div className="col-md-12">
-                          <p id="blog-title">{blogData.headings}</p>
-                          <small>
+                          <p id="blog-title" style={{ fontSize: window.innerWidth <= 480 ? 22 : 30, fontWeight: 500, color: "black", marginBottom: 8, marginTop: 10, textAlign: window.innerWidth <= 480 ? "center" : "left" }}>{blogData.headings}</p>
+                          <small style={{ display: "block", marginBottom: 12, textAlign: window.innerWidth <= 480 ? "center" : "left" }}>
                             Date -
                             {new Date(blogData.createdDate).toLocaleDateString(
                               "en-GB",
@@ -179,12 +189,13 @@ const Blogs = () => {
                             loading="lazy"
                             style={{
                               width: '100%',
-                              height: 'auto',
+                              height: window.innerWidth <= 480 ? 'auto' : 'auto',
                               objectFit: 'cover',
-                              maxWidth: '800px', 
-                              maxHeight: '550px', 
+                              maxWidth: window.innerWidth <= 991 ? '100%' : '800px',
+                              maxHeight: window.innerWidth <= 991 ? '60vw' : '550px',
                               display: 'block',
                               margin: '0 auto',
+                              borderRadius: 8,
                             }}
                           />
                         </div>
@@ -194,7 +205,7 @@ const Blogs = () => {
                             marginTop: "10px",
                             fontFamily: "Arial, sans-serif",
                             lineHeight: "1.6",
-                            fontSize: "16px",
+                            fontSize: window.innerWidth <= 480 ? 15 : 16,
                             color: "#333",
                             wordWrap: "break-word",
                           }}
@@ -237,11 +248,12 @@ const Blogs = () => {
           font-size: 18px;
           margin-top: 20px;
         }
-        /* Fixed size for all images */
         .content img {
-          width: 776px; /* Set width to 776px */
-          height: 409px; /* Set height to 409px */
-          object-fit: cover; /* Maintain aspect ratio with cropping if needed */
+          width: 100% !important;
+          height: auto !important;
+          object-fit: contain !important;
+          max-width: 100vw !important;
+          max-height: 60vw !important;
         }
       </style>
       ${blogData.description}
@@ -259,16 +271,18 @@ const Blogs = () => {
                 <div
                   className="recent-posts col-md-4"
                   style={{
-                    fontSize: "20px",
-                    margin: "0",
+                    fontSize: window.innerWidth <= 480 ? 16 : 20,
+                    margin: 0,
                     color: "#000",
-                    fontWeight: "400",
-                    marginLeft: "39px",
-                    marginTop: "40px",
-                    marginBottom: "17px",
+                    fontWeight: 400,
+                    marginLeft: window.innerWidth <= 991 ? 0 : 39,
+                    marginTop: window.innerWidth <= 991 ? 24 : 40,
+                    marginBottom: 17,
+                    width: window.innerWidth <= 991 ? "100%" : "33.333%",
+                    maxWidth: "100%",
                   }}
                 >
-                  <h2>Recent Posts</h2>
+                  <h2 style={{ fontSize: window.innerWidth <= 480 ? 18 : 24, textAlign: window.innerWidth <= 480 ? "center" : "left", marginBottom: 12 }}>Recent Posts</h2>
                   <div className="blogs-links">
                     <ul style={{ listStyleType: "none", padding: 0 }}>
                       {recentPosts
@@ -278,7 +292,7 @@ const Blogs = () => {
                           <li
                             key={post.id}
                             style={{
-                              borderBottom: "1px solidrgb(54, 50, 50)",
+                              borderBottom: "1px solid #e0e0e0",
                               padding: "7px 0",
                               cursor: "pointer",
                             }}
@@ -287,7 +301,7 @@ const Blogs = () => {
                             <span
                               style={{
                                 color: "black",
-                                fontSize: "15px",
+                                fontSize: window.innerWidth <= 480 ? 14 : 15,
                                 fontWeight: 600,
                                 textDecoration: "none",
                               }}
@@ -302,9 +316,9 @@ const Blogs = () => {
               </div>
 
               {/* Comments Section */}
-              <div className="comments col-md-12" style={{ padding: "25px" }}>
-                <h3>Leave Comments</h3>
-                <form onSubmit={handleSubmit}>
+              <div className="comments col-md-12" style={{ padding: window.innerWidth <= 480 ? "12px 0" : "25px", width: "100%", maxWidth: "100%" }}>
+                <h3 style={{ fontSize: window.innerWidth <= 480 ? 18 : 22, textAlign: window.innerWidth <= 480 ? "center" : "left", marginBottom: 16 }}>Leave Comments</h3>
+                <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: 600, margin: window.innerWidth <= 480 ? "0 auto" : "0" }}>
                   <input
                     className="form-control"
                     type="text"
@@ -312,7 +326,7 @@ const Blogs = () => {
                     placeholder="Name :"
                     value={formData.username}
                     onChange={handleChange}
-                    style={{ marginBottom: "19px" }}
+                    style={{ marginBottom: "19px", fontSize: window.innerWidth <= 480 ? 14 : 16, padding: window.innerWidth <= 480 ? "8px" : "12px" }}
                     required
                   />
                   <input
@@ -322,7 +336,7 @@ const Blogs = () => {
                     placeholder="Email :"
                     value={formData.useremail}
                     onChange={handleChange}
-                    style={{ marginBottom: "19px" }}
+                    style={{ marginBottom: "19px", fontSize: window.innerWidth <= 480 ? 14 : 16, padding: window.innerWidth <= 480 ? "8px" : "12px" }}
                     required
                   />
                   <input
@@ -339,7 +353,7 @@ const Blogs = () => {
                         .slice(0, 10);
                       setFormData({ ...formData, usermobile: value });
                     }}
-                    style={{ marginBottom: "19px" }}
+                    style={{ marginBottom: "19px", fontSize: window.innerWidth <= 480 ? 14 : 16, padding: window.innerWidth <= 480 ? "8px" : "12px" }}
                     required
                     maxLength="10"
                   />
@@ -354,6 +368,8 @@ const Blogs = () => {
                       marginBottom: "19px",
                       resize: "none",
                       overflowY: "auto",
+                      fontSize: window.innerWidth <= 480 ? 14 : 16,
+                      padding: window.innerWidth <= 480 ? "8px" : "12px",
                     }}
                     required
                   ></textarea>
@@ -364,14 +380,18 @@ const Blogs = () => {
                     style={{
                       backgroundColor: "#2067d1",
                       color: "white",
-                      padding: "11px 18px",
+                      padding: window.innerWidth <= 480 ? "14px 0" : window.innerWidth <= 991 ? "12px 0" : "11px 18px",
                       fontWeight: 700,
                       border: "none",
                       borderRadius: "5px",
                       cursor: "pointer",
-                      fontSize: "16px",
-                      width: "auto",
+                      fontSize: window.innerWidth <= 480 ? 17 : window.innerWidth <= 991 ? 16 : 16,
+                      width: window.innerWidth <= 480 ? "100%" : window.innerWidth <= 991 ? "80%" : "auto",
                       maxWidth: "100%",
+                      display: "block",
+                      margin: window.innerWidth <= 480 ? "0 auto" : undefined,
+                      boxShadow: window.innerWidth <= 480 ? "0 2px 8px rgba(32,103,209,0.07)" : undefined,
+                      transition: "background 0.2s",
                     }}
                   >
                     Submit
