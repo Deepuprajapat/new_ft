@@ -28,6 +28,8 @@ const ProjectDetailsSection = ({
     setIsEditing(true);
   };
 
+  console.log("rera----------", projectData?.web_cards?.project_details?.rera_number?.value);
+
   // Save: update main data
   const handleSaver = () => {
     handleSave(editData);
@@ -690,7 +692,7 @@ const ProjectDetailsSection = ({
                         marginTop: "2px",
                       }}
                     >
-                      {AddProjectButton ? '-- --' : projectData?.rera}
+                      {AddProjectButton ? '-- --' : projectData?.web_cards?.project_details?.rera_number?.value}
                     </p>
                   )}
                 </div>

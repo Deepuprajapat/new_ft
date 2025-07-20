@@ -19,7 +19,7 @@
         .form-top-home .form {
             background-color: #2067d1;
             border-radius: 0;
-            margin-top: 497px;
+            margin-top: 300px;
             padding: 20px;
         }
 
@@ -123,5 +123,69 @@
         color: #fff;
         font-size: 60px;
         font-weight: 200;
+    }
+
+    /* Navigation Links - Prevent Line Wrapping */
+    .navbar-nav {
+        white-space: nowrap !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .navbar-nav .nav-link,
+    .navbar-nav .dropdown-toggle {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* Ensure navbar container prevents wrapping */
+    .navbar-collapse {
+        flex-wrap: nowrap !important;
+    }
+
+    .navbar-nav .navbar-nav {
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        display: flex !important;
+        flex-direction: row !important;
+    }
+
+    /* For smaller screens, make nav scrollable instead of wrapping */
+    @media (max-width: 1199px) {
+        .navbar-nav {
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            scrollbar-width: none !important; /* Firefox */
+            -ms-overflow-style: none !important; /* IE */
+        }
+        
+        .navbar-nav::-webkit-scrollbar {
+            display: none !important; /* Chrome, Safari */
+        }
+        
+        .navbar-nav .nav-link,
+        .navbar-nav .dropdown-toggle {
+            min-width: max-content !important;
+            padding: 0.5rem 0.8rem !important;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .navbar-nav .nav-link,
+        .navbar-nav .dropdown-toggle {
+            padding: 0.4rem 0.6rem !important;
+        }
+    }
+
+    /* Prevent Bootstrap's default navbar collapse behavior for nav items */
+    .navbar-expand-lg .navbar-nav {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .navbar-expand-lg .navbar-nav .nav-link {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
     }
 

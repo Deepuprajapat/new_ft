@@ -47,11 +47,9 @@ const ProjectDetails = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log(urlName,'jkasdgdiyta')
             if (urlName) {
                 try {
                     const data = await getAllProjectsByUrlName(urlName);
-                    console.log("Fetched project data:", data);
                     if (data) {
                         setProjectData(data);
                         setDeveloperId(data.developerId); // Update developer ID
@@ -64,11 +62,11 @@ const ProjectDetails = () => {
         fetchData();
     }, [urlName]); 
 
+
     useEffect(() => {
         if (projectData) {
             const fetchAllProject = async () => {
                 const data = await getAllProject(projectData?.locality?.city?.id);
-                console.log("Fetched all project data:", data?.content);
                 if (data) {
                     setAllSimilarProjects(data?.content);
                 }
@@ -82,7 +80,6 @@ const ProjectDetails = () => {
             if (developerId) {
                 try {
                     const data = await getDeveloperById(developerId);
-                    console.log("Fetched developer data:", data);
                     if (data) {
                         setDeveloperDetails(data);
                     }
@@ -191,11 +188,10 @@ const ProjectDetails = () => {
         }
         setError("");
         setTimer(60);
-        console.log("OTP sent to:", `${formData.dial_code}${formData.usermobile}`);
         try {
             const response = await sendOTP(
                 `${formData.dial_code}${formData.usermobile}`,
-                projectData?.name || "",
+                projectData?.project_name || "",
                 "Website",
                 formData.username,
                 formData.useremail
@@ -215,7 +211,6 @@ const ProjectDetails = () => {
     const verifyOtp = async () => {
         try {
             const response = await verifyOTP(`${formData.dial_code}${formData.usermobile}`, otp);
-            console.log("OTP verification response:", response);
             if (response) {
                 setError("");
                 setOtpVerified(true);
@@ -269,7 +264,7 @@ const ProjectDetails = () => {
                     name: formData.username,
                     phone: `${formData.dial_code}${formData.usermobile}`,
                     email: formData.useremail,
-                    projectName: projectData?.name,
+                    projectName: projectData?.project_name,
                     source: "Website"
                 };
                 await saveLead(newLead);
@@ -617,7 +612,7 @@ const ProjectDetails = () => {
                                 />
                             </div>
                             <div className="text-center text-md-start">
-                                <h1 className="h3 mb-0 text-center text-md-start" style={{ fontSize: '20px' }}>{projectData?.name || "Project Name"}</h1>
+                                <h1 className="h3 mb-0 text-center text-md-start" style={{ fontSize: '20px' }}>{projectData?.project_name || "Project Name"}</h1>
                                 <p className="mb-0" style={{ fontSize: '11px' }}>{projectData?.address || "Project Address"}</p>
                                 <span style={{ fontSize: '13px' }}>By <a href={projectData?.developerLink} target="_blank" rel="noopener noreferrer">{projectData?.developerName || "Developer Name"}</a></span>
                             </div>
@@ -1025,7 +1020,7 @@ const ProjectDetails = () => {
                         <div className="">
                             <div className="">
                                 <div className="">
-                                    <h4 className="mb-0  py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>Why to choose {projectData?.name}?</h4>
+                                    <h4 className="mb-0  py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>Why to choose {projectData?.project_name}?</h4>
                                     <div className="px-3" style={{ boxShadow: '0 4px 8px rgba(0,0,0,0.1)', borderRadius: '4px', padding: '20px' }}>
                                         <p className="text-muted mb-4" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
                                             {projectData?.whyPara || "This is the reason why you should choose this project. It offers excellent amenities and prime location."}
@@ -1164,7 +1159,7 @@ const ProjectDetails = () => {
                     {/* Know About */}
                     <div className="mb-4" id = "about" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
-                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>Know About {projectData?.name}</h4>
+                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>Know About {projectData?.project_name}</h4>
                             <div className="px-3">
                                 <div className="position-relative overflow-hidden" style={{ maxHeight: showFullDescription ? 'none' : '100px' }}>
                                     <div className={!showFullDescription ? 'position-absolute w-100 h-100' : ''}
@@ -1185,7 +1180,7 @@ const ProjectDetails = () => {
                                     <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
                                         Click on the <button className="border-0 bg-transparent text-primary p-0" id="download-btn2">
                                             <span className="fw-bold">"Download"</span>
-                                        </button> button to download <span className="fw-bold">{projectData?.name} brochure</span>.
+                                        </button> button to download <span className="fw-bold">{projectData?.project_name} brochure</span>.
                                     </p>
                                 </div>
                                 <button
@@ -1205,7 +1200,7 @@ const ProjectDetails = () => {
                     {/* Floor Plan */}
                     <div className="mb-4" id = "floor"style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
-                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.name} Floor Plan</h4>
+                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.project_name} Floor Plan</h4>
                             <div className="px-3">
                                 <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
                                     This is a brief description of the floor plan for the project.
@@ -1345,7 +1340,7 @@ const ProjectDetails = () => {
                     {/* Price List */}
                     <div className="mb-4" id = "price" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
-                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.name} Price List</h4>
+                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.project_name} Price List</h4>
                             <div className="px-3">
                                 <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
                                     This is a brief description of the price list for the project.
@@ -1387,7 +1382,7 @@ const ProjectDetails = () => {
                     {/* Payment Plan */}
                     <div className="mb-4" id = "payment_plan" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
-                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.name} Payment Plan</h4>
+                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.project_name} Payment Plan</h4>
                             <div className="p-3">
                                 <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
                                     This is a brief description of the payment plan for the project.
@@ -1410,13 +1405,13 @@ const ProjectDetails = () => {
                     {/* Amenities */}
                     <div className="mb-4" id = "amenities" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
-                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.name} Amenities</h4>
+                            <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>{projectData?.project_name} Amenities</h4>
                             <div className="px-3">
                                 <p className="mb-3" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '16px' }}>
                                     {projectData?.amenitiesPara ? (
                                         <div dangerouslySetInnerHTML={{ __html: projectData.amenitiesPara }} />
                                     ) : (
-                                        <p>World class amenities are there in {projectData?.name} for the residents to enjoy a luxurious lifestyle. Know in detail about the amenities in the list below.</p>
+                                        <p>World class amenities are there in {projectData?.project_name} for the residents to enjoy a luxurious lifestyle. Know in detail about the amenities in the list below.</p>
                                     )}
                                 </p>
 
@@ -1446,14 +1441,14 @@ const ProjectDetails = () => {
                     <div className="mb-4" id = "video" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>
-                                Video Presentation of {projectData && projectData?.name}
+                                Video Presentation of {projectData && projectData?.project_name}
                             </h4>
                             <div className="px-3">
                                 <p className="mb-3 mb-md-5" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px' }}>
                                 { projectData?.videoPara ? (
                                     <div dangerouslySetInnerHTML={{ __html: projectData.videoPara }} />
                                 ) : (
-                                    `VIDEO PRESENTATION OF ${projectData?.name}`
+                                    `VIDEO PRESENTATION OF ${projectData?.project_name}`
                                 )}
                                 </p>
                                 <div className="d-flex flex-column">
@@ -1461,7 +1456,7 @@ const ProjectDetails = () => {
                                         <div key={index} className="ratio ratio-16x9 mb-3">
                                             <iframe
                                                 src={`https://www.youtube.com/embed/${videoUrl}`}
-                                                title={`${projectData?.name} Video Presentation ${index + 1}`}
+                                                title={`${projectData?.project_name} Video Presentation ${index + 1}`}
                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                                 allowFullScreen
                                                 style={{
@@ -1479,12 +1474,12 @@ const ProjectDetails = () => {
                     <div className="mb-4" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="p-0 pb-2">
                             <h4 className="mb-3 py-2 fw-bold text-white ps-3" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', backgroundColor: '#2067d1', borderRadius: '4px 4px 0 0' }}>
-                                {projectData?.name} Location Advantage
+                                {projectData?.project_name} Location Advantage
                             </h4>
                             <div className="px-3">
                                 <div className="inner-item">
                                     <p className='mb-3 mb-md-4' style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px' }}>
-                                        The residential development of <b>{projectData?.name}</b> has been strategically located in Sector-1 Greater Noida West. <b>{projectData?.name} location</b> places you near top schools, colleges, sports complexes, entertainment centers, and much more.
+                                        The residential development of <b>{projectData?.project_name}</b> has been strategically located in Sector-1 Greater Noida West. <b>{projectData?.project_name} location</b> places you near top schools, colleges, sports complexes, entertainment centers, and much more.
                                     </p>
 
                                     <div style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
@@ -1499,7 +1494,7 @@ const ProjectDetails = () => {
                     {/* Location Map */}
                     <div className="bg-white rounded-3 mb-4" id = "location">
                         <h2 className="mb-4" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', color: '#000000', fontWeight: 'bold', textAlign: 'left', backgroundColor: '#2067d1', padding: '8px 12px', borderRadius: '4px', color: '#ffffff' }}>
-                            {projectData?.name} Location Map
+                            {projectData?.project_name} Location Map
                         </h2>
                         <div className="row">
                             <div className="col-12">
@@ -1526,7 +1521,7 @@ const ProjectDetails = () => {
                     {/* Site Plan */}
                     <div className="bg-white rounded-3 mb-4" id = "siteplan">
                         <h2 className="mb-4" style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px', color: '#ffffff', fontWeight: 'bold', textAlign: 'left', backgroundColor: '#2067d1', padding: '8px 12px', borderRadius: '4px' }}>
-                            {projectData?.name} Site Plan
+                            {projectData?.project_name} Site Plan
                         </h2>
                         <div className="row">
                             <div className="col-12">
@@ -1551,7 +1546,7 @@ const ProjectDetails = () => {
                                             <img
                                                 className="img-fluid"
                                                 id="zoom-image"
-                                                alt={`${projectData?.name} Site Plan`}
+                                                alt={`${projectData?.project_name} Site Plan`}
                                                 src={projectData?.siteplanImg || "https://www.investmango.com/img/ace-divino/ace-divino-site-plan.webp"}
                                                 fetchpriority="high"
                                                 style={{
@@ -1682,7 +1677,7 @@ const ProjectDetails = () => {
                                     <h4 className="fw-bold mb-3" style={{ fontSize: window.innerWidth <= 768 ? '14px' : '18px' }}>Contact Details</h4>
 
                                     <p className="mb-0" style={{ fontSize: window.innerWidth <= 768 ? '12px' : '14px' }}>
-                                        <b>{projectData?.name}</b><br />
+                                        <b>{projectData?.project_name}</b><br />
                                         <b>Address:</b> {projectData?.address}<br />
                                         <b>Phone:</b> <a href="tel:+918595-189-189" style={{ textDecoration: 'none' }}>+91-8595-189-189</a><br />
                                         <b>Book Your Site Visit</b> <span style={{ cursor: 'pointer', color: '#2067d1', fontWeight: 700 }} id="BookBtn3">Click Here</span>

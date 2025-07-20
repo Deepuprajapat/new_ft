@@ -282,7 +282,7 @@ const ConnectExpertSection = ({
       <BrochurePopupDialog
         open={showPopup}
         onClose={closePopup}
-        projectName={projectData?.name || "Invest Mango"}
+        projectName={projectData?.project_name || "Invest Mango"}
         brochure={projectData?.brochure}
       />
     </div>

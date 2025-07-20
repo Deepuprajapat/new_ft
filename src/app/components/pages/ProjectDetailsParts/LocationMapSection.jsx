@@ -47,7 +47,7 @@ const LocationMapSection = ({
             backgroundColor: "#2067d1",
             borderRadius: "4px 4px 0 0",
           }}>
-          {projectData?.name} Location Map
+          {projectData?.project_name} Location Map
           {showEdit && (
             <span style={{ cursor: "pointer", marginRight: "12px" }}>
               {isLocationEditing ? (
@@ -92,11 +92,11 @@ const LocationMapSection = ({
         <div className="row">
           <div className="col-12">
             {/* Show short address if available */}
-            {locationInfo.short_address && (
+            {/* {locationInfo.short_address && (
               <div className="mb-2 px-3 text-muted" style={{ fontSize: "14px" }}>
-                <strong>Address:</strong> {locationInfo.short_address}
+                <strong>Address:</strong> {locationInfo.}
               </div>
-            )}
+            )} */}
             {/* Show locationMapHtml only if it has content or editing is on */}
             {(isLocationEditing || (projectData?.locationMap && projectData.locationMap.trim() !== "")) && !isLocationEditing && (
               <div

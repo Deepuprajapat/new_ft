@@ -32,6 +32,7 @@ import AddProject from "./app/components/pages/ProjectDetailsParts/AddProject/Ad
 import Dashboard from "./app/components/pages/Dashboard";
 import LeadsDashboard from "./app/components/pages/Dashboard/LeadsDashboard";
 import CustomSearchPage from "./app/components/pages/CustomSearchPage";
+import DeveloperPage from "./app/components/pages/DeveloperPage";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,7 @@ const router = createBrowserRouter([
       { path: "/career", element: <Career /> },
       { path: "/contact", element: <Contact /> },
       { path: "/sitemap", element: <SiteMap /> },
+      { path: "/developerPage/:id", element: <DeveloperPage /> },
       { path: "/:urlName", element: <ProjectDetails /> },
       { path: "/propertyforsale", element: <PropertyDetails /> },
       { path: "/propertyforsale/:id", element: <PropertyDetails /> },

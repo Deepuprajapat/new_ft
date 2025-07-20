@@ -67,7 +67,7 @@ const KnowAboutSection = ({
             borderRadius: "4px 4px 0 0",
           }}
         >
-          Know About {projectData?.name}
+          Know About {projectData?.project_name}
           {showEdit && (
             <span style={{ cursor: "pointer", marginRight: "12px" }}>
               {isAboutEditing ? (
@@ -208,7 +208,7 @@ const KnowAboutSection = ({
               </span>{" "}
               button to download{" "}
               <span className="fw-bold">
-                {projectData?.name} brochure
+                {projectData?.project_name} brochure
               </span>
               .
             </p>

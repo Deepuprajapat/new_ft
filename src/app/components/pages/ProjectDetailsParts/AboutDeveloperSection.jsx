@@ -254,21 +254,22 @@ const AboutDeveloperSection = ({
                         }}
                       />
                       <button
-                        onClick={() =>
-                          setExpandedIndex(
-                            expandedIndex === "about" ? null : "about"
-                          )
-                        }
-                        className="btn btn-link p-0 read-more-btn"
+                        onClick={() => {
+                          window.location.href = `/developerPage/${developerDetails?.id}}`;
+                        }}
+                        className="btn btn-primary"
                         style={{
                           fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                          color: "#2067d1",
-                          textDecoration: "none",
+                          backgroundColor: "#2067d1", 
+                          color: "#ffffff",
                           fontWeight: "bold",
-                          transition: "color 0.3s ease",
+                          border: "none",
+                          padding: "6px 12px",
+                          borderRadius: "4px",
+                          transition: "background-color 0.3s ease"
                         }}
                       >
-                        {expandedIndex === "about" ? "Show Less" : "Read More"}
+                        View Developer Details
                       </button>
                     </>
                   )}

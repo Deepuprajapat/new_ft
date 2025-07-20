@@ -168,7 +168,7 @@ const priceListDescription = projectData?.web_cards?.price_list?.description || 
               backgroundColor: "#2067d1",
               borderRadius: "4px 4px 0 0",
             }}>
-          {projectData?.name} Price List
+          {projectData?.project_name} Price List
           {showEdit && (
          <span style={{ cursor: "pointer", marginRight: "12px" }}>
   {isEditing ? (

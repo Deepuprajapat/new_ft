@@ -1,9 +1,244 @@
 import React, { useState, useEffect } from "react";
-import "../styles/css/contact.css";
+import styled from "styled-components";
 import { sendOTP, verifyOTP, resendOTP } from "../../apis/api";
 import { useNavigate } from "react-router-dom";
 import swal from "sweetalert";
 import { Helmet } from "react-helmet";
+
+// Styled Components
+const Section = styled.section`
+  background: #f5f8fd;
+  min-height: 100vh;
+`;
+const ContactWrapper = styled.div`
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(32,103,209,0.10);
+  border: 1.5px solid #e3eaf5;
+  padding: 40px 0 40px 0;
+  margin: 32px auto;
+  max-width: 1600px;
+  transition: box-shadow 0.2s;
+  @media (max-width: 991px) {
+    padding: 18px 0 18px 0;
+    margin: 12px 0;
+    border-radius: 10px;
+  }
+  @media (max-width: 480px) {
+    padding: 8px 0 8px 0;
+    margin: 8px 0;
+    border-radius: 8px;
+  }
+`;
+const Container = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+`;
+const OfficeTitle = styled.h2`
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 28px;
+  letter-spacing: -1px;
+  text-align: center;
+  @media (max-width: 991px) {
+    font-size: 1.3rem;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 767px) {
+    font-size: 1.1rem;
+  }
+`;
+const Row = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  @media (max-width: 767px) {
+    flex-direction: column;
+  }
+`;
+const Col = styled.div`
+  flex: 1 1 50%;
+  max-width: 50%;
+  padding: 10px;
+  @media (max-width: 767px) {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 24px;
+  }
+`;
+const OfficeBox = styled.div`
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px rgba(32,103,209,0.07);
+  border: none;
+  margin-bottom: 22px;
+  transition: box-shadow 0.2s;
+  padding: 22px 18px;
+  &:hover {
+    box-shadow: 0 4px 24px rgba(32,103,209,0.15);
+  }
+  @media (max-width: 991px) {
+    padding: 16px 10px;
+  }
+  @media (max-width: 767px) {
+    margin-bottom: 18px;
+  }
+`;
+const OfficeIcon = styled.div`
+  color: #2067d1;
+  margin-bottom: 8px;
+`;
+const OfficeName = styled.div`
+  font-size: 1.18rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #222;
+`;
+const OfficeInfo = styled.div`
+  font-size: 15px;
+  color: #444;
+  margin-top: 8px;
+  & i {
+    width: 22px;
+    text-align: center;
+    color: #2067d1;
+    margin-right: 8px;
+  }
+`;
+const MainCon = styled.div`
+  margin-top: 32px;
+`;
+const HeadLine = styled.div`
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px rgba(32,103,209,0.07);
+  padding: 32px 24px;
+  margin-bottom: 32px;
+  @media (max-width: 991px) {
+    padding: 18px 8px 10px 8px;
+  }
+  @media (max-width: 767px) {
+    padding: 12px 4px 6px 4px;
+  }
+  @media (max-width: 480px) {
+    padding: 6px 2px 4px 2px;
+  }
+`;
+const Form = styled.form``;
+const FormGroup = styled.div`
+  margin-bottom: 15px;
+`;
+const FormControl = styled.input`
+  width: 100%;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #d6e0ef;
+  font-size: 15px;
+  margin-bottom: 14px;
+  background: #f8fafd;
+  transition: border-color 0.2s;
+  &:focus {
+    border-color: #2067d1;
+    box-shadow: 0 0 0 2px #e3edfa;
+    background: #fff;
+  }
+  @media (max-width: 768px) {
+    padding: 8px;
+  }
+`;
+const FormTextarea = styled.textarea`
+  width: 100%;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #d6e0ef;
+  font-size: 15px;
+  margin-bottom: 14px;
+  background: #f8fafd;
+  transition: border-color 0.2s;
+  resize: none;
+  overflow-y: auto;
+  &:focus {
+    border-color: #2067d1;
+    box-shadow: 0 0 0 2px #e3edfa;
+    background: #fff;
+  }
+`;
+const ThemeBtn = styled.button`
+  background: #2067d1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 32px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background 0.2s;
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(32,103,209,0.07);
+  &:hover, &:focus {
+    background: #174a9b;
+    color: #fff;
+  }
+  @media (max-width: 767px) {
+    width: 100%;
+    padding: 14px 0;
+    font-size: 17px;
+    display: block;
+  }
+`;
+const BtnSecondary = styled(ThemeBtn)`
+  background: #f0f4fa;
+  color: #2067d1;
+  border: 1px solid #d6e0ef;
+`;
+const Alert = styled.div`
+  margin-top: 10px;
+  font-size: 0.97rem;
+  padding: 8px 12px;
+  background: #ffeaea;
+  color: #d32f2f;
+  border: 1px solid #ffd6d6;
+  border-radius: 6px;
+`;
+const OTPVerification = styled.div`
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px rgba(32,103,209,0.07);
+  padding: 32px 24px;
+  margin-bottom: 32px;
+`;
+const MapOuter = styled.div`
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px rgba(32,103,209,0.07);
+  border: none;
+  padding: 10px;
+  margin-top: 0;
+  overflow: hidden;
+  @media (max-width: 991px) {
+    margin-top: 24px;
+    min-height: 250px;
+  }
+  @media (max-width: 767px) {
+    margin-top: 18px;
+    padding: 6px;
+    min-height: 180px;
+  }
+  @media (max-width: 480px) {
+    padding: 4px;
+  }
+`;
+const GMapCanvas = styled.div`
+  & iframe {
+    width: 100%;
+    height: 350px;
+    border: 0;
+    border-radius: 12px;
+  }
+`;
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +251,6 @@ const ContactUs = () => {
   });
 
   useEffect(() => {
-    // Scroll to the top when the page loads
     window.scrollTo(0, 0);
   }, []);
 
@@ -28,33 +262,26 @@ const ContactUs = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "username" && !/^[a-zA-Z\s]*$/.test(value)) return;
     if (name === "usermobile" && !/^\d*$/.test(value)) return;
-
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleOtpChange = (e) => {
-    setOtp(e.target.value);
-  };
+  const handleOtpChange = (e) => setOtp(e.target.value);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
     const phonePattern = /^[5-9][0-9]{9}$/;
     if (!phonePattern.test(formData.usermobile)) {
       setError("Please enter a valid 10-digit phone number.");
       return;
     }
-
     try {
-      // Send OTP
       await sendOTP(
         formData.usermobile,
-        "Contact Page", // Project Name
-        "ORGANIC", // Source
+        "Contact Page",
+        "ORGANIC",
         formData.username,
         formData.message,
         formData.useremail,
@@ -63,7 +290,6 @@ const ContactUs = () => {
       swal("OTP Sent!", "Please check your phone for the OTP.", "success");
       setOtpSent(true);
     } catch (error) {
-      console.error("Error sending OTP:", error.message);
       setError("Failed to send OTP. Please try again later.");
     }
   };
@@ -71,12 +297,10 @@ const ContactUs = () => {
   const handleOtpVerification = async (e) => {
     e.preventDefault();
     setOtpError("");
-
     if (otp.length !== 6) {
       setOtpError("OTP must be 6 digits.");
       return;
     }
-
     try {
       const response = await verifyOTP(formData.usermobile, otp);
       console.log("OTP Verification Response:", response);
@@ -99,6 +323,7 @@ const ContactUs = () => {
       } else {
         setOtpError("Invalid OTP. Please try again.");
       }
+      setOtpError("Invalid OTP. Please try again.");
     }
   };
 
@@ -106,13 +331,8 @@ const ContactUs = () => {
     setOtpError("");
     try {
       await resendOTP(formData.usermobile);
-      swal(
-        "OTP Resent!",
-        "Please check your phone for the new OTP.",
-        "success"
-      );
+      swal("OTP Resent!", "Please check your phone for the new OTP.", "success");
     } catch (error) {
-      console.error("Error resending OTP:", error.message);
       setOtpError("Failed to resend OTP. Please try again later.");
     }
   };
@@ -128,314 +348,264 @@ const ContactUs = () => {
         <link rel="canonical" href="https://www.investmango.com/contact" />
       </Helmet>
 
-      <div>
-        <section className="main-body">
-          <div className="container">
-            <h1>Contact Us</h1>
+      <Section>
+        <ContactWrapper>
+          <Container>
+            {/* <h1>Contact Us</h1>
             <p>
               <a href="/" className="styled-link">
                 Home
               </a>{" "}
               / Contact Us
-            </p>
-          </div>
+            </p> */}
 
-          <div className="main-con contactUs">
-            <div className="container">
-              <div className="content contactUsinner">
-                <div className="row">
-                  <div className="col-md-6">
-                    <h2>
-                      <p className="h3">Head Office</p>
-                    </h2>
-                    <div className="box-add">
-                      <div className="cont_details">
-                        <i className="fas fa-phone-alt"></i>
-                        <p>
-                          <a className="aRemove" href="tel:+918595189189">
-                            +91-8595-189-189
-                          </a>
-                          <br />
-                          <a className="aRemove" href="tel:+917428189189">
-                            +91-7428-189-189
-                          </a>
-                          <br />
-                          <a className="aRemove" href="tel:+919911189189">
-                            +91-9911-189-189
-                          </a>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+            {/* --- OFFICE LOCATIONS SECTION AT THE TOP --- */}
+            <div className="container mb-5">
+              <OfficeTitle className="office-title mb-4">Discover Our Office Locations</OfficeTitle>
+              <Row>
+                {/* Noida Branch & Pune Branch */}
+                <Col>
+                  <OfficeBox>
+                    <OfficeIcon>
+                      <i className="fas fa-building fa-2x"></i>
+                    </OfficeIcon>
+                    <OfficeName>Noida Branch (Head Office )</OfficeName>
+                    <OfficeInfo>
+                      <div><i className="fas fa-envelope"></i> Info@investmango.com</div>
+                      <div><i className="fas fa-map-marker-alt"></i> 11th Floor, Magnus Tower, Sec-73 Sarfabad, Noida 201304</div>
+                      <div><i className="fas fa-phone-alt"></i> +91 8543-189-189</div>
+                    </OfficeInfo>
+                  </OfficeBox>
+                  <OfficeBox>
+                    <OfficeIcon>
+                      <i className="fas fa-building fa-2x"></i>
+                    </OfficeIcon>
+                    <OfficeName>Pune Branch</OfficeName>
+                    <OfficeInfo>
+                      <div><i className="fas fa-envelope"></i> Info@investmango.com</div>
+                      <div><i className="fas fa-map-marker-alt"></i> 803A, Teerth Technospace, Bengaluru, Mumbai Highway, Baner, Pune , Maharashtra - 411045</div>
+                      <div><i className="fas fa-phone-alt"></i> +91 9911-189-189</div>
+                    </OfficeInfo>
+                  </OfficeBox>
+                </Col>
+                {/* Gurgaon & Lucknow */}
+                <Col>
+                  <OfficeBox>
+                    <OfficeIcon>
+                      <i className="fas fa-building fa-2x"></i>
+                    </OfficeIcon>
+                    <OfficeName>Gurgaon Branch</OfficeName>
+                    <OfficeInfo>
+                      <div><i className="fas fa-envelope"></i> Info@investmango.com</div>
+                      <div><i className="fas fa-map-marker-alt"></i> Office no. 307, 3rd Floor, Tower-2, Sector-74a, DLF Corporate Green, Gurgaon Haryana - 122004</div>
+                      <div><i className="fas fa-phone-alt"></i> +91 7428-189-189</div>
+                    </OfficeInfo>
+                  </OfficeBox>
+                  {/* <OfficeBox>
+                    <OfficeIcon>
+                      <i className="fas fa-building fa-2x"></i>
+                    </OfficeIcon>
+                    <OfficeName>Lucknow Branch</OfficeName>
+                    <OfficeInfo>
+                      <div><i className="fas fa-envelope"></i> Info@investmango.com</div>
+                      <div><i className="fas fa-map-marker-alt"></i> 11th Floor, Magnus Tower, Sec-73 Sarfabad, Noida 201304</div>
+                      <div><i className="fas fa-phone-alt"></i> +91 8543-189-189</div>
+                    </OfficeInfo>
+                  </OfficeBox> */}
+                </Col>
+              </Row>
+            </div>
+            {/* --- END OF OFFICE LOCATIONS SECTION --- */}
+          </Container>
 
-                  <div className="col-md-4">
-                    {/* <p className="h3">&nbsp;</p> */}
-                    <div className="box-add">
-                      <div className="cont_details">
-                        <i className="fas fa-envelope"></i>
-                        <p>
-                          <a
-                            className="aRemove"
-                            href="mailto:info@investmango.com"
-                          >
-                            info@investmango.com
-                          </a>
-                          <br />
-                          <a
-                            className="aRemove"
-                            href="mailto:hr@investmango.com"
-                          >
-                            hr@investmango.com
-                          </a>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-md-12">
-                    <h2 className="h3">Office Locations</h2>
-                    <div className="box-add">
-                      <div className="row">
-                        {/* Noida Location */}
-                        <div className="col-md-4 location-item">
-                          <img
-                            src="/images/Noida.png"
-                            alt="Noida Location"
-                            loading="lazy"
-                            className="location-icon"
-                          />
-                          <span className="city-name">
-                            <strong>Noida</strong>
-                          </span>
-                          <p
-                            style={{ margin: 0, padding: 0, fontSize: "14px" }}
-                          >
-                            11th Floor, Plot no 6, Magnus Tower, Sector 73,
-                            Noida, Uttar Pradesh 201307
-                          </p>
-                        </div>
-                        {/* Gurugram Location */}
-                        <div className="col-md-4 location-item">
-                          <img
-                            src="/images/Gurugram.png"
-                            alt="Gurugram Location"
-                            loading="lazy"
-                            className="location-icon"
-                          />
-                          <span className="city-name">
-                            <strong>Gurugram</strong>
-                          </span>
-                          <p
-                            style={{ margin: 0, padding: 0, fontSize: "14px" }}
-                          >
-                            Office no. 307, Third Floor, (T2) DLF Corporate
-                            Green - 2, Sector - 74A, Gurugram, Haryana -122004
-                          </p>
-                        </div>
-                        {/* Pune Location */}
-                        <div className="col-md-4 location-item">
-                          <img
-                            src="/images/Pune.png"
-                            alt="Pune Location"
-                            loading="lazy"
-                            className="location-icon"
-                          />
-                          <span className="city-name">
-                            <strong>Pune</strong>
-                          </span>
-                          <p
-                            style={{ margin: 0, padding: 0, fontSize: "14px" }}
-                          >
-                            A-803A, Teerth Technospace, Bengaluru - Mumbai
-                            Highway, Baner, Pune, Maharashtra - 411045
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6">
+          <MainCon>
+            <Container>
+              {/* <div className="content contactUsinner"> */}
+                <OfficeTitle className="office-title mb-4">Let's Connect With Us</OfficeTitle>
+                <Row>
+                  {/* Contact Form */}
+                  <Col>
                     {!otpSent ? (
-                      // Form to Send OTP
-                      <div className="headline">
-                        <form id="contactpage" onSubmit={handleFormSubmit}>
-                          <div className="row">
-                            <div className="col-md-12">
-                              {/* <label>Role:</label>
-                              <select
-                                name="userType"
-                                className="form-select"
-                                value={formData.userType} // Ensure this is in your state
-                                onChange={handleChange}
-                              >
-                                <option value="">Select</option>
-                                <option value="Associate">Associate</option>
-                                <option value="Builder">Builder</option>
-                                <option value="Broker">Broker</option>
-                                <option value="Seller">Seller</option>
-                                <option value="Buyer">Buyer</option>
-                              </select> */}
-                              <label>Name:</label>
-                              <input
-                                required
-                                name="username"
-                                type="text"
-                                placeholder="Enter Name"
-                                className="form-control"
-                                value={formData.username}
-                                onChange={handleChange}
-                              />
+                      <HeadLine>
+                        <Form id="contactpage" onSubmit={handleFormSubmit}>
+                          <Row>
+                            <Col>
+                              <FormGroup>
+                                <label>Name:</label>
+                                <FormControl
+                                  required
+                                  name="username"
+                                  type="text"
+                                  placeholder="Enter Name"
+                                  value={formData.username}
+                                  onChange={handleChange}
+                                />
+                              </FormGroup>
 
-                              <label>Phone Number:</label>
-                              <input
-                                required
-                                name="usermobile"
-                                type="tel"
-                                placeholder="Enter Phone Number"
-                                maxLength="10"
-                                className="form-control"
-                                value={formData.usermobile}
-                                onChange={handleChange}
-                              />
+                              <FormGroup>
+                                <label>Phone Number:</label>
+                                <FormControl
+                                  required
+                                  name="usermobile"
+                                  type="tel"
+                                  placeholder="Enter Phone Number"
+                                  maxLength="10"
+                                  value={formData.usermobile}
+                                  onChange={e => {
+                                    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                    handleChange({
+                                      target: {
+                                        name: 'usermobile',
+                                        value,
+                                      }
+                                    });
+                                  }}
+                                />
+                              </FormGroup>
 
-                              <label>Email :</label>
-                              <input
-                                name="useremail"
-                                type="email"
-                                placeholder="Enter Email"
-                                maxLength="10"
-                                className="form-control"
-                                value={formData.useremail}
-                                onChange={handleChange}
-                              />
+                              <FormGroup>
+                                <label>Email :</label>
+                                <FormControl
+                                  name="useremail"
+                                  type="email"
+                                  placeholder="Enter Email"
+                                  value={formData.useremail}
+                                  onChange={handleChange}
+                                />
+                              </FormGroup>
 
-                              <label>Message:</label>
-                              <textarea
-                                name="message"
-                                className="form-control"
-                                rows="3"
-                                placeholder="Message"
-                                value={formData.message}
-                                style={{ resize: "none", overflowY: "auto" }}
-                                onChange={handleChange}
-                              ></textarea>
+                              <FormGroup>
+                                <label>Message:</label>
+                                <FormTextarea
+                                  name="message"
+                                  rows="3"
+                                  placeholder="Message"
+                                  value={formData.message}
+                                  onChange={handleChange}
+                                ></FormTextarea>
+                              </FormGroup>
 
                               {error && (
-                                <div
-                                  className="alert alert-danger"
-                                  role="alert"
-                                >
+                                <Alert role="alert">
                                   {error}
-                                </div>
+                                </Alert>
                               )}
-                              <div className="form-group my-3 d-flex align-items-start">
-                                <input
-                                  type="checkbox"
-                                  id="consentCheckbox"
-                                  required
+
+                              <FormGroup>
+                                <div
+                                  className="form-group my-3"
                                   style={{
-                                    marginTop: "5px",
-                                    marginRight: "10px",
-                                    flexShrink: 0,
+                                    display: "flex",
+                                    alignItems: "flex-start",
+                                    gap: 10,
+                                    width: "100%",
                                   }}
-                                />
-                                <label htmlFor="consentCheckbox" style={{ fontSize: "14px", lineHeight: "1.5", padding: "0px", }}>
-                                  I authorize <strong>Invest Mango</strong> and its representative to contact
-                                  me with updates and notifications via Email, SMS, WhatsApp, and Call. This
-                                  will override the registry on DND / NDNC.
-                                </label>
-                              </div>
+                                >
+                                  <input
+                                    type="checkbox"
+                                    id="consentCheckbox"
+                                    required
+                                    style={{
+                                      marginTop: 3,
+                                      accentColor: "#2067d1", // modern browsers
+                                      width: window.innerWidth <= 600 ? 22 : 18,
+                                      height: window.innerWidth <= 600 ? 22 : 18,
+                                      minWidth: window.innerWidth <= 600 ? 22 : 18,
+                                      minHeight: window.innerWidth <= 600 ? 22 : 18,
+                                      cursor: "pointer",
+                                      flexShrink: 0,
+                                    }}
+                                  />
+                                  <label
+                                    htmlFor="consentCheckbox"
+                                    style={{
+                                      fontSize: window.innerWidth <= 600 ? 13 : 14,
+                                      lineHeight: 1.5,
+                                      padding: 0,
+                                      width: "100%",
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    I authorize <strong>Invest Mango</strong> and its representative to contact
+                                    me with updates and notifications via Email, SMS, WhatsApp, and Call. This
+                                    will override the registry on DND / NDNC.
+                                  </label>
+                                </div>
+                              </FormGroup>
 
-
-
-                              <div className="form-group my-3 d-flex align-items-start">
-                                <input
-                                  type="checkbox"
-                                  id="consentCheckbox"
-                                  required
-                                  style={{
-                                    marginTop: "5px",
-                                    marginRight: "10px",
-                                    flexShrink: 0,
-                                  }}
-                                />
-                                <label htmlFor="consentCheckbox" style={{ fontSize: "14px", lineHeight: "1.5", padding: "0px", }}>
-                                  I authorize <strong>Invest Mango</strong> and its representative to contact
-                                  me with updates and notifications via Email, SMS, WhatsApp, and Call. This
-                                  will override the registry on DND / NDNC.
-                                </label>
-                              </div>
-
-                              <button type="submit" className="theme-btn">
+                              <ThemeBtn type="submit">
                                 Send
-                              </button>
-                            </div>
-                          </div>
-                        </form>
-                      </div>
+                              </ThemeBtn>
+                            </Col>
+                          </Row>
+                        </Form>
+                      </HeadLine>
                     ) : (
-                      // Form to Verify OTP
-                      <div className="otp-verification">
+                      <OTPVerification>
                         <h3 className="h3">Verify OTP</h3>
                         <p className="sub-headline">
-                          Enter the OTP sent to your phone number:{" "}
-                          {formData.usermobile}
+                          Enter the OTP sent to your phone number: {formData.usermobile}
                         </p>
-                        <form onSubmit={handleOtpVerification}>
-                          <div className="col-md-12">
-                            <label>OTP:</label>
-                            <input
-                              required
-                              type="text"
-                              maxLength="6"
-                              className="form-control"
-                              placeholder="Enter OTP"
-                              value={otp}
-                              onChange={handleOtpChange}
-                            />
+                        <Form onSubmit={handleOtpVerification}>
+                          <Col>
+                            <FormGroup>
+                              <label>OTP:</label>
+                              <FormControl
+                                required
+                                type="text"
+                                maxLength="6"
+                                placeholder="Enter OTP"
+                                value={otp}
+                                onChange={handleOtpChange}
+                              />
+                            </FormGroup>
 
                             {otpError && (
-                              <div className="alert alert-danger" role="alert">
+                              <Alert role="alert">
                                 {otpError}
-                              </div>
+                              </Alert>
                             )}
 
-                            <button type="submit" className="theme-btn">
+                            <ThemeBtn type="submit">
                               Verify OTP
-                            </button>
+                            </ThemeBtn>
 
-                            <button
+                            <BtnSecondary
                               type="button"
-                              className="theme-btn btn-secondary mt-2"
                               onClick={handleResendOtp}
                             >
                               Resend OTP
-                            </button>
-                          </div>
-                        </form>
-                      </div>
+                            </BtnSecondary>
+                          </Col>
+                        </Form>
+                      </OTPVerification>
                     )}
-                  </div>
-                  <div className="col-md-6">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14013.06956917024!2d77.3845057!3d28.5917541!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cef068cc0b5fd%3A0xdda5c5e0379288b2!2sInvest%20mango!5e0!3m2!1sen!2sin!4v1689407045260!5m2!1sen!2sin"
-                      width="100%"
-                      height="300"
-                      style={{ border: "0" }}
-                      allowfullscreen=""
-                      loading="lazy"
-                      referrerpolicy="no-referrer-when-downgrade"
-                      title="location"
-                    ></iframe>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
+                  </Col>
+                  {/* Map */}
+                  <Col>
+                    <MapOuter>
+                      <GMapCanvas>
+                        <iframe
+                          title="Google Map"
+                          width="100%"
+                          height="450"
+                          id="gmap_canvas"
+                          loading="lazy"
+                          src="https://maps.google.com/maps?q=Invest%20Mango%20-%20Real%20Estate%20Consultants%20in%20Delhi%20NCR&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                          frameBorder="0"
+                          allowFullScreen=""
+                          aria-hidden="false"
+                          tabIndex="0"
+                        ></iframe>
+                      </GMapCanvas>
+                    </MapOuter>
+                  </Col>
+                </Row>
+              {/* </div> */}
+            </Container>
+          </MainCon>
+        </ContactWrapper>
+      </Section>
     </>
   );
 };

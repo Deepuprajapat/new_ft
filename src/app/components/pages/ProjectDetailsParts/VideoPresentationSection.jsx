@@ -93,7 +93,7 @@ const VideoPresentationSection = ({
             borderRadius: "4px 4px 0 0",
           }}
         >
-          Video Presentation of {projectData?.name}
+          Video Presentation of {projectData?.project_name}
           {showEdit && (
           <span style={{ cursor: "pointer", marginRight: "12px" }}>
             {isVideoEditing ? (
@@ -199,7 +199,7 @@ const VideoPresentationSection = ({
                 <div className="ratio ratio-16x9 mb-3">
                   <iframe
                     src={getEmbedUrl(videoUrl)}
-                    title={`${projectData?.name} Video Presentation`}
+                    title={`${projectData?.project_name} Video Presentation`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     style={{
@@ -228,7 +228,7 @@ const VideoPresentationSection = ({
                 <div className="ratio ratio-16x9 mb-3">
                   <iframe
                     src={getEmbedUrl(videoPresentationUrl)}
-                    title={`${projectData?.name} Video Presentation`}
+                    title={`${projectData?.project_name} Video Presentation`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     style={{

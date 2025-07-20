@@ -50,7 +50,7 @@ const WhyChooseSection = ({
                 borderRadius: "4px 4px 0 0",
               }}
             >
-              <span>Why to choose {projectData?.name}?</span>
+              <span>Why to choose {projectData?.project_name}?</span>
               {showEdit && (
                 <span style={{ cursor: "pointer", marginRight: "12px" }}>
                   {isEditing ? (
@@ -270,7 +270,7 @@ const WhyChooseSection = ({
                     <PopupDialog
                       open={showSitePopup}
                       onClose={closeSitePopup}
-                      projectName={projectData?.name || "Invest Mango"}
+                      projectName={projectData?.project_name || "Invest Mango"}
                     />
                     <div className="col-12 mt-2">
                       <a

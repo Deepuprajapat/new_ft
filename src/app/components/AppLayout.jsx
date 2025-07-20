@@ -20,7 +20,6 @@ import { useState } from "react";
 
 const AppLayout = () => {
   const [projectPhoneNumber,setprojectPhoneNumber] = useState("");
-  console.log(projectPhoneNumber,"dddddddddd")
   return (
     <>
       <AddHeadScripts />

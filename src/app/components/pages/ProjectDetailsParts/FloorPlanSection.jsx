@@ -183,7 +183,7 @@ const FloorPlanSection = ({
             borderRadius: "4px 4px 0 0",
           }}
         >
-          {projectData?.name} Floor Plan
+          {projectData?.project_name} Floor Plan
           {showEdit && (
             <span style={{ cursor: "pointer", marginRight: "12px" }}>
               {isEditing ? (
@@ -636,7 +636,7 @@ const FloorPlanSection = ({
                         <BrochurePopupDialog
                           open={showFloorPlanPopup}
                           onClose={closeFloorPlanPopup}
-                          projectName={projectData?.name || "Invest Mango"}
+                          projectName={projectData?.project_name || "Invest Mango"}
                           brochure={projectData?.brochure}
                         />
                       </div>

@@ -24,8 +24,19 @@ const About = () => {
 
       <section className="main-body">
         <div className="container">
-          <h1>{aboutUsData.title}</h1>
-          <p>
+          <h1
+            style={{
+              fontSize: window.innerWidth <= 480 ? 22 : 32,
+              fontWeight: 700,
+              // textAlign: "center",
+              marginBottom: 8,
+              marginTop: 15,
+              color: "#000",
+            }}
+          >
+            {aboutUsData.title}
+          </h1>
+          <p style={{ color: "#888", fontSize: window.innerWidth <= 480 ? 13 : 16, marginBottom: 24 }}>
             {aboutUsData.breadcrumb.map((item, index) => (
               <span key={index}>
                 <a
@@ -47,14 +58,16 @@ const About = () => {
             <div className="content">
               <div className="row padding_im_about">
                 <div className="col-md-6">
-                  <h2>Our Process</h2>
+                  <h2 style={{ fontWeight: 700, fontSize: window.innerWidth <= 480 ? 18 : 24, color: "#222", textAlign: window.innerWidth <= 480 ? "center" : "left", marginBottom: 8 }}>
+                    Our Process
+                  </h2>
                   <hr />
                   {aboutUsData.process.map((item, index) => (
-                    <div style={{ fontSize: "25px" }}>
+                    <div style={{ fontSize: window.innerWidth <= 480 ? 15 : 20, marginBottom: 12 }}>
                       <p
                         className="p_n"
                         key={index}
-                        style={{ marginBottom: "10px" }}
+                        style={{ marginBottom: "10px", color: "#444", textAlign: window.innerWidth <= 480 ? "center" : "left" }}
                       >
                         <b>{item.title}</b> - {item.description}
                       </p>
@@ -69,8 +82,9 @@ const About = () => {
                     className="responsive-image"
                     style={{
                       width: "100%",
-                      height: "400px",
+                      height: window.innerWidth <= 480 ? "200px" : "400px",
                       borderRadius: "10px",
+                      objectFit: "cover",
                     }}
                   />
                 </div>
@@ -79,21 +93,23 @@ const About = () => {
               <div style={{ marginTop: "30px" }}>
                 <p
                   style={{
-                    fontSize: "24px",
+                    fontSize: window.innerWidth <= 480 ? 18 : 24,
                     fontWeight: "bold",
                     color: "#333",
+                    textAlign: window.innerWidth <= 480 ? "center" : "left",
                   }}
                 >
                   {aboutUsData.keyTakeaway.title}
                 </p>
-                <p style={{ fontSize: "16px", color: "#666" }}>
+                <p style={{ fontSize: window.innerWidth <= 480 ? 14 : 16, color: "#666", textAlign: window.innerWidth <= 480 ? "center" : "left" }}>
                   {aboutUsData.keyTakeaway.description}
                 </p>
                 <p
                   style={{
-                    fontSize: "24px",
+                    fontSize: window.innerWidth <= 480 ? 18 : 24,
                     fontWeight: "bold",
                     color: "#333",
+                    textAlign: window.innerWidth <= 480 ? "center" : "left",
                   }}
                 >
                   {aboutUsData.differentiation.title}
@@ -103,12 +119,13 @@ const About = () => {
                     paddingLeft: "20px",
                     listStyleType: "disc",
                     color: "#666",
+                    textAlign: window.innerWidth <= 480 ? "center" : "left",
                   }}
                 >
                   {aboutUsData.differentiation.points.map((point, index) => (
                     <li
                       key={index}
-                      style={{ fontSize: "16px", marginBottom: "5px" }}
+                      style={{ fontSize: window.innerWidth <= 480 ? 14 : 16, marginBottom: "5px" }}
                     >
                       {point}
                     </li>

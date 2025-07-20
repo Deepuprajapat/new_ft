@@ -34,12 +34,14 @@ const SearchBar = () => {
     debouncedSearch(value);
   };
 
+
   // Close suggestions on ESC key
   const handleKeyDown = (e) => {
     if (e.key === "Escape") {
       setShowSuggestions(false);
     }
   };
+
 
   const debouncedSearch = debounce(async (query) => {
     if (query.trim() === "") {
@@ -185,7 +187,6 @@ const SearchBar = () => {
               width: "100%",
               padding: "12px 20px",
               fontSize: "16px",
-              borderRadius: "5px",
               backgroundColor: "#000",
               color: "#fff",
               fontWeight: "bold",

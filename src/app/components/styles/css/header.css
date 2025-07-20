@@ -40,6 +40,10 @@
   padding: 8px;
   width: 500px;
   transition: width 0.3s ease;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .search-input:focus {
@@ -48,7 +52,8 @@
 }
 
 .search-overlay .search-input {
-  width: 500px; 
+  width: 500px;
+  max-width: 100%;
 }
 
 .search-overlay.show {
@@ -133,19 +138,7 @@ button a {
   font-weight: 600;
 }
 
-@media (width <= 768px) {
-  .phoneButton{
-    display: none;
-  }
-
-  .search-overlay{
-    right: 14px;
-  }
-
-  .search-overlay .search-input {
-    width: 336px;
-}
-
+@media (max-width: 768px) {
   .navbar {
     padding: 0.5rem;
   }
@@ -154,110 +147,469 @@ button a {
     height: 40px;
   }
 
-  .nav-link {
-    font-size: 14px;
-    margin-right: 10px;
-    padding: 11px 5px !important;
-    border-bottom: 1px solid #c5c5c5;
+  .search-overlay{
+    right: 14px;
+    width: 90%;
+    max-width: 336px;
+    overflow: hidden;
+  }
 
+  .search-overlay .search-input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .search-form-container{
-  position: relative;
+    position: relative;
     border-bottom: 1px solid #c5c5c5;
-  }
-
-  button {
-    font-size: 12px;
-    padding: 5px 8px;
-    width: 50px;
-
-  }
-
-  button a {
-    font-size: 12px;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
   }
 }
-.ms-auto {
-  margin-left: 28px !important;
-}
-
+/* --- Navbar Base --- */
 .custom-navbar {
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(32,103,209,0.04);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+/* Mobile navbar collapse animation */
+.navbar-collapse {
   transition: all 0.3s ease-in-out;
-  width: 100%;
-  z-index: 1000;
+}
+
+.navbar-collapse.collapsing {
+  transition: height 0.3s ease;
+}
+
+.navbar-collapse.show {
+  animation: slideDown 0.3s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .custom-navbar.sticky {
-  position: fixed;
+  position: sticky;
   top: 0;
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.95); /* Slight transparency */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(32,103,209,0.10);
+  background: #fff !important;
 }
 
-.logo-img {
-  max-height: 60px;
+.custom-navbar .container {
+  max-width: 1400px;
+  padding: 0 20px;
 }
 
-/* Search Box */
+.navbar-brand {
+  flex: 0 0 auto;
+  margin-right: 30px;
+}
+
+.navbar-collapse {
+  flex: 1 1 auto;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Ensure desktop navbar is always visible */
+@media (min-width: 992px) {
+  .navbar-collapse {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+.navbar-nav.mx-auto {
+  flex: 1 1 auto;
+  justify-content: center;
+  margin: 0 40px;
+}
+
+.navbar-nav.align-items-center {
+  flex: 0 0 auto;
+  gap: 15px;
+}
+
+.phone-buttons-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-left: 15px;
+}
+
+/* Adjust search container */
 .search-form-container {
   position: relative;
+  margin-right: 10px;
 }
 
 .search-button {
-  background: none;
+  padding: 8px;
+  margin: 0;
+}
+
+.search-overlay {
+  right: 0;
+  width: 300px;
+}
+
+/* --- Logo --- */
+.logo-img {
+  height: 44px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  margin-right: 12px;
+}
+
+/* --- Nav Links --- */
+.navbar-nav .nav-link,
+.navbar-nav .dropdown-toggle {
+  color: #222 !important;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  transition: color 0.2s;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .dropdown-toggle:hover,
+.navbar-nav .nav-link.active {
+  color: #2067d1 !important;
+  background: none !important;
+}
+
+.navbar-nav .dropdown-menu {
+  min-width: 180px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(32,103,209,0.08);
+  border: 1px solid #f0f0f0;
+  padding: 0.5rem 0;
+}
+
+.navbar-nav .dropdown-item {
+  color: #222;
+  font-size: 0.97rem;
+  padding: 0.5rem 1rem;
+  transition: background 0.2s, color 0.2s;
+  text-align: left;
+}
+
+.navbar-nav .dropdown-item:hover {
+  background: #f2f7fd;
+  color: #2067d1;
+}
+
+/* --- Search --- */
+.search-form-container {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+}
+
+.search-button {
+  background: #f2f7fd;
   border: none;
+  border-radius: 50%;
+  padding: 8px;
+  color: #2067d1;
+  font-size: 1.1rem;
   cursor: pointer;
-  font-size: 18px;
+  margin-right: 0;
+  transition: background 0.2s;
+}
+
+.search-button:hover {
+  background: #2067d1;
+  color: #fff;
 }
 
 .search-overlay {
   position: absolute;
-  right: 0;
-  top: 40px;
-  background: white;
-  border-radius: 5px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  top: 60px;
+  right: 16px;
+  z-index: 999;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(32,103,209,0.12);
+  padding: 12px;
+  min-width: 220px;
+  max-width: 300px;
+  overflow: hidden;
+}
+
+.search-overlay .d-flex {
+  width: 100%;
+}
+
+.search-overlay .form-control {
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
 .search-input {
-  width: 200px;
-  padding: 5px;
+  border-radius: 20px;
+  border: 1px solid #d4e0f7;
+  padding: 8px 16px;
+  font-size: 1rem;
+  width: 180px;
+  outline: none;
+  transition: border 0.2s;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Phone Button */
+.search-input:focus {
+  border: 1.5px solid #2067d1;
+}
+
+/* --- Phone Button --- */
 .phoneButton {
-  background-color: #007bff;
+  display: flex;
+  align-items: center;
+  background: #2067d1;
+  color: #fff !important;
   border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  margin-left: 10px;
+  border-radius: 22px;
+  padding: 7px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-left: 16px;
+  margin-right: 0;
+  box-shadow: 0 2px 8px rgba(32,103,209,0.08);
+  transition: background 0.2s, color 0.2s;
 }
 
 .phoneButton a {
-  color: white;
+  color: #fff !important;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
 
-.phoneButton:hover {
-  background-color: #0056b3;
+.phoneButton:hover,
+.phoneButton:focus {
+  background: #1256b8;
+  color: #fff !important;
 }
 
-@media (min-width: 481px) and (max-width: 1024px) {
-  .phoneButton {
-    width: 120px !important;
-    font-size: 13px !important;
-    margin-left: 10px !important;
-    padding: 6px 4px !important;
+.phoneButton svg {
+  margin-right: 7px;
+  font-size: 1.1em;
+}
+
+/* --- Responsive Styles --- */
+@media (max-width: 1200px) {
+  .navbar-nav.mx-auto {
+    margin: 0 20px;
   }
-  .phoneButton a {
-    font-size: 13px !important;
-    word-break: break-all;
-    padding: 0 !important;
+  
+  .phone-buttons-container {
+    margin-left: 10px;
+  }
+}
+
+@media (max-width: 991px) and (min-width: 768px) {
+  .navbar-collapse {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 15px 0;
+  }
+
+  .navbar-nav.mx-auto {
+    margin: 10px 0;
+    justify-content: center;
+  }
+
+  .navbar-nav.align-items-center {
+    flex-direction: row;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .phone-buttons-container {
+    margin: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .search-form-container {
+    margin: 0;
+  }
+
+  .search-overlay {
+    width: 300px;
+    right: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .custom-navbar {
+    padding: 0.5rem 0;
+  }
+
+  .navbar-collapse {
+    width: 100%;
+    padding: 20px 15px;
+    flex-direction: column !important;
+    background: #fff;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-top: 10px;
+  }
+
+  .navbar-collapse:not(.show) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .navbar-collapse.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+  }
+
+  .navbar-nav.mx-auto {
+    width: 100%;
+    margin: 0 !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .navbar-nav .nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 15px 20px !important;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 0 !important;
+    font-size: 16px;
+    color: #333 !important;
+    transition: all 0.3s ease;
+  }
+
+  .navbar-nav .nav-link:hover {
+    background: #f8f9fa;
+    color: #2067d1 !important;
+  }
+
+  .navbar-nav .nav-link:last-child {
+    border-bottom: none;
+  }
+
+  .navbar-nav .dropdown {
+    width: 100%;
+  }
+
+  .navbar-nav .dropdown-toggle {
+    width: 100%;
+    text-align: center;
+    padding: 15px 20px !important;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 0 !important;
+    font-size: 16px;
+    color: #333 !important;
+    background: transparent !important;
+    border: none !important;
+  }
+
+  .navbar-nav .dropdown-toggle:hover {
+    background: #f8f9fa !important;
+    color: #2067d1 !important;
+  }
+
+  .navbar-nav .dropdown-toggle::after {
+    margin-left: 8px;
+  }
+
+  .navbar-nav .dropdown-menu {
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    background: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .navbar-nav .dropdown-item {
+    text-align: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 14px;
+  }
+
+  .navbar-nav .dropdown-item:last-child {
+    border-bottom: none;
+  }
+
+  .navbar-nav.align-items-center {
+    width: 100%;
+    margin-top: 20px;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 15px;
+  }
+
+  .search-form-container {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    padding: 15px 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .phone-buttons-container {
+    display: none !important;
+  }
+
+  .phoneButton {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-img {
+    height: 26px;
+    max-width: 90px;
+  }
+  .phoneButton {
+    font-size: 12px;
+    padding: 5px 7px;
+  }
+  .search-overlay {
+    top: 40px;
+    min-width: 98vw;
+    padding: 7px;
   }
 }

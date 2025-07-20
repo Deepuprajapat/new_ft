@@ -304,7 +304,7 @@ const ProjectDetails = ({}) => {
                 />
                 <div className="project-name-container">
                   <h1 className="project-name">
-                    {projectData?.name || "Project Name"}
+                    {projectData?.project_name || "Project Name"}
                   </h1>
                 </div>
 
@@ -566,7 +566,7 @@ const ProjectDetails = ({}) => {
               <section id="overview1">
                 <div id="why" className="box overview">
                   <h2 className="headline">
-                    Why to choose {projectData?.name}?
+                    Why to choose {projectData?.project_name}?
                   </h2>
                   <div className="Why_action">
                     <p className="para_two_line">
@@ -650,7 +650,7 @@ const ProjectDetails = ({}) => {
 
               <section id="about" className="main-body">
                 <div className="box overview">
-                  <h2 className="headline">Know About {projectData?.name}</h2>
+                  <h2 className="headline">Know About {projectData?.project_name}</h2>
                   <div className="row">
                     <div className="col-md-12">
                       <div className="inner-item limitcon">
@@ -690,7 +690,7 @@ const ProjectDetails = ({}) => {
               </section>
               <section id="floor">
                 <div className="box overview">
-                  <h2 className="headline">{projectData?.name} Floor Plan</h2>
+                  <h2 className="headline">{projectData?.project_name} Floor Plan</h2>
                   <div className="row">
                     <div className="col-md-12" style={{ padding: "0px 30px" }}>
                       <p className="para_two_line">
@@ -858,7 +858,7 @@ const ProjectDetails = ({}) => {
               </section>
               <section id="price">
                 <div className="box overview">
-                  <h2 className="headline">{projectData?.name} Price List</h2>
+                  <h2 className="headline">{projectData?.project_name} Price List</h2>
                   <div className="row">
                     <div className="col-md-12">
                       <p className="para_two_line">
@@ -917,7 +917,7 @@ const ProjectDetails = ({}) => {
               {/* Payment Plan Section */}
               <section id="payment_plan">
                 <div className="box overview">
-                  <h2 className="headline">{projectData?.name} Payment Plan</h2>
+                  <h2 className="headline">{projectData?.project_name} Payment Plan</h2>
                   <div className="row">
                     <div className="col-md-12">
                       <p
@@ -1130,7 +1130,7 @@ const ProjectDetails = ({}) => {
               <section id="video">
                 <div className="box overview">
                   <h2 className="headline">
-                    VIDEO PRESENTATION OF {projectData?.name}
+                    VIDEO PRESENTATION OF {projectData?.project_name}
                   </h2>
                   <div className="row">
                     <div className="col-md-12">
@@ -1176,14 +1176,14 @@ const ProjectDetails = ({}) => {
               <section>
                 <div className="box overview">
                   <h2 className="headline">
-                    {projectData?.name} Location Advantage
+                    {projectData?.project_name} Location Advantage
                   </h2>
                   <div className="row">
                     <div className="col-md-12" style={{ padding: "0px 35px" }}>
                       <div className="inner-item">
                         <p>
                           The residential development of{" "}
-                          <b>{projectData?.name}</b> has been strategically
+                          <b>{projectData?.project_name}</b> has been strategically
                           located in Sector-1 Greater Noida West.
                           <b>ACE Divino location</b> places you near top
                           schools, colleges, sports complexes, entertainment
@@ -1256,7 +1256,7 @@ const ProjectDetails = ({}) => {
               </section>
               <section id="location">
                 <div className="box overview">
-                  <h2 className="headline">{projectData?.name} Location Map</h2>
+                  <h2 className="headline">{projectData?.project_name} Location Map</h2>
                   <div className="row">
                     <div className="col-md-12">
                       <p className="para_two_line">
@@ -1291,7 +1291,7 @@ const ProjectDetails = ({}) => {
               </section>
               <section id="siteplan">
                 <div className="box overview">
-                  <h2 className="headline">{projectData?.name} Site Plan</h2>
+                  <h2 className="headline">{projectData?.project_name} Site Plan</h2>
                   <div className="row">
                     <div className="col-md-12">
                       <p className="para_two_line">

@@ -175,7 +175,7 @@ const FAQSection = ({ projectData  , showEdit , handleSave }) => {
             </span>
           )}
         </div>
-        <div className="px-3">
+        <div className="px-3 mt-4">
           {(isEditing ? editFaqs : faqs)?.map((faq, index) => (
             <div key={index} className="mb-3">
               <div

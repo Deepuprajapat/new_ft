@@ -490,7 +490,7 @@ const ProjectDetails = () => {
     try {
       const response = await sendOTP(
         formData.usermobile,
-        projectData?.name || "",
+        projectData?.project_name || "",
         "ORGAINc",
         formData.username,
         formData.usermsg,
@@ -595,7 +595,7 @@ const ProjectDetails = () => {
   //         name: formData.username,
   //         phone: `${formData.dial_code}${formData.usermobile}`,
   //         email: formData.useremail,
-  //         projectName: projectData?.name,
+  //         projectName: projectData?.project_name,
   //         source: "ORGANIC",
   //       };
   //       await saveLead(newLead);
@@ -944,9 +944,8 @@ const ProjectDetails = () => {
                 <li key={item} className="mx-1">
                   <a
                     href={`#${item}`}
-                    className={`text-white text-decoration-none ${
-                      activeSection === item ? "fw-bold" : ""
-                    }`}
+                    className={`text-white text-decoration-none ${activeSection === item ? "fw-bold" : ""
+                      }`}
                     style={{
                       fontWeight: activeSection === item ? "bold" : "400",
                       textDecoration:
@@ -1200,16 +1199,14 @@ const ProjectDetails = () => {
               >
                 Get Free Consultation for this property. Call us at:{" "}
                 <a
-                  href={`tel:+91${
-                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                  href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595189189"
-                  }`}
+                    }`}
                   style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
-                  {`+91-${
-                    projectData?.locality?.city?.phoneNumber?.[0] ||
+                  {`+91-${projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595-189-189"
-                  }`}
+                    }`}
                 </a>
               </div>
               {/* Payment Plan */}
@@ -1237,7 +1234,7 @@ const ProjectDetails = () => {
               <AmenitiesSection
                 amenities={amenities}
                 amenitiesPara={amenitiesPara}
-                name={projectData?.name || ""}
+                name={projectData?.project_name || ""}
                 showEdit={showEdit}
                 handleSave={handleSave}
               />
@@ -1267,7 +1264,7 @@ const ProjectDetails = () => {
                       borderRadius: "4px 4px 0 0",
                     }}
                   >
-                    {projectData?.name} Location Advantage
+                    {projectData?.project_name} Location Advantage
                   </h4>
                   <div className="px-3">
                     <div className="inner-item">
@@ -1285,7 +1282,7 @@ const ProjectDetails = () => {
                           />
                         ) : (
                           <p style={{ padding: "0px 10px", color: "gray" }}>
-                            {projectData?.name} Location Advantage Not Available
+                            {projectData?.project_name} Location Advantage Not Available
                           </p>
                         )}
                       </div>
@@ -1322,6 +1319,7 @@ const ProjectDetails = () => {
               {/* About Developer Section */}
               <AboutDeveloperSection
                 developerDetails={{
+                  id: projectData?.developer_info?.developer_id || "",
                   logo: projectData?.developer_info?.logo || "",
                   altLogo:
                     projectData?.developer_info?.alt_logo|| "",
@@ -1365,7 +1363,7 @@ const ProjectDetails = () => {
                     projectData?.web_cards?.project_details?.area?.value || "",
                   shortAddress: projectData?.location_info?.short_address || "",
                 }}
-                showEdit={true}
+                showEdit={showEdit}
                 handleSave={handleSave}
               />
               {/* Similar Projects */}
@@ -1406,6 +1404,7 @@ const ProjectDetails = () => {
       </div>
     </>
   );
+
 };
 
 export default ProjectDetails;

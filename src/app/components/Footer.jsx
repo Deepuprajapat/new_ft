@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
 import "../components/styles/css/footer.css";
-import logo from "../assets/img/Logo-footer.png";
+import logo from "../assets/img/IM-Logo-white-01.svg";
 import {
   fetchfooterlinks,
 } from "../apis/api";
@@ -183,7 +183,7 @@ const Footer = ({ projectPhoneNumber }) => {
       <footer>
         {/* Add Generic Link Button (stick to footer) */}
         <div className="Whatsupbuttn" style={{ width: "70px" }}>
-          <a
+        <a 
             href="https://web.whatsapp.com/send?phone=+91-8448141652&text=I%27m%20interested%20in%20this%20project.%20Please%20provide%20more%20details!"
             target="_blank"
             style={{ float: "right" }}
@@ -198,26 +198,17 @@ const Footer = ({ projectPhoneNumber }) => {
           </a>
         </div>
 
-        <div className="top-footer">
+        <div className="top-footer footer-keywords-section">
           <div className="container">
-            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2">
+            {/* <div className="footer-keywords-title">Popular Searches</div> */}
+            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 align-items-center">
               {footerItems?.map((item) => (
-                <div className="col" key={item.title}>
-                  <ul className="footer-links list-unstyled m-0 p-0">
+                <div className="col" key={item.id}>
+                  <ul className="footer-links list-unstyled m-0 p-0 align-items-center">
                     <li>
                       <button
                         onClick={() => handleKeywordClick(item.slug)}
                         className="text-reset text-start custom-link"
-                        style={{
-                          background: "none",
-                          border: "none",
-                          color: "inherit",
-                          cursor: "pointer",
-                          padding: 0,
-                          margin: 0,
-                          width: "100%",
-                          textAlign: "left",
-                        }}
                       >
                         {item.title}
                       </button>
@@ -231,7 +222,7 @@ const Footer = ({ projectPhoneNumber }) => {
 
         <div className="top-footer">
           <div className="container">
-            <div className="row">
+            <div className="row footer-center-row">
               <div className="col-md-3">
                 <img
                   src={logo}
@@ -243,9 +234,9 @@ const Footer = ({ projectPhoneNumber }) => {
                   // onClick={() => navigate("/")}
                   onClick={handleClick}
                 />
-                <p className="normal">
+                {/* <p className="normal">
                   Giving the right experience to our Clients!
-                </p>
+                </p> */}
                 <ul className="content_li" style={{ color: " #737373" }}>
                   <li>
                     <a href="mailto:info@investmango.com">
@@ -255,6 +246,15 @@ const Footer = ({ projectPhoneNumber }) => {
                   <li>
                     <i className="fas fa-key"></i> UPRERAAGT12212
                   </li>
+                  <li>
+                    <i className="fas fa-key"></i> HRERA-PKL-REA-1724-2023
+                  </li>
+                  <li>
+                    <i className="fas fa-key"></i> DLRERA2021A0071
+                  </li>
+                  <li>
+                    <i className="fas fa-key"></i> MAHARERA-A041262401669
+                  </li>
                 </ul>
                 <div className="social-links">
                   <a
@@ -263,7 +263,7 @@ const Footer = ({ projectPhoneNumber }) => {
                   >
                     <img
                       // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/e6391943-c9b2-40a0-0eb9-1e14df3c8800/public"
-                      src="/images/facebook.webp"
+                      src="/images/facebook-N.png"
                       loading="lazy"
                       alt="Facebook"
                       className="social-icon"
@@ -278,7 +278,7 @@ const Footer = ({ projectPhoneNumber }) => {
                   <a href="https://x.com/investmango" target="_blank">
                     <img
                       //src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/1f2fc408-b9a8-4fff-ccae-874028f56400/public"
-                      src="/images/twitter.png"
+                      src="/images/twitter-N.png"
                       loading="lazy"
                       alt="Twitter"
                       className="social-icon"
@@ -287,7 +287,7 @@ const Footer = ({ projectPhoneNumber }) => {
                   <a href="https://instagram.com/investmango" target="_blank">
                     <img
                       // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/00c6899a-05e6-488c-2ff6-1c5fd2d8bc00/public"
-                      src="/images/instagram.jpg"
+                      src="/images/instagram-N.png"
                       loading="lazy"
                       alt="Instagram"
                       className="social-icon"
@@ -305,7 +305,7 @@ const Footer = ({ projectPhoneNumber }) => {
                   >
                     <img
                       // src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/6e591ec2-b5f2-4a01-6a43-4287e23c2300/public"
-                      src="/images/LIn.jpg"
+                      src="/images/linkedin-N.png"
                       loading="lazy"
                       alt="Linkedin"
                       className="social-icon"
@@ -323,7 +323,7 @@ const Footer = ({ projectPhoneNumber }) => {
                   >
                     <img
                       //src="https://imagedelivery.net/MbjggtGD4dFDFpyznW77nA/a3003793-d9c2-4393-222e-b1dd3deb6e00/public"
-                      src="/images/ytube.png"
+                      src="/images/youtube-N.png"
                       loading="lazy"
                       alt="YouTube"
                       className="social-icon"
@@ -339,7 +339,7 @@ const Footer = ({ projectPhoneNumber }) => {
               </div>
 
               <div className="col-md-3">
-                <p className="headline">Contact</p>
+                <p className="headlineee">Contact</p>
                 <ul>
                   <li className="subhead">
                     <i className="fas fa-map-marker-alt"></i> HEAD OFFICE
@@ -369,7 +369,7 @@ const Footer = ({ projectPhoneNumber }) => {
               </div>
 
               <div className="col-md-3">
-                <p className="headline">Quick Links</p>
+                <p className="headlineee">Quick Links</p>
                 <ul>
                   <li>
                     <Link to="/about">About Us</Link>
@@ -396,7 +396,7 @@ const Footer = ({ projectPhoneNumber }) => {
               </div>
 
               <div className="col-md-3" id="our-project">
-                <p className="headline">Our Projects</p>
+                <p className="headlineee">Our Projects</p>
                 <ul>
                   <li>
                     <a href="https://www.investmango.com/ace-starlit-sector-152-noida">

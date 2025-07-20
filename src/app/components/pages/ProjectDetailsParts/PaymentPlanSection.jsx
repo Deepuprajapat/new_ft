@@ -91,7 +91,7 @@ const PaymentPlanSection = ({ projectData, showEdit, handleSave }) => {
             borderRadius: "4px 4px 0 0",
           }}
         >
-          {projectData?.name} Payment Plan
+          {projectData?.project_name} Payment Plan
           {showEdit && (
             <span style={{ cursor: "pointer", marginRight: "12px" }}>
               {isPaymentEditing ? (

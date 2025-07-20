@@ -25,6 +25,7 @@ const Header = ({ projectPhoneNumber }) => {
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
@@ -110,17 +111,7 @@ const Header = ({ projectPhoneNumber }) => {
     setShowSearch(false); // Hide search input after navigation
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const navbarCollapse = document.querySelector(".navbar-collapse");
-      if (navbarCollapse) {
-        navbarCollapse.classList.remove("show");
-      }
-    };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Toggle Search Visibility
   const handleSearchClick = () => {
@@ -130,6 +121,7 @@ const Header = ({ projectPhoneNumber }) => {
   useEffect(() => {
     setShowSearch(false); // Hide search input when route changes
     setSearchQuery(""); // Clear search input
+    setExpanded(false); // Close mobile menu when route changes
   }, [location.pathname]);
 
   useEffect(() => {
@@ -140,141 +132,152 @@ const Header = ({ projectPhoneNumber }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Handle nav link clicks
+  const handleNavLinkClick = (path) => {
+    setExpanded(false);
+    window.location.href = path;
+  };
+
   return (
-
-    <Navbar
-      bg="light"
-      expand="lg"
-      className={`custom-navbar ${isSticky ? "sticky" : ""}`}
-    >
-      <Container>
-        <Navbar.Brand href="https://www.investmango.com/">
-          <img
-            src={logo}
-            loading="lazy"
-            alt="Invest Mango"
-            title="Invest Mango"
-            className="logo-img"
-          />
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto" >
-            {navItems.map((item, index) =>
-              item.dropdown ? (
-                <NavDropdown
-                  title={item.label}
-                  id={`nav-dropdown-${index}`}
-                  key={index}
-                  style={{ paddingBottom: "0px"}}
-                >
-                  {item.dropdown.map((subItem, subIndex) => (
-                    <NavDropdown.Item
-                      key={subIndex}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (subItem.label === 'Add Project') {
-                          setShowAddProjectModal(true);
-                        } else {
-                          window.location.href = subItem.path;
-                        }
-                      }}
-                      style={{ paddingLeft: 2, paddingRight: 4, borderBottom:"1px solid #d4cfcf", textAlign: 'center'}}
-                    >
-                      {subItem.label}
-                    </NavDropdown.Item>
-                  ))}
-                  {isAuthenticated && (
-                      <AddProject show={showAddProjectModal} handleClose={() => setShowAddProjectModal(false)} />
-                  )}
-                </NavDropdown>
-              ) : (
-                <Nav.Link
-                  href={item.path}
-                  key={index}
-                  style={{ paddingLeft: 2, paddingRight: 4 }}
-                >
-                  {item.label}
-                </Nav.Link>
-              )
-            )}
-            <Nav>
-              {/* Search Button */}
-            { isDesktop && <div className="search-form-container">
-                <button onClick={handleSearchClick} className="search-button">
-                  <FaSearch />
-                </button>
-
-                {/* Search Input */}
-                {showSearch  && (
-                  <div className="search-overlay">
-                    <Form className="d-flex" onSubmit={handleSearchSubmit}>
-                      <Form.Control
-                        type="search"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        placeholder="Search"
-                        className="search-input"
-                        aria-label="Search"
-                      />
-                    </Form>
-                  </div>
-                )}
-              </div>}
-              <div style={{ display: "flex", flexDirection: "row" }}>
-                {/* Phone Buttons */}
-                {projectPhoneNumber ? (
-                  <button
-                    className="phoneButton"
-                    style={{ background: "#2067d1", marginLeft: "320px" }}
+     <Navbar
+     bg="light"
+     expand="lg"
+     expanded={expanded}
+     onToggle={setExpanded}
+     className={`custom-navbar ${isSticky ? "sticky" : ""}`}
+   >
+     <Container>
+       <Navbar.Brand href="https://www.investmango.com/">
+         <img
+           src={logo}
+           loading="lazy"
+           alt="Invest Mango"
+           title="Invest Mango"
+           className="logo-img"
+         />
+       </Navbar.Brand>
+       <Navbar.Toggle aria-controls="basic-navbar-nav" />
+       <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="mx-auto">
+          {navItems.map((item, index) =>
+            item.dropdown ? (
+              <NavDropdown
+                title={item.label}
+                id={`nav-dropdown-${index}`}
+                key={index}
+                style={{ paddingBottom: "0px" }}
+              >
+                {item.dropdown.map((subItem, subIndex) => (
+                  <NavDropdown.Item
+                    key={subIndex}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (subItem.label === 'Add Project') {
+                        setExpanded(false);
+                        setShowAddProjectModal(true);
+                      } else {
+                        handleNavLinkClick(subItem.path);
+                      }
+                    }}
+                    style={{ paddingLeft: 2, paddingRight: 4, borderBottom:"1px solid #d4cfcf", textAlign: 'center'}}
                   >
-                    <a href={`tel:${projectPhoneNumber}`}>
-                      <FaPhoneAlt /> {projectPhoneNumber}
-                    </a>
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      className="phoneButton"
-                      style={{ background: "#2067d1", marginLeft: "185px" }}
-                    >
-                      <a href="tel:+918595189189">
-                        <FaPhoneAlt /> 8595-189-189
-                      </a>
-                    </button>
-                    <button
-                      className="phoneButton"
-                      style={{ background: "#2067d1" }}
-                    >
-                      <a href="tel:+917428189189">
-                        <FaPhoneAlt /> 7428-189-189
-                      </a>
-                    </button>
-                  </>
-                )}
-                {/* Logout Button - Only visible when authenticated */}
+                    {subItem.label}
+                  </NavDropdown.Item>
+                ))}
                 {isAuthenticated && (
-                  <button
-                    className="phoneButton"
-                    style={{ background: "#dc3545", marginLeft: "10px" }}
-                    onClick={() => setShowLogoutModal(true)}
-                  >
-                    Logout
-                  </button>
+                  <AddProject 
+                    show={showAddProjectModal} 
+                    handleClose={() => {
+                      setShowAddProjectModal(false);
+                      setExpanded(false);
+                    }} 
+                  />
                 )}
-              </div>
-            </Nav>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-      {/* Logout Confirmation Modal */}
-      <LogoutModal
-        show={showLogoutModal}
-        handleClose={() => setShowLogoutModal(false)}
-        handleConfirm={handleLogoutConfirm}
-      />
-    </Navbar>
-  );
+              </NavDropdown>
+            ) : (
+              <Nav.Link
+                key={index}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavLinkClick(item.path);
+                }}
+                style={{ paddingLeft: 2, paddingRight: 4, cursor: 'pointer' }}
+              >
+                {item.label}
+              </Nav.Link>
+            )
+          )}
+        </Nav>
+        <Nav className="align-items-center">
+          {/* Search Button */}
+          {isDesktop && (
+            <div className="search-form-container">
+              <button onClick={handleSearchClick} className="search-button">
+                <FaSearch />
+              </button>
+
+              {/* Search Input */}
+              {showSearch && (
+                <div className="search-overlay">
+                  <Form className="d-flex" onSubmit={handleSearchSubmit}>
+                    <Form.Control
+                      type="search"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      placeholder="Search"
+                      className="search-input"
+                      aria-label="Search"
+                    />
+                  </Form>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Phone Buttons Container */}
+          <div className="phone-buttons-container">
+            {projectPhoneNumber ? (
+              <button className="phoneButton">
+                <a href={`tel:${projectPhoneNumber}`}>
+                  <FaPhoneAlt /> {projectPhoneNumber}
+                </a>
+              </button>
+            ) : (
+              <>
+                <button className="phoneButton">
+                  <a href="tel:+918595189189">
+                    <FaPhoneAlt /> 8595-189-189
+                  </a>
+                </button>
+                <button className="phoneButton">
+                  <a href="tel:+917428189189">
+                    <FaPhoneAlt /> 7428-189-189
+                  </a>
+                </button>
+              </>
+            )}
+            {/* Logout Button - Only visible when authenticated */}
+            {isAuthenticated && (
+              <button
+                className="phoneButton"
+                style={{ background: "#dc3545" }}
+                onClick={() => setShowLogoutModal(true)}
+              >
+                Logout
+              </button>
+            )}
+          </div>
+        </Nav>
+      </Navbar.Collapse>
+    </Container>
+    {/* Logout Confirmation Modal */}
+    <LogoutModal
+      show={showLogoutModal}
+      handleClose={() => setShowLogoutModal(false)}
+      handleConfirm={handleLogoutConfirm}
+    />
+  </Navbar>
+);
 };
 
 export default Header;
