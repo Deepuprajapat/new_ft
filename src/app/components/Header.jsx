@@ -252,15 +252,31 @@ const Header = ({ projectPhoneNumber }) => {
                     </button>
                   </>
                 )}
-                {/* Logout Button - Only visible when authenticated */}
+                {/* Dashboard & Logout Buttons - Only visible when authenticated */}
                 {isAuthenticated && (
-                  <button
-                    className="phoneButton"
-                    style={{ background: "#dc3545", marginLeft: "10px" }}
-                    onClick={() => setShowLogoutModal(true)}
-                  >
-                    Logout
-                  </button>
+                  <>
+                    <button
+                      className="phoneButton"
+                      style={{ background: "#28a745", marginLeft: "10px" }}
+                      onClick={() => {
+                        const userRole = localStorage.getItem("user-role");
+                        if (userRole === 'dm') {
+                          navigate('/admin/leads/dashboard');
+                        } else {
+                          navigate('/admin/dashboard');
+                        }
+                      }}
+                    >
+                      Dashboard
+                    </button>
+                    <button
+                      className="phoneButton"
+                      style={{ background: "#dc3545", marginLeft: "10px" }}
+                      onClick={() => setShowLogoutModal(true)}
+                    >
+                      Logout
+                    </button>
+                  </>
                 )}
               </div>
             </Nav>
