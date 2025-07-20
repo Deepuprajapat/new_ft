@@ -13,7 +13,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
   const [editDeveloperLogo, setEditDeveloperLogo] = useState(property?.developer?.developer_logo || "");
   const [editDeveloperAddress, setEditDeveloperAddress] = useState(property?.developer?.developer_address || "");
   const [editPropertyAddress, setEditPropertyAddress] = useState(property?.propertyAddress || "");
-  const [editPrice, setEditPrice] = useState(property?.price || "");
+  const [editPrice, setEditPrice] = useState(property?.pricing_info?.price || "");
 
   // Add local state for editable RERA details
   const [editReraRows, setEditReraRows] = useState(
@@ -53,7 +53,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
     setEditDeveloperLogo(property?.developer?.developer_logo || "");
     setEditDeveloperAddress(property?.developer?.developer_address || "");
     setEditPropertyAddress(property?.propertyAddress || "");
-    setEditPrice(property?.price || "");
+    setEditPrice(property?.pricing_info?.price || "");
     setIsEditing(false);
   };
   const handleSave = () => {
