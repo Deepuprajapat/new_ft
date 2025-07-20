@@ -551,8 +551,14 @@ export const getLeadById = async (id) => {
 // Admin Leads API Endpoints
 export const getAllLeadsAdmin = async (filters = {}) => {
   try {
+    // Handle property_ids array for business partners
+    const params = { ...filters };
+    if (filters.property_ids && Array.isArray(filters.property_ids)) {
+      params.property_ids = filters.property_ids.join(',');
+    }
+    
     const response = await axios.get(`${BASE_URL}/leads`, {
-      params: filters
+      params
     });
     return response.data;
   } catch (error) {
@@ -708,6 +714,16 @@ export const getPropertyByUrlName = async (urlName) => {
   } catch (error) {
     console.error("Error fetching project by urlName:", error);
     return {}; // Return an empty object if there's an error
+  }
+};
+
+export const getPropertyBySlug = async (slug) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/properties/slug/${slug}`);
+    return res.data || {};
+  } catch (error) {
+    console.error("Error fetching property by slug:", error);
+    return {};
   }
 };
 

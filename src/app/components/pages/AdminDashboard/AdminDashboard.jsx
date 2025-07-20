@@ -6,6 +6,7 @@ import { Tabs, Table, Tag, Badge, Tooltip, Button, DatePicker, Space } from 'ant
 import { EyeOutlined, CalendarOutlined, UserOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AddProject from '../ProjectDetailsParts/AddProject/AddProject';
+import LeadModal from '../Dashboard/LeadsDashboard/LeadModal';
 import './AdminDashboard.css';
 
 const PropertyLeadsTable = ({ propertyId }) => {
@@ -202,6 +203,10 @@ const AdminDashboard = () => {
   const [selectedProject, setSelectedProject] = useState('');
   const [propertyName, setPropertyName] = useState('');
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
+  
+  // Lead modal state
+  const [selectedLead, setSelectedLead] = useState(null);
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
 
   const fetchAdminProperties = async (page = 1, currentFilters = filters) => {
     try {
@@ -253,14 +258,36 @@ const AdminDashboard = () => {
       
       if (currentFilters.startDate) params.start_date = currentFilters.startDate;
       if (currentFilters.endDate) params.end_date = currentFilters.endDate;
-      if (currentFilters.property_id) params.property_id = currentFilters.property_id;
+      
+      // Handle property filtering
+      if (currentFilters.property_id) {
+        // Specific property selected
+        params.property_id = currentFilters.property_id;
+      } else if (!currentFilters.property_id && properties.length > 0) {
+        // "All Properties" selected - send all property IDs
+        const allPropertyIds = properties.map(property => property.id);
+        params.property_ids = allPropertyIds;
+      }
       
       const response = await getAllLeadsAdmin(params);
       
       if (response && response.data) {
-        setLeads(Array.isArray(response.data) ? response.data : []);
-        setTotalLeads(response.totalElements || response.total || 0);
-        setLeadsTotalPages(Math.ceil((response.totalElements || response.total || 0) / leadsPageSize));
+        // Handle new API response structure with unique_leads and duplicate_leads
+        let allLeads = [];
+        if (response.data.unique_leads && Array.isArray(response.data.unique_leads)) {
+          allLeads = [...response.data.unique_leads];
+        }
+        if (response.data.duplicate_leads && Array.isArray(response.data.duplicate_leads)) {
+          allLeads = [...allLeads, ...response.data.duplicate_leads];
+        }
+        // Fallback to old structure if new structure is not available
+        if (allLeads.length === 0 && Array.isArray(response.data)) {
+          allLeads = response.data;
+        }
+        
+        setLeads(allLeads);
+        setTotalLeads(response.totalElements || response.total || allLeads.length);
+        setLeadsTotalPages(Math.ceil((response.totalElements || response.total || allLeads.length) / leadsPageSize));
       } else {
         setLeads([]);
         setTotalLeads(0);
@@ -332,6 +359,17 @@ const AdminDashboard = () => {
     setSelectedPropertyForLeads(null);
   };
 
+  // Lead modal handlers
+  const openLeadModal = (lead) => {
+    setSelectedLead(lead);
+    setIsLeadModalOpen(true);
+  };
+
+  const closeLeadModal = () => {
+    setIsLeadModalOpen(false);
+    setSelectedLead(null);
+  };
+
   // Leads table columns
   const leadsColumns = [
     {
@@ -372,8 +410,8 @@ const AdminDashboard = () => {
     },
     {
       title: 'Status',
-      dataIndex: 'is_verified',
-      key: 'is_verified',
+      dataIndex: 'otp_verified',
+      key: 'otp_verified',
       render: (verified) => (
         <Tag color={verified ? 'green' : 'orange'}>
           {verified ? 'Verified' : 'Unverified'}
@@ -459,14 +497,14 @@ const AdminDashboard = () => {
                   <div className="property-actions">
                     <button 
                       className="btn btn-primary btn-sm"
-                      onClick={() => navigate(`/propertyforsale/${property.id}`, { state: { editMode: true } })}
+                      onClick={() => navigate(`/propertyforsale/${property.slug || property.id}`, { state: { editMode: true } })}
                     >
                       <i className="fas fa-edit"></i>
                       Edit
                     </button>
                     <button 
                       className="btn btn-outline-secondary btn-sm"
-                      onClick={() => navigate(`/propertyforsale/${property.id}`)}
+                      onClick={() => navigate(`/propertyforsale/${property.slug || property.id}`)}
                     >
                       <i className="fas fa-eye"></i>
                       View
@@ -574,6 +612,10 @@ const AdminDashboard = () => {
           columns={leadsColumns}
           dataSource={leads}
           rowKey={(record) => record.id || record.lead_id}
+          onRow={(record) => ({
+            onClick: () => openLeadModal(record),
+            style: { cursor: 'pointer' },
+          })}
           pagination={{
             current: leadsCurrentPage,
             total: totalLeads,
@@ -1134,6 +1176,13 @@ const AdminDashboard = () => {
           handleClose={() => setShowAddProjectModal(false)}
         />
       )}
+
+      {/* Lead Details Modal */}
+      <LeadModal 
+        isOpen={isLeadModalOpen} 
+        onClose={closeLeadModal} 
+        lead={selectedLead} 
+      />
     </div>
   );
 };
