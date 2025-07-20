@@ -308,7 +308,18 @@ const PropertyDetails = () => {
     setProperty(newData);
     try {
       if (property?.id) {
-        const response = await patchPropertyDetails(property.id, newData);
+        // Format the data to put price inside pricing_info
+        const formattedData = {
+          ...newData,
+          pricing_info: {
+            ...(newData.pricing_info || {}),
+            price: newData.price
+          }
+        };
+        // Remove price from root level since it's now in pricing_info
+        delete formattedData.price;
+        
+        const response = await patchPropertyDetails(property.id, formattedData);
         console.log("Patch API response:", response);
         
         // Check if the response contains an updated slug
@@ -337,7 +348,16 @@ const PropertyDetails = () => {
       };
       // Update backend
       if (prev?.id) {
-        patchPropertyDetails(prev.id, merged).then((response) => {
+        // Format the data to put price inside pricing_info if price exists
+        const formattedData = { ...merged };
+        if (formattedData.price !== undefined) {
+          formattedData.pricing_info = {
+            ...(formattedData.pricing_info || {}),
+            price: formattedData.price
+          };
+          delete formattedData.price;
+        }
+        patchPropertyDetails(prev.id, formattedData).then((response) => {
           // Check if the response contains an updated slug
           if (response?.data?.slug && response.data.slug !== slugFromUrl) {
             console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
@@ -376,7 +396,16 @@ const PropertyDetails = () => {
       };
       // Update backend
       if (prev?.id) {
-        patchPropertyDetails(prev.id, merged).then((response) => {
+        // Format the data to put price inside pricing_info if price exists
+        const formattedData = { ...merged };
+        if (formattedData.price !== undefined) {
+          formattedData.pricing_info = {
+            ...(formattedData.pricing_info || {}),
+            price: formattedData.price
+          };
+          delete formattedData.price;
+        }
+        patchPropertyDetails(prev.id, formattedData).then((response) => {
           // Check if the response contains an updated slug
           if (response?.data?.slug && response.data.slug !== slugFromUrl) {
             console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
@@ -417,7 +446,16 @@ const PropertyDetails = () => {
         },
       };
       if (prev?.id) {
-        patchPropertyDetails(prev.id, merged).then((response) => {
+        // Format the data to put price inside pricing_info if price exists
+        const formattedData = { ...merged };
+        if (formattedData.price !== undefined) {
+          formattedData.pricing_info = {
+            ...(formattedData.pricing_info || {}),
+            price: formattedData.price
+          };
+          delete formattedData.price;
+        }
+        patchPropertyDetails(prev.id, formattedData).then((response) => {
           // Check if the response contains an updated slug
           if (response?.data?.slug && response.data.slug !== slugFromUrl) {
             console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
