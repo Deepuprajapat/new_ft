@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useLocation  } from "react-router-dom";
+import { useParams, useLocation, useNavigate  } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import {
+  getPropertyBySlug,
   getPropertyByUrlName,
   patchPropertyDetails,
   sendOTP,
@@ -77,6 +78,8 @@ const PropertyDetails = () => {
   const closeFloorPlanPopup = () => setShowFloorPlanPopup(false);
   
   const location = useLocation();
+  const navigate = useNavigate();
+  const { id: slugFromUrl } = useParams(); // Get slug from URL params
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);
@@ -96,6 +99,7 @@ const PropertyDetails = () => {
     setShowPopup(false);
   };
 
+  // Use slug from URL params as primary source, fall back to location state or session
   const getProjectIdFromSession = () => {
     const propertyState = localStorage.getItem("propertyState");
     console.log("Raw propertyState:", propertyState);
@@ -112,9 +116,9 @@ const PropertyDetails = () => {
     }
     return null;
   };
-  const propertyid = location.state?.propertyid || getProjectIdFromSession();
-
-  console.log(propertyid, "ppid")
+  
+  const propertySlug = slugFromUrl || location.state?.propertyid || getProjectIdFromSession();
+  console.log("Property slug:", propertySlug)
 
   const [formData, setFormData] = useState({
     username: "",
@@ -154,7 +158,10 @@ const PropertyDetails = () => {
         "ORGAINc",
         formData.username,
         formData.usermsg,
-        formData.useremail
+        formData.useremail,
+        "customer",
+        property?.id || "",
+        ""
       );
       if (response) {
         setOtpSent(true);
@@ -219,15 +226,27 @@ const PropertyDetails = () => {
   }, [timer, otpSent]);
 
   useEffect(() => {
-    if (propertyid) {
+    if (propertySlug) {
       const fetchProperty = async () => {
-        const data = await getPropertyByUrlName(propertyid);
+        let data;
+        
+        // Check if propertySlug is a numeric ID or a slug
+        if (/^\d+$/.test(propertySlug)) {
+          // If it's numeric, treat it as property ID
+          console.log("Fetching property by ID:", propertySlug);
+          data = await getPropertyByUrlName(propertySlug);
+        } else {
+          // If it's not numeric, treat it as a slug
+          console.log("Fetching property by slug:", propertySlug);
+          data = await getPropertyBySlug(propertySlug);
+        }
+        
         setProperty(data.data);
-        console.log("datayhdsj", data.data);
+        console.log("Property data fetched:", data.data);
       };
       fetchProperty();
     }
-  }, [propertyid]);
+  }, [propertySlug]);
 
   console.log(property, "propertyuiehuiew");
 
@@ -288,9 +307,16 @@ const PropertyDetails = () => {
   const onSaveProjectDetails = async (newData) => {
     setProperty(newData);
     try {
-      if (propertyid) {
-        const response = await patchPropertyDetails(propertyid, newData);
+      if (property?.id) {
+        const response = await patchPropertyDetails(property.id, newData);
         console.log("Patch API response:", response);
+        
+        // Check if the response contains an updated slug
+        if (response?.data?.slug && response.data.slug !== slugFromUrl) {
+          console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
+          // Navigate to the new URL with updated slug
+          navigate(`/propertyforsale/${response.data.slug}`, { replace: true });
+        }
       } else {
         console.error("Property ID not found!");
       }
@@ -310,8 +336,17 @@ const PropertyDetails = () => {
         ...changedData,
       };
       // Update backend
-      if (propertyid) {
-        patchPropertyDetails(propertyid, merged);
+      if (prev?.id) {
+        patchPropertyDetails(prev.id, merged).then((response) => {
+          // Check if the response contains an updated slug
+          if (response?.data?.slug && response.data.slug !== slugFromUrl) {
+            console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
+            // Navigate to the new URL with updated slug
+            navigate(`/propertyforsale/${response.data.slug}`, { replace: true });
+          }
+        }).catch((error) => {
+          console.error("Error updating property:", error);
+        });
       }
       return merged;
     });
@@ -340,8 +375,17 @@ const PropertyDetails = () => {
         },
       };
       // Update backend
-      if (propertyid) {
-        patchPropertyDetails(propertyid, merged);
+      if (prev?.id) {
+        patchPropertyDetails(prev.id, merged).then((response) => {
+          // Check if the response contains an updated slug
+          if (response?.data?.slug && response.data.slug !== slugFromUrl) {
+            console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
+            // Navigate to the new URL with updated slug
+            navigate(`/propertyforsale/${response.data.slug}`, { replace: true });
+          }
+        }).catch((error) => {
+          console.error("Error updating property:", error);
+        });
       }
       return merged;
     });
@@ -372,8 +416,17 @@ const PropertyDetails = () => {
           },
         },
       };
-      if (propertyid) {
-        patchPropertyDetails(propertyid, merged);
+      if (prev?.id) {
+        patchPropertyDetails(prev.id, merged).then((response) => {
+          // Check if the response contains an updated slug
+          if (response?.data?.slug && response.data.slug !== slugFromUrl) {
+            console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
+            // Navigate to the new URL with updated slug
+            navigate(`/propertyforsale/${response.data.slug}`, { replace: true });
+          }
+        }).catch((error) => {
+          console.error("Error updating property:", error);
+        });
       }
       return merged;
     });
