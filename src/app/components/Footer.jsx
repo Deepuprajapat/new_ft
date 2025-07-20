@@ -184,10 +184,10 @@ const Footer = ({ shortAddress }) => {
         <div className="top-footer footer-keywords-section">
           <div className="container">
             {/* <div className="footer-keywords-title">Popular Searches</div> */}
-            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2">
+            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 align-items-center">
               {footerItems.map((item) => (
                 <div className="col" key={item.id}>
-                  <ul className="footer-links list-unstyled m-0 p-0">
+                  <ul className="footer-links list-unstyled m-0 p-0 align-items-center">
                     <li>
                       <button
                         onClick={() => handleKeywordClick(item.path)}

@@ -1202,10 +1202,6 @@ footer {
 
       li {
         text-align: center;
-
-        &:last-child {
-          padding-bottom: 20px;
-        }
       }
     }
   }
