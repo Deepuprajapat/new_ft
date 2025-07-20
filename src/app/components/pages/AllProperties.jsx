@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Select from "react-select";
 import {
-  getAllFloor,
   getAllLocations,
   getAllProperties,
   getAllProjectsByType,
@@ -260,10 +259,6 @@ const PropertyListing = () => {
       alert("Please select a project");
       return;
     }
-    if (!propertyUrl.trim()) {
-      alert("Please enter a property URL");
-      return;
-    }
 
     const selectedProjectObj = projects.find(
       (proj) => proj.project_id === selectedProject
@@ -274,7 +269,6 @@ const PropertyListing = () => {
       project_id: selectedProject,
       name: projectName,
       property_type: "COMMERCIAL",
-      slug: propertyUrl.trim(),
       // age_of_property: ageOfProperty,
       // floor_number: floorNo,
       // facing: facing,
@@ -288,8 +282,9 @@ const PropertyListing = () => {
       const response = await saveProperty(propertyData);
       setShowDetailsModal(false);
       const propertyId = response?.data?.property_id;
+      const propertyslug = response?.data?.slug
       setProjectId(selectedProject);
-      navigate(`/propertyforsale/${propertyId}`, {
+      navigate(`/propertyforsale/${propertyslug}`, {
         state: { ...propertyData, projectId: selectedProject },
       });
     } catch (error) {
@@ -967,7 +962,7 @@ const PropertyListing = () => {
               }}
             />
             {/* Property URL input */}
-            <div style={{ marginBottom: 18 }}>
+            {/* <div style={{ marginBottom: 18 }}>
               <label htmlFor="property-url" style={{ fontWeight: 500, display: "block", marginBottom: 4 }}>
                 Property URL (slug)
               </label>
@@ -984,7 +979,7 @@ const PropertyListing = () => {
                   border: "1px solid #ccc",
                 }}
               />
-            </div>
+            </div> */}
             <div style={{display: "flex", gap: 16, marginBottom: 24, justifyContent: "flex-end"}}>
               {/* <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 500, marginBottom: 4 }}>

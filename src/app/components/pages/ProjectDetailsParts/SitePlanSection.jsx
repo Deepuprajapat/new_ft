@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
+import { imgUplod } from '../../../../utils/common.jsx';
 
 const SitePlanSection = ({
   projectData,
@@ -27,14 +28,16 @@ const SitePlanSection = ({
     setEditDescription(projectData?.web_cards?.site_plan?.description || '');
   }, [isSitePlanEditing, projectData?.web_cards?.site_plan?.image, projectData?.web_cards?.site_plan?.description]);
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setSiteplanImgUrl(ev.target.result); 
-    };
-    reader.readAsDataURL(file);
+    try {
+      const s3ImageUrl = await imgUplod(file, { alt_keywords: 'siteplan,real estate', file_path: '/siteplans' });
+      setSiteplanImgUrl(s3ImageUrl);
+    } catch (error) {
+      console.error('Site plan image upload failed:', error);
+      // Optionally show error to user
+    }
   };
 
   const handleCancel = () => setIsSitePlanEditing(false);

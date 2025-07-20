@@ -18,7 +18,7 @@ const AboutDeveloperSection = ({
     altLogo: developerDetails?.altLogo || "",
     establishedYear: developerDetails?.establishedYear || "",
     totalProjects: developerDetails?.totalProjects || "",
-    about: developerDetails?.about || "",
+    about: developerDetails?.about  || "",
     address: developerDetails?.address || "",
   });
 
@@ -30,7 +30,7 @@ const AboutDeveloperSection = ({
         altLogo: developerDetails.altLogo || "",
         establishedYear: developerDetails.establishedYear || "",
         totalProjects: developerDetails.totalProjects || "",
-        about: developerDetails.about || "",
+        about: developerDetails?.about || "",
         address: developerDetails.address || "",
       });
     }
@@ -40,9 +40,26 @@ const AboutDeveloperSection = ({
   const handleSaveChanges = (e) => {
     e.preventDefault();
     setIsDeveloperEditing(false);
-    // Optionally: call a prop function to update parent state or API
-    // onSave(developerForm);
-    handleSave(developerForm);
+    // Build the correct payload structure for PATCH
+    const payload = {
+      developer_info: {
+        logo: developerForm.logo,
+        alt_logo: developerForm.altLogo,
+        established_year: developerForm.establishedYear,
+        total_projects: developerForm.totalProjects,
+        address: developerForm.address,
+        developer_name: developerDetails?.name || "",
+        phone: developerDetails?.phone || "",
+      },
+      web_cards: {
+        ...(projectData?.web_cards || {}),
+        about: {
+          ...((projectData?.web_cards && projectData.web_cards.about) || {}),
+          description: developerForm.about,
+        },
+      },
+    };
+    handleSave(payload);
   };
   const handleCancel = () => {
     setDeveloperForm({
@@ -50,7 +67,7 @@ const AboutDeveloperSection = ({
       altLogo: developerDetails?.altLogo || "",
       establishedYear: developerDetails?.establishedYear || "",
       totalProjects: developerDetails?.totalProjects || "",
-      about: developerDetails?.about || "",
+      about: developerDetails?.about   || "",
       address: developerDetails?.address || "",
     });
     setIsDeveloperEditing(false);

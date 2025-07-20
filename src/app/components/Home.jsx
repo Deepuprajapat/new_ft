@@ -189,7 +189,7 @@ const Head = () => {
               </div>
             ) : (
               <div className="listing-home listing-page row">
-                <BlogSection isSwiper={true} />
+                <BlogSection isSwiper={true} hideAddButton={true} />
               </div>
             )}
           </div>

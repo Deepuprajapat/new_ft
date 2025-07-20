@@ -17,7 +17,7 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { uploadImage } from '../../../apis/api';
+import { imgUplod } from '../../../../utils/common.jsx';
 
 const DUMMY_IMAGE_PATH = require('../../../assets/img/dummy.webp');
 
@@ -276,41 +276,24 @@ const ProjectGallerySection = ({
         return arr;
       });
       try {
-        // 1. Get presigned URL from your API
-        const file_name = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-        const alt_keywords = "project,siteplan,real estate";
-        const file_path = "";
-        const response = await uploadImage({ file_name, alt_keywords, file_path });
-        const presignedUrl = response?.data?.presigned_url; // adjust this to your API's response
-       console.log(presignedUrl,"yyyy")
-        // 2. Upload file to S3
-        await fetch(presignedUrl, {
-          method: 'PUT',
-          body: file,
-          headers: {
-            'Content-Type': file.type,
-          },
-        });
-
-        const s3ImageUrl = presignedUrl.split('?')[0];
+        // Use the shared imgUplod utility
+        const s3ImageUrl = await imgUplod(file, { alt_keywords: "project,siteplan,real estate", file_path: "/new_vi" });
         console.log('S3 Image URL:', s3ImageUrl);
-
-        const uploadedFileName = response?.file_name || file.name;
         const newImages = [...localImages];
         while (newImages.length <= index) {
           newImages.push({});
         }
         newImages[index] = {
           ...newImages[index],
-          imageUrl: uploadedFileName, 
-          caption: uploadedFileName,
+          imageUrl: s3ImageUrl, // Use S3 URL for preview and saving
+          caption: file.name,
         };
         setLocalImages(newImages);
-        // Save only file names
+        // Save S3 URLs to projectData
         const mainImage = projectData?.web_cards?.images?.[0] || "";
         const imagesForWebCards = [
           mainImage,
-          ...newImages.map(img => img.caption || "")
+          ...newImages.map(img => img.imageUrl || "")
         ];
         setProjectData({
           ...projectData,

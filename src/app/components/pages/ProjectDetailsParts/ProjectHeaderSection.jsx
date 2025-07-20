@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { getAllLocations } from "../../../apis/api";
+import { imgUplod } from '../../../../utils/common.jsx';
 
 const ProjectHeaderSection = ({
   projectData,
@@ -14,7 +15,7 @@ const ProjectHeaderSection = ({
   // Map API data to camelCase for UI
   const mappedData = {
     
-    name: projectData?.name || projectData?.project_name || "",
+    name:  projectData?.project_name || "",
     minPrice: projectData?.minPrice ?? projectData?.min_price ?? "",
     maxPrice: projectData?.maxPrice ?? projectData?.max_price ?? "",
     // developerName: projectData?.developerName || projectData?.web_cards.about.contact_details.name || "",
@@ -25,7 +26,7 @@ const ProjectHeaderSection = ({
     shortAddress: projectData?.shortAddress || projectData?.location_info?.short_address || "",
     city: projectData?.city || "",
     locality: projectData?.locality || "",
-    reraDetails: projectData?.reraDetails || projectData?.rera_details || [],
+    reraDetails: projectData?.web_cards?.rera_info?.rera_list || projectData?.rera_info|| [],
     web_cards: projectData?.web_cards || {},
     projectLogo: projectData?.projectLogo || projectData?.project_logo || "",
     floorplans: projectData?.floorplans || [],
@@ -60,6 +61,9 @@ const ProjectHeaderSection = ({
   const [locations, setLocations] = useState([]);
   const [cities, setCities] = useState([]); // [{city: 'NOIDA', ...}]
   const [localities, setLocalities] = useState({}); // {city: [locality, ...]}
+
+  const [pendingLogoUrl, setPendingLogoUrl] = useState("");
+  const [logoUploading, setLogoUploading] = useState(false);
 
   function getLeastPriceOfFloorPlan(floorPlan) {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
@@ -99,7 +103,7 @@ const ProjectHeaderSection = ({
       setEditLocality(mappedData?.locality ?? "");
       setEditShortAddress(mappedData?.shortAddress ?? "");
     }
-  }, [isEditing, mappedData]);
+  }, [isEditing]);
 
   // Fetch locations on mount
   useEffect(() => {
@@ -163,23 +167,35 @@ const ProjectHeaderSection = ({
       };
     }
 
+    // Add logo if uploaded and different from current
+    if (pendingLogoUrl && pendingLogoUrl !== mappedData.projectLogo) {
+      updatedData.project_logo = pendingLogoUrl;
+    }
+
+    // Debug log
+    console.log('Saving with data:', updatedData);
+
     // ...other fields as per your JSON if needed...
 
     if (Object.keys(updatedData).length > 0) {
       handleSave(updatedData);
     }
     setIsEditing(false);
+    setPendingLogoUrl("");
   };
 
-  // Handle image upload and preview
-  const handleImageChange = (e) => {
+  // Handle image upload and preview (S3 upload)
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        handleInputChange("projectLogo", ev.target.result); // base64 string
-      };
-      reader.readAsDataURL(file);
+      setLogoUploading(true);
+      try {
+        const url = await imgUplod(file, { alt_keywords: editName || 'project-logo', file_path: 'project-logos/' });
+        setPendingLogoUrl(url);
+      } catch (err) {
+        alert('Image upload failed. Please try again.');
+      }
+      setLogoUploading(false);
     }
   };
 
@@ -229,45 +245,20 @@ const ProjectHeaderSection = ({
                 onMouseEnter={() => showEdit && isEditing && setIsHovered(true)}
                 onMouseLeave={() => showEdit && isEditing && setIsHovered(false)}
               >
-                {mappedData?.web_cards?.images?.length > 0
-                  ? mappedData.web_cards.images.map((imgUrl, index) => {
-                    if (!imgUrl) return null;
-                    return (
-                      <img
-                        key={index}
-                        src={imgUrl}
-                        alt={`Web Card Image ${index + 1}`}
-                        loading="lazy"
-                        className="img-fluid"
-                        style={{
-                          maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
-                          height: window.innerWidth <= 768 ? "44px" : "64px",
-                          objectFit: "contain",
-                          marginRight: "4px",
-                          filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
-                          transition: "filter 0.3s ease"
-                        }}
-                        onClick={isEditing ? () => fileInputRef.current.click() : undefined}
-                      />
-                    );
-                  })
-                  : (
-                    <img
-                      src={mappedData?.projectLogo || "defaultLogo.jpg"}
-                      alt={mappedData?.projectLogo || "Project Logo"}
-                      loading="lazy"
-                      className="img-fluid"
-                      style={{
-                        maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
-                        height: window.innerWidth <= 768 ? "44px" : "64px",
-                        objectFit: "contain",
-                        filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
-                        transition: "filter 0.3s ease"
-                      }}
-                      onClick={isEditing ? () => fileInputRef.current.click() : undefined}
-                    />
-                  )
-                }
+                <img
+                  src={pendingLogoUrl || mappedData?.projectLogo || "defaultLogo.jpg"}
+                  alt={mappedData?.projectLogo || "Project Logo"}
+                  loading="lazy"
+                  className="img-fluid"
+                  style={{
+                    maxWidth: window.innerWidth <= 768 ? "50px" : "80px",
+                    height: window.innerWidth <= 768 ? "44px" : "64px",
+                    objectFit: "contain",
+                    filter: showEdit && isEditing && isHovered ? "blur(2px)" : "none",
+                    transition: "filter 0.3s ease"
+                  }}
+                  onClick={isEditing ? () => fileInputRef.current.click() : undefined}
+                />
                 {showEdit && isEditing && isHovered && (
                   <div
                     className="position-absolute d-flex align-items-center justify-content-center"
@@ -283,15 +274,19 @@ const ProjectHeaderSection = ({
                     }}
                     onClick={() => fileInputRef.current.click()}
                   >
-                    <FontAwesomeIcon
-                      icon={faCamera}
-                      style={{
-                        color: 'white',
-                        fontSize: '10px',
-                        transition: 'transform 0.3s ease',
-                        transform: 'scale(1.2)'
-                      }}
-                    />
+                    {logoUploading ? (
+                      <span style={{ color: 'white', fontSize: '10px' }}>Uploading...</span>
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={faCamera}
+                        style={{
+                          color: 'white',
+                          fontSize: '18px',
+                          transition: 'transform 0.3s ease',
+                          transform: 'scale(1.2)'
+                        }}
+                      />
+                    )}
                     <input
                       type="file"
                       accept="image/*"
@@ -887,7 +882,7 @@ const ProjectHeaderSection = ({
                                   <input
                                     type="text"
                                     className="form-control form-control-sm"
-                                    value={item.reraNumber || ""}
+                                    value={item.rera_number || ""}
                                     onChange={e => {
                                       const updated = [...mappedData.reraDetails];
                                       updated[index].reraNumber = e.target.value;
@@ -896,7 +891,7 @@ const ProjectHeaderSection = ({
                                     placeholder="RERA Number"
                                   />
                                 ) : (
-                                  item.reraNumber || "-"
+                                  item.rera_number || "-"
                                 )}
                               </td>
                               <td style={{ fontSize: "12px", padding: "10px", fontWeight: "600", verticalAlign: "middle" }}>

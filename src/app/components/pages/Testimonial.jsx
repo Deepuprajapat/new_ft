@@ -18,7 +18,7 @@ const Testimonial = () => {
       const data = await patchStaticSiteData();
       console.log(data.data,"data")
       // Try to extract testimonials from the returned data, fallback to []
-      const fetchedTestimonials = data?.testimonials || [];
+      const fetchedTestimonials = data?.data?.testimonials || [];
       setTestimonials(
         fetchedTestimonials.map((item) => ({
           text: item.description,

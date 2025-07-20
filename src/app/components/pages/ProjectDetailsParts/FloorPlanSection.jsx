@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Carousel from "react-multi-carousel";
 import BrochurePopupDialog from "../BrochurePopup";
 import DOMPurify from "dompurify";
+import { imgUplod } from '../../../../utils/common.jsx';
 
 const BASE_URL = "https://image.investmango.com/images/";
 
@@ -94,16 +95,21 @@ const FloorPlanSection = ({
   };
 
   const handleSaveChanges = async () => {
+    // Map imageUrl to image for backend compatibility
+    const floorplansForSave = editableFloorplans.map(plan => ({
+      ...plan,
+      image: plan.imageUrl || plan.image // use imageUrl if present, fallback to image
+    }));
     const updatedData = {
       ...projectData,
       floorPara: editableFloorPara,
-      floorplans: editableFloorplans,
+      floorplans: floorplansForSave,
       web_cards: {
         ...projectData.web_cards,
         floor_plan: {
-          ...projectData.web_cards?.description,
+          ...projectData.web_cards?.floor_plan,
           title: editableFloorPara,
-          products: editableFloorplans
+          products: floorplansForSave
         }
       }
     };
@@ -116,15 +122,17 @@ const FloorPlanSection = ({
   };
 
   // Handle image upload for a floor plan
-  const handleImageUpload = (index, file) => {
+  const handleImageUpload = async (index, file) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
+    try {
+      const s3ImageUrl = await imgUplod(file, { alt_keywords: 'floorplan,real estate', file_path: '/floorplans' });
       const updated = [...editableFloorplans];
-      updated[index].imageUrl = e.target.result; // base64 string
+      updated[index].imageUrl = s3ImageUrl;
       setEditableFloorplans(updated);
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      // Optionally show error to user
+    }
   };
 
   // Filtering logic

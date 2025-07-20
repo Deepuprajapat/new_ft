@@ -4,95 +4,68 @@ import { Link } from "react-router-dom";
 import "../components/styles/css/footer.css";
 import logo from "../assets/img/Logo-footer.png";
 import {
-  getAllGenericKeywords,
-  getGenericKeywordByPath,
-  getAllCityForMobile,
-  getAllProjectsByUrlName,
+  fetchfooterlinks,
 } from "../apis/api";
 import { useNavigate } from "react-router-dom";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Checkbox,
-  FormControlLabel,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  OutlinedInput,
-  Chip,
-  Box,
-} from "@mui/material";
+import { Button, Box } from "@mui/material";
+import AddGenericLinkForm from "./AddGenericLinkForm";
 
-const Footer = ({ shortAddress }) => {
+const Footer = ({ projectPhoneNumber }) => {
   const [footerItems, setFooterItems] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [matchedPhoneNumber, setMatchedPhoneNumber] = useState(null);
-  const [projectName, setProjectName] = useState("");
-
-  // Modal state for Add Generic Link
   const [showAddGenericModal, setShowAddGenericModal] = useState(false);
-  const [genericForm, setGenericForm] = useState({
-    title: "",
-    description: "",
-    slug: "",
-    search_term: "",
-    filters: {
-      is_premium: false,
-      city: "",
-      type: "RESIDENTIAL",
-      configurations: [],
-    },
-  });
-  const configurationOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
-
-  const handleGenericFormChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (["is_premium", "city", "type"].includes(name)) {
-      setGenericForm((prev) => ({
-        ...prev,
-        filters: {
-          ...prev.filters,
-          [name]: type === "checkbox" ? checked : value,
-        },
-      }));
-    } else if (name === "configurations") {
-      setGenericForm((prev) => ({
-        ...prev,
-        filters: {
-          ...prev.filters,
-          configurations: typeof value === "string" ? value.split(",") : value,
-        },
-      }));
-    } else {
-      setGenericForm((prev) => ({ ...prev, [name]: value }));
-    }
-  };
 
   const handleOpenAddGenericModal = () => setShowAddGenericModal(true);
   const handleCloseAddGenericModal = () => setShowAddGenericModal(false);
-  const handleSaveGenericLink = () => {
-    // Here you would handle the save logic (API call etc.)
-    handleCloseAddGenericModal();
+
+  const refreshFooterLinks = async () => {
+    try {
+      const links = await fetchfooterlinks();
+      setFooterItems(links.data);
+      console.log("Footer links refreshed:", links.data);
+    } catch (error) {
+      console.error("Error refreshing footer links:", error);
+    }
   };
+
+  // const handleSaveGenericLink = async () => {
+  //   // Construct the payload from the form state
+  //   const payload = {
+  //     title: genericForm.title,
+  //     description: genericForm.description,
+  //     slug: genericForm.slug,
+  //     search_term: genericForm.search_term,
+  //     filters: {
+  //       is_premium: genericForm.filters.is_premium,
+  //       city: genericForm.filters.city,
+  //       type: genericForm.filters.type,
+  //       configurations: genericForm.filters.configurations,
+  //     },
+  //   };
+
+  //   try {
+  //     // Await the API call if CustomSearch is async
+  //     const response = await CustomSearch({ payload });
+  //     // Optionally handle the response here (e.g., show a message)
+  //     console.log(response,"uyftyf")
+  //   } catch (error) {
+  //     // Optionally handle errors here
+  //     console.error("Error saving generic link:", error);
+  //   }
+  //   handleCloseAddGenericModal();
+  // };
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    // const fetchFooterItems = async () => {
-    //   try {
-    //     const keywords = await getAlGenericKeywords();
-    //     setFooterItems(keywords);
-    //   } catch (error) {
-    //     console.error("Error fetching footer items:", error);
-    //   }
-    // };
+    const fetchLinks = async () => {
+      const links = await fetchfooterlinks();
+      setFooterItems(links.data);
+      console.log(links.data, "ooooooo");
+    };
 
-    // fetchFooterItems();
+    fetchLinks();
+
     const handleScroll = () => {
       setIsVisible(window.scrollY > 20);
     };
@@ -101,21 +74,24 @@ const Footer = ({ shortAddress }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleKeywordClick = async (path) => {
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsVisible(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleKeywordClick = async (slug) => {
     try {
-      // Fetch data based on path
-      const keywordData = await getGenericKeywordByPath(path);
-      if (keywordData) {
-        // Navigate first
-        navigate(`allProjects?${path}`);
-        setTimeout(() => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }, 500); // Adjust delay if needed
-      } else {
-        console.warn("No valid data found for path:", path);
-      }
+      console.log("Footer keyword clicked:", slug);
+      navigate(`/s/${slug}`);
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 500); // Adjust delay if needed
     } catch (error) {
-      console.error("Error fetching keyword data:", error);
+      console.error("Error handling keyword click:", error);
     }
   };
 
@@ -130,41 +106,7 @@ const Footer = ({ shortAddress }) => {
       behavior: "smooth",
     });
   };
-  useEffect(() => {
-    const fetchCities = async () => {
-      try {
-        const response = await getAllCityForMobile(); // Fetch city data
-        const cityData = Array.isArray(response) ? response : response?.data;
 
-        if (!Array.isArray(cityData) || cityData.length === 0) {
-          console.error("No data found in response");
-          return;
-        }
-
-        // Extract city names and corresponding phone numbers
-        const cityMap = cityData.reduce((acc, item) => {
-          if (item?.city?.name) {
-            acc[item.city.name.toLowerCase()] = item.city.phoneNumber;
-          }
-
-          return acc;
-        }, {});
-        // Match shortAddress with city names
-        if (shortAddress) {
-          const matchedCity = Object.keys(cityMap).find((city) =>
-            shortAddress.toLowerCase().includes(city)
-          );
-          if (matchedCity) {
-            setMatchedPhoneNumber(cityMap[matchedCity]); // Set the matched phone number
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching cities:", error);
-      }
-    };
-
-    fetchCities();
-  }, [shortAddress]);
 
   // useEffect(() => {
   //   const fetchProject = async () => {
@@ -183,123 +125,27 @@ const Footer = ({ shortAddress }) => {
   // );
   // const whatsappLink = `https://api.whatsapp.com/send?phone=+918448141652&text=${message}`;
 
+  // Function to check for auth token (same as in ProtectedRoute)
+  const getAuthToken = () => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; authToken=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return localStorage.getItem("auth-token") || localStorage.getItem("x-auth-token");
+  };
+
+  const isAuthenticated = () => {
+    const token = getAuthToken();
+    return !!token;
+  };
+
   return (
     <div>
       {/* Add Generic Link Modal */}
-      <Dialog
+      <AddGenericLinkForm
         open={showAddGenericModal}
         onClose={handleCloseAddGenericModal}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Add Generic Link</DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            label="Title"
-            name="title"
-            value={genericForm.title}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Description"
-            name="description"
-            value={genericForm.description}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Slug"
-            name="slug"
-            value={genericForm.slug}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Search Term"
-            name="search_term"
-            value={genericForm.search_term}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={genericForm.filters.is_premium}
-                onChange={handleGenericFormChange}
-                name="is_premium"
-              />
-            }
-            label="Is Premium"
-          />
-          <TextField
-            margin="dense"
-            label="City"
-            name="city"
-            value={genericForm.filters.city}
-            onChange={handleGenericFormChange}
-            fullWidth
-          />
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="type-label">Type</InputLabel>
-            <Select
-              labelId="type-label"
-              name="type"
-              value={genericForm.filters.type}
-              onChange={handleGenericFormChange}
-              label="Type"
-            >
-              <MenuItem value="RESIDENTIAL">Residential</MenuItem>
-              <MenuItem value="COMMERCIAL">Commercial</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="configurations-label">Configurations</InputLabel>
-            <Select
-              labelId="configurations-label"
-              multiple
-              name="configurations"
-              value={genericForm.filters.configurations}
-              onChange={handleGenericFormChange}
-              input={
-                <OutlinedInput
-                  id="select-multiple-chip"
-                  label="Configurations"
-                />
-              }
-              renderValue={(selected) => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={value} />
-                  ))}
-                </Box>
-              )}
-            >
-              {configurationOptions.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAddGenericModal} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSaveGenericLink}
-            color="primary"
-            variant="contained"
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onSave={refreshFooterLinks}
+      />
       <div className="CTA">
         <div className="whatsapp">
           <a
@@ -310,14 +156,12 @@ const Footer = ({ shortAddress }) => {
             <i className="fab fa-whatsapp"></i> WhatsApp
           </a>
         </div>
-        {matchedPhoneNumber && matchedPhoneNumber.length > 0 ? (
-          matchedPhoneNumber.map((number, index) => (
-            <div className="callnow">
-              <a href={`tel:+91${number}`}>
-                <i className="fas fa-phone"></i> {number}
-              </a>
-            </div>
-          ))
+        {projectPhoneNumber ? (
+          <div className="callnow">
+            <a href={`tel:+91${projectPhoneNumber}`}>
+              <i className="fas fa-phone"></i> {projectPhoneNumber}
+            </a>
+          </div>
         ) : (
           <div className="callnow">
             <a href="tel:+918368547490">
@@ -357,12 +201,12 @@ const Footer = ({ shortAddress }) => {
         <div className="top-footer">
           <div className="container">
             <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2">
-              {footerItems.map((item) => (
-                <div className="col" key={item.id}>
+              {footerItems?.map((item) => (
+                <div className="col" key={item.title}>
                   <ul className="footer-links list-unstyled m-0 p-0">
                     <li>
                       <button
-                        onClick={() => handleKeywordClick(item.path)}
+                        onClick={() => handleKeywordClick(item.slug)}
                         className="text-reset text-start custom-link"
                         style={{
                           background: "none",
@@ -375,7 +219,7 @@ const Footer = ({ shortAddress }) => {
                           textAlign: "left",
                         }}
                       >
-                        {item.keywords}
+                        {item.title}
                       </button>
                     </li>
                   </ul>
@@ -384,7 +228,7 @@ const Footer = ({ shortAddress }) => {
             </div>
           </div>
         </div>
-       
+
         <div className="top-footer">
           <div className="container">
             <div className="row">
@@ -586,18 +430,19 @@ const Footer = ({ shortAddress }) => {
                   </li>
                 </ul>
               </div>
-              <div style={{ width: "100%", display: "flex", justifyContent: "center", marginBottom: 16 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenAddGenericModal}
-            style={{ minWidth: 200 }}
-          >
-            Add Generic Link
-          </Button>
-        </div>
             </div>
-
+            <Box display="flex" justifyContent="center">
+              {isAuthenticated() && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleOpenAddGenericModal}
+                  style={{ minWidth: 150 }}
+                >
+                  Add Link
+                </Button>
+              )}
+            </Box>
             <div className="bottom-footer">
               <div className="container">
                 <p>All right Reserved | Invest Mango</p>

@@ -19,14 +19,14 @@ import AddHeadScripts from "./pages/AddHeadScripts";
 import { useState } from "react";
 
 const AppLayout = () => {
-  const [shortAddress, setShortAddress] = useState("");
-
+  const [projectPhoneNumber,setprojectPhoneNumber] = useState("");
+  console.log(projectPhoneNumber,"dddddddddd")
   return (
     <>
       <AddHeadScripts />
-      <Header shortAddress={shortAddress} />
-      <Outlet context={{ shortAddress,setShortAddress }} /> {/* 🔹 Pass function via context */}
-      <Footer shortAddress={shortAddress} />
+      <Header projectPhoneNumber={projectPhoneNumber} />
+      <Outlet context={{  projectPhoneNumber, setprojectPhoneNumber }} /> {/* 🔹 Pass function via context */}
+      <Footer projectPhoneNumber={projectPhoneNumber}  />
     </>
   );
 };

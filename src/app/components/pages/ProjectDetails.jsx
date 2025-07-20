@@ -5,12 +5,10 @@ import PopupDialog from "./CommanPopup";
 import { useOutletContext } from "react-router-dom";
 import {
   getAllProjectsByUrlName,
-  getDeveloperById,
   getAllProject,
   sendOTP,
   verifyOTP,
   resendOTP,
-  getReraInfoByProjectId,
   patchProjectById,
   patchProjectByTestUrl
   // getLeadByPhone,
@@ -82,7 +80,6 @@ const ProjectDetails = () => {
   const [allSimilarProjects, setAllSimilarProjects] = useState(null);
   const [developerId, setDeveloperId] = useState("");
   const [projectId, setProjectId] = useState("");
-  const [developerDetails, setDeveloperDetails] = useState(null);
   const { urlName } = useParams();
   const location = useLocation();
 
@@ -121,7 +118,6 @@ const ProjectDetails = () => {
   );
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [editableAmenities, setEditableAmenities] = useState([]);
-  const [reraDetails, setReraDetails] = useState(null);
   const [isVideoEditing, setIsVideoEditing] = useState(false);
   const [editableVideos, setEditableVideos] = useState([]);
   const [isLocationEditing, setIsLocationEditing] = useState(false);
@@ -135,16 +131,6 @@ const ProjectDetails = () => {
   const [siteplanImgUrl, setSiteplanImgUrl] = useState(
     projectData?.web_cards?.site_plan?.image || ""
   );
-  // ...existing code...
-  //state variabe for ace group
-  const [developerForm, setDeveloperForm] = useState({
-    logo: developerDetails?.logo_url || "",
-    establishedYear: developerDetails?.establishment_year || "",
-    totalProjects: developerDetails?.total_properties || "",
-    about: developerDetails?.description || "",
-    address: developerDetails?.contact_details?.project_address || "",
-    name: developerDetails?.contact_details?.name || "",
-  });
  
   const [expandedIndex, setExpandedIndex] = useState(null);
 
@@ -182,19 +168,6 @@ const ProjectDetails = () => {
       [field]: value,
     }));
   };
-
-  // ace group
-  useEffect(() => {
-    setDeveloperForm({
-      logo: developerDetails?.logo_url || "",
-      establishedYear: developerDetails?.establishment_year || "",
-      totalProjects: developerDetails?.total_properties || "",
-      about: developerDetails?.description || "",
-      address: developerDetails?.contact_details?.project_address || "",
-      name: developerDetails?.contact_details?.name || "",
-    });
-  }, [developerDetails]);
-
   //  site plan popup
   useEffect(() => {
     setSiteplanParaHtml(projectData?.web_cards?.site_plan?.html_content || "");
@@ -341,43 +314,6 @@ const ProjectDetails = () => {
     }
   }, [projectData]);
 
-  // Fetch developer details when DeveloperId changes
-  useEffect(() => {
-    const fetchDeveloper = async () => {
-      if (developerId) {
-        try {
-          const data = await getDeveloperById(developerId);
-          if (data) {
-            setDeveloperDetails(data);
-          }
-        } catch (error) {
-          console.error("Error fetching developer data:", error);
-        }
-      }
-    };
-    fetchDeveloper();
-  }, [developerId]);
-
-  useEffect(() => {
-    const fetchReraInfo = async () => {
-      if (!projectId) return;
-
-      try {
-        const data = await getReraInfoByProjectId(projectId);
-        setReraDetails(data || []);
-      } catch (error) {
-        console.error("Error fetching RERA data:", error);
-        setReraDetails([]);
-      }
-    };
-    fetchReraInfo();
-  }, [projectId]);
-
-  // useEffect(() => {
-  //   setFloorplans(projectData?.floorplans ? [...projectData.floorplans] : []);
-  // }, [projectData]);
-
-  // Initialize editable videos when editing starts
   useEffect(() => {
     if (isVideoEditing) {
       const videos = projectData?.videos || [""];
@@ -805,13 +741,13 @@ const ProjectDetails = () => {
         ? projectData.siteplanImg
         : `${BASE_URL}${projectData.siteplanImg}`
       : FALLBACK_IMAGE;
-  const { setShortAddress } = useOutletContext();
+  const { setShortAddress ,setprojectPhoneNumber} = useOutletContext();
 
   useEffect(() => {
-    if (projectData?.shortAddress) {
-      setShortAddress(projectData.shortAddress);
+    if (projectData?.developer_info?.phone) {
+      setprojectPhoneNumber(projectData?.developer_info?.phone);
     }
-  }, [projectData, setShortAddress]);
+  }, [projectData, setprojectPhoneNumber]);
 
   const defaultFaqs = [
     {
@@ -839,13 +775,13 @@ const ProjectDetails = () => {
   const isValidFaq = (faq) =>
     faq?.question?.trim() !== "" || faq?.answer?.trim() !== "";
 
-  const displayedFaqs =
-    Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
-      ? sortedFaqs
-      : defaultFaqs.map((faq) => ({
-          question: injectProjectData(faq.question, projectData),
-          answer: injectProjectData(faq.answer, projectData),
-        }));
+  // const displayedFaqs =
+  //   Array.isArray(sortedFaqs) && sortedFaqs.some(isValidFaq)
+  //     ? sortedFaqs
+  //     : defaultFaqs.map((faq) => ({
+  //         question: injectProjectData(faq.question, projectData),
+  //         answer: injectProjectData(faq.answer, projectData),
+  //       }));
 
   const validPaymentPlans = projectData?.paymentPlans?.filter(
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
@@ -1392,15 +1328,14 @@ const ProjectDetails = () => {
                   establishedYear:
                     projectData?.developer_info.established_year || "",
                   totalProjects:
-                    projectData?.web_cards?.about?.total_projects || "",
+                    projectData?.developer_info?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",
                   address:
-                    projectData?.web_cards?.about?.contact_details
-                      ?.project_address || "",
+                    projectData?.developer_info?.address|| "",
                   name:
-                    projectData?.web_cards?.about?.contact_details?.name || "",
+                    projectData?.developer_info?.developer_name|| "",
                   phone:
-                    projectData?.web_cards?.about?.contact_details?.phone || "",
+                    projectData?.developer_info?.phone || "",
                   bookingLink:
                     projectData?.web_cards?.about?.contact_details
                       ?.booking_link || "",
@@ -1418,7 +1353,13 @@ const ProjectDetails = () => {
               <FAQSection
                 projectData={{
                   ...projectData,
-                  faqs: projectData?.web_cards?.faqs || [],
+                  faqs:
+                    Array.isArray(projectData?.web_cards?.faqs) && projectData.web_cards.faqs.some(isValidFaq)
+                      ? projectData.web_cards.faqs
+                      : defaultFaqs.map((faq) => ({
+                          question: injectProjectData(faq.question, projectData),
+                          answer: injectProjectData(faq.answer, projectData),
+                        })),
                   name: projectData?.basic_info?.project_name || "",
                   area:
                     projectData?.web_cards?.project_details?.area?.value || "",
