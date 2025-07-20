@@ -308,25 +308,40 @@ const PropertyDetails = () => {
     setProperty(newData);
     try {
       if (property?.id) {
-        // Format the data to put price inside pricing_info
-        const formattedData = {
-          ...newData,
-          pricing_info: {
-            ...(newData.pricing_info || {}),
-            price: newData.price
+        // Only send changed fields to avoid unintended resets
+        const changedFields = {};
+        
+        // Compare each field and only include if changed
+        Object.keys(newData).forEach(key => {
+          if (newData[key] !== property[key]) {
+            changedFields[key] = newData[key];
           }
-        };
-        // Remove price from root level since it's now in pricing_info
-        delete formattedData.price;
+        });
         
-        const response = await patchPropertyDetails(property.id, formattedData);
-        console.log("Patch API response:", response);
+        // Handle price field carefully - only move to pricing_info if price itself changed
+        if (changedFields.hasOwnProperty('price')) {
+          changedFields.pricing_info = {
+            ...(property.pricing_info || {}),
+            ...(newData.pricing_info || {}),
+            price: changedFields.price
+          };
+          delete changedFields.price;
+        } else if (newData.pricing_info && !changedFields.hasOwnProperty('price')) {
+          // If pricing_info changed but not price, keep pricing_info changes
+          changedFields.pricing_info = newData.pricing_info;
+        }
         
-        // Check if the response contains an updated slug
-        if (response?.data?.slug && response.data.slug !== slugFromUrl) {
-          console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
-          // Navigate to the new URL with updated slug
-          navigate(`/propertyforsale/${response.data.slug}`, { replace: true });
+        // Only make API call if there are actual changes
+        if (Object.keys(changedFields).length > 0) {
+          const response = await patchPropertyDetails(property.id, changedFields);
+          console.log("Patch API response:", response);
+          
+          // Check if the response contains an updated slug
+          if (response?.data?.slug && response.data.slug !== slugFromUrl) {
+            console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
+            // Navigate to the new URL with updated slug
+            navigate(`/propertyforsale/${response.data.slug}`, { replace: true });
+          }
         }
       } else {
         console.error("Property ID not found!");
@@ -348,16 +363,34 @@ const PropertyDetails = () => {
       };
       // Update backend
       if (prev?.id) {
-        // Format the data to put price inside pricing_info if price exists
-        const formattedData = { ...merged };
-        if (formattedData.price !== undefined) {
-          formattedData.pricing_info = {
-            ...(formattedData.pricing_info || {}),
-            price: formattedData.price
+        // Only send the actual changes, don't send entire object
+        const actualChanges = {};
+        
+        // Include web_cards changes if present
+        if (changedData.web_cards) {
+          actualChanges.web_cards = {
+            ...prev.web_cards,
+            ...changedData.web_cards
           };
-          delete formattedData.price;
         }
-        patchPropertyDetails(prev.id, formattedData).then((response) => {
+        
+        // Include other changed fields (excluding web_cards)
+        Object.keys(changedData).forEach(key => {
+          if (key !== 'web_cards') {
+            actualChanges[key] = changedData[key];
+          }
+        });
+        
+        // Handle price field carefully - only if explicitly changed
+        if (actualChanges.hasOwnProperty('price')) {
+          actualChanges.pricing_info = {
+            ...(prev.pricing_info || {}),
+            price: actualChanges.price
+          };
+          delete actualChanges.price;
+        }
+        
+        patchPropertyDetails(prev.id, actualChanges).then((response) => {
           // Check if the response contains an updated slug
           if (response?.data?.slug && response.data.slug !== slugFromUrl) {
             console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
@@ -396,16 +429,18 @@ const PropertyDetails = () => {
       };
       // Update backend
       if (prev?.id) {
-        // Format the data to put price inside pricing_info if price exists
-        const formattedData = { ...merged };
-        if (formattedData.price !== undefined) {
-          formattedData.pricing_info = {
-            ...(formattedData.pricing_info || {}),
-            price: formattedData.price
-          };
-          delete formattedData.price;
-        }
-        patchPropertyDetails(prev.id, formattedData).then((response) => {
+        // Only send the specific web_cards.know_about change
+        const patchData = {
+          web_cards: {
+            ...prev.web_cards,
+            know_about: {
+              ...(prev.web_cards?.know_about || {}),
+              description: aboutHtml,
+            },
+          },
+        };
+        
+        patchPropertyDetails(prev.id, patchData).then((response) => {
           // Check if the response contains an updated slug
           if (response?.data?.slug && response.data.slug !== slugFromUrl) {
             console.log("Slug changed from", slugFromUrl, "to", response.data.slug);
@@ -446,16 +481,21 @@ const PropertyDetails = () => {
         },
       };
       if (prev?.id) {
-        // Format the data to put price inside pricing_info if price exists
-        const formattedData = { ...merged };
-        if (formattedData.price !== undefined) {
-          formattedData.pricing_info = {
-            ...(formattedData.pricing_info || {}),
-            price: formattedData.price
-          };
-          delete formattedData.price;
-        }
-        patchPropertyDetails(prev.id, formattedData).then((response) => {
+        // Only send the specific video-related changes
+        const patchData = {
+          videoPara,
+          propertyVideo,
+          web_cards: {
+            ...prev.web_cards,
+            video_presentation: {
+              ...(prev.web_cards?.video_presentation || {}),
+              title: JSON.stringify([videoPara]),
+              video_url: JSON.stringify(propertyVideo),
+            },
+          },
+        };
+        
+        patchPropertyDetails(prev.id, patchData).then((response) => {
           // Check if the response contains an updated slug
           if (response?.data?.slug && response.data.slug !== slugFromUrl) {
             console.log("Slug changed from", slugFromUrl, "to", response.data.slug);

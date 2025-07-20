@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 
 const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, showPopup, closePopup, BrochurePopupDialog, onSave,showEdit }) => {
   const [showReraDetails, setShowReraDetails] = useState(false);
@@ -10,7 +11,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
   const [editData, setEditData] = useState({
     name: property?.name || "",
     propertyAddress: property?.propertyAddress || "",
-    price: property?.price || "",
+    price: property?.price || property?.pricing_info?.price || "",
     developerName: property?.developer?.name || "",
     developerLogo: property?.developer?.developer_logo || "",
     developerAddress: property?.developer?.developer_address || "",
@@ -23,7 +24,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
       setEditData({
         name: property?.name || "",
         propertyAddress: property?.propertyAddress || "",
-        price: property?.price || "",
+        price: property?.price || property?.pricing_info?.price || "",
         developerName: property?.developer?.name || "",
         developerLogo: property?.developer?.developer_logo || "",
         developerAddress: property?.developer?.developer_address || "",
@@ -56,7 +57,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
     setEditData({
       name: property?.name || "",
       propertyAddress: property?.propertyAddress || "",
-      price: property?.price || "",
+      price: property?.price || property?.pricing_info?.price || "",
       developerName: property?.developer?.name || "",
       developerLogo: property?.developer?.developer_logo || "",
       developerAddress: property?.developer?.developer_address || "",
@@ -64,7 +65,38 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
     });
     setIsEditing(false);
   };
-  const handleSave = () => {
+  const handleSave = async () => {
+    const nameChanged = editData.name !== property?.name;
+    
+    if (nameChanged) {
+      const result = await Swal.fire({
+        title: 'Property Name Change Warning',
+        html: `
+          <div style="text-align: left;">
+            <p><strong>You are about to change the property name from:</strong></p>
+            <p style="color: #dc3545; margin: 8px 0;"><em>"${property?.name}"</em></p>
+            <p><strong>To:</strong></p>
+            <p style="color: #28a745; margin: 8px 0;"><em>"${editData.name}"</em></p>
+            <br>
+            <p style="color: #f39c12;"><strong>⚠️ Warning:</strong></p>
+            <p>This will change the property's URL. Any existing links to this property may no longer work.</p>
+            <p>The new URL will be generated based on the new property name.</p>
+          </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, change the name',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+    }
+
     const updatedHeaderData = {
       ...property, 
       ...editData,
@@ -402,18 +434,13 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                   placeholder="Price"
                   style={{ fontSize: "18px", fontWeight: "700", width: "120px", display: "inline-block" }}
                 />
-                {/* Show original price if different */}
-                {property?.price && editData.price !== property.price && (
-                  <div style={{ fontSize: "13px", color: "#888" }}>
-                    Old: ₹{formatPrice(property.price)}
-                  </div>
-                )}
-                {/* Show pricing_info.price if present and different */}
-                {property?.pricing_info?.price && property.pricing_info.price !== editData.price && (
-                  <div style={{ fontSize: "13px", color: "#888" }}>
-                    Pricing Info: ₹{formatPrice(property.pricing_info.price)}
-                  </div>
-                )}
+                {/* Show current stored price for reference */}
+                <div style={{ fontSize: "13px", color: "#888", marginTop: "4px" }}>
+                  Current: ₹{formatPrice(property?.price || property?.pricing_info?.price || "0")}
+                  {property?.price && property?.pricing_info?.price && property.price !== property.pricing_info.price && (
+                    <span> (pricing_info: ₹{formatPrice(property.pricing_info.price)})</span>
+                  )}
+                </div>
               </>
             ) : (
               <h2 className="h2 mb-0 fw-bold text-center text-md-end" style={{ fontSize: "25px", fontWeight: "800" }}>
