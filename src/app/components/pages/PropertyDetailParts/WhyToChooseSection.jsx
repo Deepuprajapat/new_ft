@@ -29,11 +29,10 @@ const WhyToChooseSection = ({ property, onSave ,showEdit}) => {
     setEditMode(false);
     if (onSave) {
       onSave({
-        ...property,
         web_cards: {
           ...property.web_cards,
           why_to_choose: {
-            image_urls: imageUrls,
+            ...property?.web_cards?.why_to_choose,
             usp_list: editableUsp,
           },
         },

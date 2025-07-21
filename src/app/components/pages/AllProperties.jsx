@@ -470,7 +470,7 @@ const PropertyListing = () => {
                           >
                             <div className="row g-0">
                               <div className="col-md-4">
-                                <a href={`/propertyforsale/${property?.id}`}>
+                                <a href={`/propertyforsale/${property?.slug}`}>
                                   <img
                                     className="img-fluid"
                                     alt={property.name || "Property"}

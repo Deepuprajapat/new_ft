@@ -38,7 +38,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
   const [editData, setEditData] = useState({
     name: property?.name || "",
     propertyAddress: property?.propertyAddress || "",
-    price: property?.price || "",
+    price: property?.pricing_info?.price|| "",
     developerName: property?.developer?.name || "",
     developerLogo: property?.developer?.developer_logo || "",
     projectimages:property?.property_images?.[0]||"",
@@ -52,7 +52,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
       setEditData({
         name: property?.name || "",
         propertyAddress: property?.propertyAddress || "",
-        price: property?.price || "",
+        price: property?.pricing_info?.price|| "",
         developerName: property?.developer?.name || "",
         developerLogo: property?.developer?.developer_logo || "",
         projectimages: property?.property_images?.[0] || "",
@@ -86,7 +86,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
     setEditData({
       name: property?.name || "",
       propertyAddress: property?.propertyAddress || "",
-      price: property?.price || "",
+      price: property?.pricing_info?.price || "",
       developerName: property?.developer?.name || "",
       developerLogo: property?.developer?.developer_logo || "",
       developerAddress: property?.developer?.developer_address || "",
@@ -94,33 +94,35 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
     });
     setIsEditing(false);
   };
-  const handleSave = () => {
+  const handleSave = async () => {
     const updatedHeaderData = {
       ...property, 
-      ...editData,
+      name: editData.name,
+      propertyAddress: editData.propertyAddress,
+      property_images: [editData.projectimages],
       developer: {
-        ...property?.developer, 
+        ...(property?.developer || {}),
         name: editData.developerName,
         developer_logo: editData.developerLogo,
         developer_address: editData.developerAddress,
       },
       reraDetails: editData.reraDetails,
-      name: editData.name,
-      propertyAddress: editData.propertyAddress,
-      price: editData.price,
+      pricing_info: {
+        ...(property?.pricing_info || {}),
+        price: editData.price,
+      },
     };
-    onSave(updatedHeaderData);
+    await onSave(updatedHeaderData);
     setIsEditing(false);
   };
 
   // Save handler for RERA details
-  const handleSaveRera = () => {
+  const handleSaveRera = async () => {
     if (onSave) {
-      onSave({
+      const updatedReraData = {
         ...property,
         name: editData.name,
         propertyAddress: editData.propertyAddress,
-        price: editData.price,
         reraDetails: editData.reraDetails,
         developer: {
           ...(property?.developer || {}),
@@ -128,7 +130,12 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
           developer_logo: editData.developerLogo,
           developer_address: editData.developerAddress,
         },
-      });
+        pricing_info: {
+          ...(property?.pricing_info || {}),
+          price: editData.price,
+        },
+      };
+      await onSave(updatedReraData);
     }
     setIsEditing(false);
     setShowReraDetails(false);
@@ -137,6 +144,13 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleReraInputChange = (e, index) => {
+    const { name, value } = e.target;
+    const updatedReraDetails = [...editData.reraDetails];
+    updatedReraDetails[index] = { ...updatedReraDetails[index], [name]: value };
+    setEditData(prev => ({ ...prev, reraDetails: updatedReraDetails }));
   };
 
   return (
@@ -203,60 +217,19 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                        )}
                   </h1>
                 )}
-                {isEditing ? (
-                  <input
-                    type="text"
-                    className="form-control mb-1"
-                    name="propertyAddress"
-                    value={editData.propertyAddress}
-                    onChange={handleInputChange}
-                    placeholder="Property Address"
-                    style={{ fontSize: "11px" }}
-                  />
-                ) : (
-                  <p className="mb-0" style={{ fontSize: "11px" }}>
-                    {property?.propertyAddress || "Property Address"}
-                  </p>
-                )}
+                <p className="mb-0" style={{ fontSize: "11px" }}>
+                  {property?.propertyAddress || "Property Address"}
+                </p>
                 <span style={{ fontSize: "13px" }}>
                   By {" "}
-                  {isEditing ? (
-                    <>
-                      <input
-                        type="text"
-                        className="form-control d-inline-block mb-1"
-                        name="developerName"
-                        value={editData.developerName}
-                        onChange={handleInputChange}
-                        placeholder="Developer Name"
-                        style={{ width: "auto", fontSize: "13px", display: "inline-block" }}
-                      />
-                      <span style={{ fontSize: "13px", color: "#888", marginLeft: 6 }}>
-                        {property?.developer?.name && editData.developerName !== property?.developer?.name ? `(${property.developer.name})` : ''}
-                      </span>
-                      <input
-                        type="text"
-                        className="form-control d-inline-block mb-1"
-                        name="developerAddress"
-                        value={editData.developerAddress}
-                        onChange={handleInputChange}
-                        placeholder="Developer Address"
-                        style={{ width: "auto", fontSize: "11px", display: "inline-block" }}
-                      />
-                      <span style={{ fontSize: "11px", color: "#888", marginLeft: 6 }}>
-                        {property?.developer?.developer_address && editData.developerAddress !== property?.developer?.developer_address ? `(${property.developer.developer_address})` : ''}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <a target="_blank" rel="noopener noreferrer">
-                        {property?.developer?.name || "Developer Name"}
-                      </a>
-                      {property?.developer?.developer_address && (
-                        <div style={{ fontSize: "11px", color: "#555" }}>{property.developer.developer_address}</div>
-                      )}
-                    </>
-                  )}
+                  <>
+                    <a target="_blank" rel="noopener noreferrer">
+                      {property?.developer?.name || "Developer Name"}
+                    </a>
+                    {property?.developer?.developer_address && (
+                      <div style={{ fontSize: "11px", color: "#555" }}>{property.developer.developer_address}</div>
+                    )}
+                  </>
                 </span>
                 {isEditing && (
                   <div className="mt-2 d-flex gap-2">
@@ -328,7 +301,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                                     className="form-control form-control-sm"
                                     name="phase"
                                     value={row.phase || ""}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => handleReraInputChange(e, idx)}
                                     placeholder="Phase"
                                   />
                                 </td>
@@ -338,7 +311,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                                     className="form-control form-control-sm"
                                     name="status"
                                     value={row.status || ""}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => handleReraInputChange(e, idx)}
                                     placeholder="Status"
                                   />
                                 </td>
@@ -348,7 +321,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                                     className="form-control form-control-sm"
                                     name="reraNumber"
                                     value={row.reraNumber || ""}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => handleReraInputChange(e, idx)}
                                     placeholder="Rera Number"
                                   />
                                 </td>
@@ -441,24 +414,24 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                   style={{ fontSize: "18px", fontWeight: "700", width: "120px", display: "inline-block" }}
                 />
                 {/* Show original price if different */}
-                {property?.price && editData.price !== property.price && (
+                {property?.price && editData.price !== property.pricing_info?.price && (
                   <div style={{ fontSize: "13px", color: "#888" }}>
-                    Old: ₹{formatPrice(property.price)}
+                    Old: ₹{formatPrice(property.pricing_info)}
                   </div>
                 )}
                 {/* Show pricing_info.price if present and different */}
-                {property?.pricing_info?.price && property.pricing_info.price !== editData.price && (
+                {property?.pricing_info?.price && property.pricing_info?.price !== editData.price && (
                   <div style={{ fontSize: "13px", color: "#888" }}>
-                    Pricing Info: ₹{formatPrice(property.pricing_info.price)}
+                    Pricing Info: ₹{formatPrice(property.pricing_info?.price)}
                   </div>
                 )}
               </>
             ) : (
               <h2 className="h2 mb-0 fw-bold text-center text-md-end" style={{ fontSize: "25px", fontWeight: "800" }}>
                 ₹{formatPrice(property?.price || property?.pricing_info?.price || "0")}
-                {property?.pricing_info?.price && property?.price && property.pricing_info.price !== property.price && (
+                {property?.pricing_info?.price && property?.price && property.pricing_info?.price !== property.pricing_info?.price && (
                   <span style={{ fontSize: "13px", color: "#888", marginLeft: 8 }}>
-                    (Pricing Info: ₹{formatPrice(property.pricing_info.price)})
+                    (Pricing Info: ₹{formatPrice(property.pricing_info?.price)})
                   </span>
                 )}
               </h2>
