@@ -93,17 +93,17 @@ const LeadFormPopup = ({ open, onClose }) => {
           <div className="project-title">ACE Starlit</div>
           <div className="feature-list">
             <div className="feature-item">
-              <img src="/images/call-back.webp" alt="Instant Call Back" className="feature-icon" />
+              <img src="/images/icon-return-call.svg" alt="Instant Call Back" className="feature-icon" />
               <span>INSTANT CALL BACK</span>
             </div>
             <div className="feature-item">
               {/* Replace image with Font Awesome icon */}
-              <img src="/images/handshake.png" alt="Unmatched Price" className="feature-icon" />
+              <img src="/images/icon-hand-shake.svg" alt="Unmatched Price" className="feature-icon" />
               {/* <i className="fa fa-handshake-o feature-icon" aria-hidden="true" style={{ fontSize: '43px', color: '#2c94d2' }}></i> */}
               <span>FREE SITE VISIT</span>
             </div>
             <div className="feature-item">
-              <img src="/images/offer.png" alt="Unmatched Price" className="feature-icon" />
+              <img src="/images/icon-price.svg" alt="Unmatched Price" className="feature-icon" />
               <span>UNMATCHED PRICE</span>
             </div>
           </div>
