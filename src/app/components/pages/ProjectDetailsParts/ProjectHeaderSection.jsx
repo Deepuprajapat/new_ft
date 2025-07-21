@@ -10,7 +10,6 @@ const ProjectHeaderSection = ({
   handleInputChange,
   showEdit,
   handleSave,
-  setPatchFormData
 }) => {
   // Map API data to camelCase for UI
   const mappedData = {
@@ -22,13 +21,12 @@ const ProjectHeaderSection = ({
     developerName: projectData?.web_cards?.about?.contact_details?.name 
     ?? projectData?.web_cards?.about?.contact_details?.name 
     ?? "",
-
     shortAddress: projectData?.shortAddress || projectData?.location_info?.short_address || "",
     city: projectData?.city || "",
     locality: projectData?.locality || "",
     reraDetails: projectData?.web_cards?.rera_info?.rera_list || projectData?.rera_info|| [],
     web_cards: projectData?.web_cards || {},
-    projectLogo: projectData?.projectLogo || projectData?.project_logo || "",
+    projectLogo: projectData?.web_cards.images?.[0]|| "",
     floorplans: projectData?.floorplans || [],
     // ...aur bhi fields agar chahiye toh yahan add kar lo
   };
@@ -168,10 +166,17 @@ const ProjectHeaderSection = ({
     }
 
     // Add logo if uploaded and different from current
-    if (pendingLogoUrl && pendingLogoUrl !== mappedData.projectLogo) {
-      updatedData.project_logo = pendingLogoUrl;
-    }
-
+   // Add logo if uploaded and different from current
+if (pendingLogoUrl && pendingLogoUrl !== mappedData.projectLogo) {
+  updatedData.web_cards = {
+    ...(updatedData.web_cards || projectData.web_cards || {}),
+    images: [
+      pendingLogoUrl,
+      ...(projectData.web_cards?.images?.slice(1) || [])
+    ],
+    // merge other web_cards changes here if needed
+  };
+}
     // Debug log
     console.log('Saving with data:', updatedData);
 

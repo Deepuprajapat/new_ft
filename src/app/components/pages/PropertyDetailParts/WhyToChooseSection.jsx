@@ -11,7 +11,10 @@ const WhyToChooseSection = ({ property, onSave ,showEdit}) => {
 
   // Sync editableUsp with uspList when property changes
   useEffect(() => {
-    setEditableUsp([...uspList]);
+    if (JSON.stringify(editableUsp) !== JSON.stringify(uspList)) {
+      setEditableUsp([...uspList]);
+    }
+    // eslint-disable-next-line
   }, [uspList]);
 
   const handleUspChange = (idx, value) => {

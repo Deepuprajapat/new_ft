@@ -4,15 +4,12 @@ import BrochurePopupDialog from "./BrochurePopup";
 import PopupDialog from "./CommanPopup";
 import { useOutletContext } from "react-router-dom";
 import {
-  getAllProjectsByUrlName,
   getAllProject,
   sendOTP,
   verifyOTP,
   resendOTP,
-  patchProjectById,
-  patchProjectByTestUrl
-  // getLeadByPhone,
-  // saveLead,
+  patchProjectByTestUrl,
+  getProjectFromSlug
 } from "../../apis/api";
 import "react-multi-carousel/lib/styles.css";
 import { Helmet } from "react-helmet";
@@ -34,11 +31,9 @@ import ProjectDetailsSection from "./ProjectDetailsParts/ProjectDetailsSection";
 import MetaFormSection from "./ProjectDetailsParts/MetaForm";
 import ProjectGallerySection from "./ProjectDetailsParts/ProjectGallerySection";
 import AboutDeveloperSection from "./ProjectDetailsParts/AboutDeveloperSection";
-import { DataArray } from "@mui/icons-material";
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg";
 
-// Helper function to parse flexible date formats (cross-browser compatible)
 const parseFlexibleDate = (dateStr) => {
   if (!dateStr) return null;
   const trimmed = dateStr.trim();
@@ -64,42 +59,12 @@ const parseFlexibleDate = (dateStr) => {
 };
 
 const ProjectDetails = () => {
-  // Check if user is authenticated by looking for token in cookie or localStorage
-  // const getAuthToken = () => {
-  //   // Try to get token from cookie first
-  //   const value = `; ${document.cookie}`;
-  //   const parts = value.split(`; authToken=`);
-  //   if (parts.length === 2) return parts.pop().split(";").shift();
-
-  //   // Fallback to localStorage
-  //   return localStorage.getItem("authToken");
-  // };
-
   const [activeSection, setActiveSection] = useState("overview");
   const [projectData, setProjectData] = useState(null);
   const [allSimilarProjects, setAllSimilarProjects] = useState(null);
   const [developerId, setDeveloperId] = useState("");
-  const [projectId, setProjectId] = useState("");
-  const { urlName } = useParams();
+  const { slug } = useParams();
   const location = useLocation();
-
-  const getProjectIdFromSession = () => {
-    const projectState = sessionStorage.getItem("projectState");
-    if (projectState) {
-        try {
-            // Only parse if it looks like JSON
-            const data = /^[{\[]/.test(projectState) ? JSON.parse(projectState) : projectState;
-            return data.projectId || data;
-        } catch (err) {
-            sessionStorage.removeItem("projectState");
-        }
-    }
-    return null;
-};
-
-  const projectIdFromNav = getProjectIdFromSession();
-  console.log(projectIdFromNav, "project id from nav")
-
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -110,9 +75,6 @@ const ProjectDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [AddProjectButton, setAddProjectButton] = useState(false);
   const [isPaymentEditing, setIsPaymentEditing] = useState(false);
-  const [paymentPara, setPaymentPara] = useState(
-    projectData?.paymentPara || ""
-  );
   const [paymentPlans, setPaymentPlans] = useState(
     projectData?.paymentPlans || []
   );
@@ -151,7 +113,7 @@ const ProjectDetails = () => {
 
   // Call PATCH API with the updated data
   try {
-    const projectId = projectIdFromNav || projectDataFromState?.project_id;
+    const projectId = projectData.project_id;
     const response = await patchProjectByTestUrl(projectId,newData);
     console.log("Patch API response:", response);
   } catch (error) {
@@ -201,7 +163,6 @@ const ProjectDetails = () => {
   };
 
   const projectDataFromState = location.state?.projectData;
-  // console.log(projectDataFromState,"projectDataFromState")
 
   // Store initial nav position on mount
   useEffect(() => {
@@ -217,7 +178,6 @@ const ProjectDetails = () => {
         // Use data from navigation state
         setProjectData(projectDataFromState);
         setDeveloperId(projectDataFromState.developerId);
-        setProjectId(projectDataFromState.id);
 
         if (
           Array.isArray(projectDataFromState.schema) &&
@@ -240,13 +200,12 @@ const ProjectDetails = () => {
 
           setSchemas(parsedSchemas);
         }
-      } else if (urlName) {
+      } else if (slug) {
         try {
-          const data = await getAllProjectsByUrlName(projectIdFromNav, navigate);
+          const data = await getProjectFromSlug(slug ,navigate);
           if (data) {
             setProjectData(data);
             setDeveloperId(data.developerId);
-            setProjectId(data.id);
             if (Array.isArray(data.schema) && data.schema.length > 0) {
               const parsedSchemas = data.schema
                 .map((schemaStr) => {
@@ -265,6 +224,8 @@ const ProjectDetails = () => {
 
               setSchemas(parsedSchemas);
             }
+          } else {
+            navigate("/404");
           }
         } catch (error) {
           console.error("Error fetching project data:", error);
@@ -275,17 +236,7 @@ const ProjectDetails = () => {
     };
 
     fetchData();
-  }, [urlName, navigate]);
-  
-  useEffect(() => {
-    const Pid = projectDataFromState?.project_id;
-  
-    // If both are missing, navigate to 404
-    if (!Pid && !projectIdFromNav) {
-      navigate("/404", { replace: true });
-    }
-  }, [projectIdFromNav, projectDataFromState, navigate]);
-  
+  }, [slug, navigate]);
   
 
   
@@ -313,6 +264,7 @@ const ProjectDetails = () => {
       fetchAllProject();
     }
   }, [projectData]);
+
 
   useEffect(() => {
     if (isVideoEditing) {
@@ -342,12 +294,6 @@ const ProjectDetails = () => {
     setEditableVideos([...editableVideos, ""]);
   };
 
-  // Helper function to extract YouTube video ID from various URL formats
-  // const extractYouTubeId = (url) => {
-  //   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  //   const match = url.match(regExp);
-  //   return (match && match[2].length === 11) ? match[2] : url;
-  // };
 
   const formatPrice = (price) => {
     if (price === null || price === undefined || price === "")
@@ -463,7 +409,7 @@ const ProjectDetails = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [error, setError] = useState("");
-  const [timer, setTimer] = useState(60); // Countdown timer for resend OTP
+  const [timer, setTimer] = useState(60); 
 
   // Handle input change
   const handleChange = (e) => {
@@ -491,7 +437,7 @@ const ProjectDetails = () => {
       const response = await sendOTP(
         formData.usermobile,
         projectData?.project_name || "",
-        "ORGAINc",
+        "ORGAINC",
         formData.username,
         formData.usermsg,
         formData.useremail,
@@ -510,7 +456,6 @@ const ProjectDetails = () => {
     }
   };
 
-  // Simulate OTP verification API
   const verifyOtp = async () => {
     try {
       const response = await verifyOTP(formData.usermobile, otp);
@@ -718,9 +663,6 @@ const ProjectDetails = () => {
     setIsModalOpen(false);
   };
 
-  // const [showFloorPlanPopup, setShowFloorPlanPopup] = useState(false);
-  // const [showImagePopup, setShowImagePopup] = useState(false); // State for image popup
-  // const [selectedImage, setSelectedImage] = useState(""); // State to hold selected image URL
 
   // Function to clean and extract numbers for sorting
   const cleanQuestion = (question) => {
@@ -816,16 +758,7 @@ const ProjectDetails = () => {
             ))}
         </Helmet>
       )}
-      {/* {projectData && (
-      <div >
-      <Header shortAddress={projectData?.shortAddress} />
-      </div>
-    )} */}
-      {/* {projectData && (
-      <div className="container-fluid p-0">
-      <h1>Helo</h1>
-      {projectData?.shortAddress}
-      </div> */}
+
 
       <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
@@ -1324,7 +1257,7 @@ const ProjectDetails = () => {
                   altLogo:
                     projectData?.developer_info?.alt_logo|| "",
                   establishedYear:
-                    projectData?.developer_info.established_year || "",
+                    projectData?.developer_info?.established_year || "",
                   totalProjects:
                     projectData?.web_cards?.about?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",

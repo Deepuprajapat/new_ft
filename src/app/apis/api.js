@@ -864,11 +864,23 @@ export const EditBlog = async (data ,blog_id) => {
 export const getPropertyFromSlug = async (slug) => {
   try {
     const res = await axios.get(
-      `${BASE_URL}/internal/properties/${slug}`
+      `${BASE_URL}/s/properties/${slug}`
     );
     return res.data;
   } catch (error) {
     console.error("Error patching project details:", error);
     throw error;
+  }
+};
+
+export const getProjectFromSlug = async (slug,navigate) => {
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/s/projects/${slug}`
+    );
+    return res.data.data;
+  } catch (error) {
+      navigate("/404");
+    return {};
   }
 };
