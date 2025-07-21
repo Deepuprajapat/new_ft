@@ -1,4 +1,4 @@
-import React , {useState} from "react";
+import React , {useState, useEffect} from "react";
 import PopupDialog from "../CommanPopup"; // Adjust the path if needed
 
 const WhyChooseSection = ({
@@ -12,16 +12,56 @@ const WhyChooseSection = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false); 
 
-  const handleCancel = () => setIsEditing(false);
   // Map USPs for display and editing
   const uspRawList = projectData?.web_cards?.why_to_choose?.usp_list || [];
   const displayUSPs = Array(6).fill("").map((_, index) =>
     typeof uspRawList[index] === 'string' ? uspRawList[index] : (uspRawList[index]?.description || "")
   );
-  const handleEdit = () => setIsEditing(true);
-  const handleSaveChanges = () => {
-    handleSave(projectData); // Send updated data to parent component
+
+  // Local state for editing USPs
+  const [editingUSPs, setEditingUSPs] = useState(displayUSPs);
+
+  // Sync editingUSPs with displayUSPs when projectData changes (but not during editing)
+  useEffect(() => {
+    if (!isEditing) {
+      setEditingUSPs(displayUSPs);
+    }
+  }, [displayUSPs, isEditing]);
+
+  const handleEdit = () => {
+    setEditingUSPs([...displayUSPs]); // Initialize with current values
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setEditingUSPs([...displayUSPs]); // Reset to original values
     setIsEditing(false);
+  };
+
+  const handleSaveChanges = () => {
+    // Update project data with edited values
+    const updatedProjectData = {
+      ...projectData,
+      web_cards: {
+        ...projectData.web_cards,
+        why_to_choose: {
+          ...projectData.web_cards?.why_to_choose,
+          usp_list: editingUSPs
+        }
+      }
+    };
+    setProjectData(updatedProjectData);
+    handleSave(updatedProjectData); // Send updated data to parent component
+    setIsEditing(false);
+  };
+
+  // Handle local USP changes during editing
+  const handleUSPChange = (idx, value) => {
+    setEditingUSPs(prev => {
+      const updated = [...prev];
+      updated[idx] = value;
+      return updated;
+    });
   };
 
   // Map why_to_choose.image_urls to images array for UI compatibility
@@ -175,7 +215,7 @@ const WhyChooseSection = ({
                       marginTop: window.innerWidth <= 768 ? "5px" : "0",
                     }}
                   >
-                    {displayUSPs.map((usp, idx) => (
+                    {(isEditing ? editingUSPs : displayUSPs).map((usp, idx) => (
                       <div className="col-6" key={idx}>
                         <div className="d-flex align-items-start">
                           <img
@@ -195,20 +235,7 @@ const WhyChooseSection = ({
                               className="form-control form-control-sm"
                               value={usp}
                               placeholder={`Enter USP ${idx + 1}`}
-                              onChange={(e) => {
-                                const updatedUSPs = [...displayUSPs];
-                                updatedUSPs[idx] = e.target.value;
-                                setProjectData({
-                                  ...projectData,
-                                  web_cards: {
-                                    ...projectData.web_cards,
-                                    why_to_choose: {
-                                      ...projectData.web_cards?.why_to_choose,
-                                      usp_list: updatedUSPs
-                                    }
-                                  }
-                                });
-                              }}
+                              onChange={(e) => handleUSPChange(idx, e.target.value)}
                               style={{
                                 fontSize: window.innerWidth <= 768 ? "10px" : "14px",
                                 lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",

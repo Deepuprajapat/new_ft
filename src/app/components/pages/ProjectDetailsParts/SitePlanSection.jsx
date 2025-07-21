@@ -79,7 +79,7 @@ const SitePlanSection = ({
           borderRadius: "4px",
         }}
       >
-        {(projectData?.project_name ? projectData.name + ' ' : '') + 'Site Plan'}
+        {projectData?.project_name + ' Site Plan'}
         {showEdit && (
           <span style={{ cursor: "pointer", marginLeft: "12px" }}>
             {isSitePlanEditing ? (

@@ -1326,7 +1326,7 @@ const ProjectDetails = () => {
                   establishedYear:
                     projectData?.developer_info.established_year || "",
                   totalProjects:
-                    projectData?.developer_info?.total_projects || "",
+                    projectData?.web_cards?.about?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",
                   address:
                     projectData?.developer_info?.address|| "",

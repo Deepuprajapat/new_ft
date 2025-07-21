@@ -198,6 +198,20 @@ const Footer = ({ projectPhoneNumber }) => {
           </a>
         </div>
 
+        {/* Add Link Button */}
+        <Box display="flex" justifyContent="center" style={{ marginBottom: '20px' }}>
+          {isAuthenticated() && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleOpenAddGenericModal}
+              style={{ minWidth: 150 }}
+            >
+              Add Custom Page Link
+            </Button>
+          )}
+        </Box>
+
         <div className="top-footer footer-keywords-section">
           <div className="container">
             {/* <div className="footer-keywords-title">Popular Searches</div> */}
@@ -431,18 +445,6 @@ const Footer = ({ projectPhoneNumber }) => {
                 </ul>
               </div>
             </div>
-            <Box display="flex" justifyContent="center">
-              {isAuthenticated() && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleOpenAddGenericModal}
-                  style={{ minWidth: 150 }}
-                >
-                  Add Link
-                </Button>
-              )}
-            </Box>
             <div className="bottom-footer">
               <div className="container">
                 <p>All right Reserved | Invest Mango</p>

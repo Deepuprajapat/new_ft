@@ -139,8 +139,6 @@ const PropertyListing = () => {
         cityParam
       );
 
-      console.log("Properties response:", response);
-
       if (response?.data) {
         // Handle different response structures
         if (Array.isArray(response.data)) {
@@ -215,14 +213,12 @@ const PropertyListing = () => {
     }
     return price.toLocaleString();
   };
+
   const handleMoreDetail = (id, slug) => {
-    console.log(id ,"uuuuuuuuuuuuuuuuu")
     const url = `/propertyforsale/${slug}`;
-      localStorage.setItem('propertyState', JSON.stringify({ id }))
+    localStorage.setItem('propertyState', JSON.stringify({ id }));
     window.open(url, "_blank", "noopener,noreferrer");
   };
-
-
 
   const handleTypeSelect = async (type) => {
     setSelectedType(type);
@@ -282,7 +278,7 @@ const PropertyListing = () => {
       const response = await saveProperty(propertyData);
       setShowDetailsModal(false);
       const propertyId = response?.data?.property_id;
-      const propertyslug = response?.data?.slug
+      const propertyslug = response?.data?.slug;
       setProjectId(selectedProject);
       navigate(`/propertyforsale/${propertyslug}`, {
         state: { ...propertyData, projectId: selectedProject },
@@ -318,7 +314,7 @@ const PropertyListing = () => {
               </Link>{" "}
               / All Property
             </span>
-            <h2 style={{ textAlign: "center" }}>Property For Sale</h2>
+            <h2 style={{ textAlign: "center", marginBottom: "20px", marginTop: "20px" }}>Property For Sale</h2>
 
             <div className="container">
               <div className="row">
@@ -405,7 +401,7 @@ const PropertyListing = () => {
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        marginRight: "160px",
+                        marginRight: "9%",
                       }}
                     >
                       <FontAwesomeIcon
@@ -432,7 +428,7 @@ const PropertyListing = () => {
               </div>
             </div>
 
-            <div className="listing-home listing-page">
+            <div className="listing-home listing-page mt-4">
               <div className="listing-slide row">
                 <div
                   className="col-md-8 sticky-scroll"
@@ -518,6 +514,7 @@ const PropertyListing = () => {
                                       BY {property.developer_name || "Developer"}
                                     </span>
                                   </h6>
+                                  
                                   <div
                                     className="property-info"
                                     style={{
@@ -540,13 +537,14 @@ const PropertyListing = () => {
                                       <i className="fas fa-compass"></i> Facing
                                       <br />
                                       <strong>{property.facing || "N/A"}</strong>
-                                      <div style={{ marginTop: 4 }}>
+                                      <div style={{ marginTop: "4px" }}>
                                         <i className="fas fa-map-marker-alt"></i> Location
                                         <br />
                                         <strong>{property.location || "N/A"}</strong>
                                       </div>
                                     </div>
                                   </div>
+                                  
                                   <button
                                     onClick={() =>
                                       handleMoreDetail(
@@ -651,7 +649,13 @@ const PropertyListing = () => {
                     <i className="fas fa-chevron-left"></i>
                   </button>
                   
-                  <span className="page-info" style={{ margin: "0 15px", fontWeight: "bold" }}>
+                  <span 
+                    className="page-info" 
+                    style={{ 
+                      margin: "0 15px", 
+                      fontWeight: "bold" 
+                    }}
+                  >
                     Page {currentPage + 1} of {totalPages}
                   </span>
                   
@@ -708,11 +712,11 @@ const PropertyListing = () => {
               onClick={() => setShowAddModal(false)}
               style={{
                 position: "absolute",
-                top: 18,
-                right: 24,
+                top: "18px",
+                right: "24px",
                 background: "transparent",
                 border: "none",
-                fontSize: 32,
+                fontSize: "32px",
                 color: "#e74c3c",
                 cursor: "pointer",
               }}
@@ -720,21 +724,23 @@ const PropertyListing = () => {
             >
               &times;
             </button>
+            
             <h2
               style={{
                 textAlign: "left",
                 fontWeight: 700,
-                fontSize: 24,
+                fontSize: "24px",
                 margin: "0 0 32px 0",
-                paddingLeft: 4,
+                paddingLeft: "4px",
               }}
             >
               Select Property Type
             </h2>
+            
             <div
               style={{
                 display: "flex",
-                gap: 32,
+                gap: "32px",
                 justifyContent: "center",
               }}
             >
@@ -742,8 +748,8 @@ const PropertyListing = () => {
                 style={{
                   background: "#eaf6ff",
                   borderRadius: "10px",
-                  width: 340,
-                  height: 340,
+                  width: "340px",
+                  height: "340px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
@@ -759,7 +765,7 @@ const PropertyListing = () => {
                 <div
                   style={{
                     fontWeight: 600,
-                    fontSize: 20,
+                    fontSize: "20px",
                     color: "#222",
                     marginBottom: 0,
                     marginTop: 0,
@@ -782,12 +788,13 @@ const PropertyListing = () => {
                   }}
                 />
               </div>
+              
               <div
                 style={{
                   background: "#ffeaf2",
                   borderRadius: "20px",
-                  width: 340,
-                  height: 340,
+                  width: "340px",
+                  height: "340px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
@@ -803,7 +810,7 @@ const PropertyListing = () => {
                 <div
                   style={{
                     fontWeight: 600,
-                    fontSize: 20,
+                    fontSize: "20px",
                     color: "#222",
                     marginBottom: 0,
                     marginTop: 0,
@@ -864,11 +871,11 @@ const PropertyListing = () => {
               onClick={handleCloseDetailsModal}
               style={{
                 position: "absolute",
-                top: 18,
-                right: 24,
+                top: "18px",
+                right: "24px",
                 background: "transparent",
                 border: "none",
-                fontSize: 24,
+                fontSize: "24px",
                 color: "#e74c3c",
                 cursor: "pointer",
               }}
@@ -876,19 +883,21 @@ const PropertyListing = () => {
             >
               &times;
             </button>
+            
             <h2
               style={{
                 fontWeight: 700,
-                fontSize: 22,
+                fontSize: "22px",
                 margin: "0 0 24px 0",
                 textAlign: "left",
               }}
             >
               Add a Property
             </h2>
+            
             <div
               style={{
-                marginBottom: 18,
+                marginBottom: "18px",
                 textAlign: "left",
                 fontWeight: 500,
                 display: "flex",
@@ -903,7 +912,7 @@ const PropertyListing = () => {
                   setShowAddProjectModal(true);
                 }}
                 style={{
-                  fontSize: 13,
+                  fontSize: "13px",
                   color: "#2067d1",
                   textDecoration: "none",
                   cursor: "pointer",
@@ -912,6 +921,7 @@ const PropertyListing = () => {
                 Not in List? Add New
               </span>
             </div>
+            
             <Select
               options={projects.map((proj) => ({
                 value: proj.project_id,
@@ -922,7 +932,7 @@ const PropertyListing = () => {
                   ? projects.find((proj) => proj.project_id === selectedProject)
                     ? {
                         value: selectedProject,
-                         label: projects.find(
+                        label: projects.find(
                           (proj) => proj.project_id === selectedProject
                         ).project_name,
                       }
@@ -933,57 +943,29 @@ const PropertyListing = () => {
               placeholder="Select Project"
               isClearable
               styles={{
-                container: (base) => ({ ...base, marginBottom: 18 }),
+                container: (base) => ({ ...base, marginBottom: "18px" }),
                 menu: (base) => ({ ...base, zIndex: 9999 }),
               }}
             />
-            {/* Property URL input */}
-            {/* <div style={{ marginBottom: 18 }}>
-              <label htmlFor="property-url" style={{ fontWeight: 500, display: "block", marginBottom: 4 }}>
-                Property URL (slug)
-              </label>
-              <input
-                id="property-url"
-                type="text"
-                value={propertyUrl}
-                onChange={e => setPropertyUrl(e.target.value)}
-                placeholder="Enter property URL (slug)"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: 6,
-                  border: "1px solid #ccc",
-                }}
-              />
-            </div> */}
-            <div style={{display: "flex", gap: 16, marginBottom: 24, justifyContent: "flex-end"}}>
-              {/* <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: 4 }}>
-                  Covered Parking
-                </div>
-                <input
-                  type="text"
-                  value={coveredParking}
-                  onChange={(e) => setCoveredParking(e.target.value)}
-                  placeholder="2"
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                  }}
-                />
-              </div> */}
+            
+            <div 
+              style={{
+                display: "flex", 
+                gap: "16px", 
+                marginBottom: "24px", 
+                justifyContent: "flex-end"
+              }}
+            >
               <button
                 onClick={handleConfirm}
                 style={{
                   padding: "10px 20px",
                   border: "none",
-                  borderRadius: 8,
+                  borderRadius: "8px",
                   background: "#2067d1",
                   color: "#fff",
                   fontWeight: 600,
-                  fontSize: 16,
+                  fontSize: "16px",
                   cursor: "pointer",
                   height: "40px",
                   boxShadow: "0 2px 8px rgba(32,103,209,0.10)",

@@ -7,46 +7,22 @@ import {
   sendOTP,
   verifyOTP,
   resendOTP,
+  getPropertyFromSlug,
 } from "../../apis/api"; // Adjust the import path as needed
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faExpandArrowsAlt,
-  faRulerCombined,
-  faBuilding,
-  faCalendarAlt,
-  faFlag,
-  faCity,
-  faKey,
-  faParking,
-  faBed,
-  faCouch,
-} from "@fortawesome/free-solid-svg-icons";
-import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import Swal from "sweetalert2";
-import { Helmet } from "react-helmet";
 import ProjectPropertyDetails from "./PropertyDetailParts/ProjectPropertyDetails";
 import PropertyHeaderSection from "./PropertyDetailParts/PropertyHeaderSection";
 import WhyToChooseSection from "./PropertyDetailParts/WhyToChooseSection";
 import FloorPlanSection from "./PropertyDetailParts/FloorPlanSection";
-import AboutDeveloperSection from "./PropertyDetailParts/AboutDeveloperSection";
 import AmenitiesSection from "./PropertyDetailParts/AmenitiesSection";
 import VideoSection from "./PropertyDetailParts/VideoSection";
 import KnowAboutSection from "./PropertyDetailParts/KnowAboutSection";
-import PropertyListSection from "./PropertyDetailParts/PropertyListSection";
-const BASE_URL = "https://myimwebsite.s3.ap-south-1.amazonaws.com/images/";
 
 const PropertyDetails = () => {
   // Check if user is authenticated by looking for token in cookie or localStorage
-  const getAuthToken = () => {
-    // Try to get token from cookie first
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; authToken=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
 
-    // Fallback to localStorage
-    return localStorage.getItem("authToken");
-  };
+  const {slug} = useParams();
   const [property, setProperty] = useState(null);
   const [expandedIndex, setExpandedIndex] = useState(null); // To track which FAQ is expanded
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -59,7 +35,6 @@ const PropertyDetails = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [navInitialPosition, setNavInitialPosition] = useState(null);
-
   // Store initial nav position on mount
   useEffect(() => {
     const navElement = document.getElementById("navigation-section");
@@ -96,25 +71,24 @@ const PropertyDetails = () => {
     setShowPopup(false);
   };
 
-  const getProjectIdFromSession = () => {
-    const propertyState = localStorage.getItem("propertyState");
-    console.log("Raw propertyState:", propertyState);
-    
-    if (propertyState) {
-      try {
-        const data = JSON.parse(propertyState);
-        console.log("Parsed data:", data);
-        console.log("ID from data:", data.id);
-        return data.id; 
-      } catch (err) {
-        console.error("JSON parsing error:", err);
-      }
-    }
-    return null;
-  };
-  const propertyid = location.state?.propertyid || getProjectIdFromSession();
+  // Fetch property details using slug - single source of truth
 
-  console.log(propertyid, "ppid")
+  useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        const response = await getPropertyFromSlug(slug);
+        setProperty(response.data);
+      } catch (error) {
+        console.error("Error fetching property:", error);
+      }
+    };
+
+    if (slug) {
+      fetchProperty();
+    }
+  }, [slug]);
+
+
 
   const [formData, setFormData] = useState({
     username: "",
@@ -218,18 +192,8 @@ const PropertyDetails = () => {
     }
   }, [timer, otpSent]);
 
-  useEffect(() => {
-    if (propertyid) {
-      const fetchProperty = async () => {
-        const data = await getPropertyByUrlName(propertyid);
-        setProperty(data.data);
-        console.log("datayhdsj", data.data);
-      };
-      fetchProperty();
-    }
-  }, [propertyid]);
 
-  console.log(property, "propertyuiehuiew");
+
 
   const processAmenities = () => {
     if (!property?.propertyAmenities) return [];
@@ -280,17 +244,13 @@ const PropertyDetails = () => {
     return numPrice.toLocaleString("en-IN");
   };
 
-  // Function to toggle the expanded question
-  const toggleFAQ = (index) => {
-    setExpandedIndex(index === expandedIndex ? null : index);
-  };
+
 
   const onSaveProjectDetails = async (newData) => {
     setProperty(newData);
     try {
-      if (propertyid) {
-        const response = await patchPropertyDetails(propertyid, newData);
-        console.log("Patch API response:", response);
+      if (property?.id) {
+        const response = await patchPropertyDetails(property.id, newData);
       } else {
         console.error("Property ID not found!");
       }
@@ -310,8 +270,8 @@ const PropertyDetails = () => {
         ...changedData,
       };
       // Update backend
-      if (propertyid) {
-        patchPropertyDetails(propertyid, merged);
+      if (prev?.id) {
+        patchPropertyDetails(prev.id, merged);
       }
       return merged;
     });
@@ -319,11 +279,6 @@ const PropertyDetails = () => {
 
   const onSaveFloorPlan = (changedData) => {
     setProperty(prev => ({ ...prev, ...changedData }));
-    // TODO: Call patchPropertyDetails API here if needed
-  };
-
-  const onSaveAboutDeveloper = (changedData) => {
-    setProperty((prev) => ({ ...prev, ...changedData }));
     // TODO: Call patchPropertyDetails API here if needed
   };
 
@@ -340,8 +295,8 @@ const PropertyDetails = () => {
         },
       };
       // Update backend
-      if (propertyid) {
-        patchPropertyDetails(propertyid, merged);
+      if (prev?.id) {
+        patchPropertyDetails(prev.id, merged);
       }
       return merged;
     });
@@ -372,8 +327,8 @@ const PropertyDetails = () => {
           },
         },
       };
-      if (propertyid) {
-        patchPropertyDetails(propertyid, merged);
+      if (prev?.id) {
+        patchPropertyDetails(prev.id, merged);
       }
       return merged;
     });
@@ -1072,7 +1027,7 @@ const PropertyDetails = () => {
                             >
                               <img
                                 src={
-                                  property?.developerLogo ||
+                                  property?.property_images[0] ||
                                   "/img/developer-img/ace-group.webp"
                                 }
                                 className="img-fluid"

@@ -21,7 +21,7 @@ const AboutDeveloperSection = ({
     about: developerDetails?.about  || "",
     address: developerDetails?.address || "",
   });
-
+  console.log("developerDetails----------", developerDetails);
   // Sync form with developerDetails when not editing
   useEffect(() => {
     if (!isDeveloperEditing && developerDetails) {
@@ -224,7 +224,7 @@ const AboutDeveloperSection = ({
                   >
                     ESTABLISHED IN - <b>{developerDetails?.establishedYear}</b>
                     <br />
-                    TOTAL PROJECTS - <b>{developerDetails?.totalProjects}+</b>
+                    TOTAL PROJECTS - <b>{developerDetails?.totalProjects || "N/A"}+</b>
                   </p>
                 </div>
                 <div

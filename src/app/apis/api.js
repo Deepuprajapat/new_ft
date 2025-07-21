@@ -860,3 +860,15 @@ export const EditBlog = async (data ,blog_id) => {
     throw error;
   }
 };
+
+export const getPropertyFromSlug = async (slug) => {
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/internal/properties/${slug}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    throw error;
+  }
+};

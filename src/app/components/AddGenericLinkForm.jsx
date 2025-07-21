@@ -270,6 +270,7 @@ const AddGenericLinkForm = ({ open, onClose, onSave }) => {
                   value={genericForm.filters.location || ""}
                   onChange={handleGenericFormChange}
                   label="Location"
+                  disabled={!genericForm.filters.city}
                 >
                   {locationOptions.map((loc, idx) => (
                     <MenuItem key={idx} value={loc}>
