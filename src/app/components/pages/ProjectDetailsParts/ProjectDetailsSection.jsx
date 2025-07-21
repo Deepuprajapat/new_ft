@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LeadFormPopup from "../LeadFormPopup";
 import {
   faExpandArrowsAlt,
   faRulerCombined,
@@ -21,7 +22,9 @@ const ProjectDetailsSection = ({
 }) => {
   // Local state for editing
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({});
+  const [editData, setEditData] = useState({}); 
+  const [showLeadPopup, setShowLeadPopup] = useState(false);
+  const [showImgPopup, setImgShowPopup] = useState(false);
 
   const handleEdit = () => {
     setEditData(JSON.parse(JSON.stringify(projectData)));
@@ -56,6 +59,20 @@ const ProjectDetailsSection = ({
       return newData;
     });
   };
+
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLeadPopup(true);
+    }, 5000); // 5 seconds delay
+    return () => clearTimeout(timer);
+  }, []);
+
+    useEffect(() => {
+    // console.log("Projecttttt ID:", projectData?.id);
+    if (projectData?.project_id === "d034a904e224b629") {
+      setImgShowPopup(true);
+    }
+  }, [projectData]);
 
   // const handleArrayInputChange = (field, value) => {
   //   const arrayValue = value.split(',').map(item => item.trim());
@@ -701,6 +718,61 @@ const ProjectDetailsSection = ({
           </div>
         </div>
       </div>
+
+
+
+       {showImgPopup && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+              background: "rgba(0, 0, 0, 0.7)",
+              backdropFilter: "blur(2px)",
+            }}
+          >
+            <div className="popup-wrapper">
+              <button
+                onClick={() => setImgShowPopup(false)}
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  background: "rgba(0,0,0,0.6)",
+                  border: "none",
+                  color: "#fff",
+                  fontSize: "20px",
+                  cursor: "pointer",
+                  borderRadius: "50%",
+                  width: "30px",
+                  height: "30px",
+                  lineHeight: "30px",
+                  textAlign: "center",
+                }}
+              >
+                ×
+              </button>
+
+              <img
+                src="/images/NiralaPopupNoidaIVR.png"
+                alt="Popup"
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  display: "block",
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+       <LeadFormPopup open={showLeadPopup} onClose={() => setShowLeadPopup(false)} />
     </div>
   );
 };

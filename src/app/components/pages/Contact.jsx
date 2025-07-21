@@ -60,7 +60,7 @@ const Row = styled.div`
 `;
 const Col = styled.div`
   flex: 1 1 50%;
-  max-width: 50%;
+  max-width: 100%;
   padding: 10px;
   @media (max-width: 767px) {
     width: 100%;

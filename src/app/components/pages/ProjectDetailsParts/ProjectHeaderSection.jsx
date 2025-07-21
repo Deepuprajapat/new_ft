@@ -1086,7 +1086,7 @@ const ProjectHeaderSection = ({
               >
                 No Brokerage
               </span>
-              <span
+              {/* <span
                 className="badge text-dark"
                 style={{
                   padding: "4px 8px",
@@ -1099,7 +1099,7 @@ const ProjectHeaderSection = ({
                 }}
               >
                 Floor Plans Available
-              </span>
+              </span> */}
               <span
                 className="badge text-dark"
                 style={{
