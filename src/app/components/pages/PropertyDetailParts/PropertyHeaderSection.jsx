@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from "react";
+import { imgUplod } from "../../../../utils/common";
 
 const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, showPopup, closePopup, BrochurePopupDialog, onSave,showEdit }) => {
   const [showReraDetails, setShowReraDetails] = useState(false);
   const [isReraDetailHovered, setIsReraDetailHovered] = useState(false);
   let reraTimeout = null;
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        const imageUrl = await imgUplod(file);
+        setEditData(prev => ({ ...prev, developerLogo: imageUrl }));
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    }
+  };
 
   // Edit mode state
   const [isEditing, setIsEditing] = useState(false);
@@ -198,11 +211,10 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                         {property?.developer?.developer_address && editData.developerAddress !== property?.developer?.developer_address ? `(${property.developer.developer_address})` : ''}
                       </span>
                       <input
-                        type="text"
+                        type="file"
                         className="form-control d-inline-block mb-1"
                         name="developerLogo"
-                        value={editData.developerLogo}
-                        onChange={handleInputChange}
+                        onChange={handleLogoUpload}
                         placeholder="Developer Logo URL"
                         style={{ width: "auto", fontSize: "11px", display: "inline-block" }}
                       />

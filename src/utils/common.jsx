@@ -56,12 +56,7 @@ export const carouselOptions={
     }
 }
 
-/**
- * Uploads a file to S3 using the uploadImage API and returns the live S3 URL.
- * @param {File} file - The file to upload
- * @param {Object} options - { alt_keywords, file_path }
- * @returns {Promise<string>} - The S3 image URL
- */
+
 export async function imgUplod(file, { alt_keywords = '', file_path = '' } = {}) {
   if (!file) throw new Error('No file provided');
   const file_name = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
