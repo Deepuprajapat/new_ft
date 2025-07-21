@@ -1253,7 +1253,7 @@ const ProjectDetails = () => {
               <AboutDeveloperSection
                 developerDetails={{
                   id: projectData?.developer_info?.developer_id || "",
-                  logo: projectData?.developer_info?.logo || "",
+                  logo: projectData?.web_cards?.about?.logo_url || "",
                   altLogo:
                     projectData?.developer_info?.alt_logo|| "",
                   establishedYear:
@@ -1262,7 +1262,7 @@ const ProjectDetails = () => {
                     projectData?.web_cards?.about?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",
                   address:
-                    projectData?.developer_info?.address|| "",
+                    projectData?.web_cards?.about?.contact_details?.project_address|| "",
                   name:
                     projectData?.developer_info?.developer_name|| "",
                   phone:

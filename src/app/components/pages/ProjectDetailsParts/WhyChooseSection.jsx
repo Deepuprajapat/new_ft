@@ -1,4 +1,4 @@
-import React , {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import PopupDialog from "../CommanPopup"; // Adjust the path if needed
 
 const WhyChooseSection = ({
@@ -10,13 +10,17 @@ const WhyChooseSection = ({
   showEdit,
   handleSave,
 }) => {
-  const [isEditing, setIsEditing] = useState(false); 
+  const [isEditing, setIsEditing] = useState(false);
 
   // Map USPs for display and editing
   const uspRawList = projectData?.web_cards?.why_to_choose?.usp_list || [];
-  const displayUSPs = Array(6).fill("").map((_, index) =>
-    typeof uspRawList[index] === 'string' ? uspRawList[index] : (uspRawList[index]?.description || "")
-  );
+  const displayUSPs = Array(6)
+    .fill("")
+    .map((_, index) =>
+      typeof uspRawList[index] === "string"
+        ? uspRawList[index]
+        : uspRawList[index]?.description || ""
+    );
 
   // Local state for editing USPs
   const [editingUSPs, setEditingUSPs] = useState(displayUSPs);
@@ -46,9 +50,9 @@ const WhyChooseSection = ({
         ...projectData.web_cards,
         why_to_choose: {
           ...projectData.web_cards?.why_to_choose,
-          usp_list: editingUSPs
-        }
-      }
+          usp_list: editingUSPs,
+        },
+      },
     };
     setProjectData(updatedProjectData);
     handleSave(updatedProjectData); // Send updated data to parent component
@@ -57,7 +61,7 @@ const WhyChooseSection = ({
 
   // Handle local USP changes during editing
   const handleUSPChange = (idx, value) => {
-    setEditingUSPs(prev => {
+    setEditingUSPs((prev) => {
       const updated = [...prev];
       updated[idx] = value;
       return updated;
@@ -65,13 +69,12 @@ const WhyChooseSection = ({
   };
 
   // Map why_to_choose.image_urls to images array for UI compatibility
-  const images = projectData?.web_cards?.why_to_choose?.image_urls?.length
-  ? projectData.web_cards.why_to_choose.image_urls.map((url, idx) => ({
-      imageUrl: url,
-      caption: `Image ${idx + 1}`,
-    }))
-  : [];
-
+  const images = projectData?.web_cards?.images?.length
+    ? projectData.web_cards.images.map((url, idx) => ({
+        imageUrl: url,
+        caption: `Image ${idx + 1}`,
+      }))
+    : [];
 
   return (
     <div
@@ -145,10 +148,8 @@ const WhyChooseSection = ({
                     {images && images[0] && (
                       <div className="col-12 mb-1">
                         <img
-                          alt={
-                            images[0].caption || "Project Image 1"
-                          }
-                          src={images[0].imageUrl}
+                          alt={"Project Image 1"}
+                          src={images[1]?.imageUrl}
                           loading="lazy"
                           className="img-fluid rounded w-100"
                           style={{
@@ -175,34 +176,32 @@ const WhyChooseSection = ({
                 </button> */}
 
                         {images &&
-                          images
-                            ?.slice(1, 3)
-                            .map((image, index) => (
-                              <div className="col-6" key={index + 1}>
-                                <a
-                                  href={image.imageUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="d-block"
-                                >
-                                  <img
-                                    alt={
-                                      image.caption ||
-                                      `Project Image ${index + 2}`
-                                    }
-                                    src={image.imageUrl}
-                                    loading="lazy"
-                                    className="img-fluid rounded w-100"
-                                    style={{
-                                      height: "150px",
-                                      objectFit: "cover",
-                                      borderRadius: "16px",
-                                    }}
-                                    fetchpriority="high"
-                                  />
-                                </a>
-                              </div>
-                            ))}
+                          images?.slice(2, 4).map((image, index) => (
+                            <div className="col-6" key={index + 1}>
+                              <a
+                                href={image.imageUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="d-block"
+                              >
+                                <img
+                                  alt={
+                                    image.caption ||
+                                    `Project Image ${index + 2}`
+                                  }
+                                  src={image.imageUrl}
+                                  loading="lazy"
+                                  className="img-fluid rounded w-100"
+                                  style={{
+                                    height: "150px",
+                                    objectFit: "cover",
+                                    borderRadius: "16px",
+                                  }}
+                                  fetchpriority="high"
+                                />
+                              </a>
+                            </div>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -223,7 +222,8 @@ const WhyChooseSection = ({
                             src="/images/usp-icon.svg"
                             loading="lazy"
                             style={{
-                              height: window.innerWidth <= 768 ? "24px" : "30px",
+                              height:
+                                window.innerWidth <= 768 ? "24px" : "30px",
                               marginTop: window.innerWidth <= 768 ? "2px" : "0",
                             }}
                             fetchpriority="high"
@@ -235,17 +235,23 @@ const WhyChooseSection = ({
                               className="form-control form-control-sm"
                               value={usp}
                               placeholder={`Enter USP ${idx + 1}`}
-                              onChange={(e) => handleUSPChange(idx, e.target.value)}
+                              onChange={(e) =>
+                                handleUSPChange(idx, e.target.value)
+                              }
                               style={{
-                                fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-                                lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",
+                                fontSize:
+                                  window.innerWidth <= 768 ? "10px" : "14px",
+                                lineHeight:
+                                  window.innerWidth <= 768 ? "1.2" : "normal",
                               }}
                             />
                           ) : (
                             <span
                               style={{
-                                fontSize: window.innerWidth <= 768 ? "10px" : "14px",
-                                lineHeight: window.innerWidth <= 768 ? "1.2" : "normal",
+                                fontSize:
+                                  window.innerWidth <= 768 ? "10px" : "14px",
+                                lineHeight:
+                                  window.innerWidth <= 768 ? "1.2" : "normal",
                                 color: usp ? "inherit" : "#6c757d",
                               }}
                               dangerouslySetInnerHTML={{
@@ -253,7 +259,7 @@ const WhyChooseSection = ({
                                   .replace(/\\r\\n/g, "\n")
                                   .replace(/\\n/g, "\n")
                                   .replace(/\\r/g, "\r")
-                                  .replace(/(\r\n|\n|\r)/g, "<br />")
+                                  .replace(/(\r\n|\n|\r)/g, "<br />"),
                               }}
                             />
                           )}
@@ -301,9 +307,10 @@ const WhyChooseSection = ({
                     />
                     <div className="col-12 mt-2">
                       <a
-                        href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
+                        href={`tel:+91${
+                          projectData?.locality?.city?.phoneNumber?.[0] ||
                           "8595189189"
-                          }`}
+                        }`}
                         className="btn w-100 py-1"
                         style={{
                           backgroundColor: "#fff",

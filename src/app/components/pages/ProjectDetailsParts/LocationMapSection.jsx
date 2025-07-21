@@ -136,6 +136,7 @@ const LocationMapSection = ({
                   onChange={e => setLocationUrl(e.target.value)}
                   placeholder="Enter Google Maps embed URL"
                   style={{ marginBottom: "10px" }}
+                  autoFocus
                 />
               ) : null}
               {isLocationEditing && !locationUrl ? (

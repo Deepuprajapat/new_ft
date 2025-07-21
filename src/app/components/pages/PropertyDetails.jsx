@@ -37,11 +37,9 @@ const PropertyDetails = () => {
   useEffect(() => {
     const navElement = document.getElementById("navigation-section");
     if (navElement) {
-      // Set fixed trigger height to 800px
       setNavInitialPosition(500);
     }
   }, []);
-
   const [showImagePopup, setShowImagePopup] = useState(false); // State for image popup
   const [selectedImage, setSelectedImage] = useState(""); // State to hold selected image URL
 
@@ -1052,14 +1050,14 @@ const PropertyDetails = () => {
                                 <b
                                   style={{ fontSize: "15px", color: "#2067d1" }}
                                 >
-                                  {property?.developerEstiblishedYear || "N/A"}
+                                  {property?.developer?.establised_year || "N/A"}
                                 </b>
                                 <br />
                                 TOTAL PROJECTS -{" "}
                                 <b
                                   style={{ fontSize: "15px", color: "#2067d1" }}
                                 >
-                                  {property?.totlprojects || "N/A"}
+                                  {property?.developer?.totlprojects || "N/A"}
                                 </b>
                               </p>
                             </div>
@@ -1232,21 +1230,6 @@ const PropertyDetails = () => {
                             />
                           </div>
                         </div>
-                        {/* <div className="mb-3">
-                          <label className="form-label fw-bold">
-                            I am interested in
-                          </label>
-                          <select
-                            className="form-select"
-                            name="intersted_in"
-                            value={formData.intersted_in}
-                            onChange={handleChange}
-                          >
-                            <option value="">Select</option>
-                            <option value="2bhk">2 BHK</option>
-                            <option value="3bhk">3 BHK</option>
-                          </select>
-                        </div> */}
                         <div className="mb-3">
                           <textarea
                             name="usermsg"
@@ -1408,7 +1391,7 @@ const PropertyDetails = () => {
                                 <b
                                   style={{ fontSize: "15px", color: "#2067d1" }}
                                 >
-                                  {property?.developerEstiblishedYear || "N/A"}
+                                  {property?.developer?.establised_year || "N/A"}
                                 </b>
                                 <br />
                                 TOTAL PROJECTS -{" "}

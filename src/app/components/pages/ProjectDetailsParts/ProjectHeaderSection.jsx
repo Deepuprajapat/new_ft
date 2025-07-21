@@ -128,15 +128,11 @@ const ProjectHeaderSection = ({
 
   const handleSaveAll = () => {
     const updatedData = {};
-
-    // Use backend keys as per your JSON
     if (editName !== mappedData.name) updatedData.project_name = editName;
     if (minPrice !== mappedData.minPrice) updatedData.min_price = minPrice;
     if (maxPrice !== mappedData.maxPrice) updatedData.max_price = maxPrice;
     if (editCity !== mappedData.city) updatedData.city = editCity;
     if (editLocality !== mappedData.locality) updatedData.locality = editLocality;
-    // Always update location_info with latest values
-    // Use selectedCity/selectedLocality if set, else fallback to editCity/editLocality
     const cityToSave = selectedCity || editCity;
     const localityToSave = selectedLocality || editLocality;
     let appendedShortAddress = '';
@@ -148,7 +144,6 @@ const ProjectHeaderSection = ({
       city: cityToSave,
       locality: localityToSave
     };
-    // Also update editCity/editLocality state so UI stays in sync
     setEditCity(cityToSave);
     setEditLocality(localityToSave);
     // Developer name at correct nested path
@@ -165,18 +160,6 @@ const ProjectHeaderSection = ({
       };
     }
 
-    // Add logo if uploaded and different from current
-   // Add logo if uploaded and different from current
-if (pendingLogoUrl && pendingLogoUrl !== mappedData.projectLogo) {
-  updatedData.web_cards = {
-    ...(updatedData.web_cards || projectData.web_cards || {}),
-    images: [
-      pendingLogoUrl,
-      ...(projectData.web_cards?.images?.slice(1) || [])
-    ],
-    // merge other web_cards changes here if needed
-  };
-}
     // Debug log
     console.log('Saving with data:', updatedData);
 
@@ -197,6 +180,15 @@ if (pendingLogoUrl && pendingLogoUrl !== mappedData.projectLogo) {
       try {
         const url = await imgUplod(file, { alt_keywords: editName || 'project-logo', file_path: 'project-logos/' });
         setPendingLogoUrl(url);
+        
+        const updatedData = {
+            web_cards: {
+                ...(projectData.web_cards || {}),
+                images: [url, ...(projectData.web_cards?.images?.slice(1) || [])],
+            },
+        };
+        handleSave(updatedData);
+
       } catch (err) {
         alert('Image upload failed. Please try again.');
       }

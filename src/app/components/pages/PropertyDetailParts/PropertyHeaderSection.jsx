@@ -4,13 +4,28 @@ import { imgUplod } from "../../../../utils/common";
 const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, showPopup, closePopup, BrochurePopupDialog, onSave,showEdit }) => {
   const [showReraDetails, setShowReraDetails] = useState(false);
   const [isReraDetailHovered, setIsReraDetailHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   let reraTimeout = null;
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        const imageUrl = await imgUplod(file, { alt_keywords: "project,siteplan,real estate", file_path: "/new_vi" })
+        console.log(imageUrl,"hhhhhhhhh");
+        setEditData(prev => ({ ...prev, projectimages: imageUrl }));
+        onSave({ ...property, property_images: [imageUrl] });
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    }
+  };
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       try {
-        const imageUrl = await imgUplod(file);
+        const imageUrl = await imgUplod(file, { alt_keywords: "project,siteplan,real estate", file_path: "/new_vi" });
         setEditData(prev => ({ ...prev, developerLogo: imageUrl }));
       } catch (error) {
         console.error("Error uploading image:", error);
@@ -40,6 +55,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
         price: property?.price || "",
         developerName: property?.developer?.name || "",
         developerLogo: property?.developer?.developer_logo || "",
+        projectimages: property?.property_images?.[0] || "",
         developerAddress: property?.developer?.developer_address || "",
         reraDetails: Array.isArray(property?.reraDetails) ? property.reraDetails : [],
       });
@@ -133,7 +149,12 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
           <div className="col-12 col-md-6 p-0 p-md-0">
             {/* Upper Section */}
             <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start mb-2 mt-2 mt-md-3">
-            <div className="mb-2 mb-md-0 me-md-3 text-center text-md-start" style={{ maxWidth: '90px', border: '1px solid grey', height: '66px' }}>
+            <div 
+              className="mb-2 mb-md-0 me-md-3 text-center text-md-start position-relative" 
+              style={{ maxWidth: '90px', border: '1px solid grey', height: '66px' }}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
               <img
                 src={isEditing ? editData.projectimages || "defaultLogo.jpg" : property?.property_images?.[0]|| "defaultLogo.jpg"}
                 alt={isEditing ? editData.name || "Developer Logo" : property?.name || "name"}
@@ -141,6 +162,21 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                 className="img-fluid"
                 style={{ maxWidth: "80px", height: '64px', objectFit: 'contain' }}
               />
+              {isEditing && isHovered && (
+                <label 
+                  htmlFor="image-upload" 
+                  className="position-absolute top-50 start-50 translate-middle" 
+                  style={{ cursor: 'pointer', backgroundColor: 'rgba(0,0,0,0.5)', padding: '5px', borderRadius: '50%' }}
+                >
+                  <img src="/images/edit-icon.svg" alt="Upload" style={{ width: '24px', height: '24px' }} />
+                  <input
+                    id="image-upload"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={handleImageUpload}
+                  />
+                </label>
+              )}
             </div>
               <div className="text-center text-md-start">
                 {isEditing ? (
@@ -209,17 +245,6 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
                       />
                       <span style={{ fontSize: "11px", color: "#888", marginLeft: 6 }}>
                         {property?.developer?.developer_address && editData.developerAddress !== property?.developer?.developer_address ? `(${property.developer.developer_address})` : ''}
-                      </span>
-                      <input
-                        type="file"
-                        className="form-control d-inline-block mb-1"
-                        name="developerLogo"
-                        onChange={handleLogoUpload}
-                        placeholder="Developer Logo URL"
-                        style={{ width: "auto", fontSize: "11px", display: "inline-block" }}
-                      />
-                      <span style={{ fontSize: "11px", color: "#888", marginLeft: 6 }}>
-                        {property?.developer?.developer_logo && editData.developerLogo !== property?.developer?.developer_logo ? `(${property.developer.developer_logo})` : ''}
                       </span>
                     </>
                   ) : (

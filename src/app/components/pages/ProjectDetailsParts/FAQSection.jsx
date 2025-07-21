@@ -75,7 +75,7 @@ const FAQSection = ({ projectData  , showEdit , handleSave }) => {
           ...projectData.web_cards?.faq,
           faqs: editFaqs
         },
-        faqs: editFaqs // <-- ensure faqs are also updated at web_cards.faqs for robust mapping
+        faqs: editFaqs 
       }
     };
     handleSave(updatedData);
