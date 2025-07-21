@@ -331,14 +331,14 @@ const AdminDashboard = () => {
                   <div className="property-actions">
                     <button 
                       className="btn btn-primary btn-sm"
-                      onClick={() => navigate(`/propertyforsale/${property.id}`, { state: { editMode: true } })}
+                      onClick={() => navigate(`/propertyforsale/${property.slug}`, { state: { editMode: true } })}
                     >
                       <i className="fas fa-edit"></i>
                       Edit
                     </button>
                     <button 
                       className="btn btn-outline-secondary btn-sm"
-                      onClick={() => navigate(`/propertyforsale/${property.id}`)}
+                      onClick={() => navigate(`/propertyforsale/${property.slug}`)}
                     >
                       <i className="fas fa-eye"></i>
                       View

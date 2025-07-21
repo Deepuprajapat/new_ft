@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
-
+import React, { useState, useEffect, useRef } from "react";
+import { imgUplod } from "../../../../utils/common";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCamera } from "@fortawesome/free-solid-svg-icons";
 const AboutDeveloperSection = ({
   developerDetails,
   expandedIndex,
@@ -13,6 +15,8 @@ const AboutDeveloperSection = ({
 }) => {
   // Local state for editing and form
   const [isDeveloperEditing, setIsDeveloperEditing] = useState(false);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const fileInputRef = useRef(null);
   const [developerForm, setDeveloperForm] = useState({
     logo: developerDetails?.logo || "",
     altLogo: developerDetails?.altLogo || "",
@@ -35,7 +39,19 @@ const AboutDeveloperSection = ({
       });
     }
   }, [developerDetails, isDeveloperEditing]);
-
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogoUploading(true);
+      try {
+        const url = await imgUplod(file, { alt_keywords: developerDetails?.name || "developer-logo", file_path: "/new_vi" });
+        setDeveloperForm((f) => ({ ...f, logo: url }));
+      } catch (err) {
+        alert("Image upload failed. Please try again.");
+      }
+      setLogoUploading(false);
+    }
+  };
   // Save handler (could call an API or lift state up if needed)
   const handleSaveChanges = (e) => {
     e.preventDefault();
@@ -43,11 +59,8 @@ const AboutDeveloperSection = ({
     // Build the correct payload structure for PATCH
     const payload = {
       developer_info: {
-        logo: developerForm.logo,
         alt_logo: developerForm.altLogo,
         established_year: developerForm.establishedYear,
-        total_projects: developerForm.totalProjects,
-        address: developerForm.address,
         developer_name: developerDetails?.name || "",
         phone: developerDetails?.phone || "",
       },
@@ -55,7 +68,13 @@ const AboutDeveloperSection = ({
         ...(projectData?.web_cards || {}),
         about: {
           ...((projectData?.web_cards && projectData.web_cards.about) || {}),
+          logo_url: developerForm.logo,
+          total_projects: developerForm.totalProjects,
           description: developerForm.about,
+          contact_details: {
+            ...((projectData?.web_cards?.about?.contact_details) || {}),
+            project_address: developerForm.address,
+          },
         },
       },
     };
@@ -130,16 +149,62 @@ const AboutDeveloperSection = ({
             {isDeveloperEditing ? (
               <form className="px-3" onSubmit={handleSaveChanges}>
                 <div className="mb-2 d-flex align-items-center">
-                  <input
-                    type="text"
-                    className="form-control me-2"
-                    style={{ maxWidth: 200 }}
-                    value={developerForm.logo}
-                    onChange={(e) =>
-                      setDeveloperForm((f) => ({ ...f, logo: e.target.value }))
+                  <div
+                    className="position-relative me-2"
+                    style={{
+                      width: "90px",
+                      height: "90px",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.querySelector(".camera-overlay").style.display = "flex")
                     }
-                    placeholder="Logo URL"
-                  />
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.querySelector(".camera-overlay").style.display = "none")
+                    }
+                  >
+                    <img
+                      src={developerForm.logo}
+                      alt="logo"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                      }}
+                    />
+                    <div
+                      className="camera-overlay"
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        color: "white",
+                        display: "none",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        borderRadius: "4px",
+                      }}
+                      onClick={() => fileInputRef.current.click()}
+                    >
+                      {logoUploading ? (
+                        "..."
+                      ) : (
+                        <FontAwesomeIcon icon={faCamera} />
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: "none" }}
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                    />
+                  </div>
                   <input
                     type="text"
                     className="form-control"

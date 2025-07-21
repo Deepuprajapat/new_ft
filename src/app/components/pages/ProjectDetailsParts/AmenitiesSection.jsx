@@ -345,10 +345,10 @@ const AmenitiesSection = ({
             contentEditable={isAmenitiesEditing}
             suppressContentEditableWarning={true}
             onInput={(e) => setEditableAmenitiesPara(e.currentTarget.innerHTML)}
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(
-                isAmenitiesEditing ? editableAmenitiesPara : amenitiesPara
-              ),
+            onBlur={(e) => setEditableAmenitiesPara(e.currentTarget.innerHTML)}
+            dangerouslySetInnerHTML={undefined}
+            ref={el => {
+              if (el && el.innerHTML !== editableAmenitiesPara) el.innerHTML = editableAmenitiesPara;
             }}
           />
           <div

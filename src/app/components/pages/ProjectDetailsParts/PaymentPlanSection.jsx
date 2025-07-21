@@ -135,26 +135,43 @@ const PaymentPlanSection = ({ projectData, showEdit, handleSave }) => {
           )}
         </h2>
         <div className="p-3">
-          <div
-            className=""
-            style={{
-              fontSize: window.innerWidth <= 768 ? "12px" : "16px",
-              outline: isPaymentEditing ? "1px solid #2067d1" : "none",
-              background: isPaymentEditing ? "#f8faff" : "transparent",
-              borderRadius: "4px",
-              padding: isPaymentEditing ? "8px" : "0",
-              cursor: isPaymentEditing ? "text" : "default",
-              minHeight: "40px",
-            }}
-            contentEditable={isPaymentEditing}
-            suppressContentEditableWarning={true}
-            onInput={(e) => setLocalPaymentPara(e.currentTarget.innerHTML)}
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(
-                isPaymentEditing ? localPaymentPara : getPaymentDescriptionFromData(projectData)
-              ),
-            }}
-          />
+          {isPaymentEditing ? (
+            <div
+              className=""
+              style={{
+                fontSize: window.innerWidth <= 768 ? "12px" : "16px",
+                outline: "1px solid #2067d1",
+                background: "#f8faff",
+                borderRadius: "4px",
+                padding: "8px",
+                cursor: "text",
+                minHeight: "40px",
+              }}
+              contentEditable
+              suppressContentEditableWarning={true}
+              onInput={(e) => setLocalPaymentPara(e.currentTarget.innerHTML)}
+              onBlur={(e) => setLocalPaymentPara(e.currentTarget.innerHTML)}
+              dangerouslySetInnerHTML={undefined}
+              ref={el => {
+                if (el && el.innerHTML !== localPaymentPara) el.innerHTML = localPaymentPara;
+              }}
+            />
+          ) : (
+            <div
+              className=""
+              style={{
+                fontSize: window.innerWidth <= 768 ? "12px" : "16px",
+                color: "#333",
+                fontWeight: 500,
+                marginBottom: "0px",
+              }}
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(
+                  localPaymentPara || getPaymentDescriptionFromData(projectData) || ""
+                ),
+              }}
+            />
+          )}
           <div className="table-responsive">
             <table className="table table-striped">
               <thead>

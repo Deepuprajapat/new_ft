@@ -267,6 +267,7 @@ const ProjectGallerySection = ({
 
   // Only call handleSave when an image is selected/uploaded or reordered (not on every localImages change)
   const handleImageUpload = async (index, event) => {
+    if (index < 0 || index > 4) return; // Only allow 5 slots
     const file = event.target.files[0];
     if (file) {
       // Set loading for this slot
@@ -279,8 +280,9 @@ const ProjectGallerySection = ({
         // Use the shared imgUplod utility
         const s3ImageUrl = await imgUplod(file, { alt_keywords: "project,siteplan,real estate", file_path: "/new_vi" });
         console.log('S3 Image URL:', s3ImageUrl);
+        // Always replace the image at the given index, never add more than 5
         const newImages = [...localImages];
-        while (newImages.length <= index) {
+        while (newImages.length < 5) {
           newImages.push({});
         }
         newImages[index] = {
@@ -288,6 +290,10 @@ const ProjectGallerySection = ({
           imageUrl: s3ImageUrl, // Use S3 URL for preview and saving
           caption: file.name,
         };
+        // Ensure only 5 images
+        if (newImages.length > 5) {
+          newImages.length = 5;
+        }
         setLocalImages(newImages);
         // Save S3 URLs to projectData
         const mainImage = projectData?.web_cards?.images?.[0] || "";
