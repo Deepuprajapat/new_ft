@@ -13,6 +13,7 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
     price: property?.price || "",
     developerName: property?.developer?.name || "",
     developerLogo: property?.developer?.developer_logo || "",
+    projectimages:property?.property_images?.[0]||"",
     developerAddress: property?.developer?.developer_address || "",
     reraDetails: Array.isArray(property?.reraDetails) ? property.reraDetails : [],
   });
@@ -121,8 +122,8 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
             <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start mb-2 mt-2 mt-md-3">
             <div className="mb-2 mb-md-0 me-md-3 text-center text-md-start" style={{ maxWidth: '90px', border: '1px solid grey', height: '66px' }}>
               <img
-                src={isEditing ? editData.developerLogo || "defaultLogo.jpg" : property?.developer?.developer_logo || "defaultLogo.jpg"}
-                alt={isEditing ? editData.developerName || "Developer Logo" : property?.developer?.name || "Developer Logo"}
+                src={isEditing ? editData.projectimages || "defaultLogo.jpg" : property?.property_images?.[0]|| "defaultLogo.jpg"}
+                alt={isEditing ? editData.name || "Developer Logo" : property?.name || "name"}
                 loading="lazy"
                 className="img-fluid"
                 style={{ maxWidth: "80px", height: '64px', objectFit: 'contain' }}

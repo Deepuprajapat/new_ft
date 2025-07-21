@@ -10,18 +10,21 @@ const ProjectCard = ({ project }) => {
   const navigate = useNavigate();
 
   
-  const handleMoreDetails = (url, projectId) => {
-    console.log(url, projectId, "yyyy");
-    const stateData = { projectId };
+//   const handleMoreDetails = (url, projectId) => {
+//     const stateData = { projectId };
     
-    // Fix: Stringify the object before storing
-    console.log("Storing in sessionStorage:", stateData);
-    sessionStorage.setItem('projectState', JSON.stringify(stateData));
+//     console.log("Storing in sessionStorage:", stateData);
+//     sessionStorage.setItem('projectState', JSON.stringify(stateData));
     
-    const newWindow = window.open('', '_blank');
-    if (newWindow) {
-        newWindow.location.href = url;
-    }
+//     const newWindow = window.open('', '_blank');
+//     if (newWindow) {
+//         newWindow.location.href = url;
+//     }
+// };
+
+const handleMoreDetails =( slug) => {
+  const url = `/${slug}`;
+  window.open(url, "_blank", "noopener,noreferrer");
 };
 
   const sizeRange = project.sizes?.match(/\d+/g); // Extract all numbers from the string
@@ -40,7 +43,7 @@ const ProjectCard = ({ project }) => {
   return (
     <div className="card-im">
       <div
-        onClick={() => handleMoreDetails(project.slug, project.project_id)}
+        onClick={() => handleMoreDetails(project.slug)}
         style={{ cursor: "pointer" }}
       >
         {project.is_premium && <span className="premium-tag">Premium</span>}
@@ -128,7 +131,7 @@ const ProjectCard = ({ project }) => {
           </b>
         </p>
         <button
-          onClick={() => handleMoreDetails(project.slug, project.project_id)}
+          onClick={() => handleMoreDetails(project.slug)}
           className="project-card-details-btn"
         >
           more details

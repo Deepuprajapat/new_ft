@@ -214,9 +214,8 @@ const PropertyListing = () => {
     return price.toLocaleString();
   };
 
-  const handleMoreDetail = (id, slug) => {
+  const handleMoreDetail = ( slug) => {
     const url = `/propertyforsale/${slug}`;
-    localStorage.setItem('propertyState', JSON.stringify({ id }));
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
@@ -548,7 +547,6 @@ const PropertyListing = () => {
                                   <button
                                     onClick={() =>
                                       handleMoreDetail(
-                                        property?.id,
                                         property?.slug
                                       )
                                     }

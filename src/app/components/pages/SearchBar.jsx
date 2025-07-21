@@ -72,10 +72,8 @@ const SearchBar = () => {
       );
 
       if (matchedProject) {
-        const stateData =  matchedProject.project_id ;
         const cleanUrl = `/${matchedProject.slug.toLowerCase().replace(/\s+/g, "-")}`;
 
-        sessionStorage.setItem('projectState', stateData);
 
         const newWindow = window.open('', '_blank');
       if (newWindow) {

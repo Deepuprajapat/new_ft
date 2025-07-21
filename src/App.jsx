@@ -53,10 +53,10 @@ const router = createBrowserRouter([
       { path: "/contact", element: <Contact /> },
       { path: "/sitemap", element: <SiteMap /> },
       { path: "/developerPage/:id", element: <DeveloperPage /> },
-      { path: "/:urlName", element: <ProjectDetails /> },
+      { path: "/:slug", element: <ProjectDetails /> },
       { path: "/propertyforsale", element: <PropertyDetails /> },
-      { path: "/propertyforsale/:id", element: <PropertyDetails /> },
-      {path:"/s/:slug",element:<CustomSearchPage/>},
+      { path: "/propertyforsale/:slug", element: <PropertyDetails /> },
+      { path: "/s/:slug", element: <CustomSearchPage /> },
       { path: "/featuredProperties", element: <FeaturedProperties /> },
       { path: "/thankYou", element: <ThankYouPage /> },
       { path: "*", element: <NotFound /> }, // Not Found route
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
       { path: "/terms-and-conditions", element: <TermAndCondition /> },
       { path: "/projectDetails", element: <ProjectDetails /> },
       { path: "/login", element: <Login isOpen={true} onClose={() => {}} /> }, // Login route
-      { path: "/admin", element: <LoginDashboard /> }, 
+      { path: "/admin", element: <LoginDashboard /> },
       {
         path: "/admin/dashboard",
         element: (
@@ -77,7 +77,7 @@ const router = createBrowserRouter([
       {
         path: "/admin/leads/dashboard",
         element: (
-          <ProtectedRoute allowedRoles={['dm', 'superadmin']}>
+          <ProtectedRoute allowedRoles={["dm", "superadmin"]}>
             <LeadsDashboard />
           </ProtectedRoute>
         ),

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams, useLocation  } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import {
-  getPropertyByUrlName,
   patchPropertyDetails,
   sendOTP,
   verifyOTP,
@@ -20,7 +19,6 @@ import VideoSection from "./PropertyDetailParts/VideoSection";
 import KnowAboutSection from "./PropertyDetailParts/KnowAboutSection";
 
 const PropertyDetails = () => {
-  // Check if user is authenticated by looking for token in cookie or localStorage
 
   const {slug} = useParams();
   const [property, setProperty] = useState(null);
@@ -71,7 +69,6 @@ const PropertyDetails = () => {
     setShowPopup(false);
   };
 
-  // Fetch property details using slug - single source of truth
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -333,8 +330,11 @@ const PropertyDetails = () => {
       return merged;
     });
   };
-  const showEdit = useState(localStorage.getItem("auth-token"));
-  // Use images from web_cards.why_to_choose.image_urls if available, else fallback
+
+  const showEdit = localStorage.getItem('auth-token');
+
+
+
   const galleryImages = property?.web_cards?.why_to_choose?.image_urls?.length
     ? property.web_cards.why_to_choose.image_urls
     : property?.property_images || [];
@@ -1383,7 +1383,7 @@ const PropertyDetails = () => {
                             >
                               <img
                                 src={
-                                  property?.developer.developer_logo ||
+                                  property?.developer?.developer_logo ||
                                   "/img/developer-img/ace-group.webp"
                                 }
                                 className="img-fluid"
