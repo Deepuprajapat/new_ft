@@ -1170,6 +1170,7 @@ const ProjectDetails = () => {
                 name={projectData?.project_name || ""}
                 showEdit={showEdit}
                 handleSave={handleSave}
+                projectData={projectData}
               />
               {/* video presentation */}
               <VideoPresentationSection
@@ -1257,7 +1258,7 @@ const ProjectDetails = () => {
                   altLogo:
                     projectData?.developer_info?.alt_logo|| "",
                   establishedYear:
-                    projectData?.developer_info?.established_year || "",
+                    projectData?.web_cards?.about?.establishment_year || "",
                   totalProjects:
                     projectData?.web_cards?.about?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",

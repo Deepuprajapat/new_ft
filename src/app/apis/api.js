@@ -884,3 +884,17 @@ export const getProjectFromSlug = async (slug,navigate) => {
     return {};
   }
 };
+
+
+export const getAllAmenitiesWithCategorys = async ()=>{
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/internal/amenities`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    return {};
+  }
+
+}

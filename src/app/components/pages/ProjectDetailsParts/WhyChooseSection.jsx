@@ -28,9 +28,18 @@ const WhyChooseSection = ({
   // Sync editingUSPs with displayUSPs when projectData changes (but not during editing)
   useEffect(() => {
     if (!isEditing) {
-      setEditingUSPs(displayUSPs);
+      const uspRawList = projectData?.web_cards?.why_to_choose?.usp_list || [];
+      const newDisplayUSPs = Array(6)
+        .fill("")
+        .map((_, index) =>
+          typeof uspRawList[index] === "string"
+            ? uspRawList[index]
+            : uspRawList[index]?.description || ""
+        );
+      setEditingUSPs(newDisplayUSPs);
     }
-  }, [displayUSPs, isEditing]);
+  }, [projectData, isEditing]);
+  
 
   const handleEdit = () => {
     setEditingUSPs([...displayUSPs]); // Initialize with current values

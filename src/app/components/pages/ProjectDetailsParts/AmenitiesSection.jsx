@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
-import {getAmenties ,patchStaticSiteData} from '../../../apis/api'
+import {getAmenties ,patchStaticSiteData, getAllAmenitiesWithCategorys} from '../../../apis/api'
+import { imgUplod } from '../../../../utils/common.jsx';
 
 const isMobile = window.innerWidth <= 768;
 
@@ -8,7 +9,7 @@ const AmenitiesSection = ({
   amenities = [],
   amenitiesPara = "",
   name = "",
-  onSave, // Optional: callback to save changes to parent or API
+  onSave, 
   showEdit,
   handleSave,
   projectData
@@ -25,8 +26,6 @@ const AmenitiesSection = ({
   });
   const [newCategoryAmenityName, setNewCategoryAmenityName] = useState("");
   const [showAddAmenityModal, setShowAddAmenityModal] = useState(false);
-  const [newAmenityName, setNewAmenityName] = useState("");
-  const [newAmenityIcon, setNewAmenityIcon] = useState("/images/noimage.png");
   // Group amenities by category if not already grouped
   const groupAmenities = (amenitiesList) => {
     if (!amenitiesList || !Array.isArray(amenitiesList)) return [];
@@ -111,16 +110,24 @@ const AmenitiesSection = ({
   const saveAmenitiesChanges = () => {
     const safeProjectData = projectData || {};
     const safeWebCards = safeProjectData.web_cards || {};
+
+    // Build categories_with_amenities from editableAmenities
+    const categories_with_amenities = {};
+    editableAmenities.forEach(category => {
+      categories_with_amenities[category.name] = category.assets.map(asset => ({
+        icon: asset.icon,
+        value: asset.name?.replace(/ /g, '_').toLowerCase() || ''
+      }));
+    });
+
     const updatedData = {
       ...safeProjectData,
-      amenities: editableAmenities,
-      amenitiesPara: editableAmenitiesPara,
       web_cards: {
         ...safeWebCards,
         amenities: {
           ...(safeWebCards.amenities || {}),
-          description: editableAmenitiesPara,
-          amenities: editableAmenities
+          categories_with_amenities,
+          description: editableAmenitiesPara
         }
       }
     };
@@ -134,13 +141,15 @@ const AmenitiesSection = ({
   // Add state for API amenities data
   const [apiAmenities, setApiAmenities] = useState({});
 
-  // Fetch amenities from API when modal opens
+  // Fetch amenities from getAllAmenitiesWithCategorys when modal opens
   useEffect(() => {
     if (showAmenityModal) {
       const fetchAmenities = async () => {
         try {
-          const res = await getAmenties();
-          setApiAmenities(res.data?.categories || {});
+          const res = await getAllAmenitiesWithCategorys();
+          const categories = res?.data?.categories || {};
+          console.log(categories,"ndjjledljned")
+          setApiAmenities(categories);
         } catch (err) {
           setApiAmenities({});
         }
@@ -231,6 +240,15 @@ const AmenitiesSection = ({
     // Optionally reset editableAmenities and editableAmenitiesPara to original values if needed
   };
 
+  const fetchCategoriesWithAmenities = async () => {
+    try {
+      const res = await getAmenties();
+      setApiAmenities(res.data?.amenities?.categories_with_amenities || {});
+    } catch (err) {
+      setApiAmenities({});
+    }
+  };
+
   const handleCreateNewCategory = async () => {
     if (!newCategoryData.name) return;
 
@@ -246,8 +264,9 @@ const AmenitiesSection = ({
       // 3. Call the API to save the new categories
       await patchStaticSiteData(updatedCategories);
 
-      // 4. Update local state
-      setApiAmenities(updatedCategories);
+      // 4. Refresh categories from API
+      await fetchCategoriesWithAmenities();
+
       setEditableAmenities([
         ...editableAmenities,
         {
@@ -270,6 +289,39 @@ const AmenitiesSection = ({
 
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  console.log('projectdataa' , projectData)
+  const categoriesWithAmenities = projectData?.web_cards?.amenities?.categories_with_amenities || {};
+  console.log(categoriesWithAmenities,"ajksdkh")
+
+  // Add state for new amenity form
+  const [showAddAmenityForm, setShowAddAmenityForm] = useState(false);
+  const [newAmenityName, setNewAmenityName] = useState("");
+  const [newAmenityIcon, setNewAmenityIcon] = useState("");
+  const [newAmenityIconPreview, setNewAmenityIconPreview] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [addingAmenity, setAddingAmenity] = useState(false);
+
+  const handleAddAmenitiesToCategory = async () => {
+    if (!selectedCategory || selectedAmenities.length === 0) return;
+    try {
+      const payload = {
+        categories_with_amenities: {
+          categories: {
+            [selectedCategory]: selectedAmenities.map(a => ({ value: a.value, icon: a.icon }))
+          }
+        }
+      };
+      // Call your API here (replace with actual API function if needed)
+      // Example: await patchStaticSiteData(payload);
+      console.log('Sending to API:', payload);
+      // After successful API call, close modal and reset
+      setShowAmenityModal(false);
+      setSelectedAmenities([]);
+      setSelectAll(false);
+    } catch (err) {
+      alert('Failed to add amenities.');
+    }
+  };
 
   return (
     <div
@@ -682,7 +734,6 @@ const AmenitiesSection = ({
                     }}
                   >
                     {cat}
-                    {addedCategories.includes(cat) ? " (Has existing amenities)" : ""}
                   </option>
                 ))}
               </select>
@@ -727,7 +778,6 @@ const AmenitiesSection = ({
               </div>
 
               <div style={{ 
-                flex: 1,
                 overflowY: "auto",
                 border: "1px solid #eee",
                 borderRadius: "6px",
@@ -735,110 +785,100 @@ const AmenitiesSection = ({
                 marginBottom: "16px",
                 maxHeight: "300px",
                 display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
                 gap: "8px",
               }}>
-                {availableAmenities.length > 0 ? (
-                  <>
-                    {availableAmenities.map((amenity) => (
-                      <div
-                        key={amenity.name}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          padding: "12px",
-                          borderRadius: "4px",
-                          backgroundColor: amenity.alreadyAdded ? "#f5f5f5" : "#fff",
-                          cursor: amenity.alreadyAdded ? "not-allowed" : "pointer",
-                          transition: "all 0.2s",
-                          border: "1px solid transparent",
-                          height: "100%",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                          background: "#ffffff",
-                          border: "1px solid #f0f0f0",
-                          minHeight: "60px",
-                        }}
-                        onMouseOver={(e) => !amenity.alreadyAdded && (e.currentTarget.style.backgroundColor = "#f8f9fa")}
-                        onMouseOut={(e) => !amenity.alreadyAdded && (e.currentTarget.style.backgroundColor = "#fff")}
-                        onClick={() => !amenity.alreadyAdded && handleAmenitySelection(amenity)}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedAmenities.some(a => a.name === amenity.name)}
-                          onChange={() => !amenity.alreadyAdded && handleAmenitySelection(amenity)}
-                          disabled={amenity.alreadyAdded}
-                          style={{
-                            width: "16px",
-                            height: "16px",
-                            marginRight: "12px",
-                            cursor: amenity.alreadyAdded ? "not-allowed" : "pointer",
-                          }}
-                        />
-                        <img
-                          src={amenity.icon}
-                          alt={amenity.name}
-                          loading="lazy"
-                          style={{
-                            width: "24px",
-                            height: "24px",
-                            marginRight: "12px",
-                            objectFit: "contain",
-                            opacity: amenity.alreadyAdded ? 0.5 : 1,
-                          }}
-                        />
-                        <span style={{
-                          color: amenity.alreadyAdded ? "#999" : "#333",
-                          fontSize: "14px",
-                          flex: 1,
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}>
-                          {amenity.name}
-                          {amenity.alreadyAdded && " (Already added)"}
-                        </span>
-                      </div>
-                    ))}
-                    <div
-                      key="add-new-amenity"
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        padding: "12px",
-                        borderRadius: "4px",
-                        backgroundColor: "#f4f8fb",
-                        cursor: "pointer",
-                        border: "1px dashed #2067d1",
-                        minHeight: "60px",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.07)",
-                        fontSize: "28px",
-                        color: "#2067d1",
-                        fontWeight: "bold",
-                        transition: "background 0.2s",
-                      }}
-                      onClick={() => setShowAddAmenityModal(true)}
-                      title="Add New Amenity"
-                    >
-                      <span style={{ fontSize: "28px", fontWeight: "bold" }}>+</span>
-                      <span style={{ fontSize: "13px", color: "#2067d1" }}>Add Amenity</span>
-                    </div>
-                  </>
-                ) : (
+                {selectedCategory && apiAmenities[selectedCategory] && (
                   <div style={{
-                    padding: "24px",
-                    textAlign: "center",
-                    color: "#666",
-                    fontSize: "14px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "4px",
-                    border: "1px dashed #ddd",
-                    gridColumn: "1 / -1",
+                    flex: 1,
+                    overflowY: "auto",
+                    border: "1px solid #eee",
+                    borderRadius: "6px",
+                    padding: "8px",
+                    marginBottom: "16px",
+                    maxHeight: "300px",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                    gap: "8px",
                   }}>
-                    No amenities available for this category
+                    {apiAmenities[selectedCategory].map((amenity, idx) => {
+                      const isSelected = selectedAmenities.some(a => a.value === amenity.value);
+                      return (
+                        <div
+                          key={amenity.value || idx}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "12px",
+                            borderRadius: "4px",
+                            backgroundColor: isSelected ? "#e6f0ff" : "#fff",
+                            cursor: "pointer",
+                            border: isSelected ? "2px solid #2067d1" : "1px solid #f0f0f0",
+                            minHeight: "60px",
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.07)",
+                            fontSize: "14px",
+                            color: "#333",
+                            transition: "background 0.2s, border 0.2s"
+                          }}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedAmenities(selectedAmenities.filter(a => a.value !== amenity.value));
+                            } else {
+                              setSelectedAmenities([...selectedAmenities, amenity]);
+                            }
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => {
+                              if (isSelected) {
+                                setSelectedAmenities(selectedAmenities.filter(a => a.value !== amenity.value));
+                              } else {
+                                setSelectedAmenities([...selectedAmenities, amenity]);
+                              }
+                            }}
+                            style={{ marginRight: "12px" }}
+                          />
+                          <img
+                            src={amenity.icon}
+                            alt={amenity.value}
+                            style={{ width: "24px", height: "24px", marginRight: "12px", objectFit: "contain" }}
+                          />
+                          <span style={{ flex: 1 }}>{amenity.value ? amenity.value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : ''}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
+                <div
+                  key="add-new-amenity"
+                  style={{
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "12px",
+                    borderRadius: "4px",
+                    backgroundColor: "#f4f8fb",
+                    cursor: "pointer",
+                    border: "1px dashed #2067d1",
+                    minHeight: "60px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.07)",
+                    fontSize: "18px",
+                    color: "#2067d1",
+                    fontWeight: "bold",
+                    transition: "background 0.2s",
+                    height: "60px", // Match the height of other cards
+                    width: "100%", // Make it fill the grid cell like other cards
+                    justifySelf: "stretch",
+                    alignSelf: "stretch",
+                    textAlign: "center"
+                  }}
+                  onClick={() => setShowAddAmenityForm(true)}
+                  title="Add New Amenity"
+                >
+                  <span style={{ fontSize: "20px", fontWeight: "bold" }}>+</span>
+                  <span style={{ fontSize: "13px", color: "#2067d1" }}>Add Amenity</span>
+                </div>
               </div>
             </div>
 
@@ -894,11 +934,8 @@ const AmenitiesSection = ({
                 </button>
                 <button
                   className="btn btn-primary"
-                  onClick={() => {
-                    handleAddAmenity();
-                    setShowAmenityModal(false);
-                  }}
-                  disabled={selectedAmenities.length === 0}
+                  onClick={handleAddAmenitiesToCategory}
+                  disabled={selectedAmenities.length === 0 || !selectedCategory}
                   style={{
                     width: isMobile ? "100%" : "auto",
                     padding: isMobile ? "12px" : "8px 20px",
@@ -1021,24 +1058,14 @@ const AmenitiesSection = ({
                   accept="image/*"
                   onChange={async (e) => {
                     if (e.target.files && e.target.files[0]) {
-                      const file = e.target.files[0];
-                      // Show loading state
                       setNewCategoryData(prev => ({ ...prev, uploading: true }));
                       try {
                         // Prepare form data for uploadImage API
-                        const formData = new FormData();
-                        formData.append("file_name", file.name);
-                        formData.append("alt_keywords", newCategoryData.name || "category icon");
-                        formData.append("file_path", file);
-                        // Use uploadImage API
-                        const { uploadImage } = await import('../../../apis/api');
-                        const res = await uploadImage({
-                          file_name: file.name,
-                          alt_keywords: newCategoryData.name || "category icon",
-                          file_path: file
-                        });
-                        // Set the icon URL
-                        setNewCategoryData(prev => ({ ...prev, icon: res.url || res.file_path, uploading: false }));
+                        const file = e.target.files[0];
+                        const url = await imgUplod(file, { alt_keywords: "category icon" , file_path: "/new_vi"});
+                        // const s3ImageUrl = await imgUplod(file, { alt_keywords: "project,siteplan,real estate", file_path: "/new_vi" });
+
+                        setNewCategoryData(prev => ({ ...prev, icon: url, uploading: false }));
                       } catch (err) {
                         setNewCategoryData(prev => ({ ...prev, uploading: false }));
                         alert("Failed to upload icon. Please try again.");
@@ -1177,7 +1204,7 @@ const AmenitiesSection = ({
           </div>
         </div>
       )}
-      {showAddAmenityModal && (
+      {showAddAmenityForm && (
         <div
           style={{
             position: "fixed",
@@ -1192,7 +1219,7 @@ const AmenitiesSection = ({
             justifyContent: "center",
             backdropFilter: "blur(4px)",
           }}
-          onClick={() => setShowAddAmenityModal(false)}
+          onClick={() => setShowAddAmenityForm(false)}
         >
           <div
             style={{
@@ -1229,12 +1256,25 @@ const AmenitiesSection = ({
               />
             </div>
             <div style={{ marginBottom: "16px" }}>
-              <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>Icon URL</label>
+              <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>Amenity Icon</label>
               <input
-                type="text"
-                value={newAmenityIcon}
-                onChange={e => setNewAmenityIcon(e.target.value)}
-                placeholder="Enter icon URL"
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setUploading(true);
+                    try {
+                      const file = e.target.files[0];
+                      const url = await imgUplod(file, { alt_keywords: newAmenityName||"icon" , file_path: "/new_vi"});
+
+                      setNewAmenityIcon(url);
+                      setNewAmenityIconPreview(url);
+                    } catch (err) {
+                      alert('Image upload failed');
+                    }
+                    setUploading(false);
+                  }
+                }}
                 style={{
                   width: "100%",
                   padding: "10px 12px",
@@ -1247,10 +1287,19 @@ const AmenitiesSection = ({
                   transition: "border-color 0.2s",
                 }}
               />
+              {newAmenityIconPreview && (
+                <img src={newAmenityIconPreview} alt="Preview" style={{ width: 48, height: 48, objectFit: "contain", borderRadius: 6, border: "1px solid #eee", marginTop: 8 }} />
+              )}
+              {uploading && <span>Uploading...</span>}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
               <button
-                onClick={() => setShowAddAmenityModal(false)}
+                onClick={() => {
+                  setShowAddAmenityForm(false);
+                  setNewAmenityName("");
+                  setNewAmenityIcon("");
+                  setNewAmenityIconPreview("");
+                }}
                 style={{
                   padding: "8px 20px",
                   border: "1px solid #ddd",
@@ -1266,23 +1315,27 @@ const AmenitiesSection = ({
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  if (!newAmenityName) return;
-                  setApiAmenities(prev => {
-                    const updated = { ...prev };
-                    if (updated[selectedCategory]) {
-                      updated[selectedCategory] = [
-                        ...updated[selectedCategory],
-                        { name: newAmenityName, icon: newAmenityIcon || "/images/noimage.png" }
-                      ];
-                    } else {
-                      updated[selectedCategory] = [{ name: newAmenityName, icon: newAmenityIcon || "/images/noimage.png" }];
+                onClick={async () => {
+                  if (!newAmenityName || !newAmenityIcon) return;
+                  if (selectedCategory) {
+                    setAddingAmenity(true);
+                    try {
+                      // Send only the new amenity (name and icon) and the selected category
+                      await patchStaticSiteData({
+                        amenity: {
+                          value: newAmenityName.replace(/ /g, '_').toLowerCase(),
+                          icon: newAmenityIcon
+                        }
+                      });
+                      setShowAddAmenityForm(false);
+                      setNewAmenityName("");
+                      setNewAmenityIcon("");
+                      setNewAmenityIconPreview("");
+                    } catch (err) {
+                      alert('Failed to add amenity.');
                     }
-                    return updated;
-                  });
-                  setShowAddAmenityModal(false);
-                  setNewAmenityName("");
-                  setNewAmenityIcon("/images/noimage.png");
+                    setAddingAmenity(false);
+                  }
                 }}
                 style={{
                   padding: "8px 20px",
@@ -1294,11 +1347,11 @@ const AmenitiesSection = ({
                   backgroundColor: "#2067d1",
                   cursor: "pointer",
                   transition: "all 0.2s",
-                  opacity: !newAmenityName ? 0.6 : 1,
+                  opacity: !newAmenityName || !newAmenityIcon ? 0.6 : 1,
                 }}
-                disabled={!newAmenityName}
+                disabled={!newAmenityName || !newAmenityIcon || addingAmenity}
               >
-                Add Amenity
+                {addingAmenity ? 'Adding...' : 'Add Amenity'}
               </button>
             </div>
           </div>

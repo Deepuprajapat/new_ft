@@ -514,8 +514,8 @@ const ProjectDetailsSection = ({
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
-                      value={editData?.web_cards?.project_details?.project_status?.value || ''}
-                      onChange={e => handleInputChange('web_cards.project_details.project_status.value', e.target.value)}
+                      value={editData?.status || ''}
+                      onChange={e => handleInputChange('status', e.target.value)}
                       maxLength={500}
                     />
                   ) : (
@@ -556,7 +556,7 @@ const ProjectDetailsSection = ({
                   >
                     Property Type
                   </small>
-                  {isEditing ? (
+                  {/* {isEditing ? (
                     <input
                       type="text"
                       className="form-control form-control-sm mt-1"
@@ -564,7 +564,7 @@ const ProjectDetailsSection = ({
                       onChange={e => handleInputChange('web_cards.project_details.type.value', e.target.value)}
                       maxLength={500}
                     />
-                  ) : (
+                  ) : ( */}
                     <p
                       className="mb-0 fw-normal fw-md-bolder"
                       style={{
@@ -580,7 +580,7 @@ const ProjectDetailsSection = ({
                             .toLowerCase()
                             .replace(/^[\w]/, (c) => c.toUpperCase()))}
                     </p>
-                  )}
+                  
                 </div>
               </div>
             </div>
