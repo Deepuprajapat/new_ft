@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import DOMPurify from "dompurify";
-import {getAmenties ,patchStaticSiteData, getAllAmenitiesWithCategorys} from '../../../apis/api'
+import {getAmenties , getAllAmenitiesWithCategorys, Addcategories, Addamentiesforcategory, patchStaticSiteData, deleteamentiesforcategory, deletecategory} from '../../../apis/api'
 import { imgUplod } from '../../../../utils/common.jsx';
 
 const isMobile = window.innerWidth <= 768;
@@ -9,7 +8,6 @@ const AmenitiesSection = ({
   amenities = [],
   amenitiesPara = "",
   name = "",
-  onSave, 
   showEdit,
   handleSave,
   projectData
@@ -74,8 +72,23 @@ const AmenitiesSection = ({
     setEditableAmenities(updated);
   };
 
-  const removeAmenity = (categoryIndex, amenityIndex) => {
+  const removeAmenity = async (categoryIndex, amenityIndex) => {
     const updated = [...editableAmenities];
+    const categoryName = updated[categoryIndex].name;
+    // The amenity value should be the backend value, not the display name
+    // If your asset object has a 'value' field, use that. If not, convert from display name:
+    let amenityValue = updated[categoryIndex].assets[amenityIndex].value;
+    if (!amenityValue) {
+      // Fallback: convert display name to value (e.g., "Car Parking" -> "car_parking")
+      amenityValue = updated[categoryIndex].assets[amenityIndex].name
+        .replace(/ /g, '_')
+        .toLowerCase();
+    }
+
+    // Call the API to delete the amenity
+    await deleteamentiesforcategory(categoryName, amenityValue);
+
+    // Remove from local state
     updated[categoryIndex].assets.splice(amenityIndex, 1);
     setEditableAmenities(updated);
   };
@@ -89,7 +102,12 @@ const AmenitiesSection = ({
     setEditableAmenities(updated);
   };
 
-  const removeCategoryAmenities = (categoryIndex) => {
+  const removeCategoryAmenities = async (categoryIndex) => {
+    const categoryToRemove = editableAmenities[categoryIndex];
+    console.log('categoryToRemove:', categoryToRemove);
+
+    // Call the API to delete the entire category
+    await deletecategory(categoryToRemove?.name || '');
     const updated = editableAmenities.filter((_, index) => index !== categoryIndex);
     setEditableAmenities(updated);
   };
@@ -111,24 +129,26 @@ const AmenitiesSection = ({
     const safeProjectData = projectData || {};
     const safeWebCards = safeProjectData.web_cards || {};
 
-    // Build categories_with_amenities from editableAmenities
-    const categories_with_amenities = {};
+    // Build categories_with_amenities object
+    const categoriesObj = {};
     editableAmenities.forEach(category => {
-      categories_with_amenities[category.name] = category.assets.map(asset => ({
+      categoriesObj[category.name] = category.assets.map(asset => ({
         icon: asset.icon,
         value: asset.name?.replace(/ /g, '_').toLowerCase() || ''
       }));
     });
 
+    // Build amenities object with description and categories_with_amenities
+    const amenitiesObj = {
+      description: editableAmenitiesPara,
+      categories_with_amenities: categoriesObj
+    };
+
     const updatedData = {
       ...safeProjectData,
       web_cards: {
         ...safeWebCards,
-        amenities: {
-          ...(safeWebCards.amenities || {}),
-          categories_with_amenities,
-          description: editableAmenitiesPara
-        }
+        amenities: amenitiesObj
       }
     };
     handleSave(updatedData);
@@ -180,8 +200,7 @@ const AmenitiesSection = ({
     if (selectAll) {
       setSelectedAmenities([]);
     } else {
-      const availableItems = availableAmenities.filter(a => !a.alreadyAdded);
-      setSelectedAmenities(availableItems);
+      setSelectedAmenities(availableAmenities);
     }
     setSelectAll(!selectAll);
   };
@@ -200,39 +219,83 @@ const AmenitiesSection = ({
     }
   };
 
+  // Add this function to patch selected category and amenities
+  const patchSelectedCategoryAmenities = async () => {
+    if (!selectedCategory || selectedAmenities.length === 0) return;
+    const categories = {
+      [selectedCategory]: selectedAmenities
+    };
+    try {
+      await patchStaticSiteData(categories);
+      // Optionally handle success (e.g., show a message)
+    } catch (err) {
+      // Optionally handle error
+    }
+  };
+
   // Update handleAddAmenity to handle multiple selections
-  const handleAddAmenity = () => {
+  const handleAddAmenity = async () => {
     if (selectedAmenities.length === 0) return;
     
-    let updated = [...editableAmenities];
-    let catIndex = updated.findIndex(c => c.name === selectedCategory);
-    
-    if (catIndex === -1) {
-      // Add new category with selected amenities
-      updated.push({ 
-        name: selectedCategory, 
-        assets: selectedAmenities 
-      });
-    } else {
-      // Add new amenities to existing category, avoiding duplicates
-      const existingAmenities = updated[catIndex].assets;
-      const newAmenities = selectedAmenities.filter(
-        newAmenity => !existingAmenities.some(
-          existing => existing.name === newAmenity.name
-        )
-      );
+    try {
+      // First call the API to add amenities
+      const payload = {
+        amenities: selectedAmenities.map(a => ({ 
+          value: a.value || a.name, 
+          icon: a.icon 
+        }))
+      };
+      await Addamentiesforcategory(selectedCategory, payload);
+  
+      // Then update local state
+      let updated = [...editableAmenities];
+      let catIndex = updated.findIndex(c => c.name === selectedCategory);
       
-      if (newAmenities.length > 0) {
-        updated[catIndex].assets = [
-          ...existingAmenities,
-          ...newAmenities
-        ];
+      // Convert selected amenities to the correct format
+      const formattedAmenities = selectedAmenities.map(a => ({
+        name: a.value ? a.value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : a.name,
+        icon: a.icon
+      }));
+      
+      if (catIndex === -1) {
+        // Add new category with selected amenities
+        updated.push({ 
+          name: selectedCategory, 
+          assets: formattedAmenities 
+        });
+      } else {
+        // Add new amenities to existing category, avoiding duplicates
+        const existingAmenities = updated[catIndex].assets;
+        const newAmenities = formattedAmenities.filter(
+          newAmenity => !existingAmenities.some(
+            existing => existing.name === newAmenity.name
+          )
+        );
+        
+        if (newAmenities.length > 0) {
+          updated[catIndex].assets = [
+            ...existingAmenities,
+            ...newAmenities
+          ];
+        }
       }
+      
+      setEditableAmenities(updated);
+      
+      // Refresh API data to reflect changes
+      await fetchCategoriesWithAmenities();
+      
+      // Reset selections but keep category selected
+      setSelectedAmenities([]);
+      setSelectAll(false);
+      
+      // Don't close modal, just show success
+      alert('Amenities added successfully!');
+      
+    } catch (error) {
+      console.error('Error adding amenities:', error);
+      alert('Failed to add amenities. Please try again.');
     }
-    
-    setEditableAmenities(updated);
-    setSelectedAmenities([]);
-    setSelectAll(false);
   };
 
   const handleCancel = () => {
@@ -242,8 +305,10 @@ const AmenitiesSection = ({
 
   const fetchCategoriesWithAmenities = async () => {
     try {
-      const res = await getAmenties();
-      setApiAmenities(res.data?.amenities?.categories_with_amenities || {});
+      // Get the latest data from the API that has all categories
+      const res = await getAllAmenitiesWithCategorys();
+      const categories = res?.data?.categories || {};
+      setApiAmenities(categories);
     } catch (err) {
       setApiAmenities({});
     }
@@ -252,19 +317,11 @@ const AmenitiesSection = ({
   const handleCreateNewCategory = async () => {
     if (!newCategoryData.name) return;
 
-    // 1. Clone the current categories
-    const updatedCategories = { ...apiAmenities };
-
-    // 2. Add the new category
-    updatedCategories[newCategoryData.name] = newCategoryAmenityName
-      ? [{ value: newCategoryAmenityName, icon: newCategoryData.icon }]
-      : [];
-
     try {
-      // 3. Call the API to save the new categories
-      await patchStaticSiteData(updatedCategories);
+      // Call the Addcategories API with the correct payload
+        await Addcategories({ category_name: newCategoryData.name });
 
-      // 4. Refresh categories from API
+      // Refresh categories from API
       await fetchCategoriesWithAmenities();
 
       setEditableAmenities([
@@ -282,6 +339,12 @@ const AmenitiesSection = ({
       });
       setNewCategoryAmenityName("");
       setShowCreateNewCategoryModal(false);
+      setShowAmenityModal(false); // Force close first
+
+      setTimeout(() => {
+        setShowAmenityModal(true); // Reopen after a tick
+        setSelectedCategory("");   // Reset dropdown selection
+      }, 0);
     } catch (error) {
       alert("Failed to save new category. Please try again.");
     }
@@ -289,9 +352,22 @@ const AmenitiesSection = ({
 
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
-  console.log('projectdataa' , projectData)
-  const categoriesWithAmenities = projectData?.web_cards?.amenities?.categories_with_amenities || {};
-  console.log(categoriesWithAmenities,"ajksdkh")
+  // For amenities derived from projectData, use a different variable name:
+  const projectAmenitiesObj = projectData?.web_cards?.amenities || {};
+  const projectAmenities = Object.entries(projectAmenitiesObj)
+    .filter(([key]) => key !== "description")
+    .map(([category, assets]) => ({
+      name: category,
+      assets: Array.isArray(assets)
+        ? assets.map((item) => ({
+            name: item.value
+              ? item.value.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+              : "",
+            icon: item.icon || "",
+          }))
+        : []
+    }));
+  console.log(projectAmenities, "ajksdkh");
 
   // Add state for new amenity form
   const [showAddAmenityForm, setShowAddAmenityForm] = useState(false);
@@ -304,17 +380,11 @@ const AmenitiesSection = ({
   const handleAddAmenitiesToCategory = async () => {
     if (!selectedCategory || selectedAmenities.length === 0) return;
     try {
+      // Prepare the payload as per the required format
       const payload = {
-        categories_with_amenities: {
-          categories: {
-            [selectedCategory]: selectedAmenities.map(a => ({ value: a.value, icon: a.icon }))
-          }
-        }
+        amenities: selectedAmenities.map(a => ({ value: a.value, icon: a.icon }))
       };
-      // Call your API here (replace with actual API function if needed)
-      // Example: await patchStaticSiteData(payload);
-      console.log('Sending to API:', payload);
-      // After successful API call, close modal and reset
+      await Addamentiesforcategory(selectedCategory, payload);
       setShowAmenityModal(false);
       setSelectedAmenities([]);
       setSelectAll(false);
@@ -322,6 +392,14 @@ const AmenitiesSection = ({
       alert('Failed to add amenities.');
     }
   };
+
+  // Add this useEffect after the other useEffects, before the return statement
+  useEffect(() => {
+    if (!isAmenitiesEditing && projectData?.web_cards?.amenities) {
+      setEditableAmenities(groupAmenities(projectData.web_cards.amenities));
+    }
+    // eslint-disable-next-line
+  }, [projectData?.web_cards?.amenities, isAmenitiesEditing]);
 
   return (
     <div
@@ -413,7 +491,7 @@ const AmenitiesSection = ({
           >
             {(isAmenitiesEditing
               ? processEditableAmenities()
-              : groupedAmenities
+              : Array.isArray(amenities) ? amenities : []
             ).map((category, categoryIndex) => (
               <div key={categoryIndex} style={{ marginBottom: "10px" }}>
                 <div style={{ 
@@ -801,7 +879,8 @@ const AmenitiesSection = ({
                     gap: "8px",
                   }}>
                     {apiAmenities[selectedCategory].map((amenity, idx) => {
-                      const isSelected = selectedAmenities.some(a => a.value === amenity.value);
+                      // Use .name for selectedAmenities, since availableAmenities uses .name
+                      const isSelected = selectedAmenities.some(a => a.name === amenity.value);
                       return (
                         <div
                           key={amenity.value || idx}
@@ -821,9 +900,9 @@ const AmenitiesSection = ({
                           }}
                           onClick={() => {
                             if (isSelected) {
-                              setSelectedAmenities(selectedAmenities.filter(a => a.value !== amenity.value));
+                              setSelectedAmenities(selectedAmenities.filter(a => a.name !== amenity.value));
                             } else {
-                              setSelectedAmenities([...selectedAmenities, amenity]);
+                              setSelectedAmenities([...selectedAmenities, { ...amenity, name: amenity.value }]);
                             }
                           }}
                         >
@@ -832,9 +911,9 @@ const AmenitiesSection = ({
                             checked={isSelected}
                             onChange={() => {
                               if (isSelected) {
-                                setSelectedAmenities(selectedAmenities.filter(a => a.value !== amenity.value));
+                                setSelectedAmenities(selectedAmenities.filter(a => a.name !== amenity.value));
                               } else {
-                                setSelectedAmenities([...selectedAmenities, amenity]);
+                                setSelectedAmenities([...selectedAmenities, { ...amenity, name: amenity.value }]);
                               }
                             }}
                             style={{ marginRight: "12px" }}
@@ -934,7 +1013,6 @@ const AmenitiesSection = ({
                 </button>
                 <button
                   className="btn btn-primary"
-                  onClick={handleAddAmenitiesToCategory}
                   disabled={selectedAmenities.length === 0 || !selectedCategory}
                   style={{
                     width: isMobile ? "100%" : "auto",
@@ -949,6 +1027,7 @@ const AmenitiesSection = ({
                     opacity: selectedAmenities.length === 0 ? 0.6 : 1,
                     transition: "all 0.2s",
                   }}
+                  onClick={handleAddAmenity}
                 >
                   Add Selected Amenities ({selectedAmenities.length})
                 </button>
@@ -1048,102 +1127,7 @@ const AmenitiesSection = ({
                   onBlur={(e) => e.target.style.borderColor = "#ddd"}
                 />
               </div>
-              {/* Upload Icon Section */}
-              <div>
-                <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "500", color: "#444" }}>
-                  Upload Icon
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async (e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setNewCategoryData(prev => ({ ...prev, uploading: true }));
-                      try {
-                        // Prepare form data for uploadImage API
-                        const file = e.target.files[0];
-                        const url = await imgUplod(file, { alt_keywords: "category icon" , file_path: "/new_vi"});
-                        // const s3ImageUrl = await imgUplod(file, { alt_keywords: "project,siteplan,real estate", file_path: "/new_vi" });
-
-                        setNewCategoryData(prev => ({ ...prev, icon: url, uploading: false }));
-                      } catch (err) {
-                        setNewCategoryData(prev => ({ ...prev, uploading: false }));
-                        alert("Failed to upload icon. Please try again.");
-                      }
-                    }
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    borderRadius: "6px",
-                    border: "1px solid #ddd",
-                    fontSize: "14px",
-                    color: "#333",
-                    backgroundColor: "#fff",
-                    outline: "none",
-                    transition: "border-color 0.2s",
-                  }}
-                />
-                {/* Show preview and loading */}
-                {newCategoryData.uploading && (
-                  <div style={{ marginTop: "8px", color: "#2067d1", fontSize: "13px" }}>Uploading...</div>
-                )}
-                {newCategoryData.icon && !newCategoryData.uploading && (
-                  <div style={{ marginTop: "8px" }}>
-                    <img src={newCategoryData.icon} alt="Icon Preview" style={{ width: 48, height: 48, objectFit: "contain", borderRadius: 6, border: "1px solid #eee" }} />
-                  </div>
-                )}
-              </div>
-
-              {/* <div>
-                <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "500", color: "#444" }}>
-                  Amenity Name
-                </label>
-                <input
-                  type="text"
-                  value={newCategoryAmenityName}
-                  onChange={(e) => setNewCategoryAmenityName(e.target.value)}
-                  placeholder="Enter amenity name"
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    borderRadius: "6px",
-                    border: "1px solid #ddd",
-                    fontSize: "14px",
-                    color: "#333",
-                    backgroundColor: "#fff",
-                    outline: "none",
-                    transition: "border-color 0.2s",
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = "#2067d1"}
-                  onBlur={(e) => e.target.style.borderColor = "#ddd"}
-                />
-              </div> */}
-
-              {/* <div>
-                <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "500", color: "#444" }}>
-                  Default Icon URL
-                </label>
-                <input
-                  type="text"
-                  value={newCategoryData.icon}
-                  onChange={(e) => setNewCategoryData(prev => ({ ...prev, icon: e.target.value }))}
-                  placeholder="Enter icon URL"
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    borderRadius: "6px",
-                    border: "1px solid #ddd",
-                    fontSize: "14px",
-                    color: "#333",
-                    backgroundColor: "#fff",
-                    outline: "none",
-                    transition: "border-color 0.2s",
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = "#2067d1"}
-                  onBlur={(e) => e.target.style.borderColor = "#ddd"}
-                />
-              </div> */}
+             
             </div>
 
             <div style={{ 
@@ -1254,6 +1238,7 @@ const AmenitiesSection = ({
                   transition: "border-color 0.2s",
                 }}
               />
+              
             </div>
             <div style={{ marginBottom: "16px" }}>
               <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>Amenity Icon</label>
@@ -1317,26 +1302,28 @@ const AmenitiesSection = ({
               <button
                 onClick={async () => {
                   if (!newAmenityName || !newAmenityIcon) return;
-                  if (selectedCategory) {
-                    setAddingAmenity(true);
-                    try {
-                      // Send only the new amenity (name and icon) and the selected category
-                      await patchStaticSiteData({
-                        amenity: {
-                          value: newAmenityName.replace(/ /g, '_').toLowerCase(),
-                          icon: newAmenityIcon
+                  setAddingAmenity(true);
+                  try {
+                    const payload = {
+                      amenities: [
+                        {
+                          icon: newAmenityIcon,
+                          value: newAmenityName
                         }
-                      });
-                      setShowAddAmenityForm(false);
-                      setNewAmenityName("");
-                      setNewAmenityIcon("");
-                      setNewAmenityIconPreview("");
-                    } catch (err) {
-                      alert('Failed to add amenity.');
-                    }
-                    setAddingAmenity(false);
+                      ]
+                    };
+                    await Addamentiesforcategory(selectedCategory, payload);
+                    // Refresh the API data to show new amenity
+                    await fetchCategoriesWithAmenities();
+                    // Reset form but keep the modal open and category selected
+                    setNewAmenityName("");
+                    setNewAmenityIcon("");
+                    setNewAmenityIconPreview("");
+                    setShowAddAmenityForm(false);
+                  } catch (err) {
                   }
-                }}
+                  setAddingAmenity(false);
+                }}    
                 style={{
                   padding: "8px 20px",
                   border: "none",

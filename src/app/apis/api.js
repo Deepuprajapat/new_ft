@@ -898,3 +898,51 @@ export const getAllAmenitiesWithCategorys = async ()=>{
   }
 
 }
+export const Addcategories = async (data)=>{
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/internal/category`,data
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    return {};
+  }
+
+}
+      
+export const Addamentiesforcategory = async (category_name,data)=>{
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/internal/category/${category_name}/amenities`,data,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    return {};
+  }
+}
+
+export const deleteamentiesforcategory = async (category_name,amenity_name)=>{
+  try {
+    const res = await axios.delete(
+      `${BASE_URL}/internal/category/${category_name}/amenities/${amenity_name}`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    return {};
+  }
+}
+
+export const deletecategory = async (category_name)=>{
+  try {   
+    const res = await axios.delete(
+      `${BASE_URL}/internal/category/${category_name}`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error patching project details:", error);
+    return {};
+  }
+}
