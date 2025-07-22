@@ -251,8 +251,26 @@ const PropertyDetails = () => {
   const onSaveProjectDetails = async (newData) => {
     try {
       if (newData?.id) {
-        await patchPropertyDetails(newData.id, newData);
-        setProperty(newData);
+        const response = await patchPropertyDetails(newData.id, newData);
+        console.log("PATCH response:", response);
+        
+        // The API returns data in a nested structure
+        const responseData = response?.data || response;
+        console.log("Current slug:", slug);
+        console.log("Response slug:", responseData?.slug);
+        
+        // Check if the property name changed and we have a new slug
+        if (responseData?.slug && responseData.slug !== slug) {
+          // Navigate to the new URL with the updated slug
+          console.log("Navigating to new URL:", `/propertyforsale/${responseData.slug}`);
+          navigate(`/propertyforsale/${responseData.slug}`, { replace: true });
+        } else if (responseData) {
+          // Update the property with the response data
+          setProperty(responseData);
+        } else {
+          // Fallback to using the newData if no response
+          setProperty(newData);
+        }
       } else {
         console.error("Property ID not found!");
       }

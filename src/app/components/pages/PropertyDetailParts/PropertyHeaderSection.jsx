@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { imgUplod } from "../../../../utils/common";
+import Swal from "sweetalert2";
 
 const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, showPopup, closePopup, BrochurePopupDialog, onSave,showEdit }) => {
   const [showReraDetails, setShowReraDetails] = useState(false);
@@ -95,6 +96,37 @@ const PropertyHeaderSection = ({ property, formatPrice, handleDownloadBrochure, 
     setIsEditing(false);
   };
   const handleSave = async () => {
+    const nameChanged = editData.name !== property?.name;
+    
+    if (nameChanged) {
+      const result = await Swal.fire({
+        title: 'Property Name Change Warning',
+        html: `
+          <div style="text-align: left;">
+            <p><strong>You are about to change the property name from:</strong></p>
+            <p style="color: #dc3545; margin: 8px 0;"><em>"${property?.name}"</em></p>
+            <p><strong>To:</strong></p>
+            <p style="color: #28a745; margin: 8px 0;"><em>"${editData.name}"</em></p>
+            <br>
+            <p style="color: #f39c12;"><strong>⚠️ Warning:</strong></p>
+            <p>This will change the property's URL. Any existing links to this property may no longer work.</p>
+            <p>The new URL will be generated based on the new property name.</p>
+          </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, change the name',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+    }
+
     const updatedHeaderData = {
       ...property, 
       name: editData.name,
