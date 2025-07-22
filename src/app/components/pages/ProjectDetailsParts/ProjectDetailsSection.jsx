@@ -28,7 +28,20 @@ const ProjectDetailsSection = ({
   const [showImgPopup, setImgShowPopup] = useState(false);
 
   const handleEdit = () => {
-    setEditData(JSON.parse(JSON.stringify(projectData)));
+    setEditData({
+      ...JSON.parse(JSON.stringify(projectData)),
+      rera: projectData?.web_cards?.project_details?.rera_number?.value || '',
+      web_cards: {
+        ...projectData.web_cards,
+        project_details: {
+          ...projectData.web_cards?.project_details,
+          project_status: {
+            ...projectData.web_cards?.project_details?.project_status,
+            value: projectData?.web_cards?.project_details?.project_status?.value || projectData?.status || ''
+          }
+        }
+      }
+    });
     setIsEditing(true);
   };
 
@@ -575,8 +588,8 @@ const ProjectDetailsSection = ({
                       <input
                         type="text"
                         className="form-control form-control-sm mt-1"
-                        value={editData?.web_cards?.project_details?.project_status?.value || ''}
-                        onChange={e => handleInputChange('web_cards.project_details.project_status.value', e.target.value)}
+                        value={editData?.status || ''}
+                        onChange={e => setEditData(prev => ({ ...prev, status: e.target.value }))}
                         maxLength={500}
                       />
                     ) : (

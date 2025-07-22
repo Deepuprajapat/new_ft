@@ -9,7 +9,7 @@ import {
   verifyOTP,
   resendOTP,
   patchProjectByTestUrl,
-  getProjectFromSlug
+  getProjectFromSlug,
 } from "../../apis/api";
 import "react-multi-carousel/lib/styles.css";
 import { Helmet } from "react-helmet";
@@ -93,7 +93,7 @@ const ProjectDetails = () => {
   const [siteplanImgUrl, setSiteplanImgUrl] = useState(
     projectData?.web_cards?.site_plan?.image || ""
   );
- 
+
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const handleEdit = () => {
@@ -111,18 +111,17 @@ const ProjectDetails = () => {
       console.log("New project data after update:", newData);
     }
 
-  // Call PATCH API with the updated data
-  try {
-    const projectId = projectData.project_id;
-    const response = await patchProjectByTestUrl(projectId,newData);
-    console.log("Patch API response:", response);
-  } catch (error) {
-    console.error("Error saving project data:", error);
-  }
-  setIsEditing(false);
-};
- 
-
+    // Call PATCH API with the updated data
+    try {
+      const projectId = projectData.project_id;
+      const response = await patchProjectByTestUrl(projectId, newData);
+      console.log("Patch API response:", response);
+    } catch (error) {
+      console.error("Error saving project data:", error);
+      alert(error?.message || error?.toString() || "Error saving project data");
+    }
+    setIsEditing(false);
+  };
 
   const handleInputChange = (field, value) => {
     setProjectData((prev) => ({
@@ -202,7 +201,7 @@ const ProjectDetails = () => {
         }
       } else if (slug) {
         try {
-          const data = await getProjectFromSlug(slug ,navigate);
+          const data = await getProjectFromSlug(slug, navigate);
           if (data) {
             setProjectData(data);
             setDeveloperId(data.developerId);
@@ -237,22 +236,19 @@ const ProjectDetails = () => {
 
     fetchData();
   }, [slug, navigate]);
-  
 
-  
   useEffect(() => {
     if (projectData) {
       const fetchAllProject = async () => {
         try {
           const data = await getAllProject(projectData?.city);
-          console.log(data ,"daya")
+          console.log(data, "daya");
           if (data) {
             // Filter projects based on locality ID
             const filteredProjects = data.filter(
-              (project) =>
-                project?.city === projectData?.city
+              (project) => project?.city === projectData?.city
             );
-        console.log(filteredProjects,"filter")
+            console.log(filteredProjects, "filter");
             // Limit the projects to max 15
             setAllSimilarProjects(filteredProjects.slice(0, 15));
           }
@@ -264,7 +260,6 @@ const ProjectDetails = () => {
       fetchAllProject();
     }
   }, [projectData]);
-
 
   useEffect(() => {
     if (isVideoEditing) {
@@ -293,7 +288,6 @@ const ProjectDetails = () => {
   const addNewVideo = () => {
     setEditableVideos([...editableVideos, ""]);
   };
-
 
   const formatPrice = (price) => {
     if (price === null || price === undefined || price === "")
@@ -360,14 +354,20 @@ const ProjectDetails = () => {
   useEffect(() => {
     const apiAmenities = projectData?.web_cards?.amenities || {};
     // Try both .categories_with_amenities and direct object for backward compatibility
-    const categories = apiAmenities.categories_with_amenities || apiAmenities || {};
+    const categories =
+      apiAmenities.categories_with_amenities || apiAmenities || {};
     const newAmenities = Object.entries(categories)
-      .filter(([key, assets]) => key !== "description" && Array.isArray(assets) && assets.length > 0)
+      .filter(
+        ([key, assets]) =>
+          key !== "description" && Array.isArray(assets) && assets.length > 0
+      )
       .map(([category, assets]) => ({
         name: category,
         assets: assets.map((item) => ({
           name: item.value
-            ? item.value.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+            ? item.value
+                .replace(/_/g, " ")
+                .replace(/\b\w/g, (l) => l.toUpperCase())
             : "",
           icon: item.icon || "",
         })),
@@ -376,7 +376,7 @@ const ProjectDetails = () => {
     setAmenitiesPara(apiAmenities.description || "");
   }, [projectData]);
 
-  console.log("Amenities for UI:", amenities); 
+  console.log("Amenities for UI:", amenities);
 
   function getLeastPriceOfFloorPlan(floorPlan) {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
@@ -419,7 +419,7 @@ const ProjectDetails = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [error, setError] = useState("");
-  const [timer, setTimer] = useState(60); 
+  const [timer, setTimer] = useState(60);
 
   // Handle input change
   const handleChange = (e) => {
@@ -485,7 +485,9 @@ const ProjectDetails = () => {
         setError("");
       } else {
         console.log("Unexpected response format:", response);
-        setError(response?.message || "OTP verification failed. Please try again.");
+        setError(
+          response?.message || "OTP verification failed. Please try again."
+        );
         setOtpVerified(false);
       }
     } catch (error) {
@@ -505,7 +507,10 @@ const ProjectDetails = () => {
         setOtpVerified(true);
         setError("");
       } else {
-        setError(error.response?.data?.message || "Failed to verify OTP. Please try again.");
+        setError(
+          error.response?.data?.message ||
+            "Failed to verify OTP. Please try again."
+        );
         setOtpVerified(false);
       }
     }
@@ -673,19 +678,17 @@ const ProjectDetails = () => {
     setIsModalOpen(false);
   };
 
-
   // Function to clean and extract numbers for sorting
   const cleanQuestion = (question) => {
-    const match = question.match(/^(\d+)[.\s\t]+(.*)/); 
+    const match = question.match(/^(\d+)[.\s\t]+(.*)/);
     return match
       ? { number: parseInt(match[1]), text: match[2] }
       : { number: null, text: question.trim() };
   };
 
-
   const sortedFaqs = projectData?.web_cards?.faqs
     ?.map((faq) => ({ ...faq, ...cleanQuestion(faq.question) }))
-    ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)); 
+    ?.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity));
 
   const imageSrc =
     projectData?.siteplanImg && projectData.siteplanImg.trim() !== ""
@@ -693,7 +696,7 @@ const ProjectDetails = () => {
         ? projectData.siteplanImg
         : `${BASE_URL}${projectData.siteplanImg}`
       : FALLBACK_IMAGE;
-  const { setShortAddress ,setprojectPhoneNumber} = useOutletContext();
+  const { setShortAddress, setprojectPhoneNumber } = useOutletContext();
 
   useEffect(() => {
     if (projectData?.developer_info?.phone) {
@@ -739,8 +742,7 @@ const ProjectDetails = () => {
     (plan) => plan?.planName?.trim() !== "" || plan?.details?.trim() !== ""
   );
 
-
-  const showEdit = localStorage.getItem('auth-token');
+  const showEdit = localStorage.getItem("auth-token");
   return (
     <>
       {projectData && (
@@ -768,7 +770,6 @@ const ProjectDetails = () => {
             ))}
         </Helmet>
       )}
-
 
       <div className="w-100">
         <div className="container-fluid p-0 mb-0 w-100">
@@ -887,8 +888,9 @@ const ProjectDetails = () => {
                 <li key={item} className="mx-1">
                   <a
                     href={`#${item}`}
-                    className={`text-white text-decoration-none ${activeSection === item ? "fw-bold" : ""
-                      }`}
+                    className={`text-white text-decoration-none ${
+                      activeSection === item ? "fw-bold" : ""
+                    }`}
                     style={{
                       fontWeight: activeSection === item ? "bold" : "400",
                       textDecoration:
@@ -1055,9 +1057,10 @@ const ProjectDetails = () => {
         {/* meta form */}
         {showEdit && (
           <div className="d-flex gap-3">
-            <MetaFormSection 
-             projectData={projectData}
-             handleSave={handleSave}/>
+            <MetaFormSection
+              projectData={projectData}
+              handleSave={handleSave}
+            />
           </div>
         )}
         <ProjectHeaderSection
@@ -1142,14 +1145,16 @@ const ProjectDetails = () => {
               >
                 Get Free Consultation for this property. Call us at:{" "}
                 <a
-                  href={`tel:+91${projectData?.locality?.city?.phoneNumber?.[0] ||
+                  href={`tel:+91${
+                    projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595189189"
-                    }`}
+                  }`}
                   style={{ color: "#ffffff", textDecoration: "underline" }}
                 >
-                  {`+91-${projectData?.locality?.city?.phoneNumber?.[0] ||
+                  {`+91-${
+                    projectData?.locality?.city?.phoneNumber?.[0] ||
                     "8595-189-189"
-                    }`}
+                  }`}
                 </a>
               </div>
               {/* Payment Plan */}
@@ -1265,19 +1270,17 @@ const ProjectDetails = () => {
                 developerDetails={{
                   id: projectData?.developer_info?.developer_id || "",
                   logo: projectData?.web_cards?.about?.logo_url || "",
-                  altLogo:
-                    projectData?.developer_info?.alt_logo|| "",
+                  altLogo: projectData?.developer_info?.alt_logo || "",
                   establishedYear:
                     projectData?.developer_info.established_year || "",
                   totalProjects:
                     projectData?.web_cards?.about?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",
                   address:
-                    projectData?.web_cards?.about?.contact_details?.project_address|| "",
-                  name:
-                    projectData?.developer_info?.developer_name|| "",
-                  phone:
-                    projectData?.developer_info?.phone || "",
+                    projectData?.web_cards?.about?.contact_details
+                      ?.project_address || "",
+                  name: projectData?.developer_info?.developer_name || "",
+                  phone: projectData?.developer_info?.phone || "",
                   bookingLink:
                     projectData?.web_cards?.about?.contact_details
                       ?.booking_link || "",
@@ -1296,10 +1299,14 @@ const ProjectDetails = () => {
                 projectData={{
                   ...projectData,
                   faqs:
-                    Array.isArray(projectData?.web_cards?.faqs) && projectData.web_cards.faqs.some(isValidFaq)
+                    Array.isArray(projectData?.web_cards?.faqs) &&
+                    projectData.web_cards.faqs.some(isValidFaq)
                       ? projectData.web_cards.faqs
                       : defaultFaqs.map((faq) => ({
-                          question: injectProjectData(faq.question, projectData),
+                          question: injectProjectData(
+                            faq.question,
+                            projectData
+                          ),
                           answer: injectProjectData(faq.answer, projectData),
                         })),
                   name: projectData?.basic_info?.project_name || "",
@@ -1348,7 +1355,6 @@ const ProjectDetails = () => {
       </div>
     </>
   );
-
 };
 
 export default ProjectDetails;
