@@ -216,68 +216,92 @@ const Header = ({ projectPhoneNumber }) => {
                 <FaSearch />
               </button>
 
-              {/* Search Input */}
-              {showSearch && (
-                <div className="search-overlay">
-                  <Form className="d-flex" onSubmit={handleSearchSubmit}>
-                    <Form.Control
-                      type="search"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      placeholder="Search"
-                      className="search-input"
-                      aria-label="Search"
-                    />
-                  </Form>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* Phone Buttons Container */}
-          <div className="phone-buttons-container">
-            {projectPhoneNumber ? (
-              <button className="phoneButton">
-                <a href={`tel:${projectPhoneNumber}`}>
-                  <FaPhoneAlt /> {projectPhoneNumber}
-                </a>
-              </button>
-            ) : (
-              <>
-                <button className="phoneButton">
-                  <a href="tel:+918595189189">
-                    <FaPhoneAlt /> 8595-189-189
-                  </a>
-                </button>
-                <button className="phoneButton">
-                  <a href="tel:+917428189189">
-                    <FaPhoneAlt /> 7428-189-189
-                  </a>
-                </button>
-              </>
-            )}
-            {/* Logout Button - Only visible when authenticated */}
-            {isAuthenticated && (
-              <button
-                className="phoneButton"
-                style={{ background: "#dc3545" }}
-                onClick={() => setShowLogoutModal(true)}
-              >
-                Logout
-              </button>
-            )}
-          </div>
-        </Nav>
-      </Navbar.Collapse>
-    </Container>
-    {/* Logout Confirmation Modal */}
-    <LogoutModal
-      show={showLogoutModal}
-      handleClose={() => setShowLogoutModal(false)}
-      handleConfirm={handleLogoutConfirm}
-    />
-  </Navbar>
-);
+                {/* Search Input */}
+                {showSearch  && (
+                  <div className="search-overlay">
+                    <Form className="d-flex" onSubmit={handleSearchSubmit}>
+                      <Form.Control
+                        type="search"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        placeholder="Search"
+                        className="search-input"
+                        aria-label="Search"
+                      />
+                    </Form>
+                  </div>
+                )}
+              </div>}
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                {/* Phone Buttons */}
+                {projectPhoneNumber ? (
+                  <button
+                    className="phoneButton"
+                    style={{ background: "#2067d1", marginLeft: "320px" }}
+                  >
+                    <a href={`tel:${projectPhoneNumber}`}>
+                      <FaPhoneAlt /> {projectPhoneNumber}
+                    </a>
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      className="phoneButton"
+                      style={{ background: "#2067d1", marginLeft: "185px" }}
+                    >
+                      <a href="tel:+918595189189">
+                        <FaPhoneAlt /> 8595-189-189
+                      </a>
+                    </button>
+                    <button
+                      className="phoneButton"
+                      style={{ background: "#2067d1" }}
+                    >
+                      <a href="tel:+917428189189">
+                        <FaPhoneAlt /> 7428-189-189
+                      </a>
+                    </button>
+                  </>
+                )}
+                {/* Dashboard & Logout Buttons - Only visible when authenticated */}
+                {isAuthenticated && (
+                  <>
+                    <button
+                      className="phoneButton"
+                      style={{ background: "#28a745", marginLeft: "10px" }}
+                      onClick={() => {
+                        const userRole = localStorage.getItem("user-role");
+                        if (userRole === 'dm') {
+                          navigate('/admin/leads/dashboard');
+                        } else {
+                          navigate('/admin/dashboard');
+                        }
+                      }}
+                    >
+                      Dashboard
+                    </button>
+                    <button
+                      className="phoneButton"
+                      style={{ background: "#dc3545", marginLeft: "10px" }}
+                      onClick={() => setShowLogoutModal(true)}
+                    >
+                      Logout
+                    </button>
+                  </>
+                )}
+              </div>
+            </Nav>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        show={showLogoutModal}
+        handleClose={() => setShowLogoutModal(false)}
+        handleConfirm={handleLogoutConfirm}
+      />
+    </Navbar>
+  );
 };
 
 export default Header;

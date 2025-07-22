@@ -171,7 +171,7 @@
 }
 
 .property-details {
-  padding: 20px;
+  padding: 15px;
 }
 
 .property-title {
@@ -288,15 +288,46 @@
   
   .properties-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 15px;
+  }
+
+  .property-card {
+    padding: 15px;
+    margin-bottom: 0;
+  }
+
+  .property-details {
+    padding: 10px 0;
+  }
+
+  .property-title {
+    font-size: 1.1rem !important;
+    margin-bottom: 8px !important;
+  }
+
+  .property-location {
+    font-size: 0.9rem !important;
+    margin-bottom: 10px !important;
+  }
+
+  .property-stats {
+    margin-bottom: 10px !important;
+  }
+
+  .property-stats .stat {
+    font-size: 0.8rem !important;
   }
   
   .property-actions {
-    flex-direction: column;
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 10px;
   }
   
   .property-actions .btn {
-    flex: none;
+    flex: 1;
+    font-size: 0.75rem;
+    padding: 6px 4px;
   }
 }
 
@@ -406,6 +437,155 @@
   outline: none;
 }
 
+/* Tabs Section */
+.tabs-section {
+  margin-bottom: 20px;
+}
+
+.tabs-section .ant-tabs {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.tabs-section .ant-tabs-tab {
+  padding: 12px 20px;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.tabs-section .ant-tabs-tab i {
+  margin-right: 8px;
+}
+
+.tabs-section .ant-tabs-tab-active {
+  font-weight: 600;
+}
+
+.tabs-section .ant-tabs-content-holder {
+  padding: 20px 0 0 0;
+}
+
+/* Leads Section */
+.leads-section {
+  background: #fff;
+}
+
+.leads-section .ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.leads-section .ant-table-thead > tr > th {
+  background: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+  font-weight: 600;
+  color: #495057;
+}
+
+.leads-section .ant-table-tbody > tr:hover > td {
+  background: #f8f9fa;
+}
+
+/* Lead Statistics Cards */
+.lead-stats-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.lead-stat-card {
+  flex: 1;
+  min-width: 150px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #e9ecef;
+}
+
+.lead-stat-card .stat-value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.lead-stat-card .stat-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lead-stat-card.total {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.lead-stat-card.total .stat-value {
+  color: #1976d2;
+}
+
+.lead-stat-card.verified {
+  background: #e8f5e8;
+  border-color: #4caf50;
+}
+
+.lead-stat-card.verified .stat-value {
+  color: #388e3c;
+}
+
+.lead-stat-card.unverified {
+  background: #fff3e0;
+  border-color: #ff9800;
+}
+
+.lead-stat-card.unverified .stat-value {
+  color: #f57c00;
+}
+
+/* Property Actions */
+.property-actions .btn-info {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+}
+
+.property-actions .btn-info:hover {
+  background-color: #138496;
+  border-color: #117a8b;
+}
+
+/* Ant Design DatePicker custom styles */
+.filters-section .ant-picker {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.filters-section .ant-picker:hover {
+  border-color: #007bff;
+}
+
+.filters-section .ant-picker.ant-picker-focused {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Modal improvements */
+.property-leads-modal {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.property-leads-modal .ant-table-container {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
 @media (max-width: 768px) {
   .filters-row {
     grid-template-columns: 1fr;
@@ -430,5 +610,31 @@
   .pagination .page-link {
     padding: 6px 10px;
     font-size: 0.9rem;
+  }
+
+  .tabs-section .ant-tabs {
+    padding: 15px;
+  }
+
+  .tabs-section .ant-tabs-tab {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .lead-stats-container {
+    flex-direction: column;
+  }
+
+  .lead-stat-card {
+    min-width: auto;
+  }
+
+  .property-actions {
+    flex-wrap: wrap;
+  }
+
+  .property-actions .btn {
+    flex: 1;
+    min-width: 120px;
   }
 }

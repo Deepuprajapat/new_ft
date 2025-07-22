@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
 const WhyToChooseSection = ({ property, onSave ,showEdit}) => {
   const [editMode, setEditMode] = useState(false);
   // Support new structure: property.web_cards.why_to_choose.usp_list and image_urls
-  const uspList = property?.web_cards?.why_to_choose?.usp_list || [];
-  const imageUrls = property?.web_cards?.why_to_choose?.image_urls || [];
-  const [editableUsp, setEditableUsp] = useState([...uspList]);
+  const uspList = useMemo(() => property?.web_cards?.why_to_choose?.usp_list || [], [property?.web_cards?.why_to_choose?.usp_list]);
+  const imageUrls = useMemo(() => property?.web_cards?.why_to_choose?.image_urls || [], [property?.web_cards?.why_to_choose?.image_urls]);
+  const [editableUsp, setEditableUsp] = useState([]);
 
   // Sync editableUsp with uspList when property changes
   useEffect(() => {

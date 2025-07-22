@@ -430,7 +430,7 @@ const PropertyListing = () => {
             <div className="listing-home listing-page mt-4">
               <div className="listing-slide row">
                 <div
-                  className="col-md-8 sticky-scroll"
+                  className="col-12 col-lg-8 sticky-scroll"
                   style={{
                     maxWidth: "100%",
                     maxHeight: "80vh",
@@ -487,10 +487,28 @@ const PropertyListing = () => {
                                       objectFit: "cover",
                                       padding: "5px",
                                     }}
+                                    className="d-none d-sm-block img-fluid"
+                                  />
+                                  <img
+                                    className="d-block d-sm-none img-fluid"
+                                    alt={property.name || "Property"}
+                                    src={
+                                      property.images && property.images.length > 0
+                                        ? property.images[0]
+                                        : "/default-image.jpg"
+                                    }
+                                    loading="lazy"
+                                    style={{
+                                      maxWidth: "100%",
+                                      borderRadius: "10px",
+                                      height: "150px",
+                                      objectFit: "cover",
+                                      padding: "5px",
+                                    }}
                                   />
                                 </a>
                               </div>
-                              <div className="col-md-8">
+                              <div className="col-12 col-sm-8">
                                 <div
                                   className="card-body"
                                   style={{ fontSize: "smaller" }}
@@ -550,7 +568,13 @@ const PropertyListing = () => {
                                         property?.slug
                                       )
                                     }
-                                    className="theme-btn"
+                                    className="theme-btn btn btn-primary btn-sm d-block d-sm-inline-block"
+                                    style={{ 
+                                      fontSize: "12px",
+                                      padding: "8px 12px",
+                                      width: "100%",
+                                      maxWidth: "200px"
+                                    }}
                                   >
                                     Contact Details
                                   </button>
@@ -565,7 +589,7 @@ const PropertyListing = () => {
                 </div>
 
                 {/* Carousel Section */}
-                <div className="col-md-4" id="carousel">
+                <div className="col-12 col-lg-4 d-none d-lg-block" id="carousel">
                   <div
                     className="bord"
                     style={{

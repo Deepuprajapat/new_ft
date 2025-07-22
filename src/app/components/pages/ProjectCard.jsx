@@ -41,7 +41,7 @@ const handleMoreDetails =( slug) => {
   const minPrice = validPrices?.length ? Math.min(...validPrices) : null;
 
   return (
-    <div className="card-im">
+    <div className="card-im w-100">
       <div
         onClick={() => handleMoreDetails(project.slug)}
         style={{ cursor: "pointer" }}

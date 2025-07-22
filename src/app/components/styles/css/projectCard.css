@@ -191,6 +191,31 @@ p {
   .project-title {
     font-size: 1.5em;
   }
+
+  /* Mobile-optimized button styling */
+  .project-card-details-btn {
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+  }
+
+  .project-card-title {
+    font-size: 14px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .project-card-location {
+    font-size: 12px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .project-card-details {
+    font-size: 11px !important;
+  }
+
+  .project-card-price {
+    font-size: 12px !important;
+  }
 }
 
 

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useLocation  } from "react-router-dom";
+import { useParams, useLocation, useNavigate  } from "react-router-dom";
 import BrochurePopupDialog from "./BrochurePopup";
 import {
+  getPropertyBySlug,
+  getPropertyByUrlName,
   patchPropertyDetails,
   sendOTP,
   verifyOTP,
@@ -48,6 +50,8 @@ const PropertyDetails = () => {
   const closeFloorPlanPopup = () => setShowFloorPlanPopup(false);
   
   const location = useLocation();
+  const navigate = useNavigate();
+  const { id: slugFromUrl } = useParams(); // Get slug from URL params
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);
@@ -123,7 +127,10 @@ const PropertyDetails = () => {
         "ORGAINc",
         formData.username,
         formData.usermsg,
-        formData.useremail
+        formData.useremail,
+        "customer",
+        property?.id || "",
+        ""
       );
       if (response) {
         setOtpSent(true);

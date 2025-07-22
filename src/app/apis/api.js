@@ -25,7 +25,7 @@ export const login = async (userName, password) => {
 
 axios.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("x-auth-token");
+    const token = localStorage.getItem("auth-token") || localStorage.getItem("x-auth-token");
     if (token) {
       config.headers.Authorization = `${token}`;
     }
@@ -459,12 +459,14 @@ export const resendOTP = async (phone) => {
 // Admin Leads API Endpoints
 export const getAllLeadsAdmin = async (filters = {}) => {
   try {
-    const token = localStorage.getItem("auth-token");
+    // Handle property_ids array for business partners
+    const params = { ...filters };
+    if (filters.property_ids && Array.isArray(filters.property_ids)) {
+      params.property_ids = filters.property_ids.join(',');
+    }
+    
     const response = await axios.get(`${BASE_URL}/leads`, {
-      headers: {
-        "x-auth-token": token,
-      },
-      params: filters
+      params
     });
     return response.data;
   } catch (error) {
@@ -475,13 +477,9 @@ export const getAllLeadsAdmin = async (filters = {}) => {
 
 export const getLeadsDuplicates = async () => {
   try {
-    const token = localStorage.getItem("auth-token");
     // For now, we'll implement duplicate detection on frontend
     // since there's no specific duplicates endpoint
     const response = await axios.get(`${BASE_URL}/leads`, {
-      headers: {
-        "x-auth-token": token,
-      },
       params: { page: 0, size: 1000 } // Get more data to detect duplicates
     });
     
@@ -570,7 +568,27 @@ export const getPropertyByUrlName = async (urlName) => {
   }
 };
 
+export const getPropertyBySlug = async (slug) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/properties/slug/${slug}`);
+    return res.data || {};
+  } catch (error) {
+    console.error("Error fetching property by slug:", error);
+    return {};
+  }
+};
 
+export const getReraInfoByProjectId = async (projectId) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/rera-info/get/by/project/${projectId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching lead by phone:", error);
+    return [];
+  }
+};
 
 // Get all locations
 export const getAllLocations = async (city) => {

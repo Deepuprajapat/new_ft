@@ -1106,10 +1106,10 @@ footer {
     .listing-slide {
       .card-im {
         border-radius: 15px;
-        width: 330px;
+        width: 100%;
         max-width: 100%;
         background-color: #f7f7f7;
-        padding: 15px;
+        padding: 12px;
 
         .details {
           span {
