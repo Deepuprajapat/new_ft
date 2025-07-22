@@ -242,10 +242,10 @@ const PropertyDetails = () => {
 
 
   const onSaveProjectDetails = async (newData) => {
-    setProperty(newData);
     try {
-      if (property?.id) {
-        const response = await patchPropertyDetails(property.id, newData);
+      if (newData?.id) {
+        await patchPropertyDetails(newData.id, newData);
+        setProperty(newData);
       } else {
         console.error("Property ID not found!");
       }
@@ -260,9 +260,11 @@ const PropertyDetails = () => {
         ...prev,
         web_cards: {
           ...prev.web_cards,
-          ...changedData.web_cards,
+          why_to_choose: {
+            ...prev.web_cards.why_to_choose,
+            usp_list: changedData.web_cards.why_to_choose.usp_list,
+          },
         },
-        ...changedData,
       };
       // Update backend
       if (prev?.id) {

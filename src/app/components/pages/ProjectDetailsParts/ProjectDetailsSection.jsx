@@ -514,9 +514,26 @@ const ProjectDetailsSection = ({
                       fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                       color: "#2067d1",
                     }}
+<<<<<<< HEAD
                   />
                   <div className="text-center text-md-start w-100">
                     <small
+=======
+                  >
+                    Project Status
+                  </small>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="form-control form-control-sm mt-1"
+                      value={editData?.status || ''}
+                      onChange={e => handleInputChange('status', e.target.value)}
+                      maxLength={500}
+                    />
+                  ) : (
+                    <p
+                      className="mb-0 fw-normal fw-md-bolder"
+>>>>>>> 21072025
                       style={{
                         color: "#000",
                         fontSize: window.innerWidth <= 768 ? "11px" : "15px",
@@ -560,15 +577,33 @@ const ProjectDetailsSection = ({
                       fontSize: window.innerWidth <= 768 ? "14px" : "20px",
                       color: "#2067d1",
                     }}
+<<<<<<< HEAD
                   />
                   <div className="text-center text-md-start w-100">
                     <small
+=======
+                  >
+                    Property Type
+                  </small>
+                  {/* {isEditing ? (
+                    <input
+                      type="text"
+                      className="form-control form-control-sm mt-1"
+                      value={editData?.web_cards?.project_details?.type?.value || ''}
+                      onChange={e => handleInputChange('web_cards.project_details.type.value', e.target.value)}
+                      maxLength={500}
+                    />
+                  ) : ( */}
+                    <p
+                      className="mb-0 fw-normal fw-md-bolder"
+>>>>>>> 21072025
                       style={{
                         color: "#000",
                         fontSize: window.innerWidth <= 768 ? "11px" : "15px",
                         fontWeight: "600",
                       }}
                     >
+<<<<<<< HEAD
                       Project Status
                     </small>
                     {isEditing ? (
@@ -593,6 +628,16 @@ const ProjectDetailsSection = ({
                       </p>
                     )}
                   </div>
+=======
+                      {AddProjectButton
+                        ? '-- --'
+                        : (projectData?.web_cards?.project_details?.type?.value &&
+                          projectData?.web_cards?.project_details?.type?.value
+                            .toLowerCase()
+                            .replace(/^[\w]/, (c) => c.toUpperCase()))}
+                    </p>
+                  
+>>>>>>> 21072025
                 </div>
               </div>
 

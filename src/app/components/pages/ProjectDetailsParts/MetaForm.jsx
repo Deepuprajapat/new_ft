@@ -3,6 +3,7 @@ import DOMPurify from "dompurify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faFile, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/css/metaform.css";
+import { imgUplod } from "../../../../utils/common.jsx";
 
 function MetaFormSection({ projectData, handleSave }) {
   const [showMetaForm, setShowMetaForm] = useState(false);
@@ -11,9 +12,11 @@ function MetaFormSection({ projectData, handleSave }) {
   const [metaKeywords, setMetaKeywords] = useState([]);
   const [keywordInput, setKeywordInput] = useState("");
   const [schema, setSchema] = useState("");
-  const [canonical, setCanonical] = useState("");
+  const [slug, setslug] = useState("");
   const [brochure, setBrochure] = useState(null);
   const [brochureError, setBrochureError] = useState("");
+  const [brochureUrl, setBrochureUrl] = useState("");
+  const [brochureUploading, setBrochureUploading] = useState(false);
 
   // Prefill with your provided meta_info JSON when form opens
   useEffect(() => {
@@ -28,15 +31,15 @@ function MetaFormSection({ projectData, handleSave }) {
         try {
           keywords = JSON.parse(keywords).join(", ");
         } catch {
-          // fallback to raw string
         }
       }
+      setBrochureUrl(projectData?.know_about?.download_link)
       setMetaKeywords(keywords ? keywords.split(",").map(k => k.trim()).filter(Boolean) : []);
       setKeywordInput(keywords || "");
       setSchema(Array.isArray(projectData.meta_info.project_schema)
         ? projectData.meta_info.project_schema[0]
         : projectData.meta_info.project_schema || "");
-      setCanonical(projectData.meta_info.canonical || "");
+      setslug(projectData.meta_info.slug || "");
     }
   }, [showMetaForm, projectData]);
 
@@ -51,26 +54,36 @@ function MetaFormSection({ projectData, handleSave }) {
     setMetaKeywords(metaKeywords.filter((_, i) => i !== index));
   };
 
-  const handleBrochureUpload = (event) => {
+  const handleBrochureUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Check file type
       if (file.type !== 'application/pdf') {
         setBrochureError("Please upload a PDF file");
         return;
       }
-      // Check file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         setBrochureError("File size should be less than 10MB");
         return;
       }
       setBrochureError("");
       setBrochure(file);
+      setBrochureUploading(true);
+      try {
+        const url = await imgUplod(file, { alt_keywords: "project,siteplan,real estate", file_path: "/new_vi" });
+
+        setBrochureUrl(url);
+      } catch (error) {
+        setBrochureError("Failed to upload brochure.");
+        console.error(error);
+      } finally {
+        setBrochureUploading(false);
+      }
     }
   };
 
   const removeBrochure = () => {
     setBrochure(null);
+    setBrochureUrl("");
     setBrochureError("");
   };
 
@@ -97,8 +110,9 @@ function MetaFormSection({ projectData, handleSave }) {
       title: metaTitle,
       description: metaDescription,
       keywords: keywordInput,
-      canonical,
-      project_schema: [schema]
+      slug,
+      project_schema: [schema],
+      brochure_url: brochureUrl || undefined
     };
     handleSave({
       ...projectData,
@@ -259,8 +273,8 @@ function MetaFormSection({ projectData, handleSave }) {
                 <input
                   type="text"
                   className="form-control"
-                  value={canonical}
-                  onChange={(e) => handleInputChange(e, setCanonical)}
+                  value={slug}
+                  onChange={(e) => handleInputChange(e, setslug)}
                   placeholder="Canonical URL or slug"
                   style={{ borderRadius: 8, fontSize: 16 }}
                 />
@@ -331,6 +345,11 @@ function MetaFormSection({ projectData, handleSave }) {
                       {brochureError}
                     </div>
                   )}
+                  {brochureUploading && (
+                    <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
+                      Uploading...
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -338,7 +357,7 @@ function MetaFormSection({ projectData, handleSave }) {
                 type="submit"
                 className="btn btn-primary"
                 style={{ borderRadius: 8, fontWeight: 500, cursor: "pointer", justifyContent:'end' }}
-                disabled={!metaTitle || !metaDescription || brochureError}
+                disabled={!metaTitle || !metaDescription || brochureError || brochureUploading}
                 title={!metaTitle || !metaDescription ? "Please fill required fields" : ""}
               >
                 Save

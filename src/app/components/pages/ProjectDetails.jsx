@@ -354,19 +354,29 @@ const ProjectDetails = () => {
     return Object.values(groupedAmenities);
   };
 
-  // API se amenities data map karo
-  const apiAmenities =
-    projectData?.web_cards?.amenities?.categories_with_amenities || {};
-  const amenities = Object.entries(apiAmenities).map(([category, assets]) => ({
-    name: category.charAt(0) + category.slice(1).toLowerCase(),
-    assets: assets.map((item) => ({
-      name: item.value
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (l) => l.toUpperCase()),
-      icon: item.icon,
-    })),
-  }));
-  const amenitiesPara = projectData?.web_cards?.amenities?.description || "";
+  const [amenities, setAmenities] = useState([]);
+  const [amenitiesPara, setAmenitiesPara] = useState("");
+
+  useEffect(() => {
+    const apiAmenities = projectData?.web_cards?.amenities || {};
+    // Try both .categories_with_amenities and direct object for backward compatibility
+    const categories = apiAmenities.categories_with_amenities || apiAmenities || {};
+    const newAmenities = Object.entries(categories)
+      .filter(([key, assets]) => key !== "description" && Array.isArray(assets) && assets.length > 0)
+      .map(([category, assets]) => ({
+        name: category,
+        assets: assets.map((item) => ({
+          name: item.value
+            ? item.value.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+            : "",
+          icon: item.icon || "",
+        })),
+      }));
+    setAmenities(newAmenities);
+    setAmenitiesPara(apiAmenities.description || "");
+  }, [projectData]);
+
+  console.log("Amenities for UI:", amenities); 
 
   function getLeastPriceOfFloorPlan(floorPlan) {
     if (!floorPlan || !Array.isArray(floorPlan) || floorPlan.length === 0) {
@@ -1170,6 +1180,7 @@ const ProjectDetails = () => {
                 name={projectData?.project_name || ""}
                 showEdit={showEdit}
                 handleSave={handleSave}
+                projectData={projectData}
               />
               {/* video presentation */}
               <VideoPresentationSection
@@ -1257,7 +1268,7 @@ const ProjectDetails = () => {
                   altLogo:
                     projectData?.developer_info?.alt_logo|| "",
                   establishedYear:
-                    projectData?.developer_info?.established_year || "",
+                    projectData?.developer_info.established_year || "",
                   totalProjects:
                     projectData?.web_cards?.about?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",

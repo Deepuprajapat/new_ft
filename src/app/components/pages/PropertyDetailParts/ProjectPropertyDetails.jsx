@@ -29,6 +29,7 @@ const renderedFields = [
   "furnishing_type",
   "facing",
   "rera_number",
+  "configuration",
 ];
 
 const ProjectPropertyDetails = ({ property, onSave , ageOfProperty,showEdit}) => {
@@ -66,6 +67,7 @@ const ProjectPropertyDetails = ({ property, onSave , ageOfProperty,showEdit}) =>
       furnishing_type: ["furnishing_type"],
       facing: ["facing"],
       rera_number: ["rera_number"],
+      configuration: ["configuration"],
     };
     console.log(altKeys,"altkeys")
     if (altKeys[field]) {
@@ -95,18 +97,18 @@ const ProjectPropertyDetails = ({ property, onSave , ageOfProperty,showEdit}) =>
   };
 
   // For nested configurationTypeName
-  const handleConfigTypeChange = (e) => {
-    setEditableProperty((prev) => ({
-      ...prev,
-      configuration: {
-        ...prev.configuration,
-        configurationType: {
-          ...prev.configuration?.configurationType,
-          configurationTypeName: e.target.value,
-        },
-      },
-    }));
-  };
+  // const handleConfigTypeChange = (e) => {
+  //   setEditableProperty((prev) => ({
+  //     ...prev,
+  //     configuration: {
+  //       ...prev.configuration,
+  //       configurationType: {
+  //         ...prev.configuration?.configurationType,
+  //         configurationTypeName: e.target.value,
+  //       },
+  //     },
+  //   }));
+  // };
 
   const handleSave = () => {
     setEditMode(false);
@@ -214,32 +216,14 @@ const ProjectPropertyDetails = ({ property, onSave , ageOfProperty,showEdit}) =>
                   {editMode ? (
                     <input
                       type="text"
-                      name="configurationTypeName"
-                      value={editableProperty?.configuration?.configurationType?.configurationTypeName || ""}
-                      onChange={handleConfigTypeChange}
+                      name="configuration"
+                      value={getDetailValue("configuration")}
+                      onChange={handleChange}
                       className="form-control"
                     />
                   ) : (
                     <p className="mb-0 fw-normal fw-md-bolder" style={{ color: "#000", fontSize: window.innerWidth <= 768 ? "12px" : "13px", marginTop: "2px" }}>
-                      {(() => {
-                        let configVal = property?.configuration?.configurationType?.configurationTypeName || property?.configuration;
-                        if (!configVal) return "";
-                        let arr = [];
-                        try {
-                          arr = typeof configVal === "string" ? JSON.parse(configVal) : configVal;
-                        } catch {
-                          arr = Array.isArray(configVal) ? configVal : [configVal];
-                        }
-                        // Only keep BHK configs
-                        const bhkArr = arr.filter((c) => /\d+BHK/.test(c));
-                        if (bhkArr.length > 0) {
-                          // Extract numbers and find min
-                          const minBHK = Math.min(...bhkArr.map((c) => parseInt(c)));
-                          return `${minBHK}BHK`;
-                        }
-                        // fallback: show first config
-                        return arr[0] || configVal;
-                      })()}
+                      {property?.web_cards?.property_details?.configuration?.value || property?.configuration}
                     </p>
                   )}
                 </div>
