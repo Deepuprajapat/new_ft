@@ -12,7 +12,7 @@ const DeveloperPage = () => {
         const fetchDeveloperData = async () => {
             try {
                 const res = await axios.get(`${process.env.REACT_APP_BASE_URL}/developers/${id}`);
-                const matchedDeveloper = res.data.find(
+                const matchedDeveloper = res.data.data.find(
                     (dev) => dev.id === parseInt(id)
                 );
                 setDeveloperData(matchedDeveloper);

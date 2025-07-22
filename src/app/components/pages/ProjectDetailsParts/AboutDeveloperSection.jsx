@@ -22,7 +22,7 @@ const AboutDeveloperSection = ({
     altLogo: developerDetails?.altLogo || "",
     establishedYear: developerDetails?.establishedYear || "",
     totalProjects: developerDetails?.totalProjects || "",
-    about: developerDetails?.about  || "",
+    about: developerDetails?.about || "",
     address: developerDetails?.address || "",
   });
   console.log("developerDetails----------", developerDetails);
@@ -86,7 +86,7 @@ const AboutDeveloperSection = ({
       altLogo: developerDetails?.altLogo || "",
       establishedYear: developerDetails?.establishedYear || "",
       totalProjects: developerDetails?.totalProjects || "",
-      about: developerDetails?.about   || "",
+      about: developerDetails?.about || "",
       address: developerDetails?.address || "",
     });
     setIsDeveloperEditing(false);
@@ -306,26 +306,27 @@ const AboutDeveloperSection = ({
                           __html:
                             expandedIndex === "about"
                               ? developerDetails.about
-                                  .replace(
-                                    /<ul>/g,
-                                    '<ul style="padding-left: 20px; margin-top: 10px;">'
-                                  )
-                                  .replace(
-                                    /<li>/g,
-                                    '<li style="font-size: 1em; color: #666;">'
-                                  )
-                              : developerDetails.about.substring(0, 150) +
-                                "...",
+                                .replace(
+                                  /<ul>/g,
+                                  '<ul style="padding-left: 20px; margin-top: 10px;">'
+                                )
+                                .replace(
+                                  /<li>/g,
+                                  '<li style="font-size: 1em; color: #666;">'
+                                )
+                              : developerDetails.about.substring(0, 350) +
+                              "...",
                         }}
                       />
                       <button
                         onClick={() => {
-                          window.location.href = `/developerPage/${developerDetails?.id}}`;
+                          window.location.href = `/developerPage/${projectData?.developer_info?.developer_id}}`;
+                          // console.log("Developer Page Clicked" , window.location.href);
                         }}
                         className="btn btn-primary"
                         style={{
                           fontSize: window.innerWidth <= 768 ? "12px" : "14px",
-                          backgroundColor: "#2067d1", 
+                          backgroundColor: "#2067d1",
                           color: "#ffffff",
                           fontWeight: "bold",
                           border: "none",
@@ -334,7 +335,7 @@ const AboutDeveloperSection = ({
                           transition: "background-color 0.3s ease"
                         }}
                       >
-                        View Developer Details
+                        Read More
                       </button>
                     </>
                   )}
@@ -391,23 +392,23 @@ const AboutDeveloperSection = ({
                   )}
                   <br />
                   <b>Book Your Site Visit</b>{" "}
-                    <span
-                      onClick={
-                        isMobileView
-                          ? handleDownloadBrochuree
-                          : handleDownloadBrochure
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        cursor: "pointer",
-                        color: "#2067d1",
-                        fontWeight: 700,
-                      }}
-                      id="BookBtn3"
-                    >
-                      Click Here
-                    </span>
+                  <span
+                    onClick={
+                      isMobileView
+                        ? handleDownloadBrochuree
+                        : handleDownloadBrochure
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      cursor: "pointer",
+                      color: "#2067d1",
+                      fontWeight: 700,
+                    }}
+                    id="BookBtn3"
+                  >
+                    Click Here
+                  </span>
                 </p>
               </>
             )}

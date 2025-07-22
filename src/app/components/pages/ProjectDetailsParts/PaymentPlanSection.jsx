@@ -226,58 +226,58 @@ const PaymentPlanSection = ({ projectData, showEdit, handleSave }) => {
               <tbody>
                 {isPaymentEditing
                   ? localPaymentPlans.map((plan, index) => (
-                      <tr key={index}>
-                        <td>
-                          <input
-                            type="text"
-                            value={plan.planName}
-                            onChange={(e) =>
-                              updatePaymentPlan(
-                                index,
-                                "planName",
-                                e.target.value
-                              )
-                            }
-                            className="form-control"
-                          />
-                        </td>
-                        <td>
-                          <textarea
-                            value={plan.details}
-                            onChange={(e) =>
-                              updatePaymentPlan(
-                                index,
-                                "details",
-                                e.target.value
-                              )
-                            }
-                            className="form-control"
-                            style={{ minHeight: "60px", resize: "vertical" }}
-                          />
-                        </td>
-                        <td>
-                          <img
-                            src="/images/delete1.png"
-                            onClick={() => removePaymentPlan(index)}
-                            style={{
-                              padding: "4px",
-                              width: "30px",
-                              marginTop: "10px",
-                              height: "30px",
-                              verticalAlign: "middle",
-                              cursor: "pointer",
-                              marginLeft: "10px",
-                            }}
-                          />
-                        </td>
-                      </tr>
-                    ))
+                    <tr key={index}>
+                      <td>
+                        <input
+                          type="text"
+                          value={plan.planName}
+                          onChange={(e) =>
+                            updatePaymentPlan(
+                              index,
+                              "planName",
+                              e.target.value
+                            )
+                          }
+                          className="form-control"
+                        />
+                      </td>
+                      <td>
+                        <textarea
+                          value={plan.details}
+                          onChange={(e) =>
+                            updatePaymentPlan(
+                              index,
+                              "details",
+                              e.target.value
+                            )
+                          }
+                          className="form-control"
+                          style={{ minHeight: "60px", resize: "vertical" }}
+                        />
+                      </td>
+                      <td>
+                        <img
+                          src="/images/delete1.png"
+                          onClick={() => removePaymentPlan(index)}
+                          style={{
+                            padding: "4px",
+                            width: "30px",
+                            marginTop: "10px",
+                            height: "30px",
+                            verticalAlign: "middle",
+                            cursor: "pointer",
+                            marginLeft: "10px",
+                          }}
+                        />
+                      </td>
+                    </tr>
+                  ))
                   : validPaymentPlans.map((plan, index) => (
-                      <tr key={index}>
-                        <td>{plan?.planName}</td>
-                        <td>{plan?.details}</td>
-                      </tr>
-                    ))}
+                    <tr key={index}>
+                      <td>{plan?.planName}</td>
+                      <td>{plan?.details}</td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
             {isPaymentEditing && (
@@ -302,6 +302,10 @@ const PaymentPlanSection = ({ projectData, showEdit, handleSave }) => {
               </div>
             )}
           </div>
+
+          <span style={{ fontSize: "14px", fontWeight: "400" }}>
+            *Prices are subject to change
+          </span>
         </div>
       </div>
     </div>

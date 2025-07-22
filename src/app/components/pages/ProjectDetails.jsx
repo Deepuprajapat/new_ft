@@ -31,6 +31,7 @@ import ProjectDetailsSection from "./ProjectDetailsParts/ProjectDetailsSection";
 import MetaFormSection from "./ProjectDetailsParts/MetaForm";
 import ProjectGallerySection from "./ProjectDetailsParts/ProjectGallerySection";
 import AboutDeveloperSection from "./ProjectDetailsParts/AboutDeveloperSection";
+
 const BASE_URL = "https://image.investmango.com/images/";
 const FALLBACK_IMAGE = "/images/For-Website.jpg";
 

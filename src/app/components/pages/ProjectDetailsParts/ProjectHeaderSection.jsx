@@ -13,20 +13,20 @@ const ProjectHeaderSection = ({
 }) => {
   // Map API data to camelCase for UI
   const mappedData = {
-    
-    name:  projectData?.project_name || "",
+
+    name: projectData?.project_name || "",
     minPrice: projectData?.minPrice ?? projectData?.min_price ?? "",
     maxPrice: projectData?.maxPrice ?? projectData?.max_price ?? "",
     // developerName: projectData?.developerName || projectData?.web_cards.about.contact_details.name || "",
-    developerName: projectData?.web_cards?.about?.contact_details?.name 
-    ?? projectData?.web_cards?.about?.contact_details?.name 
-    ?? "",
+    developerName: projectData?.web_cards?.about?.contact_details?.name
+      ?? projectData?.web_cards?.about?.contact_details?.name
+      ?? "",
     shortAddress: projectData?.shortAddress || projectData?.location_info?.short_address || "",
     city: projectData?.city || "",
     locality: projectData?.locality || "",
-    reraDetails: projectData?.web_cards?.rera_info?.rera_list || projectData?.rera_info|| [],
+    reraDetails: projectData?.web_cards?.rera_info?.rera_list || projectData?.rera_info || [],
     web_cards: projectData?.web_cards || {},
-    projectLogo: projectData?.web_cards.images?.[0]|| "",
+    projectLogo: projectData?.web_cards.images?.[0] || "",
     floorplans: projectData?.floorplans || [],
     // ...aur bhi fields agar chahiye toh yahan add kar lo
   };
@@ -180,12 +180,12 @@ const ProjectHeaderSection = ({
       try {
         const url = await imgUplod(file, { alt_keywords: editName || 'project-logo', file_path: 'project-logos/' });
         setPendingLogoUrl(url);
-        
+
         const updatedData = {
-            web_cards: {
-                ...(projectData.web_cards || {}),
-                images: [url, ...(projectData.web_cards?.images?.slice(1) || [])],
-            },
+          web_cards: {
+            ...(projectData.web_cards || {}),
+            images: [url, ...(projectData.web_cards?.images?.slice(1) || [])],
+          },
         };
         handleSave(updatedData);
 
@@ -1154,7 +1154,12 @@ const ProjectHeaderSection = ({
                 style={{ fontSize: "25px", fontWeight: "800" }}
               >
                 ₹ {formatPrice(mappedData.minPrice)} - ₹ {formatPrice(mappedData.maxPrice)}
+                <br />
+                <span style={{ fontSize: "14px", fontWeight: "400" }}>
+                  *Prices are subject to change.
+                </span>
               </h2>
+
             )}
           </div>
         </div>

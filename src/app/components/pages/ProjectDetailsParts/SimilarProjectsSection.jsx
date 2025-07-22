@@ -146,7 +146,8 @@ const SimilarProjectsSection = ({
                               >
                                 Starting ₹
                                 <b>
-                                  {project?.min_price}
+                                  {/* {project?.min_price} */}
+                                    {formatPrice(project?.min_price)}
                                 </b>
                               </p>
                             )}
