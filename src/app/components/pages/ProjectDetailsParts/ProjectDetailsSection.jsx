@@ -49,7 +49,22 @@ const ProjectDetailsSection = ({
 
   // Save: update main data
   const handleSaver = () => {
-    handleSave(editData);
+    // Ensure rera_number and establishment_year are nested objects with .value
+    const patchedEditData = {
+      ...editData,
+      web_cards: {
+        ...(editData.web_cards || {}),
+        project_details: {
+          ...(editData.web_cards?.project_details || {}),
+          rera_number: { value: editData.rera || '' },
+        },
+        about: {
+          ...(editData.web_cards?.about || {}),
+          establishment_year: { value: editData.establishment_year || '' },
+        },
+      },
+    };
+    handleSave(patchedEditData);
     setIsEditing(false);
   };
 
@@ -82,43 +97,10 @@ const ProjectDetailsSection = ({
   }, []);
 
   useEffect(() => {
-    // console.log("Projecttttt ID:", projectData?.id);
     if (projectData?.project_id === "d034a904e224b629") {
       setImgShowPopup(true);
     }
   }, [projectData]);
-
-  // const handleArrayInputChange = (field, value) => {
-  //   const arrayValue = value.split(',').map(item => item.trim());
-  //   setProjectData(prev => ({
-  //     ...prev,
-  //     [field]: arrayValue
-  //   }));
-  // };
-
-  //   const getSizeRange = () => {
-  //       if (!projectData?.floorplans || projectData.floorplans.length === 0) {
-  //         return "Size not available";
-  //       }
-  //       const sizes = projectData.floorplans.map(fp => fp.size);
-  //       const minSize = Math.min(...sizes);
-  //       const maxSize = Math.max(...sizes);
-  //       return `${minSize} - ${maxSize} Sq. Ft.`;
-  //     };
-
-  // const formatDate = (dateStr) => {
-  //   if (!dateStr) return "-";
-  //   if (dateStr.toLowerCase().includes("coming")) return "Coming Soon";
-  //   try {
-  //     const date = new Date(isNaN(dateStr) ? dateStr : Number(dateStr));
-  //     return date.toLocaleDateString("en-US", {
-  //       year: "numeric",
-  //       month: "long",
-  //     });
-  //   } catch {
-  //     return dateStr;
-  //   }
-  // };
 
   return (
     <>
@@ -630,15 +612,6 @@ const ProjectDetailsSection = ({
                     >
                       Property Type
                     </small>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        className="form-control form-control-sm mt-1"
-                        value={editData?.web_cards?.project_details?.type?.value || ''}
-                        onChange={e => handleInputChange('web_cards.project_details.type.value', e.target.value)}
-                        maxLength={500}
-                      />
-                    ) : (
                       <p
                         className="mb-0 fw-normal fw-md-bolder"
                         style={{
@@ -654,7 +627,7 @@ const ProjectDetailsSection = ({
                               .toLowerCase()
                               .replace(/^[\w]/, (c) => c.toUpperCase()))}
                       </p>
-                    )}
+              
                   </div>
                 </div>
               </div>
