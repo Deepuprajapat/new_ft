@@ -1272,7 +1272,7 @@ const ProjectDetails = () => {
                   logo: projectData?.web_cards?.about?.logo_url || "",
                   altLogo: projectData?.developer_info?.alt_logo || "",
                   establishedYear:
-                    projectData?.developer_info.established_year || "",
+                    projectData?.web_cards?.about?.establishment_year || "",
                   totalProjects:
                     projectData?.web_cards?.about?.total_projects || "",
                   about: projectData?.web_cards?.about?.description || "",

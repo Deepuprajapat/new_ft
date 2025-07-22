@@ -14,6 +14,8 @@ const AmenitiesSection = ({
 }) => {
   const [isAmenitiesEditing, setIsAmenitiesEditing] = useState(false);
   const [editableAmenities, setEditableAmenities] = useState([]);
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [editableAmenitiesPara, setEditableAmenitiesPara] = useState(amenitiesPara);
   const [showAmenityModal, setShowAmenityModal] = useState(false);
@@ -187,35 +189,133 @@ const AmenitiesSection = ({
     return cat ? cat.assets.map((a) => a.name) : [];
   };
 
-  const availableAmenities = selectedCategory
-    ? (apiAmenities[selectedCategory] || []).map((amenity) => ({
-        name: amenity.value,
-        icon: amenity.icon,
-        alreadyAdded: addedAmenities(selectedCategory).includes(amenity.value),
-      }))
-    : [];
+  // For amenities derived from projectData, use a different variable name:
+  const projectAmenitiesObj = projectData?.web_cards?.amenities || {};
+  const projectAmenities = Object.entries(projectAmenitiesObj)
+    .filter(([key]) => key !== "description")
+    .map(([category, assets]) => ({
+      name: category,
+      assets: Array.isArray(assets)
+        ? assets.map((item) => ({
+            name: item.value || "",
+            displayName: item.value
+              ? item.value.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+              : "",
+            icon: item.icon || "",
+          }))
+        : []
+    }));
 
-  // Add these functions for handling selections
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedAmenities([]);
-    } else {
-      setSelectedAmenities(availableAmenities);
+  // Add state for new amenity form
+  const [showAddAmenityForm, setShowAddAmenityForm] = useState(false);
+  const [newAmenityName, setNewAmenityName] = useState("");
+  const [newAmenityIcon, setNewAmenityIcon] = useState("");
+  const [newAmenityIconPreview, setNewAmenityIconPreview] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [addingAmenity, setAddingAmenity] = useState(false);
+
+  // 1. Replace syncSelectedAmenitiesWithProject
+  const syncSelectedAmenitiesWithProject = () => {
+    if (selectedCategory && apiAmenities[selectedCategory]) {
+      const projectCat = (projectAmenities || []).find(cat => cat.name === selectedCategory);
+      if (projectCat && projectCat.assets) {
+        const projectAmenityNames = projectCat.assets.map(asset => asset.name.toLowerCase());
+        const selectedFromProject = (apiAmenities[selectedCategory] || [])
+          .filter(apiAmenity => {
+            const apiAmenityName = (apiAmenity.value || apiAmenity.name).toLowerCase();
+            return projectAmenityNames.includes(apiAmenityName);
+          })
+          .map(apiAmenity => ({
+            ...apiAmenity,
+            name: apiAmenity.value || apiAmenity.name
+          }));
+        setSelectedAmenities(selectedFromProject);
+        // Update selectAll state based on whether all available amenities are selected
+        const availableNotAdded = (apiAmenities[selectedCategory] || []).filter(a => {
+          const apiName = (a.value || a.name).toLowerCase();
+          return !projectAmenityNames.includes(apiName);
+        });
+        setSelectAll(availableNotAdded.length === 0 && selectedFromProject.length > 0);
+      } else {
+        setSelectedAmenities([]);
+        setSelectAll(false);
+      }
     }
-    setSelectAll(!selectAll);
   };
 
-  const handleAmenitySelection = (amenity) => {
-    const isSelected = selectedAmenities.some(a => a.name === amenity.name);
-    if (isSelected) {
-      setSelectedAmenities(selectedAmenities.filter(a => a.name !== amenity.name));
+  // 2. Update availableAmenities calculation
+  const availableAmenities = selectedCategory && apiAmenities[selectedCategory]
+    ? (apiAmenities[selectedCategory] || []).map((amenity) => {
+        const projectCat = (projectAmenities || []).find(cat => cat.name === selectedCategory);
+        const projectAmenityNames = projectCat ? projectCat.assets.map(asset => asset.name.toLowerCase()) : [];
+        const amenityName = (amenity.value || amenity.name).toLowerCase();
+        return {
+          name: amenity.value || amenity.name,
+          icon: amenity.icon,
+          alreadyAdded: projectAmenityNames.includes(amenityName),
+          value: amenity.value,
+        };
+      })
+    : [];
+
+  // 1. Add a helper function for consistent naming
+  const getAmenityIdentifier = (amenity) => amenity.value || amenity.name;
+
+  // 2. Simplify the Select All checkbox logic
+  const availableForSelection = availableAmenities.filter(a => !a.alreadyAdded);
+  const isAllSelected = availableForSelection.length > 0 &&
+    availableForSelection.every(a =>
+      selectedAmenities.some(sel => sel.name === getAmenityIdentifier(a))
+    );
+
+  // --- Select All Handler ---
+  const handleSelectAll = () => {
+    console.log('Select All clicked');
+    const alreadySelected = selectedAmenities.filter(sel =>
+      availableAmenities.find(av => av.name === sel.name && av.alreadyAdded)
+    );
+    if (isAllSelected) {
+      // Deselect all not-already-added amenities, keep the already-added ones selected
+      setSelectedAmenities(alreadySelected);
       setSelectAll(false);
     } else {
-      const newSelected = [...selectedAmenities, amenity];
+      // Select all available amenities (both already added and not added)
+      const allAvailable = availableAmenities.map(a => ({
+        name: getAmenityIdentifier(a),
+        icon: a.icon,
+        value: a.value
+      }));
+      setSelectedAmenities(allAvailable);
+      setSelectAll(true);
+    }
+    console.log('Current selectedAmenities after Select All:', selectedAmenities);
+  };
+
+  // --- Individual Amenity Selection Handler ---
+  const handleAmenitySelection = (amenity) => {
+    const amenityName = getAmenityIdentifier(amenity);
+    const isSelected = selectedAmenities.some(a => a.name === amenityName);
+    console.log('Amenity clicked:', amenity);
+    console.log('Current selectedAmenities:', selectedAmenities);
+    console.log('IsSelected result:', isSelected);
+    if (isSelected) {
+      const newSelected = selectedAmenities.filter(a => a.name !== amenityName);
       setSelectedAmenities(newSelected);
-      // Check if all available amenities are now selected
-      const availableItems = availableAmenities.filter(a => !a.alreadyAdded);
-      setSelectAll(newSelected.length === availableItems.length);
+      setSelectAll(false);
+    } else {
+      const newSelected = [
+        ...selectedAmenities,
+        {
+          name: amenityName,
+          icon: amenity.icon,
+          value: amenity.value
+        }
+      ];
+      setSelectedAmenities(newSelected);
+      // Update selectAll if all not-already-added are now selected
+      const allNowSelected = availableForSelection.length > 0 &&
+        availableForSelection.every(a => newSelected.some(sel => sel.name === getAmenityIdentifier(a)));
+      setSelectAll(allNowSelected);
     }
   };
 
@@ -237,10 +337,24 @@ const AmenitiesSection = ({
   const handleAddAmenity = async () => {
     if (selectedAmenities.length === 0) return;
     
+    // Find already present amenities in the project for this category
+    const projectCat = (projectAmenities || []).find(cat => cat.name === selectedCategory);
+    const alreadyPresent = projectCat ? projectCat.assets.map(a => a.name.toLowerCase()) : [];
+
+    // Only send new amenities
+    const newAmenities = selectedAmenities.filter(
+      a => !alreadyPresent.includes((a.value || a.name).toLowerCase())
+    );
+
+    if (newAmenities.length === 0) {
+      alert('No new amenities to add.');
+      return;
+    }
+
     try {
       // First call the API to add amenities
       const payload = {
-        amenities: selectedAmenities.map(a => ({ 
+        amenities: newAmenities.map(a => ({ 
           value: a.value || a.name, 
           icon: a.icon 
         }))
@@ -252,7 +366,7 @@ const AmenitiesSection = ({
       let catIndex = updated.findIndex(c => c.name === selectedCategory);
       
       // Convert selected amenities to the correct format
-      const formattedAmenities = selectedAmenities.map(a => ({
+      const formattedAmenities = newAmenities.map(a => ({
         name: a.value ? a.value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : a.name,
         icon: a.icon
       }));
@@ -290,7 +404,8 @@ const AmenitiesSection = ({
       setSelectAll(false);
       
       // Don't close modal, just show success
-      alert('Amenities added successfully!');
+
+      setShowAmenityModal(false);
       
     } catch (error) {
       console.error('Error adding amenities:', error);
@@ -350,33 +465,6 @@ const AmenitiesSection = ({
     }
   };
 
-  const [selectedAmenities, setSelectedAmenities] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
-  // For amenities derived from projectData, use a different variable name:
-  const projectAmenitiesObj = projectData?.web_cards?.amenities || {};
-  const projectAmenities = Object.entries(projectAmenitiesObj)
-    .filter(([key]) => key !== "description")
-    .map(([category, assets]) => ({
-      name: category,
-      assets: Array.isArray(assets)
-        ? assets.map((item) => ({
-            name: item.value
-              ? item.value.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-              : "",
-            icon: item.icon || "",
-          }))
-        : []
-    }));
-  console.log(projectAmenities, "ajksdkh");
-
-  // Add state for new amenity form
-  const [showAddAmenityForm, setShowAddAmenityForm] = useState(false);
-  const [newAmenityName, setNewAmenityName] = useState("");
-  const [newAmenityIcon, setNewAmenityIcon] = useState("");
-  const [newAmenityIconPreview, setNewAmenityIconPreview] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [addingAmenity, setAddingAmenity] = useState(false);
-
   const handleAddAmenitiesToCategory = async () => {
     if (!selectedCategory || selectedAmenities.length === 0) return;
     try {
@@ -400,6 +488,13 @@ const AmenitiesSection = ({
     }
     // eslint-disable-next-line
   }, [projectData?.web_cards?.amenities, isAmenitiesEditing]);
+
+  // 5. Update useEffect to sync when modal opens
+  useEffect(() => {
+    if (showAmenityModal && selectedCategory) {
+      syncSelectedAmenitiesWithProject();
+    }
+  }, [showAmenityModal, selectedCategory]);
 
   return (
     <div
@@ -661,7 +756,12 @@ const AmenitiesSection = ({
           <div style={{ width: isMobile ? "100%" : "auto", display: "flex", justifyContent: isMobile ? "center" : "flex-start" }}>
             <button
               className="btn btn-primary"
-              onClick={() => setShowAmenityModal(true)}
+              onClick={() => {
+                setShowAmenityModal(true);
+                if (selectedCategory) {
+                  syncSelectedAmenitiesWithProject();
+                }
+              }}
               style={{
                 padding: isMobile ? "10px" : "8px 20px",
                 border: "none",
@@ -736,7 +836,7 @@ const AmenitiesSection = ({
                 fontSize: "20px", 
                 fontWeight: "600",
                 color: "#2067d1"
-              }}>Add Amenities</h5>
+              }}>Categories & Amenities</h5>
               <button
                 style={{
                   position: "absolute",
@@ -834,7 +934,7 @@ const AmenitiesSection = ({
                 <input
                   type="checkbox"
                   id="selectAll"
-                  checked={selectAll}
+                  checked={isAllSelected}
                   onChange={handleSelectAll}
                   style={{
                     width: "16px",
@@ -879,8 +979,7 @@ const AmenitiesSection = ({
                     gap: "8px",
                   }}>
                     {apiAmenities[selectedCategory].map((amenity, idx) => {
-                      // Use .name for selectedAmenities, since availableAmenities uses .name
-                      const isSelected = selectedAmenities.some(a => a.name === amenity.value);
+                      const isSelected = selectedAmenities.some(a => a.name === getAmenityIdentifier(amenity));
                       return (
                         <div
                           key={amenity.value || idx}
@@ -898,23 +997,14 @@ const AmenitiesSection = ({
                             color: "#333",
                             transition: "background 0.2s, border 0.2s"
                           }}
-                          onClick={() => {
-                            if (isSelected) {
-                              setSelectedAmenities(selectedAmenities.filter(a => a.name !== amenity.value));
-                            } else {
-                              setSelectedAmenities([...selectedAmenities, { ...amenity, name: amenity.value }]);
-                            }
-                          }}
+                          onClick={() => handleAmenitySelection(amenity)}
                         >
                           <input
                             type="checkbox"
                             checked={isSelected}
-                            onChange={() => {
-                              if (isSelected) {
-                                setSelectedAmenities(selectedAmenities.filter(a => a.name !== amenity.value));
-                              } else {
-                                setSelectedAmenities([...selectedAmenities, { ...amenity, name: amenity.value }]);
-                              }
+                            onChange={e => {
+                              e.stopPropagation();
+                              handleAmenitySelection(amenity);
                             }}
                             style={{ marginRight: "12px" }}
                           />
